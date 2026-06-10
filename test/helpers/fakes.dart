@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wise_workout/boundaries/gateways/ai_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/auth_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/social_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/social_share_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/entities/enums.dart';
@@ -144,6 +146,35 @@ class FakeAiGateway implements AiGateway {
     calls++;
     if (throwOnCall) throw Exception('AI unavailable');
     return result;
+  }
+}
+
+/// Fake SocialGateway — records created/deleted posts.
+class FakeSocialGateway implements SocialGateway {
+  final createdPosts = <Map<String, String?>>[];
+  final deletedIds = <String>[];
+
+  @override
+  Future<String> createWorkoutSharePost({
+    required String userId,
+    required String workoutSessionId,
+    String? body,
+  }) async {
+    createdPosts.add({'userId': userId, 'sessionId': workoutSessionId, 'body': body});
+    return 'post-${createdPosts.length}';
+  }
+
+  @override
+  Future<void> deletePost(String postId) async => deletedIds.add(postId);
+}
+
+/// Fake SocialShareGateway — records platform + text passed to the OS share.
+class FakeSocialShareGateway implements SocialShareGateway {
+  final shares = <(SocialPlatform, String)>[];
+
+  @override
+  Future<void> shareTo(SocialPlatform platform, {required String text}) async {
+    shares.add((platform, text));
   }
 }
 
