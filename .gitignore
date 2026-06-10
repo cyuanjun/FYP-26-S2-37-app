@@ -15,6 +15,10 @@
 # MCP config (may hold access tokens; project_ref is project-local)
 .mcp.json
 
+# Generated code — regenerate with: dart run build_runner build
+*.freezed.dart
+*.g.dart
+
 # Flutter / Dart (for when the app is scaffolded)
 .dart_tool/
 .packages
