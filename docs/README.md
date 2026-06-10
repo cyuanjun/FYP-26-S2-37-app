@@ -1,0 +1,31 @@
+# Wise Workout — Docs
+
+Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code lives in this repo's root; this folder holds the planning, design, and reference material.
+
+## Layout
+
+> **Resuming work?** Read **[STATUS.md](STATUS.md)** first — current progress and next steps.
+
+| Folder | What's in it | Start here |
+|---|---|---|
+| **Requirements** | **The official SRS v2.0 is canonical** (64 use cases + FR/NFR). [requirements/urs.md](requirements/urs.md) is **deprecated** — superseded by the SRS. | SRS v2.0 (team docs) |
+| **[deliverables/](deliverables/)** | FYP submission-document prep — assembly checklists, cross-doc change log, and the PTD/PUM net-new drafts | [ptd-pum-assembly.md](deliverables/ptd-pum-assembly.md), [doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md), [ptd-net-new-sections.md](deliverables/ptd-net-new-sections.md), [pum-net-new-sections.md](deliverables/pum-net-new-sections.md) |
+| **[architecture/](architecture/)** | How the real Flutter app is built | [build-plan.md](architecture/build-plan.md), [bce-design.md](architecture/bce-design.md) |
+| **[reference/](reference/)** | The spec carried over from the design phase — data model, design system, screen-by-screen specs | [database-v1.md](reference/database-v1.md), [screens-v1.md](reference/screens-v1.md) |
+| **[archive/](archive/)** | Legacy docs for the React flow-explorer mock (kept for provenance; not the build target) | — |
+| [project-description.md](project-description.md) | The FYP project brief | — |
+
+## Reading order for someone new
+
+0. [STATUS.md](STATUS.md) — current progress + what's next (if you're resuming).
+1. [project-description.md](project-description.md) — what we're required to build.
+2. **PRD v2.0 + SRS v2.0 + TDM v3.0** (the team's submitted docs) — canonical requirements (PRD/SRS) and system design: architecture, ERD (§8), wireframes (TDM). Divergences between them and engineering decisions are tracked in [deliverables/doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md). ([requirements/urs.md](requirements/urs.md) is deprecated.)
+3. [architecture/build-plan.md](architecture/build-plan.md) — scope, stack, roadmap, team split.
+4. [architecture/bce-design.md](architecture/bce-design.md) — BCE architecture + robustness/sequence diagrams + traceability.
+5. [reference/database-v1.md](reference/database-v1.md) — the 28-entity schema and screen→data map.
+6. [reference/screens-v1.md](reference/screens-v1.md) — per-screen UI specs.
+
+## Notes
+
+- **`reference/` is now canonical.** It's a copy of the design-phase docs; treat it as the source of truth for the build and let the original flow-explorer copies go stale.
+- Some `archive/` docs cite mock source paths (`../app/src/...`, `../CLAUDE.md`) that don't exist in this repo — they're provenance references to the React mock, intentionally left as-is.

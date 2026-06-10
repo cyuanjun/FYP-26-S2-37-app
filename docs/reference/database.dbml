@@ -1,0 +1,382 @@
+// Wise Workout — FYP-26-S2-37 database schema
+// Paste into https://dbdiagram.io to render + export the ERD (PNG / SVG / PDF).
+// Tables are colored + grouped by domain; drag a group to rearrange the layout.
+// Source of truth: docs/database-v1.md  +  app/src/state/types.ts
+// 26 tables. Junction/specialization tables use composite or shared PKs.
+
+//////////////////////////////////////////////////////////////
+// Enums
+//////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////
+// Identity & Auth
+//////////////////////////////////////////////////////////////
+
+Table User [headercolor: #3B5BA5] {
+  userId String [pk]
+  email String [not null, unique]
+  role String [not null]
+  status String [note: 'null = active; admin suspend/unsuspend on #26.1']
+  firstName String
+  lastName String
+  username String [unique, note: 'stored without leading @']
+  avatarUrl String [null]
+  preferredUnits String [not null]
+  bio String [null]
+  notificationPrefs Map<String, bool> [note: 'NotificationTypeKey -> bool map; merged from the old NotificationPreference table']
+  followedExpertIds List<String> [note: 'expert userId[] this user follows (heart on #6/#6.1); merged from the old SavedExpert junction. Distinct from the user-to-user Follow entity in Social (which is mutual friendship); this is a one-way bookmark of marketplace experts.']
+}
+
+Table FitnessProfile [headercolor: #3B5BA5] {
+  userId String [pk, ref: - User.userId, note: 'shared PK — athlete-only specialization (1:1); mirrors ExpertProfile']
+  dateOfBirth DateTime [null]
+  sex String [null]
+  heightCm int [null]
+  weightKg int [null]
+  activityLevel String [null]
+  trainingExperience String [null]
+  restingHeartRate int [null, note: 'bpm — Karvonen HRR baseline for Training Effect (lib/effectEstimate) and #12.2 HR-zone breakdown (lib/advancedAnalytics). null = use default 60. Wearables auto-populate in production.']
+  healthTagIds List<String> [note: 'healthTagId[] (diet / allergy / injury) selected on #13.1; merged from the old UserHealthTag junction']
+  preferredWorkoutTypeIds List<String> [note: 'workoutTypeId[] preferred on #13.1; merged from the old UserWorkoutPreference junction']
+  totalXp int [null, note: 'lifetime XP — bumped by endWorkoutSession via lib/levelXp.xpForSession']
+  currentStreak int [null, note: 'consecutive Mon–Sun weeks with ≥1 ended workout (recomputed live on each session end)']
+}
+
+Table ConnectedDevice [headercolor: #3B5BA5] {
+  connectedDeviceId String [pk]
+  userId String [not null, ref: > User.userId]
+  deviceType String [not null]
+  deviceName String [not null]
+  lastSyncedAt DateTime [null]
+  isActive bool [not null]
+}
+
+//////////////////////////////////////////////////////////////
+// Catalogs
+//////////////////////////////////////////////////////////////
+
+Table WorkoutType [headercolor: #2D6A8E] {
+  workoutTypeId String [pk]
+  name String [not null]
+  slug String [not null, unique]
+  isCustom bool [not null]
+  createdByUserId String [null, ref: > User.userId]
+}
+
+Table HealthTag [headercolor: #2D6A8E] {
+  healthTagId String [pk]
+  kind String [not null, note: 'diet | allergy | injury']
+  name String [not null]
+  isCustom bool [not null]
+  createdByUserId String [null, ref: > User.userId]
+  Note: 'One catalog for diet / allergy / injury tags (collapsed from 3 identical entities)'
+}
+
+//////////////////////////////////////////////////////////////
+// Training & Activity
+//////////////////////////////////////////////////////////////
+
+Table FitnessGoal [headercolor: #2E8B57] {
+  fitnessGoalId String [pk]
+  userId String [not null, ref: > FitnessProfile.userId]
+  primaryGoal String [not null]
+  targetValue double [null]
+  targetUnit String [null]
+  startingValue double [null]
+  timelineWeeks int [null, note: '4 | 8 | 12 | 16 | 24']
+  weeklyCommitmentDays int [null, note: '1-7']
+  createdAt DateTime [not null]
+  achievedAt DateTime [null]
+}
+
+Table FitnessPlan [headercolor: #2E8B57] {
+  fitnessPlanId String [pk]
+  userId String [not null, ref: > FitnessProfile.userId]
+  fitnessGoalId String [not null, ref: > FitnessGoal.fitnessGoalId, note: 'required — plan must target a goal']
+  name String [not null]
+  description String [null]
+  durationWeeks int [not null]
+  workoutsPerWeek int [not null]
+  generationStrategy String [not null, note: "'personalised' = Premium (uses full profile)"]
+  regeneratedCount int [not null]
+  startedAt DateTime [null]
+  isActive bool [not null, note: 'one active plan per user']
+}
+
+Table PlannedWorkout [headercolor: #2E8B57] {
+  plannedWorkoutId String [pk]
+  fitnessPlanId String [not null, ref: > FitnessPlan.fitnessPlanId]
+  workoutTypeId String [not null, ref: > WorkoutType.workoutTypeId]
+  weekNumber int [not null]
+  dayOfWeek int [not null, note: '1-7']
+  durationMinutes int [not null]
+  name String [null, note: 'AI-generated, e.g. "Easy Run"']
+  descriptor String [null]
+  orderIndex int [not null]
+  segments List<WorkoutSegment> [note: 'Premium; WorkoutSegment[] {label, detail, sub?} — any activity']
+  coachingCues List<String> [note: 'Premium; string[]']
+}
+
+Table WorkoutSession [headercolor: #2E8B57] {
+  workoutSessionId String [pk]
+  userId String [not null, ref: > FitnessProfile.userId]
+  workoutTypeId String [not null, ref: > WorkoutType.workoutTypeId]
+  plannedWorkoutId String [null, ref: > PlannedWorkout.plannedWorkoutId, note: 'null = free-form']
+  connectedDeviceId String [null, ref: > ConnectedDevice.connectedDeviceId, note: 'null = manual entry; non-null device determines phone vs wearable via deviceType']
+  startedAt DateTime [not null]
+  endedAt DateTime [null]
+  durationSeconds int [not null]
+  caloriesBurned int [null]
+  avgHeartRate int [null]
+  maxHeartRate int [null]
+  distanceMeters int [null]
+  feelRating String [null]
+  notes String [null, note: 'private to owner']
+  customName String [null]
+  trackPoints List<TrackPoint> [note: 'TrackPoint[] — t, hr, cad, elev, pace; null = no track. Merged from the old WorkoutSessionTrack (1:1)']
+  trackSource String [null, note: "'live' | 'gpx'"]
+}
+
+Table ExerciseLog [headercolor: #2E8B57] {
+  exerciseLogId String [pk]
+  workoutSessionId String [not null, ref: > WorkoutSession.workoutSessionId]
+  exerciseName String [not null]
+  sets int [not null]
+  reps int [not null]
+  weightKg double [null]
+  orderIndex int [not null]
+}
+
+//////////////////////////////////////////////////////////////
+// Social
+//////////////////////////////////////////////////////////////
+
+Table Post [headercolor: #B0457B] {
+  postId String [pk]
+  userId String [not null, ref: > User.userId]
+  kind String [not null]
+  workoutSessionId String [null, ref: > WorkoutSession.workoutSessionId, note: "set when kind='workout_share'"]
+  challengeId String [null, ref: > Challenge.challengeId, note: "set when kind='challenge_result'"]
+  level int [null, note: "set when kind='level_up' — the level reached"]
+  body String [null, note: 'public caption']
+  createdAt DateTime [not null]
+}
+
+Table PostLike [headercolor: #B0457B] {
+  postId String [ref: > Post.postId]
+  userId String [ref: > User.userId]
+
+  indexes {
+    (postId, userId) [pk]
+  }
+}
+
+Table PostComment [headercolor: #B0457B] {
+  commentId String [pk]
+  postId String [not null, ref: > Post.postId]
+  userId String [not null, ref: > User.userId]
+  body String [not null]
+  createdAt DateTime [not null]
+}
+
+Table Challenge [headercolor: #B0457B] {
+  challengeId String [pk]
+  createdByUserId String [null, ref: > User.userId, note: 'null = system/curator-seeded']
+  name String [not null]
+  shortName String [not null]
+  description String [null]
+  icon String [not null, note: 'emoji glyph']
+  visibility String [not null]
+  metricKind String [not null]
+  metric String [not null]
+  targetValue double [null, note: 'required for accumulator, null for best_of']
+  workoutTypeId String [null, ref: > WorkoutType.workoutTypeId, note: 'null = any type qualifies']
+  startedAt DateTime [not null]
+  endedAt DateTime [not null]
+}
+
+Table ChallengeParticipant [headercolor: #B0457B] {
+  challengeId String [ref: > Challenge.challengeId]
+  userId String [ref: > User.userId]
+  workoutSessionId String [null, ref: > WorkoutSession.workoutSessionId, note: 'best_of chosen entry; null for accumulator']
+
+  indexes {
+    (challengeId, userId) [pk]
+  }
+}
+
+Table Follow [headercolor: #B0457B] {
+  followerId String [ref: > User.userId]
+  followingId String [ref: > User.userId]
+
+  indexes {
+    (followerId, followingId) [pk]
+  }
+  Note: 'Mutual friendship — stored as a pair of A->B + B->A rows; no payload columns'
+}
+
+//////////////////////////////////////////////////////////////
+// Experts
+//////////////////////////////////////////////////////////////
+
+Table ExpertCategory [headercolor: #B8860B] {
+  categoryId String [pk, note: 'stable slug, e.g. "strength" (was the expert_specialty enum value)']
+  label String [not null, note: 'display name on chips / filters / pickers']
+  description String [not null, note: 'what the category covers — admin-authored on #29']
+  isActive bool [not null, note: 'false = suspended; hidden from new selection, still resolves labels']
+  Note: 'Marketplace category catalog — admin curates on #29 (add / rename / suspend; never deleted)'
+}
+
+Table ExpertProfile [headercolor: #B8860B] {
+  userId String [pk, ref: - User.userId, note: "shared PK — role='expert' specialization (1:1)"]
+  title String [not null]
+  yearsCoaching int [not null]
+  about String [not null]
+  credentials List<String> [note: 'string[]']
+  specialties List<String> [note: 'CategoryId[] — FK slugs → ExpertCategory.categoryId']
+  ratingAvg double [not null]
+  reviewCount int [not null]
+  clientCount int [not null]
+  verificationStatus String [not null, note: "pending | verified | rejected — 'verified' drives the ✓ badge"]
+}
+
+Table ExpertReview [headercolor: #B8860B] {
+  expertReviewId String [pk]
+  expertUserId String [not null, ref: > ExpertProfile.userId, note: 'the expert reviewed']
+  userId String [not null, ref: > User.userId, note: 'the reviewer (client)']
+  serviceRequestId String [not null, ref: > ServiceRequest.serviceRequestId, note: 'completed engagement; one review per']
+  rating int [not null, note: '1–5 stars']
+  body String [not null]
+  createdAt DateTime [not null]
+  Note: 'Client review shown on #6.1; ratingAvg/reviewCount stay the stored aggregate'
+}
+
+Table ExpertVerificationDocument [headercolor: #B8860B] {
+  expertVerificationDocumentId String [pk]
+  userId String [not null, ref: > ExpertProfile.userId, note: 'the expert who submitted']
+  docType String [not null]
+  title String [not null, note: 'e.g. "Passport", "CSCS Certificate"']
+  fileName String [not null, note: 'mock metadata — production stores a URL']
+  uploadedAt DateTime [not null]
+  Note: 'Proof submitted at (external) signup; admin reviews on #27.1 before approving'
+}
+
+Table ExpertService [headercolor: #B8860B] {
+  expertServiceId String [pk]
+  expertUserId String [not null, ref: > ExpertProfile.userId]
+  status String [not null, note: 'default draft']
+  name String [not null]
+  description String [note: 'short summary, ≤ 200 chars']
+  detailBullets List<String> [note: 'string[]']
+  category String [not null, ref: > ExpertCategory.categoryId, note: 'topic/domain']
+  fulfillment String [not null, note: 'what the deliverable is']
+  pricingModel String [not null]
+  priceCents int [not null, note: '0 = unset (draft)']
+  durationWeeks int [note: 'plan length; null for one-off calls/reviews']
+  acceptingBookings bool [not null]
+  availableDays List<int> [note: 'int[] 1–7 (Mon–Sun)']
+  maxConcurrentClients int [note: 'null = uncapped / n-a']
+  responseTime String [not null]
+  createdAt DateTime [not null]
+}
+
+Table ServiceRequest [headercolor: #B8860B] {
+  serviceRequestId String [pk]
+  userId String [not null, ref: > User.userId, note: 'the requester (client)']
+  expertServiceId String [not null, ref: > ExpertService.expertServiceId]
+  expertUserId String [not null, ref: > User.userId, note: 'denormalised — the expert']
+  quotedPriceCents int [not null, note: 'price snapshot at request time (no payment in mock)']
+  status String [not null, note: 'pending | accepted (ongoing) | completed (review unlocked) | cancelled']
+  requestMessage String [not null, note: "client's goal note sent with the request (required)"]
+  requestedAt DateTime [not null]
+  completedAt DateTime [note: 'stamped when the expert marks the engagement complete on #23.1']
+}
+
+Table Deliverable [headercolor: #B8860B] {
+  deliverableId String [pk]
+  serviceRequestId String [not null, ref: > ServiceRequest.serviceRequestId, note: 'the engagement']
+  title String [not null]
+  note String [note: 'optional cover note']
+  sections List<DeliverableSection> [note: 'DeliverableSection[]: { heading, items: WorkoutSegment[] }']
+  createdAt DateTime [not null]
+}
+
+//////////////////////////////////////////////////////////////
+// Support
+//////////////////////////////////////////////////////////////
+
+Table Feedback [headercolor: #BD5B2E] {
+  feedbackId String [pk]
+  userId String [not null, ref: > User.userId, note: 'submitter']
+  category String [not null]
+  body String [not null, note: 'required, >=10 chars after trim']
+  status String [not null, note: "admin triage (#28); 'new' on submit"]
+  createdAt DateTime [not null]
+}
+
+Table ContactMessage [headercolor: #BD5B2E] {
+  contactMessageId String [pk]
+  submitterName String [not null, note: 'captured by the marketing-site contact form']
+  submitterEmail String [not null, note: 'captured by the marketing-site contact form']
+  message String [not null, note: 'the body of the contact form']
+  status String [not null, note: "'open' until the admin resolves"]
+  response String [note: "admin's reply; null while open"]
+  createdAt DateTime [not null]
+  Note: 'Contact form on the external marketing site — open to anyone, so no User FK. Admin reads + answers on #28/#28.1.'
+}
+
+Table Subscription [headercolor: #3B5BA5] {
+  userId String [pk, ref: > User.userId, note: 'shared key with User — 1:1 specialization for premium role (like FitnessProfile / ExpertProfile)']
+  status String [not null]
+  startedAt DateTime [not null]
+  renewsAt DateTime [not null, note: 'after cancel, the access-until date']
+  priceCents int [not null, note: '999 = $9.99']
+}
+
+//////////////////////////////////////////////////////////////
+// Domain groups — drag a whole group in dbdiagram to arrange
+//////////////////////////////////////////////////////////////
+
+TableGroup "Identity & Auth" [color: #3B5BA5] {
+  User
+  FitnessProfile
+  ConnectedDevice
+  Subscription
+}
+
+TableGroup "Catalogs" [color: #2D6A8E] {
+  WorkoutType
+  HealthTag
+}
+
+TableGroup "Training & Activity" [color: #2E8B57] {
+  FitnessGoal
+  FitnessPlan
+  PlannedWorkout
+  WorkoutSession
+  ExerciseLog
+}
+
+TableGroup "Social" [color: #B0457B] {
+  Post
+  PostLike
+  PostComment
+  Challenge
+  ChallengeParticipant
+  Follow
+}
+
+TableGroup "Experts" [color: #B8860B] {
+  ExpertCategory
+  ExpertProfile
+  ExpertReview
+  ExpertVerificationDocument
+  ExpertService
+  ServiceRequest
+  Deliverable
+}
+
+TableGroup "Support" [color: #BD5B2E] {
+  Feedback
+  ContactMessage
+}
