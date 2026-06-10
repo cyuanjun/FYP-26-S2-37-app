@@ -2,6 +2,8 @@
 
 **Read this first when resuming.** Single source for current progress. Last updated **10 Jun 2026**.
 
+> 🏃 **Want to run/demo the prototype?** See **[prototype-demo-guide.md](prototype-demo-guide.md)** — how to run, a step-by-step manual-test walkthrough (what to do + what you should see), test accounts, and how to verify the backend.
+
 ## One-line state
 **PRD/SRS/TDM submitted and reconciled; PTD/PUM net-new writing drafted.** Backend deployed to Supabase (26 tables + RLS + `end_workout_session` RPC + `summarise-progress` Edge Function). **Flutter app scaffolded (BCE) and the full vertical slice is built, tested (43 tests), and verified on Android + iOS** — log in → record phone-GPS workout → history → AI summary → share. Next: deepen a feature / next sprint, or finish PTD/PUM. (Details below.)
 
