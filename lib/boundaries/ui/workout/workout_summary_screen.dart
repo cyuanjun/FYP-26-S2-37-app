@@ -3,15 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/save_workout_details.dart';
 import '../../../controls/share_workout.dart';
-import '../../../boundaries/gateways/social_share_gateway.dart';
 import '../../../core/format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/workout_type.dart';
 
-/// BOUNDARY (#10 Workout Summary). Post-session recap: stats + XP, name / feel / notes.
-/// Social sharing is added in Phase 5.
+/// BOUNDARY (#10 Workout Summary). Post-session recap: stats + XP, name / feel /
+/// notes, and Share to Social (creates a workout_share Post + named-platform share).
 class WorkoutSummaryScreen extends ConsumerStatefulWidget {
   const WorkoutSummaryScreen({
     super.key,
