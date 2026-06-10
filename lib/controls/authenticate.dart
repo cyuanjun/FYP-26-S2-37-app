@@ -11,6 +11,13 @@ final authChangesProvider = StreamProvider<AuthState>(
   (ref) => ref.watch(authGatewayProvider).onAuthStateChange,
 );
 
+/// The signed-in user's id (null when signed out). A seam that lets controls
+/// avoid depending on the Supabase `User` type — overridable in tests.
+final currentUserIdProvider = Provider<String?>((ref) {
+  ref.watch(authChangesProvider);
+  return ref.watch(authGatewayProvider).currentUser?.id;
+});
+
 /// The signed-in user's Profile (null when signed out). Re-fetches on auth change.
 final currentProfileProvider = FutureProvider<Profile?>((ref) async {
   ref.watch(authChangesProvider);
