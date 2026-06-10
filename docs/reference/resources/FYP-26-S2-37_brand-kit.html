@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseUp — Neon Forge Brand Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --lime:    #B8FF00;
+  --lime-dim:#8CC400;
+  --lime-glow: rgba(184,255,0,0.08);
+  --lime-border: rgba(184,255,0,0.18);
+  --red:     #FF2D55; /* semantic: alert · failure · challenge decline · competitor delta */
+  --blue:    #00B4FF; /* semantic: rest · recovery · info · secondary CTA */
+  --bg:      #111210;
+  --bg2:     #181916;
+  --bg3:     #1E1F1B;
+  --bg4:     #252620;
+  --ink:     #EEEEE8;
+  --muted:   #8A8A84; /* WCAG AA: ≥4.5:1 on --bg2 at 12px+ */
+  --faint:   #333330;
+  --border:  rgba(255,255,255,0.06);
+  --display: 'Barlow Condensed', sans-serif; /* display / headline font */
+  --mono:    'DM Mono', monospace;
+  --sans:    'DM Sans', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.6;
+  cursor:default;
+}
+
+/* ── VERTICAL LINES TEXTURE ── */
+.v-lines{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    90deg,
+    transparent,transparent 79px,
+    rgba(184,255,0,0.025) 79px,rgba(184,255,0,0.025) 80px
+  );
+  pointer-events:none;
+}
+.h-lines{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 79px,
+    rgba(184,255,0,0.015) 79px,rgba(184,255,0,0.015) 80px
+  );
+  pointer-events:none;
+}
+
+/* ── SHARED ── */
+.page{
+  max-width:960px;
+  margin:0 auto;
+  padding:80px 60px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.page:last-child{border-bottom:none;}
+
+.tag{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--lime);
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.tag::before{
+  content:'';
+  display:inline-block;
+  width:20px;height:1px;
+  background:var(--lime);
+}
+.rule{border:none;border-top:1px solid var(--border);margin:52px 0;}
+
+.page-num{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--faint);
+  margin-bottom:40px;
+  letter-spacing:0.12em;
+}
+.page-title{
+  font-family:var(--display);
+  font-size:52px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:-0.03em;
+  line-height:0.95;
+  margin-bottom:52px;
+  color:var(--ink);
+}
+.page-title span{color:var(--lime);}
+
+/* ── COVER ── */
+.cover{
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:0;
+  position:relative;
+  overflow:hidden;
+}
+.cover-inner{
+  max-width:960px;
+  margin:0 auto;
+  padding:52px 60px 60px;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:100vh;
+}
+.cover-corner-tl{
+  position:absolute;top:0;left:0;
+  width:0;height:0;
+  border-style:solid;
+  border-width:200px 200px 0 0;
+  border-color:rgba(184,255,0,0.05) transparent transparent transparent;
+}
+.cover-corner-br{
+  position:absolute;bottom:0;right:0;
+  width:0;height:0;
+  border-style:solid;
+  border-width:0 0 280px 280px;
+  border-color:transparent transparent rgba(184,255,0,0.04) transparent;
+}
+.cover-slash{
+  position:absolute;
+  top:0;bottom:0;
+  right:320px;
+  width:2px;
+  background:rgba(184,255,0,0.06);
+  transform:skewX(-8deg);
+}
+.cover-slash2{
+  position:absolute;
+  top:0;bottom:0;
+  right:280px;
+  width:1px;
+  background:rgba(184,255,0,0.03);
+  transform:skewX(-8deg);
+}
+.cover-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:relative;z-index:2;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:12px;
+}
+.nav-icon{
+  width:40px;height:40px;
+  border-radius:0;
+  background:var(--lime);
+  display:flex;align-items:center;justify-content:center;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
+}
+.nav-wordmark{
+  font-family:var(--display);
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-0.02em;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.nav-wordmark span{color:var(--lime);}
+.nav-meta{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--faint);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  text-align:right;
+  line-height:1.8;
+}
+
+.cover-body{position:relative;z-index:2;}
+.cover-eyebrow{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--lime);
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  margin-bottom:32px;
+  display:flex;align-items:center;gap:12px;
+}
+.cover-eyebrow::before{content:'';width:32px;height:1px;background:var(--lime);}
+
+.cover-title{
+  font-family:var(--display);
+  font-size:96px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:-0.04em;
+  line-height:0.88;
+  color:var(--ink);
+  margin-bottom:40px;
+}
+.cover-title .accent{color:var(--lime);}
+.cover-title .outline{
+  -webkit-text-stroke:2px var(--ink);
+  color:transparent;
+}
+.cover-title .outline-lime{
+  -webkit-text-stroke:2px var(--lime);
+  color:transparent;
+}
+
+.cover-sub{
+  font-family:var(--sans);
+  font-size:15px;
+  color:var(--muted);
+  max-width:360px;
+  line-height:1.75;
+  border-left:2px solid var(--lime);
+  padding-left:20px;
+}
+
+.cover-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  position:relative;z-index:2;
+  padding-top:40px;
+  border-top:1px solid var(--border);
+}
+.cover-index{
+  display:flex;gap:32px;
+}
+.cover-index-item{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:10px;
+  color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;
+}
+.cover-index-dot{width:6px;height:6px;background:var(--lime);}
+
+/* ── LOGO ── */
+.logo-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px;
+  background:var(--border);
+  border:1px solid var(--border);
+  margin-bottom:32px;
+}
+.logo-panel{
+  padding:48px 44px;
+  display:flex;flex-direction:column;gap:24px;
+}
+.logo-lockup{display:flex;align-items:center;gap:14px;}
+.logo-icon{
+  width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+}
+.logo-wm{
+  font-family:var(--display);
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:-0.03em;
+  text-transform:uppercase;
+}
+.logo-panel-label{
+  font-family:var(--mono);
+  font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ICON SIZES */
+.icon-sizes{
+  display:flex;gap:20px;align-items:flex-end;
+  margin-bottom:32px;
+}
+.icon-sz{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.icon-box{
+  display:flex;align-items:center;justify-content:center;
+  background:var(--lime);
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
+}
+.icon-sz-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.08em;}
+
+/* ── COLORS ── */
+.color-main{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr 1fr 1fr;
+  gap:2px;
+  background:var(--border);
+  margin-bottom:16px;
+}
+.color-cell{display:flex;flex-direction:column;}
+.color-fill{flex:1;min-height:120px;}
+.color-info{padding:14px 16px;background:var(--bg2);}
+.color-name{
+  font-family:var(--display);font-size:13px;font-weight:700;
+  letter-spacing:-0.01em;text-transform:uppercase;margin-bottom:3px;
+}
+.color-hex{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.color-role{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4;}
+
+.tint-group{margin-bottom:28px;}
+.tint-label{
+  font-family:var(--mono);font-size:10px;color:var(--muted);
+  letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;
+}
+.tint-row{display:flex;border:1px solid var(--border);overflow:hidden;border-radius:2px;}
+.tint-cell{flex:1;height:40px;}
+
+.usage-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+}
+.usage-card{
+  background:var(--bg2);border:1px solid var(--border);
+  padding:20px;
+}
+.usage-swatch{height:36px;margin-bottom:14px;}
+.usage-title{
+  font-family:var(--display);font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.04em;
+  color:var(--ink);margin-bottom:6px;
+}
+.usage-desc{font-size:11px;color:var(--muted);line-height:1.55;}
+
+/* ── TYPOGRAPHY ── */
+.type-scale{display:flex;flex-direction:column;gap:0;}
+.type-row{
+  display:flex;align-items:center;gap:0;
+  border-bottom:1px solid var(--border);
+}
+.type-row:last-child{border-bottom:none;}
+.type-meta{
+  width:180px;flex-shrink:0;
+  padding:20px 0;
+  border-right:1px solid var(--border);
+  padding-right:20px;
+}
+.type-tag{font-family:var(--mono);font-size:10px;color:var(--lime);letter-spacing:0.1em;text-transform:uppercase;}
+.type-spec{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6;}
+.type-preview{flex:1;padding:20px 28px;}
+
+.pair-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  margin-top:32px;
+}
+.pair-box{background:var(--bg2);border:1px solid var(--border);padding:28px;}
+.pair-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;}
+
+/* ── VOICE ── */
+.voice-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px;
+  background:var(--border);margin-bottom:40px;
+}
+.voice-card{background:var(--bg2);padding:32px;}
+.voice-mode{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--lime);margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.voice-mode::before{content:'';width:16px;height:1px;background:var(--lime);}
+.voice-quote{
+  font-family:var(--display);font-size:20px;font-weight:700;
+  text-transform:uppercase;letter-spacing:-0.02em;
+  color:var(--ink);line-height:1.2;margin-bottom:16px;
+}
+.voice-desc{font-size:12px;color:var(--muted);line-height:1.65;}
+
+.dd-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dd-box{padding:28px;border:1px solid var(--border);}
+.dd-box.do{border-color:var(--lime-border);background:var(--lime-glow);}
+.dd-box.dont{border-color:rgba(255,45,85,0.15);background:rgba(255,45,85,0.04);}
+.dd-title{
+  font-family:var(--display);font-size:13px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.04em;margin-bottom:18px;
+}
+.dd-box.do .dd-title{color:var(--lime);}
+.dd-box.dont .dd-title{color:var(--red);}
+.dd-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.dd-item{display:flex;gap:10px;font-size:12px;color:var(--muted);line-height:1.55;align-items:flex-start;}
+.dd-mark{font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.dd-box.do .dd-mark{color:var(--lime);}
+.dd-box.dont .dd-mark{color:var(--red);}
+
+/* ── TAGLINES ── */
+.tagline-stack{display:flex;flex-direction:column;gap:2px;background:var(--border);margin-bottom:40px;}
+.tl-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 36px;background:var(--bg2);
+  position:relative;overflow:hidden;
+}
+.tl-row.primary{background:var(--lime);padding:36px 36px;}
+.tl-row.primary::after{
+  content:'PRIMARY';
+  position:absolute;right:36px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:9px;letter-spacing:0.16em;
+  color:rgba(17,18,16,0.35);
+}
+.tl-text{
+  font-family:var(--display);font-size:24px;font-weight:800;
+  text-transform:uppercase;letter-spacing:-0.02em;
+}
+.tl-row.primary .tl-text{color:#111210;}
+.tl-use{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--muted);
+  background:var(--bg3);padding:5px 12px;
+}
+.tl-row.primary .tl-use{background:rgba(17,18,16,0.12);color:rgba(17,18,16,0.5);}
+
+.naming-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);}
+.naming-cell{background:var(--bg2);padding:24px 22px;}
+.naming-cat{font-family:var(--mono);font-size:9px;color:var(--lime);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;}
+.naming-word{
+  font-family:var(--display);font-size:18px;font-weight:800;
+  text-transform:uppercase;letter-spacing:-0.02em;color:var(--ink);margin-bottom:8px;
+}
+.naming-desc{font-size:11px;color:var(--muted);line-height:1.55;}
+
+/* ── MOTION ── */
+.motion-row{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);margin-bottom:32px;}
+.motion-cell{background:var(--bg2);padding:28px 24px;}
+.motion-val{
+  font-family:var(--mono);font-size:28px;font-weight:500;
+  color:var(--lime);letter-spacing:-0.02em;margin-bottom:8px;
+}
+.motion-name{
+  font-family:var(--display);font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);margin-bottom:6px;
+}
+.motion-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+
+.easing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.easing-box{background:var(--bg2);border:1px solid var(--border);padding:20px;}
+.easing-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;
+}
+.easing-row:last-child{border-bottom:none;}
+.easing-key{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:11px;color:var(--ink);}
+.easing-val{font-family:var(--mono);font-size:10px;color:var(--muted);}
+
+/* ── COMPONENTS ── */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);margin-bottom:16px;}
+.comp-panel{background:var(--bg2);padding:28px;}
+.comp-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+}
+.comp-label::before{content:'';width:14px;height:1px;background:var(--muted);}
+
+/* Buttons */
+.btn-col{display:flex;flex-direction:column;gap:10px;}
+.btn{
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:13px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.04em;
+  padding:13px 24px;cursor:pointer;border:none;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);
+}
+.btn-lime{background:var(--lime);color:#111210;}
+.btn-dark{background:var(--bg4);color:var(--ink);border:1px solid var(--border);}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid rgba(255,255,255,0.15);clip-path:none;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-ghost{background:var(--lime-glow);color:var(--lime);border:1px solid var(--lime-border);clip-path:none;}
+
+/* Badges */
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;
+  font-family:var(--mono);font-size:10px;letter-spacing:0.06em;
+  font-weight:500;text-transform:uppercase;
+}
+.badge-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.badge-live{background:rgba(184,255,0,0.12);color:var(--lime);border:1px solid var(--lime-border);}
+.badge-live .badge-dot{background:var(--lime);}
+.badge-battle{background:var(--lime);color:#111210;}
+.badge-battle .badge-dot{background:#111210;}
+.badge-rest{background:rgba(0,180,255,0.1);color:var(--blue);border:1px solid rgba(0,180,255,0.2);}
+.badge-rest .badge-dot{background:var(--blue);}
+.badge-red{background:rgba(255,45,85,0.1);color:var(--red);border:1px solid rgba(255,45,85,0.2);}
+.badge-red .badge-dot{background:var(--red);}
+.badge-pro{background:var(--bg4);color:var(--ink);border:1px solid var(--border);}
+
+/* Stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);}
+.stat-cell{background:var(--bg3);padding:18px 16px;}
+.stat-num{
+  font-family:var(--mono);font-size:24px;font-weight:500;
+  letter-spacing:-0.02em;color:var(--ink);margin-bottom:3px;
+}
+.stat-lbl{font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:0.06em;text-transform:uppercase;}
+
+/* Alerts */
+.alert-stack{display:flex;flex-direction:column;gap:2px;background:var(--border);}
+.alert{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:16px 18px;font-size:13px;line-height:1.5;
+}
+.alert-icon{
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,0 100%);
+}
+.alert-success{background:rgba(184,255,0,0.07);color:var(--lime);}
+.alert-success .alert-icon{background:rgba(184,255,0,0.15);}
+.alert-warn{background:rgba(255,45,85,0.07);color:#FF7090;}
+.alert-warn .alert-icon{background:rgba(255,45,85,0.15);}
+.alert-info{background:rgba(0,180,255,0.07);color:var(--blue);}
+.alert-info .alert-icon{background:rgba(0,180,255,0.15);}
+
+/* Progress */
+.prog-stack{display:flex;flex-direction:column;gap:16px;}
+.prog-item{}
+.prog-head{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px;}
+.prog-key{font-family:var(--display);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);}
+.prog-val{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.prog-bar{height:4px;background:var(--faint);position:relative;overflow:visible;}
+.prog-fill{height:100%;position:relative;}
+.prog-fill::after{
+  content:'';position:absolute;right:0;top:50%;
+  transform:translate(50%,-50%);
+  width:8px;height:8px;
+  background:var(--lime);
+  clip-path:polygon(0 0,calc(100% - 3px) 0,100% 3px,100% 100%,0 100%);
+}
+
+/* Leaderboard */
+.lb-list{display:flex;flex-direction:column;gap:2px;background:var(--border);}
+.lb-row{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;background:var(--bg2);
+}
+.lb-row.you{background:var(--lime-glow);border:1px solid var(--lime-border);}
+.lb-rank{
+  font-family:var(--mono);font-size:13px;font-weight:500;
+  color:var(--muted);width:22px;text-align:center;flex-shrink:0;
+}
+.lb-row:first-child .lb-rank{color:var(--lime);}
+.lb-avatar{
+  width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:11px;font-weight:700;
+  flex-shrink:0;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%);
+}
+.lb-name{
+  flex:1;
+  font-family:var(--display);font-size:13px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.02em;color:var(--ink);
+}
+.lb-pts{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.lb-delta{font-family:var(--mono);font-size:11px;color:var(--lime);}
+
+/* ── IMAGERY ── */
+.imagery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);margin-bottom:32px;}
+.img-card{}
+.img-visual{height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.img-label{padding:16px 18px;background:var(--bg2);}
+.img-title{
+  font-family:var(--display);font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);margin-bottom:4px;
+}
+.img-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.06em;}
+
+.photo-rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.photo-rule{padding:24px;border:1px solid var(--border);}
+.photo-rule.do{border-color:var(--lime-border);background:var(--lime-glow);}
+.photo-rule.dont{border-color:rgba(255,45,85,0.15);background:rgba(255,45,85,0.04);}
+.photo-rule-title{
+  font-family:var(--display);font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;
+}
+.photo-rule.do .photo-rule-title{color:var(--lime);}
+.photo-rule.dont .photo-rule-title{color:var(--red);}
+.photo-rule-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.photo-rule-list li{font-size:12px;color:var(--muted);display:flex;gap:8px;line-height:1.5;}
+
+/* ── SPACING ── */
+.spacing-track{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:40px;}
+.spacing-unit{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.spacing-block{background:rgba(184,255,0,0.12);border:1px dashed rgba(184,255,0,0.3);width:44px;}
+.spacing-v{font-family:var(--mono);font-size:10px;color:var(--lime);}
+.spacing-n{font-size:10px;color:var(--muted);}
+
+.radius-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;}
+.radius-demo{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.radius-box{
+  width:60px;height:60px;
+  background:rgba(184,255,0,0.1);
+  border:1px dashed rgba(184,255,0,0.3);
+}
+.radius-v{font-family:var(--mono);font-size:10px;color:var(--lime);}
+.radius-n{font-size:10px;color:var(--muted);}
+
+.grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;}
+.grid-col-unit{height:32px;background:rgba(184,255,0,0.07);border:1px dashed rgba(184,255,0,0.2);}
+.grid-ex{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;margin-top:10px;}
+.ge{
+  height:52px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:500;
+}
+.ge4{grid-column:span 4;background:rgba(184,255,0,0.1);color:var(--lime);border:1px solid rgba(184,255,0,0.2);}
+.ge8{grid-column:span 8;background:var(--bg3);color:var(--muted);border:1px solid var(--border);}
+.ge6{grid-column:span 6;background:rgba(0,180,255,0.07);color:var(--blue);border:1px solid rgba(0,180,255,0.15);}
+.ge3{grid-column:span 3;background:rgba(255,45,85,0.06);color:var(--red);border:1px solid rgba(255,45,85,0.15);}
+
+/* ── BACK COVER ── */
+.back-cover{
+  background:var(--lime);
+  padding:80px 60px;
+  min-height:60vh;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.back-grid{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    90deg,transparent,transparent 79px,
+    rgba(17,18,16,0.05) 79px,rgba(17,18,16,0.05) 80px
+  );
+  pointer-events:none;
+}
+.back-corner{
+  position:absolute;bottom:0;right:0;
+  width:0;height:0;
+  border-style:solid;
+  border-width:0 0 300px 300px;
+  border-color:transparent transparent rgba(17,18,16,0.06) transparent;
+}
+.back-inner{
+  max-width:960px;margin:0 auto;width:100%;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  min-height:60vh;
+  position:relative;z-index:2;
+}
+.back-title{
+  font-family:var(--display);
+  font-size:88px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:-0.04em;
+  line-height:0.88;
+  color:#111210;
+}
+.back-title .out{
+  -webkit-text-stroke:3px #111210;
+  color:transparent;
+}
+.back-bottom{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  border-top:2px solid rgba(17,18,16,0.15);
+  padding-top:28px;
+}
+.back-logo{display:flex;align-items:center;gap:12px;}
+.back-wm{
+  font-family:var(--display);font-size:18px;font-weight:800;
+  text-transform:uppercase;letter-spacing:-0.02em;color:#111210;
+}
+.back-meta{
+  font-family:var(--mono);font-size:10px;color:rgba(17,18,16,0.4);
+  letter-spacing:0.12em;text-transform:uppercase;text-align:right;line-height:1.8;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ COVER ═══════════ -->
+<div class="cover">
+  <div class="v-lines"></div>
+  <div class="h-lines"></div>
+  <div class="cover-corner-tl"></div>
+  <div class="cover-corner-br"></div>
+  <div class="cover-slash"></div>
+  <div class="cover-slash2"></div>
+  <div class="cover-inner">
+    <div class="cover-nav">
+      <div class="nav-logo">
+        <div class="nav-icon">
+          <svg width="22" height="18" viewBox="0 0 52 44" fill="none"><rect x="2" y="28" width="12" height="14" fill="#111210" opacity="0.35"/><rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/><rect x="38" y="4" width="12" height="38" fill="#111210"/></svg>
+        </div>
+        <span class="nav-wordmark">PULSE<span>UP</span></span>
+      </div>
+      <div class="nav-meta">
+        Neon Forge — Variant C<br>
+        Brand Identity Kit · 2026
+      </div>
+    </div>
+
+    <div class="cover-body">
+      <div class="cover-eyebrow">Brand identity system — complete kit</div>
+      <div class="cover-title">
+        NO<br>
+        <span class="accent">LIMITS.</span><br>
+        <span class="outline">NO</span><br>
+        <span class="outline-lime">EXCUSES.</span>
+      </div>
+      <p class="cover-sub">Charcoal, grit, and electric lime. A complete visual identity for athletes who compete hard and share harder. Every colour, typeface, component, and rule — built for one purpose. <strong style="color:var(--ink);">Dark-mode exclusive system.</strong></p>
+    </div>
+
+    <div class="cover-footer">
+      <div class="cover-index">
+        <div class="cover-index-item"><div class="cover-index-dot"></div>Logo</div>
+        <div class="cover-index-item"><div class="cover-index-dot"></div>Color</div>
+        <div class="cover-index-item"><div class="cover-index-dot"></div>Type</div>
+        <div class="cover-index-item"><div class="cover-index-dot"></div>Voice</div>
+        <div class="cover-index-item"><div class="cover-index-dot"></div>Motion</div>
+        <div class="cover-index-item"><div class="cover-index-dot"></div>Components</div>
+        <div class="cover-index-item"><div class="cover-index-dot"></div>Spacing</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:0.1em;text-transform:uppercase;">© 2026 PulseUp Technologies</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ 01 · BRAND FOUNDATION ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">01 · Brand foundation</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">Who<br>we <span>are.</span></h1>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:52px;">
+    <div>
+      <div class="tag" style="margin-bottom:16px;">Mission</div>
+      <p style="font-family:var(--display);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:-0.02em;color:var(--ink);line-height:1.2;margin-bottom:20px;">"Move more.<br>Compete harder.<br><span style="color:var(--lime);">Win together."</span></p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;">PulseUp is built for athletes who need more than a step counter — they need a rival, a coach, and a stage. We combine raw sensor data, AI intelligence, and social competition into one relentless platform.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="padding:24px;background:var(--lime-glow);border:1px solid var(--lime-border);">
+        <div class="tag" style="margin-bottom:10px;">Positioning</div>
+        <p style="font-size:13px;color:var(--lime);line-height:1.65;">The only fitness app where your data fuels your competitive edge — and every workout is a chance to top the leaderboard.</p>
+      </div>
+      <div style="padding:24px;background:var(--bg2);border:1px solid var(--border);">
+        <div class="tag" style="margin-bottom:10px;">Audience</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.65;">Performance-driven adults 18–40 who treat fitness as a sport. Gym-goers, runners, cyclists — anyone who needs to be first.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);">
+    <div style="background:var(--bg2);padding:28px 22px;">
+      <div class="tag" style="margin-bottom:14px;">Energetic</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;">We match the fire of someone chasing a personal record at mile 5.</p>
+    </div>
+    <div style="background:var(--bg2);padding:28px 22px;">
+      <div class="tag" style="margin-bottom:14px;">Competitive</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;">We weaponise your data — turning reps, steps, and calories into ammunition.</p>
+    </div>
+    <div style="background:var(--bg2);padding:28px 22px;">
+      <div class="tag" style="margin-bottom:14px;">Direct</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;">No fluff. Short sentences. Bold claims. We say exactly what you need to hear.</p>
+    </div>
+    <div style="background:var(--bg2);padding:28px 22px;">
+      <div class="tag" style="margin-bottom:14px;">Social</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;">Every workout is shareable. Every win is public. Community is our superpower.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ 02 · LOGO ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">02 · Logo system</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">The <span>mark.</span></h1>
+
+  <!-- CONCEPT NOTE -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:40px;">
+    <div>
+      <div class="tag" style="margin-bottom:14px;">Mark concept</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:16px;">Three stacked bars — ascending left to right — read simultaneously as a leaderboard rank chart, a signal-strength indicator showing connection to others, and an upward trajectory. The tallest bar is lime; the others are cut versions of it. The whole thing sits inside the brand's signature clipped square.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;">This is not a heartbeat. Heartbeats belong to every other fitness app. This is a scoreboard. That's what PulseUp actually is.</p>
+    </div>
+    <!-- LARGE HERO MARK -->
+    <div style="display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);padding:48px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:24px;">
+        <div style="width:96px;height:96px;background:var(--lime);display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);">
+          <svg width="52" height="44" viewBox="0 0 52 44" fill="none">
+            <!-- Three ascending bars: leaderboard / signal / upward -->
+            <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.35"/>
+            <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/>
+            <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+            <!-- Clip notch on top-right of tallest bar (brand detail echo) -->
+            <polygon points="44,4 50,4 50,10" fill="#B8FF00" opacity="0.4"/>
+          </svg>
+        </div>
+        <span style="font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-0.03em;text-transform:uppercase;color:var(--ink);">PULSE<span style="color:var(--lime);">UP</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="logo-grid">
+    <!-- on black -->
+    <div class="logo-panel" style="background:#111210;border-right:1px solid var(--border);">
+      <div class="logo-lockup">
+        <div class="logo-icon" style="background:var(--lime);">
+          <svg width="24" height="24" viewBox="0 0 52 44" fill="none">
+            <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.35"/>
+            <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/>
+            <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+            <polygon points="44,4 50,4 50,10" fill="#B8FF00" opacity="0.4"/>
+          </svg>
+        </div>
+        <span class="logo-wm" style="color:var(--ink);">PULSE<span style="color:var(--lime);">UP</span></span>
+      </div>
+      <div class="logo-panel-label">On black · Primary</div>
+    </div>
+    <!-- on lime -->
+    <div class="logo-panel" style="background:var(--lime);">
+      <div class="logo-lockup">
+        <div class="logo-icon" style="background:#111210;">
+          <svg width="24" height="24" viewBox="0 0 52 44" fill="none">
+            <rect x="2"  y="28" width="12" height="14" fill="#B8FF00" opacity="0.3"/>
+            <rect x="20" y="16" width="12" height="26" fill="#B8FF00" opacity="0.6"/>
+            <rect x="38" y="4"  width="12" height="38" fill="#B8FF00"/>
+            <polygon points="44,4 50,4 50,10" fill="#111210" opacity="0.3"/>
+          </svg>
+        </div>
+        <span class="logo-wm" style="color:#111210;">PULSE<span style="opacity:0.45;">UP</span></span>
+      </div>
+      <div class="logo-panel-label" style="color:rgba(17,18,16,0.4);">On brand color</div>
+    </div>
+    <!-- on surface -->
+    <div class="logo-panel" style="background:var(--bg3);border-right:1px solid var(--border);">
+      <div class="logo-lockup">
+        <div class="logo-icon" style="background:var(--lime);">
+          <svg width="24" height="24" viewBox="0 0 52 44" fill="none">
+            <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.35"/>
+            <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/>
+            <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+            <polygon points="44,4 50,4 50,10" fill="#B8FF00" opacity="0.4"/>
+          </svg>
+        </div>
+        <span class="logo-wm" style="color:var(--ink);">PULSE<span style="color:var(--lime);">UP</span></span>
+      </div>
+      <div class="logo-panel-label">On surface · Secondary</div>
+    </div>
+    <!-- reversed on white -->
+    <div class="logo-panel" style="background:#F5F5F0;">
+      <div class="logo-lockup">
+        <div class="logo-icon" style="background:#111210;">
+          <svg width="24" height="24" viewBox="0 0 52 44" fill="none">
+            <rect x="2"  y="28" width="12" height="14" fill="#B8FF00" opacity="0.3"/>
+            <rect x="20" y="16" width="12" height="26" fill="#B8FF00" opacity="0.6"/>
+            <rect x="38" y="4"  width="12" height="38" fill="#B8FF00"/>
+            <polygon points="44,4 50,4 50,10" fill="#111210" opacity="0.3"/>
+          </svg>
+        </div>
+        <span class="logo-wm" style="color:#111210;">PULSE<span style="color:var(--lime-dim);">UP</span></span>
+      </div>
+      <div class="logo-panel-label" style="color:#888;">On white · Use sparingly</div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- MARK ANATOMY -->
+  <div class="tag" style="margin-bottom:20px;">Mark anatomy</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);padding:40px;margin-bottom:32px;display:flex;align-items:center;justify-content:center;gap:80px;">
+    <!-- Annotated mark -->
+    <div style="position:relative;">
+      <div style="width:96px;height:96px;background:var(--lime);display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);">
+        <svg width="52" height="44" viewBox="0 0 52 44" fill="none">
+          <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.35"/>
+          <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/>
+          <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+          <polygon points="44,4 50,4 50,10" fill="#B8FF00" opacity="0.4"/>
+        </svg>
+      </div>
+      <!-- annotation lines -->
+      <svg style="position:absolute;top:-20px;left:-60px;pointer-events:none;" width="220" height="140" viewBox="0 0 220 140" fill="none">
+        <!-- bar 1 annotation -->
+        <line x1="20" y1="118" x2="55" y2="100" stroke="rgba(184,255,0,0.3)" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <circle cx="20" cy="118" r="2" fill="rgba(184,255,0,0.5)"/>
+        <!-- bar 2 annotation -->
+        <line x1="20" y1="85" x2="73" y2="72" stroke="rgba(184,255,0,0.3)" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <circle cx="20" cy="85" r="2" fill="rgba(184,255,0,0.5)"/>
+        <!-- bar 3 annotation -->
+        <line x1="20" y1="52" x2="92" y2="42" stroke="rgba(184,255,0,0.3)" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <circle cx="20" cy="52" r="2" fill="rgba(184,255,0,0.5)"/>
+        <!-- clip annotation -->
+        <line x1="200" y1="20" x2="158" y2="30" stroke="rgba(184,255,0,0.3)" stroke-width="0.75" stroke-dasharray="3 3"/>
+        <circle cx="200" cy="20" r="2" fill="rgba(184,255,0,0.5)"/>
+      </svg>
+    </div>
+    <!-- annotation labels -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:8px;height:8px;background:rgba(184,255,0,0.5);border-radius:50%;flex-shrink:0;margin-top:3px;"></div>
+        <div><div style="font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink);letter-spacing:0.04em;">Rank bars</div><div style="font-size:11px;color:var(--muted);line-height:1.55;margin-top:2px;">3 ascending bars = leaderboard positions. Reads as signal strength (social connectivity) and upward trajectory simultaneously.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:8px;height:8px;background:rgba(184,255,0,0.5);border-radius:50%;flex-shrink:0;margin-top:3px;"></div>
+        <div><div style="font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink);letter-spacing:0.04em;">Tallest bar = #1</div><div style="font-size:11px;color:var(--muted);line-height:1.55;margin-top:2px;">Full opacity. The goal state. What every user is working toward.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:8px;height:8px;background:rgba(184,255,0,0.5);border-radius:50%;flex-shrink:0;margin-top:3px;"></div>
+        <div><div style="font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;color:var(--ink);letter-spacing:0.04em;">Corner notch echo</div><div style="font-size:11px;color:var(--muted);line-height:1.55;margin-top:2px;">The brand clip-path detail mirrors itself inside the mark — a small cut on the tallest bar's top-right corner. Invisible at small sizes, a reward detail at large.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tag" style="margin-bottom:20px;">Icon sizes</div>
+  <div class="icon-sizes">
+    <div class="icon-sz">
+      <div class="icon-box" style="width:88px;height:88px;">
+        <svg width="48" height="42" viewBox="0 0 52 44" fill="none">
+          <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.35"/>
+          <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/>
+          <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+          <polygon points="44,4 50,4 50,10" fill="#B8FF00" opacity="0.4"/>
+        </svg>
+      </div>
+      <span class="icon-sz-lbl">88px · App store</span>
+    </div>
+    <div class="icon-sz">
+      <div class="icon-box" style="width:60px;height:60px;">
+        <svg width="32" height="28" viewBox="0 0 52 44" fill="none">
+          <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.35"/>
+          <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/>
+          <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+          <polygon points="44,4 50,4 50,10" fill="#B8FF00" opacity="0.4"/>
+        </svg>
+      </div>
+      <span class="icon-sz-lbl">60px · Home screen</span>
+    </div>
+    <div class="icon-sz">
+      <div class="icon-box" style="width:44px;height:44px;">
+        <svg width="24" height="20" viewBox="0 0 52 44" fill="none">
+          <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.35"/>
+          <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/>
+          <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+        </svg>
+      </div>
+      <span class="icon-sz-lbl">44px · Nav / UI</span>
+    </div>
+    <div class="icon-sz">
+      <div class="icon-box" style="width:28px;height:28px;">
+        <svg width="16" height="14" viewBox="0 0 52 44" fill="none">
+          <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.4"/>
+          <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.65"/>
+          <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+        </svg>
+      </div>
+      <span class="icon-sz-lbl">28px · Inline</span>
+    </div>
+    <div class="icon-sz">
+      <div class="icon-box" style="width:20px;height:20px;">
+        <svg width="12" height="10" viewBox="0 0 52 44" fill="none">
+          <rect x="2"  y="28" width="12" height="14" fill="#111210" opacity="0.4"/>
+          <rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.65"/>
+          <rect x="38" y="4"  width="12" height="38" fill="#111210"/>
+        </svg>
+      </div>
+      <span class="icon-sz-lbl">20px · Min size</span>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;padding:20px 24px;background:var(--bg2);border-left:2px solid var(--lime);display:flex;gap:20px;align-items:flex-start;">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--lime);letter-spacing:0.12em;text-transform:uppercase;flex-shrink:0;margin-top:2px;">Rules</div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.75;">Never scale below 20px. At 28px and below, suppress the corner notch detail — it will not render cleanly. Never round the outer icon corners. Never distort bar proportions — the 3-bar ascending ratio (37% · 63% · 100% height) must be preserved. Never replace the three-bar mark with any other chart-like shape. Minimum clearspace = half the icon height on all sides.</p>
+  </div>
+</div>
+
+
+<!-- ═══════════ 03 · COLOR ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">03 · Color system</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">The <span>palette.</span></h1>
+
+  <div class="color-main">
+    <div class="color-cell">
+      <div class="color-fill" style="background:#B8FF00;"></div>
+      <div class="color-info">
+        <div class="color-name" style="color:var(--ink);">Acid Lime</div>
+        <div class="color-hex">#B8FF00</div>
+        <div class="color-role">Primary action, energy, brand accent. All CTAs and live state indicators.</div>
+      </div>
+    </div>
+    <div class="color-cell">
+      <div class="color-fill" style="background:#111210;border-bottom:1px solid rgba(255,255,255,0.06);"></div>
+      <div class="color-info">
+        <div class="color-name">Forge Black</div>
+        <div class="color-hex">#111210</div>
+        <div class="color-role">Primary bg. Maximum contrast base.</div>
+      </div>
+    </div>
+    <div class="color-cell">
+      <div class="color-fill" style="background:#1E1F1B;"></div>
+      <div class="color-info">
+        <div class="color-name">Graphite</div>
+        <div class="color-hex">#1E1F1B</div>
+        <div class="color-role">Cards, surfaces, raised elements.</div>
+      </div>
+    </div>
+    <div class="color-cell">
+      <div class="color-fill" style="background:#FF2D55;"></div>
+      <div class="color-info">
+        <div class="color-name">Knockout</div>
+        <div class="color-hex">#FF2D55</div>
+        <div class="color-role">Alerts, losing states, intensity warnings.</div>
+      </div>
+    </div>
+    <div class="color-cell">
+      <div class="color-fill" style="background:#00B4FF;"></div>
+      <div class="color-info">
+        <div class="color-name">Social Blue</div>
+        <div class="color-hex">#00B4FF</div>
+        <div class="color-role">Sharing, social features, info states.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary swatches -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--border);margin-bottom:32px;">
+    <div class="color-cell"><div class="color-fill" style="background:#8CC400;min-height:60px;"></div><div class="color-info" style="padding:10px 14px;"><div class="color-name" style="font-size:11px;">Deep Lime</div><div class="color-hex">#8CC400</div></div></div>
+    <div class="color-cell"><div class="color-fill" style="background:#252620;min-height:60px;"></div><div class="color-info" style="padding:10px 14px;"><div class="color-name" style="font-size:11px;">Dark Surface</div><div class="color-hex">#252620</div></div></div>
+    <div class="color-cell"><div class="color-fill" style="background:#EEEEE8;min-height:60px;"></div><div class="color-info" style="padding:10px 14px;"><div class="color-name" style="font-size:11px;">Off-white</div><div class="color-hex">#EEEEE8</div></div></div>
+    <div class="color-cell"><div class="color-fill" style="background:#8A8A84;min-height:60px;"></div><div class="color-info" style="padding:10px 14px;"><div class="color-name" style="font-size:11px;">Ash</div><div class="color-hex">#8A8A84 <span style="color:var(--lime);font-size:9px;">✓ AA</span></div></div></div>
+    <div class="color-cell"><div class="color-fill" style="background:#FFD700;min-height:60px;"></div><div class="color-info" style="padding:10px 14px;"><div class="color-name" style="font-size:11px;">Gold (rank 1)</div><div class="color-hex">#FFD700</div></div></div>
+  </div>
+
+  <div class="tint-group">
+    <div class="tint-label">Acid lime — tint scale</div>
+    <div class="tint-row">
+      <div class="tint-cell" style="background:#F2FFB3;"></div>
+      <div class="tint-cell" style="background:#E0FF66;"></div>
+      <div class="tint-cell" style="background:#CBFF1A;"></div>
+      <div class="tint-cell" style="background:#B8FF00;"></div>
+      <div class="tint-cell" style="background:#8CC400;"></div>
+      <div class="tint-cell" style="background:#608A00;"></div>
+      <div class="tint-cell" style="background:#345000;"></div>
+      <div class="tint-cell" style="background:#1A2800;"></div>
+      <div class="tint-cell" style="background:#0A1000;"></div>
+    </div>
+  </div>
+  <div class="tint-group">
+    <div class="tint-label">Dark surface scale</div>
+    <div class="tint-row">
+      <div class="tint-cell" style="background:#EEEEE8;"></div>
+      <div class="tint-cell" style="background:#888880;"></div>
+      <div class="tint-cell" style="background:#444440;"></div>
+      <div class="tint-cell" style="background:#333330;"></div>
+      <div class="tint-cell" style="background:#252620;"></div>
+      <div class="tint-cell" style="background:#1E1F1B;"></div>
+      <div class="tint-cell" style="background:#181916;"></div>
+      <div class="tint-cell" style="background:#141512;"></div>
+      <div class="tint-cell" style="background:#111210;"></div>
+    </div>
+  </div>
+
+  <hr class="rule">
+  <div class="usage-grid">
+    <div class="usage-card">
+      <div class="usage-swatch" style="background:var(--lime);"></div>
+      <div class="usage-title">Primary actions</div>
+      <div class="usage-desc">Acid Lime on all CTAs, active states, live indicators. Always pair with Forge Black text — never white.</div>
+    </div>
+    <div class="usage-card">
+      <div class="usage-swatch" style="display:flex;gap:4px;">
+        <div style="flex:1;background:#111210;height:36px;"></div>
+        <div style="flex:1;background:#1E1F1B;height:36px;"></div>
+        <div style="flex:1;background:#252620;height:36px;"></div>
+      </div>
+      <div class="usage-title">Surface layers</div>
+      <div class="usage-desc">Layer #111210 → #1E1F1B → #252620 for depth. Never use pure #000000 — it's too flat and harsh.</div>
+    </div>
+    <div class="usage-card">
+      <div class="usage-swatch" style="display:flex;gap:4px;">
+        <div style="flex:1;background:#FF2D55;height:36px;"></div>
+        <div style="flex:1;background:#00B4FF;height:36px;"></div>
+        <div style="flex:1;background:#FFD700;height:36px;"></div>
+      </div>
+      <div class="usage-title">Semantic colors</div>
+      <div class="usage-desc">Red = alerts/danger/loss. Blue = social/sharing/rest. Gold = rank 1 only. Never reassign these roles.</div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- SEMANTIC COLOR DECISION TABLE -->
+  <div class="tag" style="margin-bottom:16px;">Color semantic map — when to use each</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);overflow:hidden;margin-bottom:32px;">
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border);">
+      <div style="padding:12px 16px;color:var(--muted);border-right:1px solid var(--border);">Color</div>
+      <div style="padding:12px 16px;color:var(--muted);border-right:1px solid var(--border);">Use for</div>
+      <div style="padding:12px 16px;color:var(--muted);">Never use for</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;border-bottom:1px solid var(--border);">
+      <div style="padding:14px 16px;border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;background:#B8FF00;flex-shrink:0;clip-path:polygon(0 0,calc(100% - 3px) 0,100% 3px,100% 100%,0 100%);"></div><span style="font-family:var(--mono);font-size:10px;color:var(--lime);">Acid Lime</span></div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">Primary CTA · Active / live state · Progress fills · Brand moments · #1 rank accent</div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);">Errors · Decorative backgrounds · Photo tints · Body copy colour</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;border-bottom:1px solid var(--border);">
+      <div style="padding:14px 16px;border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;background:#FF2D55;flex-shrink:0;"></div><span style="font-family:var(--mono);font-size:10px;color:var(--red);">Knockout Red</span></div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">Errors · Destructive actions · Challenge declined · Losing delta · Intensity/danger zone</div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);">Success states · Primary actions · Decorative use without semantic meaning</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;border-bottom:1px solid var(--border);">
+      <div style="padding:14px 16px;border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;background:#00B4FF;flex-shrink:0;"></div><span style="font-family:var(--mono);font-size:10px;color:var(--blue);">Social Blue</span></div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">Informational alerts · Rest / recovery state · Share actions · Social features · External links</div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);">Active workout states · Alerts (use red) · Replacing lime as primary CTA</div>
+    </div>
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;">
+      <div style="padding:14px 16px;border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;background:#FFD700;flex-shrink:0;"></div><span style="font-family:var(--mono);font-size:10px;color:#FFD700;">Gold</span></div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">#1 rank position only · First-place podium · Champion badge</div>
+      <div style="padding:14px 16px;font-size:12px;color:var(--muted);">Any other rank · General decoration · Warnings (use red)</div>
+    </div>
+  </div>
+
+  <!-- ACCESSIBILITY BLOCK -->
+  <div style="padding:20px 24px;border:1px solid var(--lime-border);background:var(--lime-glow);">
+    <div class="tag" style="margin-bottom:12px;">Accessibility — contrast requirements</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--lime);margin-bottom:6px;letter-spacing:0.08em;">BODY TEXT (≥14px)</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">Minimum 4.5:1 contrast ratio required. Use <code style="font-family:var(--mono);font-size:10px;color:var(--ink);">--muted (#8A8A84)</code> or brighter on <code style="font-family:var(--mono);font-size:10px;color:var(--ink);">--bg2</code>. Never use <code style="font-family:var(--mono);font-size:10px;color:var(--red);">--faint (#333330)</code> for text.</div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--lime);margin-bottom:6px;letter-spacing:0.08em;">LARGE TEXT (≥18px bold)</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">Minimum 3:1 contrast ratio. Display headlines in <code style="font-family:var(--mono);font-size:10px;color:var(--ink);">--ink</code> or <code style="font-family:var(--mono);font-size:10px;color:var(--lime);">--lime</code> on dark surfaces always pass. Outline text (stroke only) does not count as text for contrast.</div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--lime);margin-bottom:6px;letter-spacing:0.08em;">INTERACTIVE ELEMENTS</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">All buttons, links and focusable elements must meet 3:1 against adjacent color. Lime CTAs on dark bg: ✓ passes. Add <code style="font-family:var(--mono);font-size:10px;color:var(--ink);">outline-offset:3px</code> for keyboard focus rings.</div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- ═══════════ 04 · TYPOGRAPHY ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">04 · Typography</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">The <span>type.</span></h1>
+
+  <div class="pair-grid" style="margin-bottom:40px;">
+    <div class="pair-box">
+      <div class="pair-label">Display · Barlow Condensed 800</div>
+      <div style="font-family:var(--display);font-size:42px;font-weight:800;text-transform:uppercase;letter-spacing:-0.04em;line-height:0.9;color:var(--ink);">Your<br>rivals are<br><span style="color:var(--lime);">moving.</span></div>
+    </div>
+    <div class="pair-box">
+      <div class="pair-label">Body · DM Sans 300 + Metric · DM Mono 500</div>
+      <div style="font-family:var(--sans);font-size:14px;font-weight:300;color:var(--muted);line-height:1.75;margin-bottom:20px;">Priya is 2,100 steps ahead in today's Pulse Battle. Close the gap — there are 3 hours left on the clock. At your current pace, you'll finish second.</div>
+      <div style="font-family:var(--mono);font-size:32px;font-weight:500;color:var(--lime);letter-spacing:-0.02em;">#3 <span style="font-size:13px;color:var(--muted);">of 24</span></div>
+    </div>
+  </div>
+
+  <div class="type-scale">
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-tag">Display</div>
+        <div class="type-spec">Barlow Condensed 800<br>72–96px<br>uppercase<br>−0.04em</div>
+      </div>
+      <div class="type-preview">
+        <div style="font-family:var(--display);font-size:64px;font-weight:800;text-transform:uppercase;letter-spacing:-0.04em;line-height:0.9;color:var(--ink);">No <span style="color:var(--lime);">limits.</span></div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-tag">Headline</div>
+        <div class="type-spec">Barlow Condensed 800<br>32–48px<br>uppercase<br>−0.03em</div>
+      </div>
+      <div class="type-preview">
+        <div style="font-family:var(--display);font-size:36px;font-weight:800;text-transform:uppercase;letter-spacing:-0.03em;line-height:1.0;color:var(--ink);">Weekly battle results</div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-tag">Subhead</div>
+        <div class="type-spec">Barlow Condensed 700<br>18–24px<br>uppercase<br>−0.01em</div>
+      </div>
+      <div class="type-preview">
+        <div style="font-family:var(--display);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:-0.01em;color:var(--ink);">Your AI coach has updated your plan</div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-tag">Body</div>
+        <div class="type-spec">DM Sans 300<br>14–16px<br>1.75 leading<br>sentence case</div>
+      </div>
+      <div class="type-preview">
+        <div style="font-family:var(--sans);font-size:15px;font-weight:300;color:var(--muted);line-height:1.75;">Based on your Zone 4 output this week, we've adjusted Thursday's intervals. You're trending 12% above your baseline — add a 20-minute cooldown after tomorrow's session to avoid overtraining.</div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-tag">Metric</div>
+        <div class="type-spec">DM Mono 500<br>24–48px<br>−0.02em</div>
+      </div>
+      <div class="type-preview">
+        <div style="font-family:var(--mono);font-size:40px;font-weight:500;color:var(--lime);letter-spacing:-0.02em;">8,412 <span style="font-size:14px;color:var(--muted);font-weight:400;">steps today</span></div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-tag">Label</div>
+        <div class="type-spec">DM Mono 400<br>10–12px<br>+0.14em<br>uppercase</div>
+      </div>
+      <div class="type-preview">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);">Heart rate · Calories burned · Weekly progress · Active battles</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ 05 · VOICE ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">05 · Brand voice & tone</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">How we <span>speak.</span></h1>
+
+  <div class="voice-grid">
+    <div class="voice-card">
+      <div class="voice-mode">Energetic — sessions & streaks</div>
+      <div class="voice-quote">YOU CRUSHED IT. 3-DAY STREAK. KEEP THE FIRE BURNING.</div>
+      <div class="voice-desc">Direct, punchy, all-caps in UI headings. Celebrate loudly. No hedging, no disclaimers. Maximum 12 words for achievement copy. Think: hype man at mile 5 of a 10K.</div>
+    </div>
+    <div class="voice-card">
+      <div class="voice-mode">Competitive — battles & leaderboard</div>
+      <div class="voice-quote">JAI IS 840 STEPS AHEAD. 2 HOURS LEFT. CLOSE THE GAP.</div>
+      <div class="voice-desc">Urgent, tactical, peer-pressure without cruelty. Use rival's name. Use exact numbers. Use a countdown. Never soften competition — lean into the tension.</div>
+    </div>
+    <div class="voice-card">
+      <div class="voice-mode">Intelligent — coaching & data</div>
+      <div class="voice-quote">"Your Zone 3 output is up 14%. Time to test your threshold."</div>
+      <div class="voice-desc">Sentence case for AI coach copy. Data-first, specific, credible. Sound like the smartest trainer in the room. No jargon without a number to back it up.</div>
+    </div>
+    <div class="voice-card">
+      <div class="voice-mode">Caring — rest & recovery</div>
+      <div class="voice-quote">"6 days straight. Your body is asking for a rest day — let's schedule one."</div>
+      <div class="voice-desc">Warm and direct. Never judgmental. We protect performance long-term. Sentence case — recovery moments feel different from competition moments.</div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <div class="dd-row">
+    <div class="dd-box do">
+      <div class="dd-title">Do</div>
+      <ul class="dd-list">
+        <li class="dd-item"><span class="dd-mark">→</span>Use real numbers always ("burned 487 kcal", not "calories burned")</li>
+        <li class="dd-item"><span class="dd-mark">→</span>ALL-CAPS for achievement headlines and battle copy</li>
+        <li class="dd-item"><span class="dd-mark">→</span>Use the user's rival's name in competition nudges</li>
+        <li class="dd-item"><span class="dd-mark">→</span>Keep in-app battle copy under 12 words</li>
+        <li class="dd-item"><span class="dd-mark">→</span>Switch to sentence case for coaching and recovery voice</li>
+      </ul>
+    </div>
+    <div class="dd-box dont">
+      <div class="dd-title">Don't</div>
+      <ul class="dd-list">
+        <li class="dd-item"><span class="dd-mark">✗</span>Use shame or guilt — channel it into competition instead</li>
+        <li class="dd-item"><span class="dd-mark">✗</span>Soften competition with phrases like "you're almost there!"</li>
+        <li class="dd-item"><span class="dd-mark">✗</span>Over-explain — if it can't be said in one sentence, it's too long</li>
+        <li class="dd-item"><span class="dd-mark">✗</span>Use emoji in UI copy — we're a performance brand, not casual</li>
+        <li class="dd-item"><span class="dd-mark">✗</span>Generalise health advice — always tie recommendations to data</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ 06 · TAGLINES & NAMING ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">06 · Taglines & naming</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">The <span>words.</span></h1>
+
+  <div class="tagline-stack">
+    <div class="tl-row primary">
+      <div class="tl-text">NO LIMITS. NO EXCUSES.</div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-text" style="color:var(--ink);">MOVE. COMPETE. WIN.</div>
+      <div class="tl-use">Campaign</div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-text" style="color:var(--ink);">YOUR RIVAL IS ALREADY TRAINING.</div>
+      <div class="tl-use">Social ads</div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-text" style="color:var(--ink);">EVERY REP IS A CHALLENGE ISSUED.</div>
+      <div class="tl-use">App store</div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-text" style="color:var(--ink);">SMARTER TRAINING. LOUDER WINNING.</div>
+      <div class="tl-use">AI features</div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <div class="tag" style="margin-bottom:20px;">Feature naming</div>
+  <div class="naming-grid">
+    <div class="naming-cell">
+      <div class="naming-cat">AI Coach</div>
+      <div class="naming-word">PulseIQ</div>
+      <div class="naming-desc">The AI engine powering personalised plans and real-time coaching. Used in premium plan marketing — "Powered by PulseIQ."</div>
+    </div>
+    <div class="naming-cell">
+      <div class="naming-cat">Competitions</div>
+      <div class="naming-word">Pulse Battles</div>
+      <div class="naming-desc">Social challenge feature. Always used as a proper noun. CTA: "Start a Pulse Battle." Victory state: "Battle Won."</div>
+    </div>
+    <div class="naming-cell">
+      <div class="naming-cat">Training plans</div>
+      <div class="naming-word">PulsePrograms</div>
+      <div class="naming-desc">AI-generated personalised training blocks. "Your PulseProgram for this week." Personalised, never generic.</div>
+    </div>
+    <div class="naming-cell">
+      <div class="naming-cat">Analytics</div>
+      <div class="naming-word">Pulse Insights</div>
+      <div class="naming-desc">Weekly data digest. "Your Pulse Insights are ready." Links to predictive analytics and trend reports.</div>
+    </div>
+    <div class="naming-cell">
+      <div class="naming-cat">Rewards</div>
+      <div class="naming-word">PulsePoints</div>
+      <div class="naming-desc">Gamification currency earned through streaks, battles, and milestones. "You earned 250 PulsePoints."</div>
+    </div>
+    <div class="naming-cell">
+      <div class="naming-cat">Community</div>
+      <div class="naming-word">The Pulse</div>
+      <div class="naming-desc">Social feed, challenges, and community hub. "Check The Pulse for active battles." Always with definite article.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ 07 · MOTION ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">07 · Motion & feel</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">How we <span>move.</span></h1>
+
+  <div class="motion-row">
+    <div class="motion-cell">
+      <div class="motion-val">80ms</div>
+      <div class="motion-name">Instant</div>
+      <div class="motion-desc">Tap feedback, toggle states, icon swaps. Must feel immediate — any lag breaks the competitive tension.</div>
+    </div>
+    <div class="motion-cell">
+      <div class="motion-val">200ms</div>
+      <div class="motion-name">Micro</div>
+      <div class="motion-desc">Button press, badge pop, checkmark confirm. Snappy and mechanical — like a click from quality hardware.</div>
+    </div>
+    <div class="motion-cell">
+      <div class="motion-val">350ms</div>
+      <div class="motion-name">Transition</div>
+      <div class="motion-desc">Screen nav, card expansion, leaderboard reveal. Efficient. No bounce — straight lines, no fluff.</div>
+    </div>
+    <div class="motion-cell">
+      <div class="motion-val">600ms</div>
+      <div class="motion-name">Celebration</div>
+      <div class="motion-desc">Battle won, goal hit, streak milestone. Full dramatic effect — this is the payoff moment. Make it count.</div>
+    </div>
+  </div>
+
+  <div class="easing-grid">
+    <div class="easing-box">
+      <div class="comp-label" style="margin-bottom:16px;">Easing functions</div>
+      <div class="easing-row"><span class="easing-key">Enter</span><span class="easing-val">cubic-bezier(0.0, 0.0, 0.2, 1)</span></div>
+      <div class="easing-row"><span class="easing-key">Exit</span><span class="easing-val">cubic-bezier(0.4, 0.0, 1, 1)</span></div>
+      <div class="easing-row"><span class="easing-key">Standard</span><span class="easing-val">cubic-bezier(0.4, 0.0, 0.2, 1)</span></div>
+      <div class="easing-row"><span class="easing-key">Spring</span><span class="easing-val">spring(1, 180, 12, 0)</span></div>
+      <div class="easing-row"><span class="easing-key">Pulse loop</span><span class="easing-val">ease-in-out · 1.2s · infinite</span></div>
+    </div>
+    <div class="easing-box">
+      <div class="comp-label" style="margin-bottom:16px;">Haptic patterns</div>
+      <div class="easing-row"><span class="easing-key">Tap</span><span class="easing-val">Light impact</span></div>
+      <div class="easing-row"><span class="easing-key">Goal reached</span><span class="easing-val">Heavy × 2 with 80ms pause</span></div>
+      <div class="easing-row"><span class="easing-key">Battle won</span><span class="easing-val">Pulse sequence × 3</span></div>
+      <div class="easing-row"><span class="easing-key">Reminder</span><span class="easing-val">Soft notification</span></div>
+      <div class="easing-row"><span class="easing-key">Alert / danger</span><span class="easing-val">Sharp double tap</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;padding:20px 24px;background:var(--bg2);border-left:2px solid var(--lime);">
+    <div class="tag" style="margin-bottom:10px;">Motion principles</div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.75;">No bounce. No rubber-band. No playful easing. This is a performance platform — motion should feel precise and athletic, like a sprinter's stride: explosive entry, clean stop. Reserve celebration animations (particle bursts, scale pops) exclusively for battle wins and goal completions — never for routine interactions.</p>
+  </div>
+</div>
+
+
+<!-- ═══════════ 08 · UI COMPONENTS ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">08 · UI components</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">The <span>blocks.</span></h1>
+
+  <div class="comp-grid">
+    <div class="comp-panel">
+      <div class="comp-label">Buttons</div>
+      <div class="btn-col">
+        <button class="btn btn-lime">Download PulseUp free</button>
+        <button class="btn btn-dark">Start a Pulse Battle</button>
+        <button class="btn btn-outline">View my PulseProgram</button>
+        <button class="btn btn-ghost">See Pulse Insights</button>
+        <button class="btn btn-red">Overtraining alert</button>
+      </div>
+    </div>
+    <div class="comp-panel">
+      <div class="comp-label">Status badges</div>
+      <div class="badge-row" style="margin-bottom:20px;">
+        <div class="badge badge-live"><div class="badge-dot"></div>Live session</div>
+        <div class="badge badge-battle"><div class="badge-dot"></div>Battle active</div>
+        <div class="badge badge-rest"><div class="badge-dot"></div>Recovery</div>
+        <div class="badge badge-red"><div class="badge-dot"></div>High HR alert</div>
+        <div class="badge badge-pro">Pro member</div>
+      </div>
+      <div class="comp-label" style="margin-bottom:12px;">Stat cards</div>
+      <div class="stat-row">
+        <div class="stat-cell"><div class="stat-num" style="color:var(--lime);">8,412<span style="font-size:16px;">↑</span></div><div class="stat-lbl">Steps</div></div>
+        <div class="stat-cell"><div class="stat-num" style="color:var(--red);">487</div><div class="stat-lbl">Kcal</div></div>
+        <div class="stat-cell"><div class="stat-num">128</div><div class="stat-lbl">BPM avg</div></div>
+      </div>
+    </div>
+    <div class="comp-panel">
+      <div class="comp-label">Alerts</div>
+      <div class="alert-stack">
+        <div class="alert alert-success">
+          <div class="alert-icon">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#B8FF00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span>Goal hit — 10,000 steps. 3-day streak unlocked.</span>
+        </div>
+        <div class="alert alert-warn">
+          <div class="alert-icon">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 3v4M6 9v.5" stroke="#FF2D55" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <span>90 minutes active. Consider a cooldown break now.</span>
+        </div>
+        <div class="alert alert-info">
+          <div class="alert-icon">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 5v4M6 3v.5" stroke="#00B4FF" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <span>Priya challenged you to a 7-day step battle. Accept?</span>
+        </div>
+      </div>
+    </div>
+    <div class="comp-panel">
+      <div class="comp-label">Progress bars</div>
+      <div class="prog-stack">
+        <div class="prog-item">
+          <div class="prog-head"><span class="prog-key">Daily steps</span><span class="prog-val">8,412 / 10,000</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:84%;background:var(--lime);"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-head"><span class="prog-key">Calories</span><span class="prog-val">487 / 600 kcal</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:81%;background:var(--red);"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-head"><span class="prog-key">Battle rank</span><span class="prog-val">#3 of 24</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:55%;background:var(--blue);"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-head"><span class="prog-key">Monthly goal</span><span class="prog-val">68%</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:68%;background:var(--muted);"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <div class="tag" style="margin-bottom:20px;">Leaderboard component</div>
+  <div class="lb-list">
+    <div class="lb-row">
+      <div class="lb-rank" style="color:#FFD700;">1</div>
+      <div class="lb-avatar" style="background:#FFD700;color:#111210;">PR</div>
+      <div class="lb-name">Priya R.</div>
+      <div class="lb-pts">42,810 pts</div>
+      <div class="lb-delta">↑12%</div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">2</div>
+      <div class="lb-avatar" style="background:var(--bg4);color:var(--ink);">JM</div>
+      <div class="lb-name">Jai M.</div>
+      <div class="lb-pts">38,204 pts</div>
+      <div class="lb-delta" style="color:var(--muted);">—</div>
+    </div>
+    <div class="lb-row you">
+      <div class="lb-rank" style="color:var(--lime);">3</div>
+      <div class="lb-avatar" style="background:var(--lime);color:#111210;">YOU</div>
+      <div class="lb-name" style="color:var(--lime);">You</div>
+      <div class="lb-pts" style="color:var(--lime);">35,991 pts</div>
+      <div class="lb-delta">↑4%</div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">4</div>
+      <div class="lb-avatar" style="background:var(--bg4);color:var(--ink);">AL</div>
+      <div class="lb-name">Aisha L.</div>
+      <div class="lb-pts">31,240 pts</div>
+      <div class="lb-delta" style="color:var(--red);">↓2%</div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">5</div>
+      <div class="lb-avatar" style="background:var(--bg4);color:var(--ink);">KT</div>
+      <div class="lb-name">Kai T.</div>
+      <div class="lb-pts">28,880 pts</div>
+      <div class="lb-delta" style="color:var(--muted);">—</div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- INPUT FIELDS — properly accessible divs not raw inputs -->
+  <div class="tag" style="margin-bottom:20px;">Form inputs</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:40px;">
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <!-- Default -->
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Default</div>
+        <label style="display:block;font-family:var(--sans);font-size:11px;color:var(--muted);margin-bottom:6px;" for="ex-default">Username</label>
+        <div role="textbox" aria-labelledby="ex-default" style="background:var(--bg3);border:1px solid var(--border);border-bottom:1px solid var(--muted);color:var(--ink);font-family:var(--sans);font-size:14px;padding:13px 16px;min-height:48px;display:flex;align-items:center;">priya.runner</div>
+      </div>
+      <!-- Focused -->
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--lime);margin-bottom:6px;">Focused</div>
+        <label style="display:block;font-family:var(--sans);font-size:11px;color:var(--lime);margin-bottom:6px;">Username</label>
+        <div role="textbox" aria-label="Username focused" style="background:var(--bg3);border:1px solid var(--lime);border-bottom:2px solid var(--lime);color:var(--ink);font-family:var(--sans);font-size:14px;padding:13px 16px;min-height:48px;display:flex;align-items:center;outline:none;">priya.runner<span style="display:inline-block;width:1px;height:16px;background:var(--lime);margin-left:1px;animation:none;vertical-align:middle;"></span></div>
+      </div>
+      <!-- Error -->
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Error</div>
+        <label style="display:block;font-family:var(--sans);font-size:11px;color:var(--red);margin-bottom:6px;">Username</label>
+        <div role="textbox" aria-label="Username error" aria-describedby="err-msg" style="background:rgba(255,45,85,0.04);border:1px solid var(--red);color:var(--ink);font-family:var(--sans);font-size:14px;padding:13px 16px;min-height:48px;display:flex;align-items:center;">p</div>
+        <div id="err-msg" role="alert" style="font-size:11px;color:var(--red);margin-top:6px;font-family:var(--sans);display:flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#FF2D55" stroke-width="1.2"/><path d="M6 3.5v3M6 8.5v.5" stroke="#FF2D55" stroke-width="1.2" stroke-linecap="round"/></svg>Username must be at least 3 characters</div>
+      </div>
+      <!-- Disabled -->
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Disabled</div>
+        <label style="display:block;font-family:var(--sans);font-size:11px;color:var(--faint);margin-bottom:6px;">Email</label>
+        <div role="textbox" aria-label="Email disabled" aria-disabled="true" style="background:var(--bg);border:1px solid var(--faint);color:var(--muted);font-family:var(--sans);font-size:14px;padding:13px 16px;min-height:48px;display:flex;align-items:center;justify-content:space-between;opacity:0.6;cursor:not-allowed;">priya@email.com <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="6" width="8" height="7" rx="0" stroke="#8A8A84" stroke-width="1.1"/><path d="M5 6V4a2 2 0 0 1 4 0v2" stroke="#8A8A84" stroke-width="1.1"/></svg></div>
+      </div>
+    </div>
+
+    <!-- TOGGLE + BOTTOM NAV WITH TAP TARGET SPEC -->
+    <div style="display:flex;flex-direction:column;gap:24px;">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Toggle — min tap target 44×44px</div>
+        <div style="display:flex;flex-direction:column;gap:2px;background:var(--border);">
+          <div role="switch" aria-checked="true" style="display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--bg2);height:56px;cursor:pointer;">
+            <div>
+              <div style="font-family:var(--sans);font-size:14px;color:var(--ink);">Battle notifications</div>
+              <div style="font-family:var(--sans);font-size:11px;color:var(--muted);margin-top:1px;">Push alerts for active battles</div>
+            </div>
+            <!-- Touch zone wraps toggle -->
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+              <div style="width:44px;height:24px;background:var(--lime);border-radius:999px;position:relative;"><div style="position:absolute;right:2px;top:2px;width:20px;height:20px;background:#111210;border-radius:50%;"></div></div>
+            </div>
+          </div>
+          <div role="switch" aria-checked="false" style="display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--bg2);height:56px;cursor:pointer;">
+            <div>
+              <div style="font-family:var(--sans);font-size:14px;color:var(--muted);">Public profile</div>
+              <div style="font-family:var(--sans);font-size:11px;color:var(--faint);margin-top:1px;">Allow others to find you</div>
+            </div>
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+              <div style="width:44px;height:24px;background:var(--faint);border-radius:999px;position:relative;"><div style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:var(--muted);border-radius:50%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV WITH FULL TAP TARGET ANNOTATIONS -->
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Bottom navigation</div>
+        <!-- Phone frame -->
+        <div style="width:280px;margin:0 auto;border:2px solid var(--border);border-radius:0;overflow:hidden;">
+          <!-- status bar -->
+          <div style="background:var(--bg);height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
+            <span style="font-family:var(--mono);font-size:8px;color:var(--muted);">9:41</span>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <svg width="12" height="10" viewBox="0 0 52 44" fill="none"><rect x="2" y="28" width="12" height="14" fill="#8A8A84" opacity="0.5"/><rect x="20" y="16" width="12" height="26" fill="#8A8A84" opacity="0.7"/><rect x="38" y="4" width="12" height="38" fill="#8A8A84"/></svg>
+              <svg width="14" height="10" viewBox="0 0 24 16" fill="none"><rect x="1" y="1" width="20" height="14" rx="2" stroke="#8A8A84" stroke-width="1.5"/><rect x="3" y="3" width="13" height="10" fill="#8A8A84"/><path d="M22 5.5v5a2.5 2.5 0 0 0 0-5z" fill="#8A8A84"/></svg>
+            </div>
+          </div>
+          <!-- screen content placeholder -->
+          <div style="background:var(--bg);height:120px;display:flex;align-items:center;justify-content:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:0.08em;">SCREEN CONTENT</span>
+          </div>
+          <!-- Bottom nav — 5 items, each touch zone is 56px tall x 1/5 wide -->
+          <div style="background:var(--bg2);display:flex;align-items:stretch;height:72px;border-top:1px solid var(--border);">
+            <!-- HOME active -->
+            <div role="tab" aria-selected="true" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;min-height:44px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9v9H15v-5H9v5H3V12z" stroke="#B8FF00" stroke-width="1.5" fill="rgba(184,255,0,0.12)"/></svg>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--lime);letter-spacing:0.03em;">HOME</span>
+            </div>
+            <!-- BATTLE -->
+            <div role="tab" aria-selected="false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;min-height:44px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#8A8A84" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:0.03em;">BATTLE</span>
+            </div>
+            <!-- RECORD — lime CTA, no label, 56px min touch zone -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;">
+              <div style="width:48px;height:48px;background:var(--lime);display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%);margin-top:-16px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#111210"/><circle cx="12" cy="12" r="9" stroke="#111210" stroke-width="1.5"/></svg>
+              </div>
+            </div>
+            <!-- SOCIAL -->
+            <div role="tab" aria-selected="false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;min-height:44px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#8A8A84" stroke-width="1.5"/><circle cx="9" cy="7" r="4" stroke="#8A8A84" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#8A8A84" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:0.03em;">SOCIAL</span>
+            </div>
+            <!-- PROFILE -->
+            <div role="tab" aria-selected="false" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;min-height:44px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#8A8A84" stroke-width="1.5"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#8A8A84" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:0.03em;">YOU</span>
+            </div>
+          </div>
+          <!-- safe area spacer -->
+          <div style="background:var(--bg2);height:20px;"></div>
+        </div>
+        <div style="margin-top:12px;font-size:10px;color:var(--muted);font-family:var(--mono);line-height:1.8;text-align:center;">
+          Nav height: 72px + 20px safe area · Each tab: min 44px touch zone · Record: 48×48px button elevated −16px · Include <code style="color:var(--lime);">padding-bottom: env(safe-area-inset-bottom)</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS WITH POSITION SPEC -->
+  <div class="tag" style="margin-bottom:16px;">Toast notifications — position & behaviour spec</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px;">
+    <!-- Phone frame showing toast position -->
+    <div>
+      <div style="width:280px;border:2px solid var(--border);overflow:hidden;position:relative;">
+        <div style="background:var(--bg);height:24px;display:flex;align-items:center;padding:0 16px;"><span style="font-family:var(--mono);font-size:8px;color:var(--muted);">9:41</span></div>
+        <!-- Toast appears top, 16px below status bar -->
+        <div style="margin:8px 8px 0;background:var(--bg2);border:1px solid var(--lime-border);border-left:3px solid var(--lime);padding:12px 14px;display:flex;align-items:center;gap:10px;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="#B8FF00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div style="flex:1"><div style="font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;color:var(--lime);letter-spacing:0.02em;">Battle won!</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">+1,200 pts added</div></div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);flex-shrink:0;">✕</div>
+        </div>
+        <!-- Screen content -->
+        <div style="background:var(--bg);height:200px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);"><span style="font-family:var(--mono);font-size:10px;color:var(--faint);">SCREEN CONTENT</span></div>
+        <!-- Bottom nav -->
+        <div style="background:var(--bg2);height:32px;border-top:1px solid var(--border);"></div>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--muted);font-family:var(--mono);line-height:1.8;width:280px;">Position: top · 8px from edge · below status bar · z-index above all content except modals</div>
+    </div>
+    <!-- Behaviour rules -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--lime-border);border-left:3px solid var(--lime);">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="#B8FF00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div style="flex:1"><div style="font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;color:var(--lime);">Battle won!</div><div style="font-size:11px;color:var(--muted);">+1,200 pts added to your profile</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid rgba(255,45,85,0.2);border-left:3px solid var(--red);">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3.5v4M7 9.5v.5" stroke="#FF2D55" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div style="flex:1"><div style="font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;color:var(--red);">High HR alert</div><div style="font-size:11px;color:var(--muted);">168 BPM — consider slowing down</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg2);border:1px solid rgba(0,180,255,0.2);border-left:3px solid var(--blue);">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#00B4FF" stroke-width="1.1"/><path d="M7 6v4M7 4.5v.5" stroke="#00B4FF" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div style="flex:1"><div style="font-family:var(--display);font-size:12px;font-weight:700;text-transform:uppercase;color:var(--blue);">Challenge received</div><div style="font-size:11px;color:var(--muted);">Priya challenged you to 7 days</div></div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--lime);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;">Behaviour rules</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.65;display:flex;flex-direction:column;gap:6px;">
+          <div>→ <strong style="color:var(--ink);">Duration:</strong> Success = 3s auto-dismiss. Warning = 5s. Info = 4s. HR alert = persistent until dismissed.</div>
+          <div>→ <strong style="color:var(--ink);">Stacking:</strong> Max 1 visible at a time. Queue subsequent toasts — never stack vertically.</div>
+          <div>→ <strong style="color:var(--ink);">Swipe:</strong> Swipe up to dismiss. Tap to navigate to relevant screen.</div>
+          <div>→ <strong style="color:var(--ink);">During workout:</strong> All toasts suppressed except HR warnings. Record session is sacred.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPTY STATES — VERTICAL MOBILE STACK -->
+  <div class="tag" style="margin-bottom:16px;">Empty states — mobile vertical layout (375px target)</div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
+    <!-- Empty state 1 — no battles -->
+    <div style="width:240px;border:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;align-items:center;text-align:center;">
+      <!-- status bar -->
+      <div style="width:100%;background:var(--bg);height:24px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;"><span style="font-family:var(--mono);font-size:8px;color:var(--muted);">Battles</span></div>
+      <!-- illustration area -->
+      <div style="padding:48px 32px 32px;display:flex;flex-direction:column;align-items:center;gap:24px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <!-- podium outline -->
+          <rect x="10" y="50" width="18" height="22" stroke="rgba(184,255,0,0.2)" stroke-width="1" stroke-dasharray="3 3"/>
+          <rect x="31" y="35" width="18" height="37" stroke="rgba(184,255,0,0.35)" stroke-width="1" stroke-dasharray="3 3"/>
+          <rect x="52" y="44" width="18" height="28" stroke="rgba(184,255,0,0.2)" stroke-width="1" stroke-dasharray="3 3"/>
+          <!-- #1 bar glows slightly -->
+          <rect x="32" y="36" width="16" height="35" fill="rgba(184,255,0,0.05)"/>
+          <!-- question marks -->
+          <text x="19" y="47" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="rgba(184,255,0,0.25)">?</text>
+          <text x="40" y="32" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="rgba(184,255,0,0.4)">?</text>
+          <text x="61" y="41" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="rgba(184,255,0,0.25)">?</text>
+        </svg>
+        <div>
+          <div style="font-family:var(--display);font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:-0.02em;color:var(--ink);line-height:1.1;margin-bottom:10px;">No battles<br>yet</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65;">Challenge someone to a Pulse Battle. Pick a metric, set a duration, and let the data decide who wins.</div>
+        </div>
+        <button class="btn btn-lime" style="font-size:12px;padding:12px 24px;width:100%;">Start a battle</button>
+        <div style="font-size:11px;color:var(--muted);">or <span style="color:var(--lime);text-decoration:underline;cursor:pointer;">browse open challenges</span></div>
+      </div>
+      <!-- bottom nav stub -->
+      <div style="width:100%;height:40px;background:var(--bg);border-top:1px solid var(--border);"></div>
+    </div>
+
+    <!-- Empty state 2 — rest day -->
+    <div style="width:240px;border:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;align-items:center;text-align:center;">
+      <div style="width:100%;background:var(--bg);height:24px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;"><span style="font-family:var(--mono);font-size:8px;color:var(--muted);">Today</span></div>
+      <div style="padding:48px 32px 32px;display:flex;flex-direction:column;align-items:center;gap:24px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <!-- moon / rest icon - outlines only -->
+          <path d="M45 20a22 22 0 1 0 15 38A26 26 0 0 1 45 20z" stroke="rgba(0,180,255,0.3)" stroke-width="1.2" stroke-dasharray="4 3" fill="rgba(0,180,255,0.04)"/>
+          <circle cx="58" cy="22" r="3" stroke="rgba(0,180,255,0.2)" stroke-width="1"/>
+          <circle cx="65" cy="32" r="2" stroke="rgba(0,180,255,0.15)" stroke-width="1"/>
+          <circle cx="62" cy="15" r="1.5" stroke="rgba(0,180,255,0.15)" stroke-width="1"/>
+        </svg>
+        <div>
+          <div style="font-family:var(--display);font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:-0.02em;color:var(--ink);line-height:1.1;margin-bottom:10px;">Rest day</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65;">No activity logged today. Recovery isn't a gap in your data — it's part of your programme.</div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:12px;padding:12px 24px;width:100%;clip-path:none;">Log a rest session</button>
+        <div style="font-size:11px;color:var(--muted);">Your streak is safe</div>
+      </div>
+      <div style="width:100%;height:40px;background:var(--bg);border-top:1px solid var(--border);"></div>
+    </div>
+
+    <!-- Empty state rules card -->
+    <div style="flex:1;min-width:200px;padding:24px;border:1px solid var(--lime-border);background:var(--lime-glow);align-self:flex-start;">
+      <div class="tag" style="margin-bottom:14px;">Empty state rules</div>
+      <div style="display:flex;flex-direction:column;gap:14px;font-size:12px;color:var(--muted);line-height:1.65;">
+        <div><span style="color:var(--lime);font-family:var(--mono);font-size:10px;">01</span><br>SVG illustration: outline only, no fills. Lime for competitive contexts, blue for rest/recovery. 80×80px max.</div>
+        <div><span style="color:var(--lime);font-family:var(--mono);font-size:10px;">02</span><br>Headline in display type. Names what's missing without blame. Max 3 words. Never "No data found."</div>
+        <div><span style="color:var(--lime);font-family:var(--mono);font-size:10px;">03</span><br>Body copy max 2 lines. Explain the situation and reframe it positively — rest is not failure.</div>
+        <div><span style="color:var(--lime);font-family:var(--mono);font-size:10px;">04</span><br>Primary CTA resolves the empty state directly. Optional secondary link for exploration. Never two CTAs of equal weight.</div>
+        <div><span style="color:var(--lime);font-family:var(--mono);font-size:10px;">05</span><br>Full-width layout, vertically centred in available screen space above the nav bar.</div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- ═══════════ 09 · IMAGERY ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">09 · Imagery & visual direction</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">The <span>visuals.</span></h1>
+
+  <div class="imagery-grid">
+    <div class="img-card">
+      <div class="img-visual" style="background:#0D0E0B;">
+        <svg width="140" height="90" viewBox="0 0 140 90" fill="none">
+          <line x1="10" y1="20" x2="130" y2="20" stroke="rgba(184,255,0,0.07)" stroke-width="0.5"/>
+          <line x1="10" y1="45" x2="130" y2="45" stroke="rgba(184,255,0,0.07)" stroke-width="0.5"/>
+          <line x1="10" y1="70" x2="130" y2="70" stroke="rgba(184,255,0,0.07)" stroke-width="0.5"/>
+          <path d="M10 45 L28 45 L38 20 L55 68 L68 30 L82 45 L98 45 L110 45" stroke="#B8FF00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="55" cy="68" r="3.5" fill="#B8FF00" opacity="0.4"/>
+          <circle cx="38" cy="20" r="3.5" fill="#B8FF00" opacity="0.4"/>
+          <line x1="55" y1="68" x2="55" y2="74" stroke="#B8FF00" stroke-width="0.5" opacity="0.4"/>
+        </svg>
+      </div>
+      <div class="img-label">
+        <div class="img-title">Heartrate / data viz</div>
+        <div class="img-sub">Lime-on-black · precise · minimal axis</div>
+      </div>
+    </div>
+    <div class="img-card">
+      <div class="img-visual" style="background:#181916;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
+            <circle cx="45" cy="45" r="36" stroke="rgba(184,255,0,0.08)" stroke-width="7"/>
+            <circle cx="45" cy="45" r="36" stroke="#B8FF00" stroke-width="7" stroke-dasharray="160 226" stroke-linecap="square" transform="rotate(-90 45 45)"/>
+            <circle cx="45" cy="45" r="25" stroke="rgba(255,45,85,0.1)" stroke-width="5"/>
+            <circle cx="45" cy="45" r="25" stroke="#FF2D55" stroke-width="5" stroke-dasharray="110 157" stroke-linecap="square" transform="rotate(-90 45 45)"/>
+            <text x="45" y="42" text-anchor="middle" font-size="13" font-weight="500" fill="#EEEEE8" font-family="DM Mono, monospace">71%</text>
+            <text x="45" y="54" text-anchor="middle" font-size="8" fill="#8A8A84" font-family="DM Sans, sans-serif">battle goal</text>
+          </svg>
+        </div>
+      </div>
+      <div class="img-label">
+        <div class="img-title">Battle progress ring</div>
+        <div class="img-sub">Square stroke-cap · dual ring · no rounded corners</div>
+      </div>
+    </div>
+    <div class="img-card">
+      <div class="img-visual" style="background:#111210;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(90deg,transparent,transparent 19px,rgba(184,255,0,0.03) 19px,rgba(184,255,0,0.03) 20px);"></div>
+        <div style="position:relative;z-index:2;padding:0 24px;width:100%;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:var(--lime);margin-bottom:8px;">PULSE BATTLE · LIVE</div>
+          <div style="font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:#EEEEE8;letter-spacing:-0.02em;line-height:1;">#3<span style="font-size:12px;color:#8A8A84;"> / 24</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:#8A8A84;margin-top:4px;">2h 44m remaining</div>
+          <div style="margin-top:10px;height:3px;background:#252620;"><div style="width:55%;height:100%;background:var(--lime);"></div></div>
+        </div>
+      </div>
+      <div class="img-label">
+        <div class="img-title">Live battle widget</div>
+        <div class="img-sub">Grid texture · mono metrics · top status bar</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <div class="photo-rule-grid">
+    <div class="photo-rule do">
+      <div class="photo-rule-title">Photography direction →</div>
+      <ul class="photo-rule-list">
+        <li><span style="color:var(--lime);">→</span>High contrast, dramatic lighting — underexpose background, expose subject</li>
+        <li><span style="color:var(--lime);">→</span>Real sweat, real strain — authentic over polished</li>
+        <li><span style="color:var(--lime);">→</span>Tech integrated naturally — phone on wrist, earbuds in, watch visible</li>
+        <li><span style="color:var(--lime);">→</span>Group competition shots — races, gym floor, outdoor challenges</li>
+        <li><span style="color:var(--lime);">→</span>Strong, diagonal compositions — action mid-frame, not posed</li>
+        <li><span style="color:var(--lime);">→</span>Diverse athletes — all bodies, ages, backgrounds. Performance is universal.</li>
+      </ul>
+    </div>
+    <div class="photo-rule dont">
+      <div class="photo-rule-title">Avoid →</div>
+      <ul class="photo-rule-list">
+        <li><span style="color:var(--red);">✗</span>Bright white or pastel art direction — wrong energy entirely</li>
+        <li><span style="color:var(--red);">✗</span>Posed gym stock photos with perfect lighting and no sweat</li>
+        <li><span style="color:var(--red);">✗</span>Unrealistic body ideals or physiques as aspirational</li>
+        <li><span style="color:var(--red);">✗</span>Solo isolation shots — we're a social platform, always</li>
+        <li><span style="color:var(--red);">✗</span>Softbox studio lighting — outdoor, gritty, real environments</li>
+        <li><span style="color:var(--red);">✗</span>Lime color-grading on photos — reserve for UI elements only</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ 10 · SPACING & LAYOUT ═══════════ -->
+<div class="page">
+  <div class="v-lines"></div>
+  <div class="tag">10 · Spacing & layout</div>
+  <div class="page-num">────────────────────────────────</div>
+  <h1 class="page-title">The <span>grid.</span></h1>
+
+  <div class="tag" style="margin-bottom:16px;">Spacing scale</div>
+  <div class="spacing-track">
+    <div class="spacing-unit"><div class="spacing-block" style="height:4px;"></div><div class="spacing-v">4px</div><div class="spacing-n">Hairline</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:8px;"></div><div class="spacing-v">8px</div><div class="spacing-n">Tight</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:12px;"></div><div class="spacing-v">12px</div><div class="spacing-n">Compact</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:16px;"></div><div class="spacing-v">16px</div><div class="spacing-n">Base</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:24px;"></div><div class="spacing-v">24px</div><div class="spacing-n">Loose</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:32px;"></div><div class="spacing-v">32px</div><div class="spacing-n">Section</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:48px;"></div><div class="spacing-v">48px</div><div class="spacing-n">Large</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:64px;"></div><div class="spacing-v">64px</div><div class="spacing-n">XL</div></div>
+    <div class="spacing-unit"><div class="spacing-block" style="height:80px;"></div><div class="spacing-v">80px</div><div class="spacing-n">Page</div></div>
+  </div>
+
+  <hr class="rule">
+
+  <div class="tag" style="margin-bottom:16px;">Border radius</div>
+  <div class="radius-row" style="margin-bottom:40px;">
+    <div class="radius-demo"><div class="radius-box" style="border-radius:0;"></div><div class="radius-v">0px</div><div class="radius-n">Hero elements</div></div>
+    <div class="radius-demo"><div class="radius-box" style="border-radius:2px;"></div><div class="radius-v">2px</div><div class="radius-n">Data tables</div></div>
+    <div class="radius-demo"><div class="radius-box" style="border-radius:4px;"></div><div class="radius-v">4px</div><div class="radius-n">Default</div></div>
+    <div class="radius-demo"><div class="radius-box" style="border-radius:8px;"></div><div class="radius-v">8px</div><div class="radius-n">Cards</div></div>
+    <div class="radius-demo"><div class="radius-box" style="border-radius:12px;"></div><div class="radius-v">12px</div><div class="radius-n">Panels</div></div>
+    <div class="radius-demo"><div class="radius-box" style="border-radius:999px;width:60px;height:32px;"></div><div class="radius-v">999px</div><div class="radius-n">Pills only</div></div>
+  </div>
+
+  <div style="padding:16px 20px;border-left:2px solid var(--lime);background:var(--lime-glow);margin-bottom:40px;">
+    <div class="tag" style="margin-bottom:6px;">Neon Forge corner rule</div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.65;">The angled clip-path on the logo icon and primary buttons (cutting the top-right corner) is a signature brand detail. Use <span style="font-family:var(--mono);font-size:11px;color:var(--lime);">clip-path: polygon(0 0, calc(100% - Npx) 0, 100% Npx, 100% 100%, 0 100%)</span> consistently. N = 8px for small components, 10px for medium, 14px for large. Never mix rounded corners and clipped corners on the same component.</p>
+  </div>
+
+  <div class="tag" style="margin-bottom:16px;">12-column grid</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);padding:24px;">
+    <div class="grid12">
+      <div class="grid-col-unit"></div><div class="grid-col-unit"></div><div class="grid-col-unit"></div>
+      <div class="grid-col-unit"></div><div class="grid-col-unit"></div><div class="grid-col-unit"></div>
+      <div class="grid-col-unit"></div><div class="grid-col-unit"></div><div class="grid-col-unit"></div>
+      <div class="grid-col-unit"></div><div class="grid-col-unit"></div><div class="grid-col-unit"></div>
+    </div>
+    <div class="grid-ex">
+      <div class="ge ge4">4 col</div>
+      <div class="ge ge8">8 col</div>
+      <div class="ge ge6">6 col</div>
+      <div class="ge ge6" style="background:rgba(0,180,255,0.07);color:var(--blue);border:1px solid rgba(0,180,255,0.15);">6 col</div>
+      <div class="ge ge3">3 col</div>
+      <div class="ge ge3">3 col</div>
+      <div class="ge ge3">3 col</div>
+      <div class="ge ge3">3 col</div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- MOBILE BREAKPOINT GUIDANCE -->
+  <div class="tag" style="margin-bottom:16px;">Mobile breakpoints — the primary context</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);margin-bottom:16px;">
+    <div style="display:grid;grid-template-columns:120px 140px 1fr 1fr;font-family:var(--mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--border);">
+      <div style="padding:12px 16px;color:var(--muted);border-right:1px solid var(--border);">Breakpoint</div>
+      <div style="padding:12px 16px;color:var(--muted);border-right:1px solid var(--border);">Width</div>
+      <div style="padding:12px 16px;color:var(--muted);border-right:1px solid var(--border);">Columns</div>
+      <div style="padding:12px 16px;color:var(--muted);">Gutter</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 140px 1fr 1fr;border-bottom:1px solid var(--border);">
+      <div style="padding:12px 16px;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:12px;color:var(--lime);border-right:1px solid var(--border);">Mobile S</div>
+      <div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--muted);border-right:1px solid var(--border);">320–374px</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">4 col</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);">12px</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 140px 1fr 1fr;border-bottom:1px solid var(--border);">
+      <div style="padding:12px 16px;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:12px;color:var(--lime);border-right:1px solid var(--border);">Mobile L ★</div>
+      <div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--muted);border-right:1px solid var(--border);">375–767px</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">4 col</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);">16px</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 140px 1fr 1fr;border-bottom:1px solid var(--border);">
+      <div style="padding:12px 16px;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">Tablet</div>
+      <div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--muted);border-right:1px solid var(--border);">768–1023px</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">8 col</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);">20px</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 140px 1fr 1fr;">
+      <div style="padding:12px 16px;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">Desktop</div>
+      <div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--muted);border-right:1px solid var(--border);">1024px+</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);border-right:1px solid var(--border);">12 col</div>
+      <div style="padding:12px 16px;font-size:12px;color:var(--muted);">24px</div>
+    </div>
+  </div>
+  <div style="padding:14px 18px;background:var(--lime-glow);border:1px solid var(--lime-border);font-size:12px;color:var(--muted);line-height:1.65;">
+    <span style="color:var(--lime);font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;">★ Primary design target</span> — Design all components at 375px first. 90%+ of users are on mobile. Desktop is secondary. The 12-column grid shown above is for marketing/web — the app UI uses 4 columns with 16px gutters and 16px horizontal page padding.
+  </div>
+
+
+<!-- ═══════════ BACK COVER ═══════════ -->
+<div class="back-cover">
+  <div class="back-grid"></div>
+  <div class="back-corner"></div>
+  <div class="back-inner">
+
+    <!-- Top: tagline block -->
+    <div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(17,18,16,0.45);margin-bottom:28px;display:flex;align-items:center;gap:12px;"><span style="display:inline-block;width:32px;height:1px;background:rgba(17,18,16,0.3);"></span>Neon Forge — Brand Identity System</div>
+      <div class="back-title">
+        YOUR<br>
+        <span class="out">DATA.</span><br>
+        THEIR<br>
+        <span class="out">PROBLEM.</span>
+      </div>
+    </div>
+
+    <!-- Middle: quick-ref principles -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(17,18,16,0.15);margin:0 0 0 0;">
+      <div style="background:rgba(17,18,16,0.06);padding:24px 20px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(17,18,16,0.45);margin-bottom:10px;">Color rule</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;color:#111210;line-height:1.2;">Lime acts.<br>Red warns.<br>Blue shares.</div>
+      </div>
+      <div style="background:rgba(17,18,16,0.06);padding:24px 20px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(17,18,16,0.45);margin-bottom:10px;">Type rule</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;color:#111210;line-height:1.2;">Barlow yells.<br>DM Sans talks.<br>DM Mono counts.</div>
+      </div>
+      <div style="background:rgba(17,18,16,0.06);padding:24px 20px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(17,18,16,0.45);margin-bottom:10px;">Corner rule</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;color:#111210;line-height:1.2;">Clip, don't<br>round. Never<br>mix both.</div>
+      </div>
+      <div style="background:rgba(17,18,16,0.06);padding:24px 20px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(17,18,16,0.45);margin-bottom:10px;">Photo rule</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;color:#111210;line-height:1.2;">Real sweat.<br>No stock.<br>No lime tints.</div>
+      </div>
+    </div>
+
+    <!-- Bottom: logo + meta -->
+    <div class="back-bottom">
+      <div class="back-logo">
+        <div class="nav-icon" style="width:44px;height:44px;">
+          <svg width="24" height="20" viewBox="0 0 52 44" fill="none"><rect x="2" y="28" width="12" height="14" fill="#111210" opacity="0.35"/><rect x="20" y="16" width="12" height="26" fill="#111210" opacity="0.6"/><rect x="38" y="4" width="12" height="38" fill="#111210"/></svg>
+        </div>
+        <span class="back-wm">PULSEUP — NEON FORGE</span>
+      </div>
+      <div class="back-meta">
+        Brand Identity Kit · Variant C · v1.1 (Revised)<br>
+        Dark-mode exclusive system · © 2026 PulseUp Technologies
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
