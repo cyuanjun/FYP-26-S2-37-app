@@ -18,6 +18,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 ## Reading order for someone new
 
 0. [STATUS.md](STATUS.md) — current progress + what's next (if you're resuming).
+0b. [prototype-demo-guide.md](prototype-demo-guide.md) — **run & demo the prototype**: setup, manual-test walkthrough (do this → see this), test accounts, backend verification.
 1. [project-description.md](project-description.md) — what we're required to build.
 2. **PRD v2.0 + SRS v2.0 + TDM v3.0** (the team's submitted docs) — canonical requirements (PRD/SRS) and system design: architecture, ERD (§8), wireframes (TDM). Divergences between them and engineering decisions are tracked in [deliverables/doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md). ([requirements/urs.md](requirements/urs.md) is deprecated.)
 3. [architecture/build-plan.md](architecture/build-plan.md) — scope, stack, roadmap, team split.
