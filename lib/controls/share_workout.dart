@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../boundaries/gateways/social_gateway.dart';
 import '../boundaries/gateways/social_share_gateway.dart';
 import '../core/seq_log.dart';
+import '../entities/enums.dart';
 import 'authenticate.dart';
 
 /// CONTROL — CreateWorkoutSharePost: inserts a `workout_share` Post for a session.

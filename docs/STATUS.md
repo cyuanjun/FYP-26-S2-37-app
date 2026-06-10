@@ -3,7 +3,7 @@
 **Read this first when resuming.** Single source for current progress. Last updated **10 Jun 2026**.
 
 ## One-line state
-**PRD/SRS/TDM are submitted and reconciled; PTD/PUM net-new writing is drafted.** First backend code has landed: **schema aligned to TDM §8 + Postgres DDL/RLS/seed generated** in [`/supabase/`](../supabase/). Flutter app not scaffolded yet. Next code step is the Flutter scaffold → vertical slice.
+**PRD/SRS/TDM submitted and reconciled; PTD/PUM net-new writing drafted.** Backend deployed to Supabase (26 tables + RLS + `end_workout_session` RPC + `summarise-progress` Edge Function). **Flutter app scaffolded (BCE) and the full vertical slice is built, tested (43 tests), and verified on Android + iOS** — log in → record phone-GPS workout → history → AI summary → share. Next: deepen a feature / next sprint, or finish PTD/PUM. (Details below.)
 
 ## Calendar
 - **~13 Jun** — PTD + PUM due (basic-prototype milestone, PRD §8.2).

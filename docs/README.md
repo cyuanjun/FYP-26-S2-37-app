@@ -22,7 +22,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 2. **PRD v2.0 + SRS v2.0 + TDM v3.0** (the team's submitted docs) — canonical requirements (PRD/SRS) and system design: architecture, ERD (§8), wireframes (TDM). Divergences between them and engineering decisions are tracked in [deliverables/doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md). ([requirements/urs.md](requirements/urs.md) is deprecated.)
 3. [architecture/build-plan.md](architecture/build-plan.md) — scope, stack, roadmap, team split.
 4. [architecture/bce-design.md](architecture/bce-design.md) — BCE architecture + robustness/sequence diagrams + traceability.
-5. [reference/database-v1.md](reference/database-v1.md) — the 28-entity schema and screen→data map.
+5. [reference/database-v1.md](reference/database-v1.md) — the 26-entity schema and screen→data map.
 6. [reference/screens-v1.md](reference/screens-v1.md) — per-screen UI specs.
 
 ## Notes

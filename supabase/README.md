@@ -10,8 +10,13 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | File | What |
 |---|---|
 | `migrations/20260610090000_init_schema.sql` | Extensions, 28 enum types, the 26 tables (FKs, checks, indexes), and the `on_auth_user_created` signup trigger. |
-| `migrations/20260610090100_rls_policies.sql` | Helper `is_admin()`, RLS enabled on every table, per-table policies, the role/status self-escalation guard, and the two privacy views. |
+| `migrations/20260610090100_rls_policies.sql` | Helper `is_admin()`, RLS enabled on every table, per-table policies, the role/status self-escalation guard, the two privacy views, and the trigger-function EXECUTE revokes. |
+| `migrations/20260610120000_end_workout_session_rpc.sql` | The `end_workout_session` SECURITY DEFINER RPC (finalize session + XP + weekly streak + level_up post). |
+| `migrations/20260610130000_fitness_profile_on_signup.sql` | Extends the signup trigger to also create the 1:1 `fitness_profiles` row (so `workout_sessions.user_id` FK resolves); backfills existing accounts. |
 | `seed.sql` | The three install-time catalogs: `workout_types`, `health_tags`, `expert_categories`. |
+| `seed-demo.sql` | **Demo data** (not install data): two login accounts (`free@`/`premium@wiseworkout.test`, pw `Password123!`) + varied workout sessions, XP/streak, and share posts. Idempotent — re-run to reset the demo. |
+
+> **Note on migration versions:** these files are the replayable local history. The hosted project was provisioned via the Supabase MCP, which assigned its own version timestamps (and split the RPC + trigger-grant changes into separate migrations) — so `supabase migration list` against the remote shows different version ids for the same final schema. Reconcile with `supabase migration repair` if/when adopting CLI `db push`.
 
 ## Running it
 
@@ -64,10 +69,11 @@ These are the deliberate translations from the PascalCase ERD to the physical sc
 - **Admin-only**: reading `feedback` / `contact_messages`, suspending users (`role`/`status` changes are
   blocked for non-admins by the `guard_profile_privileged_columns` trigger).
 
-### Deliberately deferred (not in this starter)
+### SECURITY DEFINER RPCs
 
-Multi-step atomic mutations belong in **SECURITY DEFINER RPCs**, added when their controls land (build-plan
-§3) — e.g. `endWorkoutSession` (write session + bump XP + maybe emit a `level_up` post), `startPremium`
-(role flip + `subscriptions` upsert), and the `ServiceRequest` status-transition rules (client cancels /
-expert accepts+completes). The RLS here gates *row access*; these RPCs will enforce the *column-level
-transition* logic.
+Multi-step atomic mutations live in **SECURITY DEFINER RPCs**, added as their controls land (build-plan §3).
+- ✅ **`end_workout_session`** (finalize session + bump XP + recompute streak + maybe emit a `level_up` post) — built.
+- ⏳ Still deferred: `startPremium` (role flip + `subscriptions` upsert) and the `ServiceRequest`
+  status-transition rules (client cancels / expert accepts+completes).
+
+The RLS here gates *row access*; these RPCs enforce the *column-level transition* logic.

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../controls/authenticate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../gateways/auth_gateway.dart';
 import '../auth/login_screen.dart';
 import '../home/home_shell.dart';
 
@@ -25,7 +25,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future<void>.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
-      final signedIn = ref.read(authGatewayProvider).isSignedIn;
+      final signedIn = ref.read(currentUserIdProvider) != null;
       context.go(signedIn ? HomeShell.path : LoginScreen.path);
     });
   }

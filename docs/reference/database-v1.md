@@ -102,7 +102,7 @@ One catalog for the three profile-tag kinds — **diet** (Vegetarian, Keto…), 
 Notification on/off toggles are stored as a `notificationPrefs` JSON map (`NotificationTypeKey → bool`) **on `User`**, not as their own table. Merged from the former `NotificationPreference` entity in schema-v2: a handful of settings switches didn't justify a relational table, and they apply to every role. A missing key reads as off. Edited on #13.4 (the screen filters which types to show by audience). Display metadata (label/description/category per type) lives in code (`NOTIFICATION_TYPES`, `NOTIFICATION_CATEGORY_LABELS`), not the DB.
 
 ### FitnessPlan
-**AI-generated** training plan for an athlete. 1-to-many with `FitnessProfile`. Auto-generated when the user sets a `FitnessGoal`, and on manual "Regenerate" tap. Premium users get **personalised** plans (driven by their full profile — allergies, injuries, preferred workouts, training experience). Free users get **basic** plans (goal + activity level only) and are capped at 1 regeneration per month.
+A training plan for an athlete. 1-to-many with `FitnessProfile`. Generated when the user sets a `FitnessGoal`, and on manual "Regenerate" tap. Per the locked AI scope (build-plan §5, bce-design §2.1), the **base week skeleton is rule-based** (`BuildPlanSkeleton`, all tiers); AI only *personalises* it (`SuggestPlan`, Premium). `GenerationStrategy` records which path: Free users get **basic** plans (rule-based skeleton from goal + activity level, capped at 1 regeneration per month); Premium users get **personalised** plans (AI refinement driven by their full profile — allergies, injuries, preferred workouts, training experience).
 
 *Introduced by: #7 Train · #8 Plan Detail · planned for AI-generation flow*
 

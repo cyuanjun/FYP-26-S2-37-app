@@ -4,6 +4,7 @@ import 'package:wise_workout/boundaries/gateways/social_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/social_share_gateway.dart';
 import 'package:wise_workout/controls/authenticate.dart';
 import 'package:wise_workout/controls/share_workout.dart';
+import 'package:wise_workout/entities/enums.dart';
 
 import '../helpers/fakes.dart';
 

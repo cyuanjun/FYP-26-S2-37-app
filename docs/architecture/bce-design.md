@@ -17,7 +17,7 @@ The architecture and robustness/sequence analysis for the Flutter app, following
 
 | Stereotype | Responsibility | Lives in |
 |---|---|---|
-| **Entity** | Persistent domain data + invariants that belong to the data | `lib/entities/` (freezed models of the 28 schema entities) |
+| **Entity** | Persistent domain data + invariants that belong to the data | `lib/entities/` (freezed models of the 26 schema entities) |
 | **Boundary** | The system edge — talks to an **actor** (UI) or an **external system** (gateway) | `lib/boundaries/ui/`, `lib/boundaries/gateways/` |
 | **Control** | Coordinates exactly **one use case**; the verb logic mediating boundary ↔ entity | `lib/controls/` (one class per use case = the mock's store actions) |
 
@@ -54,7 +54,7 @@ Actor ── Boundary ── Control ── Entity
 
 ### 2.1 Entities (`lib/entities/`)
 
-The 28 schema entities, grouped. Each is a freezed model; data-owned rules (e.g. XP/level/streak math) live with the entity or its Control per §1.
+The 26 schema entities, grouped. Each is a freezed model; data-owned rules (e.g. XP/level/streak math) live with the entity or its Control per §1.
 
 - **Identity & profile:** `User`, `FitnessProfile`, `ExpertProfile`, `Subscription`, `FitnessGoal`
 - **Catalogs:** `WorkoutType`, `HealthTag`, `ExpertCategory`
@@ -100,6 +100,10 @@ Each is one of the mock's store actions = one use case = one Control class.
 | Feedback | `SubmitFeedback` |
 | Subscription | `StartPremium`, `CancelSubscription`, `Resubscribe` |
 | Admin | `SetUserStatus`, `ReviewExpertVerification`, `TriageFeedback`, `ResolveContactMessage` |
+
+> **As-built (vertical slice).** §2.2–§2.4 are the full design for all 64 use cases; the shipped vertical slice implements a subset, with two deliberate realizations:
+> - **Gateways:** the logical `SupabaseGateway` is realized as **three feature gateways** — `ProfileGateway`, `WorkoutGateway`, `SocialGateway` (plus the as-designed `AuthGateway`, `AiGateway`, `WorkoutDataSource`, `SocialShareGateway`). `NotificationGateway` / `StorageGateway` are not built yet.
+> - **Controls built:** `Authenticate`, `ActiveWorkout` (realizes `StartWorkoutSession` + `EndWorkoutSession` as one live-capture Notifier — SEQ participant `ActiveWorkout`, calling the `end_workout_session` RPC), `SaveWorkoutDetails` (realizes `UpdateWorkoutSession`), `DeleteWorkoutSession`, `SummariseProgress`, `CreateWorkoutSharePost`, `ShareWorkoutToSocial`. All other §2.4 controls are pending.
 
 ---
 
