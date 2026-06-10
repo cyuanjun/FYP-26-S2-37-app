@@ -243,7 +243,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Widget _statTile(String label, String value, int? delta) {
     return Expanded(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(label, style: AppTypography.caption2),
           if (delta != null && delta != 0)
@@ -441,7 +441,7 @@ class _WorkoutListCard extends StatelessWidget {
 
   Widget _cell(String value, String label) => Expanded(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(value, style: AppTypography.headline),
             Text(label, style: AppTypography.caption2),
