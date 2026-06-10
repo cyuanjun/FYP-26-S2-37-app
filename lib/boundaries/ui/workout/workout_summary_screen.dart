@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/save_workout_details.dart';
+import '../../../controls/share_workout.dart';
+import '../../../boundaries/gateways/social_share_gateway.dart';
 import '../../../core/format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
@@ -33,14 +35,25 @@ class WorkoutSummaryScreen extends ConsumerStatefulWidget {
 class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   final _name = TextEditingController();
   final _notes = TextEditingController();
+  final _caption = TextEditingController();
   FeelRating? _feel;
   bool _saving = false;
+  bool _share = false;
 
   @override
   void dispose() {
     _name.dispose();
     _notes.dispose();
+    _caption.dispose();
     super.dispose();
+  }
+
+  String _shareText() {
+    final t = widget.type.name;
+    final dur = fmtDuration(widget.elapsed);
+    return widget.type.isCardio
+        ? 'I just finished a $t workout — ${fmtKm(widget.distanceMeters)} km in $dur on Wise Workout!'
+        : 'I just finished a $t workout — $dur on Wise Workout!';
   }
 
   Future<void> _save() async {
@@ -51,6 +64,12 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
           feelRating: _feel,
           notes: _notes.text,
         );
+    if (_share) {
+      await ref.read(createWorkoutSharePostProvider).call(
+            sessionId: widget.sessionId,
+            caption: _caption.text,
+          );
+    }
     if (!mounted) return;
     Navigator.of(context).pop(); // back to the app shell (Train tab)
   }
@@ -110,6 +129,42 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
             maxLines: 3,
             decoration: const InputDecoration(labelText: 'PRIVATE NOTES (OPTIONAL)'),
           ),
+          const SizedBox(height: 16),
+          // Share to Social — posts a workout_share to the feed (on save) and
+          // offers named-platform external shares.
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Share to Social', style: AppTypography.headline),
+            subtitle: Text('Posts to your feed', style: AppTypography.footnote),
+            value: _share,
+            activeThumbColor: AppColors.accent,
+            onChanged: (v) => setState(() => _share = v),
+          ),
+          if (_share) ...[
+            TextField(
+              controller: _caption,
+              maxLines: 2,
+              decoration: const InputDecoration(labelText: 'DESCRIPTION (PUBLIC, OPTIONAL)'),
+            ),
+            const SizedBox(height: 12),
+            Text('SHARE TO', style: AppTypography.caption2),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: SocialPlatform.values
+                  .map((p) => OutlinedButton(
+                        onPressed: () =>
+                            ref.read(shareWorkoutToSocialProvider).call(p, text: _shareText()),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.ink,
+                          side: const BorderSide(color: AppColors.faint),
+                        ),
+                        child: Text(p.label),
+                      ))
+                  .toList(),
+            ),
+          ],
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: _saving ? null : _save,

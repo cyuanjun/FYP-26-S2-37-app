@@ -34,7 +34,11 @@
 3. **Vertical slice** — log in → record a phone-GPS workout → history → AI summary → share. (build-plan §7.) Plan: [~/.claude/plans/nested-questing-raccoon.md]; 5 phases (auth · capture · history · AI summary · share); decisions: slice-only, AI stubbed behind AiGateway, test accounts via MCP.
    - ✅ **Phase 1 (auth slice + shell) done & verified on Android + iOS** (10 Jun): first freezed entity (`Profile`) + codegen pipeline; `build.yaml` snake_case; `seq_log`; `Authenticate` control + `ProfileGateway`; Login/Splash/HomeShell + go_router auth redirect. Two test accounts seeded in Supabase Auth (`free@`/`premium@wiseworkout.test`, pw `Password123!`). REST-verified auth + RLS (own-row only); login screen renders on emulator + iOS simulator. *Toolchain note:* manually-seeded `auth.users` needed empty-string token columns (not NULL) to avoid GoTrue 500s.
    - **Toolchains set up (10 Jun):** openjdk@17 + Android cmdline-tools/SDK/emulator (`pixel_api35` AVD), Xcode 26.5 + CocoaPods + iOS 26.5 simulator runtime. Android build needed core-library desugaring for flutter_local_notifications (in `android/app/build.gradle.kts`).
-   - **Next: Phase 2 (capture)** — `WorkoutDataSource`/`PhoneSensorSource` + sensor permissions, `end_workout_session` RPC, Train/Active/Summary screens.
+   - ✅ **Phase 2 (capture)** — `WorkoutDataSource`/`PhoneSensorSource` + permissions, `end_workout_session` RPC (XP/streak/level-up), Train/ActiveWorkout/Summary (spec-matched to #7/#9).
+   - ✅ **Phase 3 (history)** — History (#12, analytics + grouped cards) + History Detail (#12.1, edit/delete); matches TDM activity diagram.
+   - ✅ **Phase 4 (AI summary)** — `summarise-progress` Edge Function (stub, swappable) + `AiGateway` + `SummariseProgress` + History ✨ sheet (AI-assisted label).
+   - ✅ **Phase 5 (share)** — `SocialShareGateway` (FB/IG/Twitter/TikTok) + `CreateWorkoutSharePost`/`ShareWorkoutToSocial` + Summary share section (creates `workout_share` Post).
+   - ✅ **Vertical slice COMPLETE** — log in → record phone-GPS workout → history → AI summary → share, verified on Android emulator + iOS simulator. **43 tests** (positive/negative) green. Test accounts: `free@`/`premium@wiseworkout.test` (pw `Password123!`).
 
 > User flagged for the legal section: confirm whether a privacy policy + minimum-age requirement exist yet or are "preliminary."
 
