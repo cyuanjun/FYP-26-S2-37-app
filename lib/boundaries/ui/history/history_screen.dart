@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/authenticate.dart';
+import '../../../controls/summarise_progress.dart';
 import '../../../controls/workout_history.dart';
 import '../../../core/format.dart';
 import '../../../core/theme/app_colors.dart';
@@ -29,6 +30,48 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   void _soon(String what) => ScaffoldMessenger.of(context)
       .showSnackBar(SnackBar(content: Text('$what is a Premium feature (later sprint).')));
 
+  void _showAiSummary() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      showDragHandle: true,
+      builder: (_) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+        child: Consumer(
+          builder: (context, ref, _) {
+            final summary = ref.watch(aiSummaryProvider);
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.auto_awesome, color: AppColors.accent, size: 18),
+                    const SizedBox(width: 8),
+                    Text('AI PROGRESS SUMMARY', style: AppTypography.caption2),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                summary.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (e, _) => Text("Couldn't generate a summary right now. Please try again.",
+                      style: AppTypography.body),
+                  data: (s) => Text(s.text, style: AppTypography.body),
+                ),
+                const SizedBox(height: 16),
+                Text('AI-assisted · for information only, not medical advice.',
+                    style: AppTypography.footnote),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final history = ref.watch(historyProvider);
@@ -36,7 +79,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     final isPremium = ref.watch(currentProfileProvider).value?.isPremium ?? false;
 
     return Scaffold(
-      appBar: AppBar(titleSpacing: 20, title: const Text('HISTORY', style: AppTypography.title1)),
+      appBar: AppBar(
+        titleSpacing: 20,
+        title: const Text('HISTORY', style: AppTypography.title1),
+        actions: [
+          IconButton(
+            tooltip: 'AI summary',
+            icon: const Icon(Icons.auto_awesome, color: AppColors.accent),
+            onPressed: _showAiSummary,
+          ),
+        ],
+      ),
       body: history.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Could not load history.\n$e', style: AppTypography.footnote)),
