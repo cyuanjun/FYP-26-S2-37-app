@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wise_workout/boundaries/gateways/ai_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/auth_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
@@ -128,6 +129,22 @@ class FakeWorkoutDataSource implements WorkoutDataSource {
   void emit(LiveMetrics m) => _controller.add(m);
 
   void dispose() => _controller.close();
+}
+
+/// Fake AiGateway — returns a canned summary or throws.
+class FakeAiGateway implements AiGateway {
+  FakeAiGateway({this.result = const ProgressSummary(text: 'You trained 2x this week.', model: 'stub'), this.throwOnCall = false});
+
+  ProgressSummary result;
+  bool throwOnCall;
+  int calls = 0;
+
+  @override
+  Future<ProgressSummary> summariseProgress({String range = 'week'}) async {
+    calls++;
+    if (throwOnCall) throw Exception('AI unavailable');
+    return result;
+  }
 }
 
 /// Common test fixtures.
