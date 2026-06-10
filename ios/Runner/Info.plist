@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Wise Workout uses your location to track distance, pace, and route during a workout.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Wise Workout uses motion data to count steps and cadence during a workout.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
