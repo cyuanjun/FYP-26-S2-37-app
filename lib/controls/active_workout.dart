@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../boundaries/gateways/auth_gateway.dart';
 import '../boundaries/gateways/workout_data_source.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/workout_type.dart';
+import 'authenticate.dart';
 import 'workout_history.dart';
 
 enum WorkoutStatus { idle, running, paused }
@@ -65,7 +65,7 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
   }
 
   Future<void> start(WorkoutType type) async {
-    final userId = ref.read(authGatewayProvider).currentUser!.id;
+    final userId = ref.read(currentUserIdProvider)!;
     SeqLog.msg('start-workout', 'ActiveWorkoutScreen', 'ActiveWorkout', 'start(${type.slug})');
     SeqLog.msg('start-workout', 'ActiveWorkout', 'WorkoutGateway', 'startSession');
     final session = await ref

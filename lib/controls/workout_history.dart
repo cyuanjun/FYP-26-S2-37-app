@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../boundaries/gateways/auth_gateway.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/workout_session.dart';
@@ -9,8 +8,7 @@ import 'authenticate.dart';
 /// Read-side: the current user's ended sessions (View Workout History activity).
 /// Invalidated by EndWorkoutSession / DeleteWorkoutSession / SaveWorkoutDetails.
 final historyProvider = FutureProvider<List<WorkoutSession>>((ref) {
-  ref.watch(authChangesProvider);
-  final userId = ref.watch(authGatewayProvider).currentUser?.id;
+  final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Future.value(const <WorkoutSession>[]);
   return ref.watch(workoutGatewayProvider).listEndedSessions(userId);
 });
