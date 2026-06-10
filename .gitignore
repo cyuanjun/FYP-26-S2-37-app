@@ -12,6 +12,9 @@
 .env.*
 *.local
 
+# MCP config (may hold access tokens; project_ref is project-local)
+.mcp.json
+
 # Flutter / Dart (for when the app is scaffolded)
 .dart_tool/
 .packages

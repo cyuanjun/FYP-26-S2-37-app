@@ -37,7 +37,7 @@ The **marketing website** (Next.js, Jedidiah) is a *separate* deliverable — al
 | App | **Flutter** (stable channel) | Android + iOS from one Dart codebase, as the brief requires |
 | State | **Riverpod** | Async providers map cleanly onto Supabase queries (loading / data / error) |
 | Routing | **go_router** | Declarative; role-based redirects for Free / Premium / Expert / Admin |
-| Models | **freezed** + json_serializable | Immutable models + auto JSON ↔ Dart for the 28 entities |
+| Models | **freezed** + json_serializable | Immutable models + auto JSON ↔ Dart for the 26 entities |
 | Backend | **Supabase** (Postgres + Auth + Storage + Realtime) + **Edge Functions** | Managed backend, no servers to host; Edge Functions (TypeScript/Deno) are the custom-API + AI-proxy layer → Foong's "backend/API" deliverable. **Supersedes the PRD's Node/Express + MySQL + Firebase Auth** (§10 lists the PRD edit). |
 | AI | **OpenAI** (Gemini fallback) via an Edge Function | Two functions only: progress **summaries** + plan **suggestions** (§5). Key stays server-side. |
 | Payment | **Simulated** (mock status / manual access grant) | Premium upgrade + expert-service purchase show the access-control flow; no real gateway (PRD §4.4). |
@@ -51,7 +51,7 @@ The **marketing website** (Next.js, Jedidiah) is a *separate* deliverable — al
 
 The app is designed to **Jacobson's BCE** stereotypes so the design docs (robustness + sequence diagrams, traceability matrix) are FYP/TDM-compliant. Full detail — inventory, matrix, robustness diagrams, sequence diagrams, and a runtime logging convention — is in [bce-design.md](bce-design.md).
 
-- **Entity** = the 28 schema entities (freezed models) → `lib/entities/`
+- **Entity** = the 26 schema entities (freezed models) → `lib/entities/`
 - **Boundary** = UI screens (actor-facing) + gateways for DB/AI/sensors/social/notifications (system-facing) → `lib/boundaries/{ui,gateways}/`
 - **Control** = one class per use case (the mock's store actions) → `lib/controls/`
 

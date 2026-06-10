@@ -3,7 +3,7 @@
 **Read this first when resuming.** Single source for current progress. Last updated **10 Jun 2026**.
 
 ## One-line state
-Docs-only phase. **PRD/SRS/TDM are submitted and reconciled; PTD/PUM net-new writing is drafted.** No app code scaffolded yet. Next code step (after the PTD/PUM are assembled) is schema alignment → DDL → Flutter scaffold.
+**PRD/SRS/TDM are submitted and reconciled; PTD/PUM net-new writing is drafted.** First backend code has landed: **schema aligned to TDM §8 + Postgres DDL/RLS/seed generated** in [`/supabase/`](../supabase/). Flutter app not scaffolded yet. Next code step is the Flutter scaffold → vertical slice.
 
 ## Calendar
 - **~13 Jun** — PTD + PUM due (basic-prototype milestone, PRD §8.2).
@@ -29,8 +29,8 @@ Docs-only phase. **PRD/SRS/TDM are submitted and reconciled; PTD/PUM net-new wri
 - **Fill TDM §6 Sequence Diagrams** (currently an empty placeholder) from bce-design.md §5.
 
 ## Next — engineering (after the 13th; not blocked)
-1. **Align [reference/database-v1.md](reference/database-v1.md) to the TDM §8 ERD**, then generate **Postgres DDL + RLS starter + seed**.
-2. **Scaffold the Flutter project** — BCE folders (`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`), Riverpod + go_router + Supabase client, design tokens from [reference/palette.md](reference/palette.md).
+1. ✅ **Aligned [reference/database-v1.md](reference/database-v1.md) to the TDM §8 ERD** (rosters match at 26 entities) and generated **Postgres DDL + RLS starter + seed** → [`/supabase/`](../supabase/) (`migrations/` + `seed.sql`; see [supabase/README.md](../supabase/README.md)). ✅ **Applied to the hosted Supabase project** (`zbeyytgilrqruttvecdc`) via MCP on 10 Jun — 26 tables · 28 enums · 49 policies · 2 privacy views · catalogs seeded; security advisor triaged (trigger-function EXECUTE revoked; the 2 SECURITY DEFINER privacy views are intentional). *Still to do:* the SECURITY DEFINER RPCs (`endWorkoutSession`, `startPremium`, request transitions) when their controls land; note the MCP-applied migration history uses its own version ids — reconcile if/when adopting the Supabase CLI `db push`.
+2. ✅ **Scaffolded the Flutter project** (10 Jun) — `flutter create` (pkg `wise_workout`, android/ios/web), BCE folders (`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`), deps wired (flutter_riverpod, go_router, freezed + json_serializable, supabase_flutter, geolocator/pedometer, flutter_local_notifications), design tokens in `lib/core/theme/` (palette + iOS type scale), Supabase client initialized in `main.dart` (publishable key via `lib/core/config/env.dart`), go_router skeleton (Splash → Home), `AuthGateway` boundary. `flutter analyze` clean · widget test passes · `flutter build web` succeeds. *Toolchain note:* Android SDK + Xcode/CocoaPods not yet installed — web + connected devices work now.
 3. **Vertical slice** — log in → record a phone-GPS workout → history → AI summary → share. (build-plan §7.)
 
 > User flagged for the legal section: confirm whether a privacy policy + minimum-age requirement exist yet or are "preliminary."
