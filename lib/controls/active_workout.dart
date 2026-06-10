@@ -7,6 +7,7 @@ import '../boundaries/gateways/workout_data_source.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/workout_type.dart';
+import 'workout_history.dart';
 
 enum WorkoutStatus { idle, running, paused }
 
@@ -132,6 +133,7 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
 
     _source = null;
     state = const ActiveWorkoutState();
+    ref.invalidate(historyProvider);
     return result;
   }
 

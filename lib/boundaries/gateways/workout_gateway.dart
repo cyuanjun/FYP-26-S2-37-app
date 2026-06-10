@@ -43,6 +43,21 @@ class WorkoutGateway {
     return Map<String, dynamic>.from(res as Map);
   }
 
+  /// All ended sessions for a user, newest first (History list).
+  Future<List<WorkoutSession>> listEndedSessions(String userId) async {
+    final rows = await _client
+        .from('workout_sessions')
+        .select()
+        .eq('user_id', userId)
+        .not('ended_at', 'is', null)
+        .order('started_at', ascending: false);
+    return rows.map(WorkoutSession.fromJson).toList();
+  }
+
+  Future<void> deleteSession(String sessionId) async {
+    await _client.from('workout_sessions').delete().eq('id', sessionId);
+  }
+
   /// Captures the post-session inputs from the summary screen.
   Future<void> updateSummary({
     required String sessionId,

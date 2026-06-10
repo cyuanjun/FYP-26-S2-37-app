@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/enums.dart';
+import 'workout_history.dart';
 
 /// CONTROL — persists the summary-screen inputs (name / feel / notes) for a session.
 class SaveWorkoutDetails {
@@ -23,6 +24,7 @@ class SaveWorkoutDetails {
           feelRating: feelRating,
           notes: notes,
         );
+    _ref.invalidate(historyProvider);
   }
 }
 
