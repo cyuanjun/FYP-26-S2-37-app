@@ -16,3 +16,38 @@ String fmtPace(double meters, Duration elapsed) {
   final s = (secPerKm % 60).round();
   return '$m:${s.toString().padLeft(2, '0')}';
 }
+
+/// Workout-type glyph by slug (History/Social cards).
+String iconForSlug(String slug) => switch (slug) {
+      'running' => '🏃',
+      'cycling' => '🚴',
+      'swimming' => '🏊',
+      'strength' => '💪',
+      'yoga' => '🧘',
+      'pilates' => '🤸',
+      'hiit' => '⚡',
+      'walking' => '🚶',
+      'rowing' => '🚣',
+      'hiking' => '🥾',
+      _ => '🏋️',
+    };
+
+const _months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const _weekdays = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+/// "Today" / "Yesterday" / "Wed 13 May" relative to [now].
+String relativeDay(DateTime d, {DateTime? now}) {
+  final ref = now ?? DateTime.now();
+  final day = DateTime(d.year, d.month, d.day);
+  final today = DateTime(ref.year, ref.month, ref.day);
+  final diff = today.difference(day).inDays;
+  if (diff == 0) return 'Today';
+  if (diff == 1) return 'Yesterday';
+  return '${_weekdays[d.weekday]} ${d.day} ${_months[d.month]}';
+}
+
+/// Monday 00:00 of the week containing [d].
+DateTime startOfWeek(DateTime d) {
+  final day = DateTime(d.year, d.month, d.day);
+  return day.subtract(Duration(days: day.weekday - 1));
+}
