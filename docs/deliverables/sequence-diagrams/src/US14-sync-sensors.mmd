@@ -5,13 +5,13 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ActiveWorkoutScreen
   participant C as «Control»<br/>ActiveWorkout
-  participant G as «Gateway»<br/>WorkoutDataSource (PhoneSensorSource)
+  participant E as «Entity»<br/>WorkoutSession (live metrics)
   A->>B: workout running
   B->>C: live state
-  C->>G: start() — geolocator + pedometer
+  C->>E: start sensor capture
   loop every sensor tick
-    G-->>C: distance, steps, track point
+    E-->>C: distance, steps, track point
     C-->>B: live metrics
     B-->>A: DISTANCE / PACE update
   end
-  note over G: wearables later = new<br/>HealthSource / BleHeartRateSource class
+  note over E: fed by WorkoutDataSource (geolocator + pedometer) -<br/>wearables later = new HealthSource / BLE source class

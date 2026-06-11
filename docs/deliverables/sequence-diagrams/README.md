@@ -7,9 +7,11 @@ app flow, matching the TDM's own scope.
 
 ## Format
 
-Mirrors the TDM example style, simplified: the story's actor + three lifelines
-(«Boundary» screen → «Control» use case → «Gateway»/«Entity»), with `alt` frames for
-normal/alternate flow where one exists. Names are the **as-built/as-designed** classes
+Mirrors the **sample PTD convention**: the story's actor + exactly three lifelines —
+«Boundary» screen → «Control» use case → «Entity» domain object — with `alt` frames for
+normal/alternate flow. The gateway/Supabase persistence path appears as a small note under
+the Entity (gateways are system-facing Boundaries in BCE; the note keeps the diagrams
+faithful to the as-built architecture without breaking the sample's three-box format). Names are the **as-built/as-designed** classes
 from [bce-design.md](../../architecture/bce-design.md) §2 (built stories use shipped
 class names; unbuilt stories use the §2.4 design inventory).
 

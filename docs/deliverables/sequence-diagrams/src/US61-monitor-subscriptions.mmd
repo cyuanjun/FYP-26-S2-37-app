@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>MonitorScreen
   participant C as «Control»<br/>ViewSubscriptionOverview
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>Subscription
   A->>B: open subscription stats
   B->>C: load overview
-  C->>G: aggregate subscriptions + roles
-  G-->>C: counts by tier / status
-  C-->>B: overview
+  C->>E: aggregate by tier / status
+  E-->>C: counts
+  C-->>B: dashboard tiles
   B-->>A: premium gating is working as intended
+  note over E: read via SupabaseGateway

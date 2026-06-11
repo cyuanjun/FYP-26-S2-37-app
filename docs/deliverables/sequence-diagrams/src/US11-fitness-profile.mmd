@@ -5,15 +5,17 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>FitnessProfileScreen
   participant C as «Control»<br/>UpsertFitnessProfile
-  participant G as «Gateway»<br/>FitnessGateway → Supabase
+  participant E as «Entity»<br/>FitnessProfile
   A->>B: edit metrics, chips, tags - tap SAVE PROFILE
   B->>C: save(patch)
-  C->>G: update fitness_profiles (one batched write)
-  G-->>C: ok / error
+  C->>E: apply edits, persist (one batched write)
   alt saved
-    C-->>B: refreshed profile
+    E-->>C: updated FitnessProfile
+    C-->>B: refreshed state
     B-->>A: "Fitness profile saved."
   else write fails
+    E-->>C: error
     C-->>B: AsyncError
     B-->>A: "Could not save. Please try again."
   end
+  note over E: persisted via FitnessGateway → Supabase (RLS: own row only)

@@ -5,14 +5,14 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>TrainScreen
   participant C as «Control»<br/>SuggestPlan (AI)
-  participant G as «Gateway»<br/>AiGateway → Edge Function
+  participant E as «Entity»<br/>FitnessPlan · PlannedWorkout
   A->>B: tap "Suggest plan"
   B->>C: suggestPlan(goal, profile)
-  C->>G: invoke suggest-plan
-  G-->>C: plan draft
   alt accepted
-    C-->>B: save fitness_plans + planned_workouts
-    B-->>A: personalised plan active
+    C->>E: FitnessPlan + PlannedWorkouts (personalised)
+    E-->>C: plan active
+    B-->>A: personalised plan on Train tab
   else regenerate
     B->>C: suggest again
   end
+  note over E: AI draft via AiGateway → Edge Function -<br/>persisted via SupabaseGateway

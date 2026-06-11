@@ -5,14 +5,14 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ActiveWorkoutScreen
   participant C as «Control»<br/>StartWorkoutSession / EndWorkoutSession
-  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  participant E as «Entity»<br/>WorkoutSession
   A->>B: tap START
   B->>C: start(type)
-  C->>G: insert workout_sessions
+  C->>E: create WorkoutSession (startedAt)
   A->>B: tap END → Save & Finish
   B->>C: end()
-  C->>G: rpc end_workout_session(metrics)
-  note right of G: atomic - duration, calories,<br/>XP, streak, level-up post
-  G-->>C: xp_gained, streak, leveled_up
+  C->>E: finalise - duration, distance, calories, XP, streak
+  E-->>C: xp_gained, streak, leveled_up
   C-->>B: summary result
   B-->>A: Workout complete (+XP, streak)
+  note over E: persisted via WorkoutGateway - atomic<br/>end_workout_session RPC on Supabase

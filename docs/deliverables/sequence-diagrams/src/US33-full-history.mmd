@@ -5,11 +5,12 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>HistoryScreen
   participant C as «Control»<br/>ViewWorkoutHistory
-  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  participant E as «Entity»<br/>WorkoutSession
   A->>B: open History tab
   B->>C: load sessions
-  C->>G: listEndedSessions(no date bound)
-  note right of G: lifetime query -<br/>Free month-cap not applied
-  G-->>C: all sessions
+  C->>E: all sessions (no date bound)
+  note right of E: lifetime query -<br/>Free month-cap not applied
+  E-->>C: every session
   C-->>B: full grouped history
   B-->>A: every recorded session
+  note over E: read via WorkoutGateway → Supabase

@@ -5,9 +5,11 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>NotificationsScreen
   participant C as «Control»<br/>UpdateNotificationPrefs + rule controls
-  participant G as «Gateway»<br/>NotificationGateway
+  participant E as «Entity»<br/>PlannedWorkout · Profile (prefs)
   A->>B: enable personalised reminders
   B->>C: setEnabled(...)
-  note over C: rules read the active plan -<br/>planned-workout times, rest days
-  C->>G: schedule plan-aware notifications
-  G-->>A: reminders tuned to the plan
+  C->>E: read active plan - workout times, rest days
+  E-->>C: schedule inputs
+  C-->>B: scheduled
+  B-->>A: reminders tuned to the plan
+  note over E: delivered via NotificationGateway (rule-based)

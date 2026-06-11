@@ -5,14 +5,15 @@ sequenceDiagram
   actor A as Expert User
   participant B as «Boundary»<br/>RequestsScreen
   participant C as «Control»<br/>AcceptServiceRequest
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ServiceRequest
   A->>B: open a pending request
   alt accept
     B->>C: accept(requestId)
-    C->>G: update status = accepted
+    C->>E: status → accepted
     B-->>A: client notified, work begins
   else reject
     B->>C: reject(requestId)
-    C->>G: update status = cancelled
+    C->>E: status → cancelled
     B-->>A: request closed
   end
+  note over E: persisted via SupabaseGateway

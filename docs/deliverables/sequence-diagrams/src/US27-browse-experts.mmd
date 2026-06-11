@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ExpertsScreen
   participant C as «Control»<br/>BrowseExperts
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ExpertProfile · ExpertService
   A->>B: open Experts tab, search / filter
   B->>C: load experts + services
-  C->>G: select expert_profiles, expert_services (live)
-  G-->>C: rows
+  C->>E: live listings + profiles
+  E-->>C: domain objects
   C-->>B: expert + service cards
   B-->>A: directory with ratings + prices
+  note over E: read via SupabaseGateway

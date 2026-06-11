@@ -5,9 +5,10 @@ sequenceDiagram
   actor A as Expert User
   participant B as «Boundary»<br/>ExpertProfileScreen
   participant C as «Control»<br/>UpsertExpertProfile
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ExpertProfile · ExpertCategory
   A->>B: pick specialty categories
   B->>C: save(categoryIds)
-  C->>G: update expert profile ↔ expert_categories
-  G-->>C: ok
+  C->>E: link profile to categories
+  E-->>C: linked
   B-->>A: appears under those categories in Experts tab
+  note over E: persisted via SupabaseGateway

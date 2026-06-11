@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>HistoryScreen (analytics card)
   participant C as «Control»<br/>ViewWorkoutHistory
-  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  participant E as «Entity»<br/>WorkoutSession
   A->>B: tap Day / Week / Month pill
   B->>C: sessions for period
-  C->>G: listEndedSessions(...)
-  G-->>C: rows
-  C-->>B: aggregates + vs-prior deltas
+  C->>E: aggregate per period
+  E-->>C: totals + vs-prior deltas
+  C-->>B: analytics view state
   B-->>A: sessions, active min, calories, HR tiles
+  note over E: read via WorkoutGateway → Supabase

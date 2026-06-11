@@ -5,15 +5,15 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>SplashScreen
   participant C as «Control»<br/>Authenticate
-  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  participant E as «Entity»<br/>Profile
   A->>B: launch app
   B->>C: check session
-  C->>G: currentSession
-  G-->>C: session / null
+  C->>E: current session + Profile
   alt session valid
-    C-->>B: signed in
+    E-->>C: Profile (role drives shell)
     B-->>A: route to Home
   else no session
-    C-->>B: signed out
+    E-->>C: null
     B-->>A: route to Login
   end
+  note over E: via AuthGateway / ProfileGateway → Supabase

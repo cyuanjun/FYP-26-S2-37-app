@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>AdvancedAnalyticsScreen
   participant C as «Control»<br/>ComputeEffectEstimates (rule)
-  participant E as «Entity»<br/>WorkoutSession / FitnessProfile
+  participant E as «Entity»<br/>WorkoutSession · FitnessProfile
   A->>B: open effect estimates
   B->>C: compute(range)
   C->>E: sessions + body metrics + HR
   E-->>C: short / long-term effect figures
   C-->>B: estimates
   B-->>A: detailed effect breakdown
+  note over E: rule-based computation on Entity data (no AI)

@@ -5,9 +5,10 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>ForgotPasswordScreen
   participant C as «Control»<br/>RequestPasswordReset
-  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  participant E as «Entity»<br/>User credentials (auth.users)
   A->>B: enter email, send link
   B->>C: send(email)
-  C->>G: sendPasswordResetEmail()
-  G-->>C: ok
+  C->>E: request reset link
+  E-->>C: ok
   B-->>A: "reset link sent" card
+  note over E: owned by Supabase Auth via AuthGateway

@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>WebsiteAdminScreen
   participant C as «Control»<br/>ManageWebsiteContent
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>Website content (site CMS)
   A->>B: edit hero / pricing / FAQ / testimonials
   B->>C: save(sectionContent)
-  C->>G: update website content tables
-  G-->>C: ok
-  C-->>B: published
+  C->>E: update content sections
+  E-->>C: published
+  C-->>B: done
   B-->>A: marketing site reflects the change
+  note over E: site CMS tables sit outside the 26-entity app ERD -<br/>persisted via SupabaseGateway

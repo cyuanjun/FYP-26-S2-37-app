@@ -5,9 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>NotificationsScreen
   participant C as «Control»<br/>CheckOvertraining (rule-based)
-  participant G as «Gateway»<br/>NotificationGateway
+  participant E as «Entity»<br/>WorkoutSession
   A->>B: rest alerts enabled
-  note over C: rule - sessions on too many<br/>consecutive days / volume spike
-  C->>G: schedule rest-day notification
-  G-->>A: "Consider a rest day"
-  note over B,G: tier TBD - SRS says Free, WBS says Premium<br/>(reconciliation pending)
+  C->>E: scan consecutive training days / volume spike
+  E-->>C: overtraining signal
+  C-->>B: schedule rest-day alert
+  B-->>A: "Consider a rest day"
+  note over B,E: tier TBD - SRS says Free, WBS says Premium<br/>(reconciliation pending)
+  note over E: delivered via NotificationGateway

@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ProfileScreen
   participant C as «Control»<br/>Authenticate
-  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  participant E as «Entity»<br/>Profile
   A->>B: tap LOG OUT
   B->>C: signOut()
-  C->>G: signOut()
-  G-->>C: session cleared
+  C->>E: end session, clear cached Profile
+  E-->>C: session cleared
   C-->>B: auth state = signed out
   B-->>A: redirect to Login
+  note over E: via AuthGateway → Supabase Auth

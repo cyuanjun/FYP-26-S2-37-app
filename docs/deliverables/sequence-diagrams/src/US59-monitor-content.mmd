@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>MonitorScreen
   participant C as «Control»<br/>ModerateServiceListing
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ExpertService
   A->>B: review reported / new listings
   B->>C: takeDown(listingId)
-  C->>G: update expert_services status = archived
-  G-->>C: ok
-  C-->>B: removed from marketplace
+  C->>E: status → archived
+  E-->>C: removed from marketplace
+  C-->>B: done
   B-->>A: listing no longer visible
+  note over E: persisted via SupabaseGateway

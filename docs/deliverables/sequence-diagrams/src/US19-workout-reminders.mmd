@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>NotificationsScreen
   participant C as «Control»<br/>UpdateNotificationPrefs
-  participant G as «Gateway»<br/>NotificationGateway (local notifications)
+  participant E as «Entity»<br/>Profile (notification_prefs)
   A->>B: toggle "Daily reminder" on
   B->>C: setEnabled(daily_reminder, true)
-  C->>G: schedule local notification (rule-based)
-  C-->>B: prefs saved (profiles.notification_prefs)
-  B-->>A: toggle on - reminder fires at preferred time
-  note over C,G: rule-based - no AI involved
+  C->>E: update prefs map, persist
+  E-->>C: saved
+  C-->>B: toggle committed
+  B-->>A: reminder fires at preferred time
+  note over E: prefs via ProfileGateway → Supabase -<br/>scheduling rule-based via NotificationGateway (no AI)

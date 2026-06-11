@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>HomeShell
   participant C as «Control»<br/>Authenticate
-  participant G as «Gateway»<br/>ProfileGateway → Supabase
+  participant E as «Entity»<br/>Profile
   A->>B: log in
   B->>C: load profile
-  C->>G: fetchProfile()
-  G-->>C: role = premium
+  C->>E: Profile (role = premium)
+  E-->>C: isPremium = true
   C-->>B: premium profile
   B-->>A: all Free features + premium surfaces<br/>(no cap banner, no locks)
+  note over E: read via ProfileGateway → Supabase

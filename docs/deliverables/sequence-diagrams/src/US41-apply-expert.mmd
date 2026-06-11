@@ -5,11 +5,11 @@ sequenceDiagram
   actor A as Expert User
   participant B as «Boundary»<br/>Expert Application Page (website)
   participant C as «Control»<br/>SubmitExpertApplication
-  participant G as «Gateway»<br/>SupabaseGateway + StorageGateway
+  participant E as «Entity»<br/>ExpertProfile · ExpertVerificationDocument
   A->>B: fill application, attach credentials
   B->>C: submit(application)
-  C->>G: upload expert_verification_documents
-  C->>G: insert expert_profiles (status=pending)
-  G-->>C: ok
-  C-->>B: submitted
+  C->>E: ExpertProfile (pending) + verification documents
+  E-->>C: submitted
+  C-->>B: done
   B-->>A: "application under review"
+  note over E: files via StorageGateway - rows via SupabaseGateway

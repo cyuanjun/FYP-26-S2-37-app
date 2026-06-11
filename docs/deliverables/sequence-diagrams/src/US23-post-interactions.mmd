@@ -5,13 +5,14 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>SocialScreen / PostDetailScreen
   participant C as «Control»<br/>CreateWorkoutSharePost · TogglePostLike · AddPostComment
-  participant G as «Gateway»<br/>SocialGateway → Supabase
+  participant E as «Entity»<br/>Post · PostLike · PostComment
   A->>B: share a workout
   B->>C: createWorkoutSharePost(caption)
-  C->>G: insert posts (kind=workout_share)
+  C->>E: new Post (kind = workout_share)
   A->>B: tap like / write comment
   B->>C: toggleLike(post) / addComment(text)
-  C->>G: insert/delete post_likes · insert post_comments
-  G-->>C: ok
-  C-->>B: updated counts
+  C->>E: new PostLike / PostComment
+  E-->>C: updated counts
+  C-->>B: state
   B-->>A: like + comment reflected
+  note over E: persisted via SocialGateway → Supabase
