@@ -7,6 +7,7 @@ import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/workout_type.dart';
 import 'authenticate.dart';
+import 'view_profile.dart';
 import 'workout_history.dart';
 
 enum WorkoutStatus { idle, running, paused }
@@ -119,8 +120,18 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
     _timer?.cancel();
     await _metricsSub?.cancel();
 
+    // Calorie estimate is a data-owned rule on WorkoutType (MET-based);
+    // weight comes from the fitness profile, defaulting inside the entity.
+    double? weightKg;
+    try {
+      weightKg = (await ref.read(fitnessProfileProvider.future))?.weightKg;
+    } catch (_) {} // profile unavailable → entity falls back to 70 kg
+    final calories =
+        type.estimateCalories(durationSeconds: elapsed.inSeconds, weightKg: weightKg);
+
     final metrics = <String, dynamic>{
       'duration_seconds': elapsed.inSeconds,
+      'calories_burned': calories,
       if (type.isCardio) 'distance_meters': state.distanceMeters.round(),
       if (_source != null && _source!.trackPoints.isNotEmpty)
         'track_points': _source!.trackPoints,

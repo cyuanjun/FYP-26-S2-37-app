@@ -9,7 +9,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 10 built · 13 partial · 41 not started
+**Score:** 11 built · 12 partial · 41 not started
 
 
 ## Unregistered user (US01–US06)
@@ -36,7 +36,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | Manual entry UI not built (schema supports it: null device) |
 | US14 | 🟨 | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone sensors (GPS+steps) ✅; wearables are additive later |
 | US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + analytics ✅; Free cap = current calendar month, enforced at the query level (12 Jun) |
-| US16 | 🟨 | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | XP per session ✅; calories not computed for live sessions yet (seeded data only) |
+| US16 | ✅ | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | MET-based calorie estimate per session (entity rule, profile weight w/ 70 kg fallback) + XP; computed live since 12 Jun |
 | US17 | 🟨 | As a registered free user, I want to view simple charts or reports so that my fitness progress is easier to understand. | Analytics card with deltas ✅; charts pending |
 | US18 | 🟨 | As a registered free user, I want to receive basic AI progress summaries and basic AI-assisted fitness plan suggestions so that I can better understand my activity data and follow a simple workout routine. | AI progress summary ✅ (stub model); basic plan suggestion pending |
 | US19 | 🟨 | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Preference toggles #13.4 ✅; flutter_local_notifications wired but no scheduling yet |
