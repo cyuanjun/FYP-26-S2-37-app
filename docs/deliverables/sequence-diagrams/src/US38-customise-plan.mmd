@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>PlanDetailScreen
   participant C as «Control»<br/>RegeneratePlan
-  participant G as «Gateway»<br/>AiGateway + SupabaseGateway
+  participant E as «Entity»<br/>FitnessPlan
   A->>B: change duration / frequency / preferences
   B->>C: regenerate(options)
-  C->>G: suggest-plan with constraints
-  G-->>C: revised plan
-  C-->>B: updated fitness_plan (regenerated_count+1)
+  C->>E: update FitnessPlan (regenerated_count + 1)
+  E-->>C: updated plan
+  C-->>B: plan persisted
   B-->>A: plan reflects custom parameters
+  note over E: AI re-draft via AiGateway - persisted via SupabaseGateway

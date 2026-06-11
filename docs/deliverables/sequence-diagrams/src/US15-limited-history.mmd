@@ -5,11 +5,12 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>HistoryScreen
   participant C as «Control»<br/>ViewWorkoutHistory
-  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  participant E as «Entity»<br/>WorkoutSession
   A->>B: open History tab
   B->>C: load sessions
-  C->>G: listEndedSessions(from = 1st of month)
-  note right of G: Free cap = current calendar<br/>month, enforced in the query
-  G-->>C: this month's sessions
+  C->>E: sessions from 1st of current month
+  note right of E: Free cap = current calendar<br/>month, enforced in the query
+  E-->>C: this month's sessions
   C-->>B: grouped list + weekly analytics
   B-->>A: sessions, deltas, cap banner + upsell
+  note over E: read via WorkoutGateway → Supabase

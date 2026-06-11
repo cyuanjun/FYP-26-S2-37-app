@@ -5,16 +5,16 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ChallengeDetailScreen
   participant C as «Control»<br/>JoinChallenge
-  participant G as «Gateway»<br/>SocialGateway → Supabase
+  participant E as «Entity»<br/>Challenge · ChallengeParticipant
   A->>B: tap JOIN CHALLENGE
   B->>C: join(challengeId)
-  C->>G: insert challenge_participants
+  C->>E: check deadline, add participant
   alt joined
-    G-->>C: ok
-    C-->>B: participating
+    E-->>C: participating
     B-->>A: progress tracked - XP on completion
   else deadline passed
-    G-->>C: rejected
+    E-->>C: challenge ended
     B-->>A: "Challenge has ended"
   end
-  note over C,G: rewards = XP / levels<br/>(replaces badges - schema v2)
+  note over C,E: rewards = XP / levels<br/>(replaces badges - schema v2)
+  note over E: persisted via SocialGateway → Supabase

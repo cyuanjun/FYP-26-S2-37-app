@@ -5,12 +5,13 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>MonitorScreen
   participant C as «Control»<br/>TriageFeedback / ResolveContactMessage
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>Feedback · ContactMessage
   A->>B: open feedback inbox
   B->>C: markReviewed(feedbackId)
-  C->>G: update feedback.status = reviewed
+  C->>E: Feedback status → reviewed
   A->>B: open contact request
   B->>C: respond(messageId, reply)
-  C->>G: update contact_messages (response, resolved)
-  G-->>C: ok
+  C->>E: ContactMessage response + resolved
+  E-->>C: updated
   B-->>A: queues cleared
+  note over E: persisted via SupabaseGateway

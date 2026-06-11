@@ -5,14 +5,15 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>ExpertsApprovalScreen
   participant C as «Control»<br/>ReviewExpertVerification
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ExpertVerificationDocument · ExpertProfile
   A->>B: open pending application + documents
+  B->>C: review(expertId)
+  C->>E: inspect documents
   alt approve
-    B->>C: approve(expertId)
-    C->>G: verification_status = verified, role = expert
+    C->>E: verification_status → verified, role → expert
     B-->>A: expert goes live
   else reject
-    B->>C: reject(expertId, reason)
-    C->>G: verification_status = rejected
+    C->>E: verification_status → rejected (+reason)
     B-->>A: applicant notified
   end
+  note over E: persisted via SupabaseGateway

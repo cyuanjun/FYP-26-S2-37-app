@@ -5,11 +5,12 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ManualEntryScreen
   participant C as «Control»<br/>StartWorkoutSession / EndWorkoutSession
-  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  participant E as «Entity»<br/>WorkoutSession
   A->>B: enter type, duration, metrics
-  B->>C: save manual session (no device)
-  C->>G: insert + rpc end_workout_session
-  note right of G: connected_device_id = null<br/>marks a manual entry
-  G-->>C: xp_gained
-  C-->>B: saved
+  B->>C: save manual session
+  C->>E: WorkoutSession with connectedDeviceId = null
+  note right of E: null device marks<br/>a manual entry
+  E-->>C: saved (+XP)
+  C-->>B: done
   B-->>A: session appears in History
+  note over E: persisted via WorkoutGateway → Supabase

@@ -5,10 +5,12 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>WorkoutSummaryScreen
   participant C as «Control»<br/>CreateWorkoutSharePost · ShareWorkoutToSocial
-  participant G as «Gateway»<br/>SocialGateway + SocialShareGateway
+  participant E as «Entity»<br/>Post (workout_share)
   A->>B: toggle "Share to Social" on, pick platform
   B->>C: share(caption, platform)
-  C->>G: insert posts (public caption only)
-  note right of G: private notes are never shared
-  C->>G: shareTo(Facebook / Instagram / Twitter / TikTok)
-  G-->>A: OS share sheet opens with message
+  C->>E: new Post with public caption only
+  note right of E: private notes are<br/>never shared
+  E-->>C: post created
+  C-->>B: share to Facebook / Instagram / Twitter / TikTok
+  B-->>A: OS share sheet opens with message
+  note over E: post via SocialGateway - platform share via SocialShareGateway

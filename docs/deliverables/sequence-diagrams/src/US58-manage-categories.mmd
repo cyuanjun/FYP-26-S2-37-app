@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>CategoriesScreen
   participant C as «Control»<br/>UpsertExpertCategory
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ExpertCategory
   A->>B: create / rename / suspend a category
   B->>C: save(category)
-  C->>G: insert/update expert_categories
-  G-->>C: ok
+  C->>E: category changes
+  E-->>C: updated
   C-->>B: catalog updated
   B-->>A: marketplace filters reflect it
+  note over E: persisted via SupabaseGateway

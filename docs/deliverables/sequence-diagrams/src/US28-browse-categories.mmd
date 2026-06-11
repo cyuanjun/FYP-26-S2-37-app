@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ExpertsScreen (category chips)
   participant C as «Control»<br/>BrowseExperts
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ExpertCategory
   A->>B: tap a category chip
   B->>C: filter(categoryId)
-  C->>G: select expert_categories + filtered experts
-  G-->>C: rows
+  C->>E: categories + filtered experts
+  E-->>C: filtered set
   C-->>B: filtered list
   B-->>A: experts for that specialty
+  note over E: read via SupabaseGateway

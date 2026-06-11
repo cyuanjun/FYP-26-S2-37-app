@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Expert User
   participant B as «Boundary»<br/>RequestsScreen
   participant C as «Control»<br/>ViewServiceRequests
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ServiceRequest
   A->>B: open Requests tab
   B->>C: load requests
-  C->>G: select service_requests for my services
-  G-->>C: pending / accepted / completed rows
+  C->>E: requests for my services
+  E-->>C: pending / accepted / completed
   C-->>B: request list
   B-->>A: who asked, for what, when
+  note over E: read via SupabaseGateway

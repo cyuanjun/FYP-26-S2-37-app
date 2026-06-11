@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>UserProfileScreen
   participant C as «Control»<br/>FollowUser / UnfollowUser
-  participant G as «Gateway»<br/>SocialGateway → Supabase
+  participant E as «Entity»<br/>Follow
   A->>B: tap "Add Friend"
   B->>C: follow(userId)
-  C->>G: insert follows
-  G-->>C: ok
+  C->>E: new Follow (follower → followed)
+  E-->>C: created
   C-->>B: following
   B-->>A: button now "Unfriend" - their posts join the feed
+  note over E: persisted via SocialGateway → Supabase

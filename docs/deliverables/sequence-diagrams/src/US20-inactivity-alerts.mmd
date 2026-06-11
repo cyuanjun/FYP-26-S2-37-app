@@ -5,8 +5,10 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>NotificationsScreen
   participant C as «Control»<br/>CheckInactivity (rule-based)
-  participant G as «Gateway»<br/>NotificationGateway
+  participant E as «Entity»<br/>WorkoutSession
   A->>B: inactivity alerts enabled
-  note over C: rule - no ended session<br/>for N days vs weekly commitment
-  C->>G: schedule inactivity notification
-  G-->>A: "You have not worked out since..."
+  C->>E: scan recent sessions vs weekly commitment
+  E-->>C: no ended session for N days
+  C-->>B: schedule alert
+  B-->>A: "You have not worked out since..."
+  note over E: delivered via NotificationGateway (local notifications)

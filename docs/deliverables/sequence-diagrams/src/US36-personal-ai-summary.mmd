@@ -5,11 +5,11 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>HistoryScreen (AI sheet)
   participant C as «Control»<br/>SummariseProgress
-  participant G as «Gateway»<br/>AiGateway → Edge Function
+  participant E as «Entity»<br/>WorkoutSession · FitnessGoal
   A->>B: tap AI summary
   B->>C: summarise(range)
-  C->>G: invoke summarise-progress (+goal, profile context)
-  note right of G: premium = personalised prose<br/>vs basic generic tier
-  G-->>C: personalised summary
-  C-->>B: text
-  B-->>A: tailored summary, AI-assisted label
+  C->>E: sessions + active goal context
+  E-->>C: personalised inputs
+  C-->>B: tailored summary text
+  B-->>A: summary, AI-assisted label
+  note over E: AI call via AiGateway → Edge Function -<br/>premium = personalised vs basic generic tier

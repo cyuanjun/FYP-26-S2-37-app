@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as System Admin
   participant B as «Boundary»<br/>LoginScreen
   participant C as «Control»<br/>Authenticate
-  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  participant E as «Entity»<br/>Profile
   A->>B: enter credentials
   B->>C: signIn()
-  C->>G: signInWithPassword()
-  G-->>C: session, role = admin
+  C->>E: verify credentials, load Profile
+  E-->>C: session + role = admin
   C-->>B: signed in
   B-->>A: route to Admin portal (5-tab shell)
+  note over E: credential check by Supabase Auth via AuthGateway

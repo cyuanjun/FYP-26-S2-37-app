@@ -5,10 +5,11 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>SocialScreen (Community)
   participant C as «Control»<br/>ViewFeed
-  participant G as «Gateway»<br/>SocialGateway → Supabase
+  participant E as «Entity»<br/>Post
   A->>B: open Social tab
   B->>C: load feed
-  C->>G: select posts (workout_share, level_up, challenge_result)
-  G-->>C: post rows + authors
+  C->>E: posts (workout_share, level_up, challenge_result)
+  E-->>C: feed items + authors
   C-->>B: feed models
   B-->>A: scrollable community feed
+  note over E: read via SocialGateway → Supabase

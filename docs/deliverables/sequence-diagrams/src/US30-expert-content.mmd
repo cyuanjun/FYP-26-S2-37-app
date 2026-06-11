@@ -5,11 +5,12 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ExpertDetailScreen
   participant C as «Control»<br/>RequestService
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>ServiceRequest · Deliverable
   A->>B: browse expert content / offerings
   B->>C: purchase(item)
-  C->>G: insert service_requests (simulated payment)
-  G-->>C: ok
+  C->>E: new ServiceRequest (simulated payment)
+  E-->>C: created
   C-->>B: purchased
   B-->>A: content delivered via Deliverable
-  note over B,G: scope under review - may narrow to<br/>services-only (reconciliation log)
+  note over B,E: scope under review - may narrow to<br/>services-only (reconciliation log)
+  note over E: persisted via SupabaseGateway

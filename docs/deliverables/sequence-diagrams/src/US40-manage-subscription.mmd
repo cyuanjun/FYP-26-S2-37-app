@@ -5,12 +5,13 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>SubscriptionScreen
   participant C as «Control»<br/>CancelSubscription / Resubscribe
-  participant G as «Gateway»<br/>SupabaseGateway
+  participant E as «Entity»<br/>Subscription
   A->>B: open Subscription
   B-->>A: status, renews-at, $9.99/mo (simulated)
   A->>B: tap Cancel
   B->>C: cancel()
-  C->>G: update subscriptions.status=cancelled
-  G-->>C: ok
+  C->>E: status → cancelled
+  E-->>C: updated
   C-->>B: cancelled (access until period end)
   B-->>A: status updated
+  note over E: persisted via SupabaseGateway

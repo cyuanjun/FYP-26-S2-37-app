@@ -5,15 +5,17 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>LoginScreen
   participant C as «Control»<br/>Authenticate
-  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  participant E as «Entity»<br/>Profile
   A->>B: enter email + password, tap LOG IN
   B->>C: signIn(email, password)
-  C->>G: signInWithPassword()
-  G-->>C: session / AuthException
+  C->>E: verify credentials, load Profile
   alt valid credentials
+    E-->>C: session + Profile (role)
     C-->>B: auth state = signed in
     B-->>A: redirect to Home (role-aware)
   else invalid credentials
-    C-->>B: AsyncError
+    E-->>C: AuthException
+    C-->>B: error state
     B-->>A: "Incorrect email or password."
   end
+  note over E: credential check by Supabase Auth,<br/>reached via AuthGateway
