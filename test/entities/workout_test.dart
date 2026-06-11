@@ -3,6 +3,8 @@ import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/workout_session.dart';
 import 'package:wise_workout/entities/workout_type.dart';
 
+import '../helpers/fakes.dart';
+
 void main() {
   group('WorkoutType.isCardio', () {
     test('cardio slugs are cardio', () {
@@ -50,6 +52,33 @@ void main() {
       expect(s.distanceMeters, 5000);
       expect(s.feelRating, FeelRating.great);
       expect(s.caloriesBurned, isNull);
+    });
+  });
+
+  group('WorkoutType.estimateCalories (MET × kg × hours)', () {
+    test('30-min run at 70 kg ≈ 343 kcal (positive)', () {
+      expect(runningType.estimateCalories(durationSeconds: 1800, weightKg: 70), 343);
+    });
+
+    test('null weight falls back to the 70 kg default', () {
+      expect(runningType.estimateCalories(durationSeconds: 1800),
+          runningType.estimateCalories(durationSeconds: 1800, weightKg: 70));
+    });
+
+    test('lower-MET discipline burns less for the same session', () {
+      final run = runningType.estimateCalories(durationSeconds: 1800, weightKg: 70);
+      final yoga = yogaType.estimateCalories(durationSeconds: 1800, weightKg: 70);
+      expect(yoga, lessThan(run));
+    });
+
+    test('zero duration → 0 kcal (negative)', () {
+      expect(runningType.estimateCalories(durationSeconds: 0, weightKg: 70), 0);
+    });
+
+    test('unknown slug falls back to moderate 4.0 MET', () {
+      const custom = WorkoutType(id: 'x', name: 'Aerial silks', slug: 'aerial-silks');
+      expect(custom.met, 4.0);
+      expect(custom.estimateCalories(durationSeconds: 3600, weightKg: 70), 280);
     });
   });
 }

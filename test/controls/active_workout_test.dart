@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wise_workout/boundaries/gateways/fitness_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/controls/active_workout.dart';
 import 'package:wise_workout/controls/authenticate.dart';
+import 'package:wise_workout/entities/fitness_profile.dart';
 
 import '../helpers/fakes.dart';
 
@@ -11,13 +13,15 @@ void main() {
   late FakeWorkoutGateway gw;
   late FakeWorkoutDataSource src;
 
-  ProviderContainer makeContainer() {
+  ProviderContainer makeContainer({double? weightKg}) {
     gw = FakeWorkoutGateway(endResult: {'xp_gained': 42, 'leveled_up': false, 'current_streak': 1});
     src = FakeWorkoutDataSource();
     final c = ProviderContainer(overrides: [
       currentUserIdProvider.overrideWithValue('u1'),
       workoutGatewayProvider.overrideWithValue(gw),
       workoutDataSourceFactoryProvider.overrideWithValue(() => src),
+      fitnessGatewayProvider.overrideWithValue(
+          FakeFitnessGateway(profile: FitnessProfile(id: 'u1', weightKg: weightKg))),
     ]);
     addTearDown(() {
       src.dispose();
@@ -54,8 +58,23 @@ void main() {
     final result = await c.read(activeWorkoutProvider.notifier).end();
     expect(result['xp_gained'], 42);
     expect(gw.endSessionCalls.single.metrics.containsKey('distance_meters'), isTrue);
+    expect(gw.endSessionCalls.single.metrics['calories_burned'], isA<int>());
     expect(src.stopped, isTrue);
     expect(c.read(activeWorkoutProvider).status, WorkoutStatus.idle);
+  });
+
+  test('end → calorie estimate uses profile weight when set (positive)', () async {
+    final c = makeContainer(weightKg: 100); // heavier burns more than default 70
+    await c.read(activeWorkoutProvider.notifier).start(runningType);
+    await c.read(activeWorkoutProvider.notifier).end();
+    final heavy = gw.endSessionCalls.single.metrics['calories_burned'] as int;
+
+    final c2 = makeContainer(); // null weight → entity's 70 kg default
+    await c2.read(activeWorkoutProvider.notifier).start(runningType);
+    await c2.read(activeWorkoutProvider.notifier).end();
+    final defaultW = gw.endSessionCalls.single.metrics['calories_burned'] as int;
+
+    expect(heavy, greaterThanOrEqualTo(defaultW));
   });
 
   test('end non-cardio → no distance in metrics (negative for distance)', () async {

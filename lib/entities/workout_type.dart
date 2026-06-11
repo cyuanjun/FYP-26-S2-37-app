@@ -21,4 +21,28 @@ abstract class WorkoutType with _$WorkoutType {
   factory WorkoutType.fromJson(Map<String, dynamic> json) => _$WorkoutTypeFromJson(json);
 
   bool get isCardio => cardioSlugs.contains(slug);
+
+  /// MET (metabolic equivalent) per catalog slug — population averages from
+  /// the Compendium of Physical Activities; unknown/custom types fall back to
+  /// a moderate 4.0.
+  static const mets = <String, double>{
+    'running': 9.8,
+    'cycling': 7.5,
+    'swimming': 8.0,
+    'walking': 3.5,
+    'hiit': 10.0,
+    'rowing': 7.0,
+    'hiking': 6.0,
+    'strength': 5.0,
+    'yoga': 2.5,
+    'pilates': 3.0,
+  };
+
+  double get met => mets[slug] ?? 4.0;
+
+  /// Estimated kcal = MET × weight(kg) × hours (US16 basic effect estimate).
+  /// [weightKg] falls back to a 70 kg population default when the fitness
+  /// profile has no weight set.
+  int estimateCalories({required int durationSeconds, double? weightKg}) =>
+      (met * (weightKg ?? 70) * (durationSeconds / 3600)).round();
 }
