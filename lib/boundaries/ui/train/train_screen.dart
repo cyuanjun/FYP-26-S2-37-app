@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../common/avatar_button.dart';
+import '../profile/fitness_goals_screen.dart';
 import '../workout/active_workout_screen.dart';
 
 /// BOUNDARY (#7 Train). Active-plan card + device status + a sticky
@@ -23,6 +25,7 @@ class TrainScreen extends ConsumerWidget {
       appBar: AppBar(
         titleSpacing: 20,
         title: const Text('TRAIN', style: AppTypography.title1),
+        actions: const [AvatarButton()],
       ),
       body: Column(
         children: [
@@ -36,7 +39,11 @@ class TrainScreen extends ConsumerWidget {
                   onAction: () => _soon(context, 'Plan detail'),
                 ),
                 const SizedBox(height: 8),
-                _NoPlanCard(onSetGoal: () => _soon(context, 'Fitness goals')),
+                _NoPlanCard(
+                  onSetGoal: () => Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (_) => const FitnessGoalsScreen()),
+                  ),
+                ),
                 const SizedBox(height: 24),
                 const _SectionHeader(label: 'DEVICES'),
                 const SizedBox(height: 8),

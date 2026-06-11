@@ -20,11 +20,13 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **History** | Analytics card (Day/Week/Month + vs-prior deltas), sessions grouped by week, detail with edit/delete | Free tier shows upsell/cap/search-lock; Premium hides them |
 | **AI summary** | "✨" on History → data-driven progress summary | Stub Edge Function (no API key); swappable for OpenAI/Gemini with no app change |
 | **Share** | Summary → "Share to Social" toggle → caption + Facebook/Instagram/Twitter/TikTok | Creates a `workout_share` Post; platform buttons open the OS share |
+| **Profile cluster** | Avatar (top-right) → Profile hub: level/XP bar, lifetime stats, Fitness Profile (#13.1), Fitness Goals (#13.2), Account Settings (#13.3), Notifications (#13.4), Submit Feedback (#13.5), log out | All live writes: fitness_profiles, fitness_goals (active-goal upsert), notification_prefs jsonb, feedback |
+| **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
 
 **Architecture:** Flutter · Riverpod · go_router · freezed · `supabase_flutter`. Strict **Boundary–Control–Entity**
 (`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`). **Backend:** 26 tables + 49 RLS policies +
 2 privacy views + `end_workout_session` RPC + `summarise-progress` Edge Function, all on Supabase project
-`zbeyytgilrqruttvecdc`. **Tests:** 43 unit/control tests (`flutter test`).
+`zbeyytgilrqruttvecdc`. **Tests:** 71 unit/control tests (`flutter test`).
 
 ---
 
@@ -133,6 +135,27 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 1. Home tab → logout icon (top-right).
    - **See:** back at the Login screen (session cleared).
 
+### F2. Profile & account flows
+1. On any tab, tap the **avatar (top-right)**.
+   - **See:** **PROFILE** — avatar with edit dot, **MIA PATEL @mia**, a **LEVEL n** XP bar (`x / 200 XP`),
+     a **Workouts / Active days / Streak** stats row, five menu rows, and an outlined red **LOG OUT**.
+     Free users also get a **GO PREMIUM** pill (hidden for Premium).
+2. **Fitness Profile** → set DOB/sex/height/weight, pick activity level, tap experience/workout chips,
+   use a section's **+** to open the searchable picker (type an unknown allergy → **+ Add "X" as new**)
+   → **SAVE PROFILE**.
+   - **See:** "Fitness profile saved." and the values persist on reopen.
+3. **Fitness Goals** → pick a goal card (target stepper appears, hidden for Maintain Fitness),
+   adjust days/timeline → **SAVE GOAL**.
+   - **See:** "Goal saved." — one active goal per user, upserted.
+4. **Account Settings** → flip **METRIC / IMPERIAL** (commits instantly); **CHANGE PASSWORD** emails a
+   reset link to the signed-in address.
+5. **Notifications** → flip any toggle — it commits immediately (workout/social default on, marketing off).
+6. **Submit Feedback** → pick a category, type ≥10 chars (counter flips), **SUBMIT FEEDBACK**.
+   - **See:** in-screen success with **Submit another / Back to Profile**; a `feedback` row lands in the DB.
+7. **Negative check:** with <10 characters the submit button stays disabled.
+8. **Forgot password:** log out → "Forgot password?" → enter any email → **SEND RESET LINK**.
+   - **See:** the same "sent" card whether or not the email exists (anti-enumeration).
+
 ### G. Premium differences
 1. Log in as `premium@wiseworkout.test`.
 2. Open **History**.
@@ -145,7 +168,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ```bash
 flutter analyze     # static analysis — should report "No issues found!"
-flutter test        # 43 tests — should end "All tests passed!"
+flutter test        # 71 tests — should end "All tests passed!"
 ```
 
 Coverage (positive **and** negative cases per flow): entity rules (`Profile`, `WorkoutType.isCardio`,
@@ -195,9 +218,9 @@ catalogs: workout types, health tags, expert categories.)
   true per-app deep-linking is a later sprint.
 - **Real GPS needs a physical device** — emulators/simulators show 0 distance unless you mock location.
 - **Payment is simulated** (price fields only — premium = $9.99/mo, no gateway).
-- **Placeholders** (show "later sprint"): the Experts and Social tabs, Set a goal, Add device,
-  History search, Advanced analytics, full plan. The Dashboard is a minimal greeting. These are
-  scoped out of the slice, not broken.
+- **Placeholders** (show "later sprint"): the Experts and Social tabs, Add device, History search,
+  Advanced analytics, full plan, Upgrade flow, photo upload, per-field name/username/email edits.
+  The Dashboard is a minimal greeting. These are scoped out, not broken.
 
 ---
 
@@ -205,12 +228,17 @@ catalogs: workout types, health tags, expert categories.)
 
 ```
 lib/
-  entities/        Profile, WorkoutSession, WorkoutType, enums  (freezed models)
+  entities/        Profile, FitnessProfile, FitnessGoal, HealthTag, WorkoutSession,
+                   WorkoutType, enums  (freezed models)
   controls/        Authenticate, ActiveWorkout, SaveWorkoutDetails, SummariseProgress,
-                   CreateWorkoutSharePost, ShareWorkoutToSocial, DeleteWorkoutSession, history
+                   CreateWorkoutSharePost, ShareWorkoutToSocial, DeleteWorkoutSession, history,
+                   ViewProfile, UpdateFitnessProfile, SetFitnessGoal, UpdateAccountSettings,
+                   ManageNotificationPrefs, SubmitFeedback, RequestPasswordReset
   boundaries/
-    ui/            splash · auth · home · experts · train · social · history · workout screens
-    gateways/      auth, profile, workout, social, social_share, ai, workout_data_source
+    ui/            splash · auth (login, forgot pwd) · home · experts · train · social ·
+                   history · workout · profile (hub + 5 sub-screens) · common
+    gateways/      auth, profile, fitness, feedback, workout, social, social_share, ai,
+                   workout_data_source
   core/            theme (palette + iOS type scale), format, seq_log, config/env
   router/          go_router (auth redirect)
 supabase/

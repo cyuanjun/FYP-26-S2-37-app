@@ -3,11 +3,18 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wise_workout/boundaries/gateways/ai_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/auth_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/feedback_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/fitness_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/profile_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/social_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/social_share_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/entities/enums.dart';
+import 'package:wise_workout/entities/fitness_goal.dart';
+import 'package:wise_workout/entities/fitness_profile.dart';
+import 'package:wise_workout/entities/health_tag.dart';
+import 'package:wise_workout/entities/profile.dart';
 import 'package:wise_workout/entities/workout_session.dart';
 import 'package:wise_workout/entities/workout_type.dart';
 
@@ -39,6 +46,15 @@ class FakeAuthGateway implements AuthGateway {
 
   @override
   Future<void> signOut() async => signOutCount++;
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    resetEmails.add(email);
+    if (throwOnReset) throw const AuthException('rate limited');
+  }
+
+  bool throwOnReset = false;
+  final resetEmails = <String>[];
 }
 
 class StartSessionCall {
@@ -175,6 +191,99 @@ class FakeSocialShareGateway implements SocialShareGateway {
   @override
   Future<void> shareTo(SocialPlatform platform, {required String text}) async {
     shares.add((platform, text));
+  }
+}
+
+/// Fake FitnessGateway — in-memory fitness profile / goal / tag catalog.
+class FakeFitnessGateway implements FitnessGateway {
+  FakeFitnessGateway({FitnessProfile? profile, this.activeGoal, List<HealthTag>? tags})
+      : profile = profile ?? const FitnessProfile(id: 'user-1'),
+        tags = tags ?? [];
+
+  FitnessProfile profile;
+  FitnessGoal? activeGoal;
+  List<HealthTag> tags;
+  bool throwOnWrite = false;
+
+  final profilePatches = <Map<String, dynamic>>[];
+  final goalUpserts = <Map<String, dynamic>>[];
+
+  @override
+  Future<FitnessProfile> fetchFitnessProfile(String userId) async => profile;
+
+  @override
+  Future<void> updateFitnessProfile(String userId, Map<String, dynamic> patch) async {
+    if (throwOnWrite) throw Exception('write failed');
+    profilePatches.add(patch);
+  }
+
+  @override
+  Future<List<HealthTag>> listHealthTags() async => tags;
+
+  @override
+  Future<HealthTag> addCustomHealthTag({
+    required String userId,
+    required HealthTagKind kind,
+    required String name,
+  }) async {
+    final tag = HealthTag(
+        id: 'tag-${tags.length + 1}', kind: kind, name: name, isCustom: true, createdByUserId: userId);
+    tags = [...tags, tag];
+    return tag;
+  }
+
+  @override
+  Future<FitnessGoal?> fetchActiveGoal(String userId) async => activeGoal;
+
+  @override
+  Future<FitnessGoal> upsertActiveGoal({
+    required String userId,
+    required Map<String, dynamic> values,
+  }) async {
+    if (throwOnWrite) throw Exception('write failed');
+    goalUpserts.add(values);
+    return FitnessGoal(
+      id: activeGoal?.id ?? 'goal-1',
+      userId: userId,
+      primaryGoal: PrimaryGoal.maintainFitness,
+    );
+  }
+}
+
+/// Fake ProfileGateway — records preference writes.
+class FakeProfileGateway implements ProfileGateway {
+  FakeProfileGateway({this.profile});
+
+  Profile? profile;
+  final unitWrites = <PreferredUnits>[];
+  final prefsWrites = <Map<String, dynamic>>[];
+
+  @override
+  Future<Profile> fetchProfile(String id) async =>
+      profile ?? Profile(id: id, email: 'x@test', role: UserRole.free);
+
+  @override
+  Future<void> updatePreferredUnits(String id, PreferredUnits units) async =>
+      unitWrites.add(units);
+
+  @override
+  Future<void> updateNotificationPrefs(String id, Map<String, dynamic> prefs) async =>
+      prefsWrites.add(prefs);
+}
+
+/// Fake FeedbackGateway — records submissions, optionally throws.
+class FakeFeedbackGateway implements FeedbackGateway {
+  bool throwOnSubmit = false;
+  final submissions = <(String, FeedbackCategory, String)>[];
+
+  @override
+  Future<void> submitFeedback({
+    required String userId,
+    required FeedbackCategory category,
+    required String body,
+  }) async {
+    if (throwOnSubmit) throw Exception('insert failed');
+    submissions.add((userId, category, body));
   }
 }
 

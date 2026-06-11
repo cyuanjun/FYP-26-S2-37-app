@@ -40,7 +40,10 @@
    - ✅ **Phase 3 (history)** — History (#12, analytics + grouped cards) + History Detail (#12.1, edit/delete); matches TDM activity diagram.
    - ✅ **Phase 4 (AI summary)** — `summarise-progress` Edge Function (stub, swappable) + `AiGateway` + `SummariseProgress` + History ✨ sheet (AI-assisted label).
    - ✅ **Phase 5 (share)** — `SocialShareGateway` (FB/IG/Twitter/TikTok) + `CreateWorkoutSharePost`/`ShareWorkoutToSocial` + Summary share section (creates `workout_share` Post).
-   - ✅ **Vertical slice COMPLETE** — log in → record phone-GPS workout → history → AI summary → share, verified on Android emulator + iOS simulator. **43 tests** (positive/negative) green. Test accounts: `free@`/`premium@wiseworkout.test` (pw `Password123!`).
+   - ✅ **Vertical slice COMPLETE** — log in → record phone-GPS workout → history → AI summary → share, verified on Android emulator + iOS simulator. Test accounts: `free@`/`premium@wiseworkout.test` (pw `Password123!`).
+4. **Breadth build-out** (11–12 Jun, with Claude Code; order: profile → plans → social → experts → premium → dashboard → portals):
+   - ✅ **5-tab bottom nav** per spec (Home · Experts · Train · Social · History); Experts/Social are styled later-sprint placeholders (11 Jun).
+   - ✅ **Profile cluster (#13 + 13.1–13.5 + #4) COMPLETE** (12 Jun) — Profile hub (identity, level/XP bar, lifetime stats, Go Premium pill, log out), Fitness Profile (body metrics + activity/experience + preferred workouts + diet/allergy/injury pickers w/ custom tags, batched save), Fitness Goals (goal cards + target/commitment steppers + timeline, active-goal upsert), Account Settings (units instant-commit, change-password reset email), Notifications (10 toggles → `profiles.notification_prefs` jsonb), Submit Feedback (≥10-char guard → `feedback` row, in-screen success), Forgot Password (anti-enumeration sent card). Avatar entry on Home/Train headers; every flow verified on-device against live Supabase. **71 tests** green.
 
 > User flagged for the legal section: confirm whether a privacy policy + minimum-age requirement exist yet or are "preliminary."
 
