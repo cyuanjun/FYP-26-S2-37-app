@@ -9,7 +9,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 9 built · 14 partial · 41 not started
+**Score:** 10 built · 13 partial · 41 not started
 
 
 ## Unregistered user (US01–US06)
@@ -35,7 +35,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
 | US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | Manual entry UI not built (schema supports it: null device) |
 | US14 | 🟨 | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone sensors (GPS+steps) ✅; wearables are additive later |
-| US15 | 🟨 | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + weekly analytics ✅; Free cap banner is cosmetic — query enforcement pending |
+| US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + analytics ✅; Free cap = current calendar month, enforced at the query level (12 Jun) |
 | US16 | 🟨 | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | XP per session ✅; calories not computed for live sessions yet (seeded data only) |
 | US17 | 🟨 | As a registered free user, I want to view simple charts or reports so that my fitness progress is easier to understand. | Analytics card with deltas ✅; charts pending |
 | US18 | 🟨 | As a registered free user, I want to receive basic AI progress summaries and basic AI-assisted fitness plan suggestions so that I can better understand my activity data and follow a simple workout routine. | AI progress summary ✅ (stub model); basic plan suggestion pending |
@@ -58,7 +58,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | ID | Status | User story | Build note |
 |---|---|---|---|
 | US32 | ✅ | As a registered premium user, I want to access all registered free user features so that I can use the full platform experience. | Premium role inherits all Free features (role-aware UI) |
-| US33 | ✅ | As a registered premium user, I want to view full workout history so that I can review my long-term activity records. | Premium History shows no cap/locks (trivially true until the US15 cap is enforced) |
+| US33 | ✅ | As a registered premium user, I want to view full workout history so that I can review my long-term activity records. | Premium queries lifetime history (no from-bound); Free is month-capped |
 | US34 | ⬜ | As a registered premium user, I want to access advanced progress analytics so that I can understand my fitness trends in more detail. | Advanced analytics / detailed estimates pending |
 | US35 | ⬜ | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Advanced analytics / detailed estimates pending |
 | US36 | 🟨 | As a registered premium user, I want to receive personalised AI progress summaries, fitness plan suggestions, and personalised fitness reports so that I can get more relevant guidance. | Summary works for Premium; personalisation pending (stub) |
@@ -126,4 +126,4 @@ Built and working, but mapped to no story: user-side Submit Feedback, XP/levels 
 1. Fold reconciliation-log §B into the PRD (it was *not* done in v3) and re-cite TDM v5 as canonical.
 2. Resolve US21: rest alerts Free (SRS) vs Premium-only (WBS) — pick one, log it.
 3. Ask the team whether the no-story items (change password, in-app feedback, save expert, create/quit challenge, post edit/delete, XP/levels replacing badges) should become SRS stories or stay implementation detail — they're all in the WBS or TDM, so the SRS is the lagging document.
-4. Either enforce the Free history cap or drop the cap banner (US15).
+4. ~~Either enforce the Free history cap or drop the cap banner (US15).~~ ✅ Done 12 Jun — cap enforced at the query level; Profile lifetime stats intentionally bypass it (#13 spec).
