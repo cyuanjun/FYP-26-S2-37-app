@@ -120,7 +120,14 @@ class FakeWorkoutGateway implements WorkoutGateway {
   }
 
   @override
-  Future<List<WorkoutSession>> listEndedSessions(String userId) async => ended;
+  Future<List<WorkoutSession>> listEndedSessions(String userId, {DateTime? from}) async {
+    listFroms.add(from);
+    if (from == null) return ended;
+    return ended.where((s) => !s.startedAt.isBefore(from)).toList();
+  }
+
+  /// The `from` bound of each list call (null = lifetime) — asserts the cap.
+  final listFroms = <DateTime?>[];
 
   @override
   Future<void> deleteSession(String sessionId) async => deletedIds.add(sessionId);

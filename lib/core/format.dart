@@ -54,3 +54,7 @@ DateTime startOfWeek(DateTime d) {
 
 /// Short month name ("12 Mar 2002" style dates).
 String monthName(int month) => _months[month];
+
+/// First instant of the calendar month containing [d] — the Free history
+/// cap window (#12: Free sees the current calendar month only).
+DateTime startOfMonth(DateTime d) => DateTime(d.year, d.month);

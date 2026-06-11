@@ -43,14 +43,19 @@ class WorkoutGateway {
     return Map<String, dynamic>.from(res as Map);
   }
 
-  /// All ended sessions for a user, newest first (History list).
-  Future<List<WorkoutSession>> listEndedSessions(String userId) async {
-    final rows = await _client
+  /// Ended sessions for a user, newest first (History list). [from] bounds
+  /// the window at the query level — the Free monthly cap passes the start of
+  /// the current calendar month; Premium passes nothing (lifetime).
+  Future<List<WorkoutSession>> listEndedSessions(String userId, {DateTime? from}) async {
+    var query = _client
         .from('workout_sessions')
         .select()
         .eq('user_id', userId)
-        .not('ended_at', 'is', null)
-        .order('started_at', ascending: false);
+        .not('ended_at', 'is', null);
+    if (from != null) {
+      query = query.gte('started_at', from.toUtc().toIso8601String());
+    }
+    final rows = await query.order('started_at', ascending: false);
     return rows.map(WorkoutSession.fromJson).toList();
   }
 
