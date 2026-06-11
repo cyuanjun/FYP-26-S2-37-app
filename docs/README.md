@@ -8,7 +8,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 
 | Folder | What's in it | Start here |
 |---|---|---|
-| **Requirements** | **The official SRS v2.0 is canonical** (64 use cases + FR/NFR). [requirements/urs.md](requirements/urs.md) is **deprecated** — superseded by the SRS. | SRS v2.0 (team docs) |
+| **Requirements** | **The official SRS v2.0 is canonical** (64 use cases + FR/NFR). [requirements/user-stories.md](requirements/user-stories.md) mirrors all 64 user stories with **build status** (the engineering tracker). [requirements/urs.md](requirements/urs.md) is **deprecated** — superseded by the SRS. | [user-stories.md](requirements/user-stories.md) + SRS v2.0 (team docs) |
 | **[deliverables/](deliverables/)** | FYP submission-document prep — assembly checklists, cross-doc change log, and the PTD/PUM net-new drafts | [ptd-pum-assembly.md](deliverables/ptd-pum-assembly.md), [doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md), [ptd-net-new-sections.md](deliverables/ptd-net-new-sections.md), [pum-net-new-sections.md](deliverables/pum-net-new-sections.md) |
 | **[architecture/](architecture/)** | How the real Flutter app is built | [build-plan.md](architecture/build-plan.md), [bce-design.md](architecture/bce-design.md) |
 | **[reference/](reference/)** | The spec carried over from the design phase — data model, design system, screen-by-screen specs | [database-v1.md](reference/database-v1.md), [screens-v1.md](reference/screens-v1.md) |
