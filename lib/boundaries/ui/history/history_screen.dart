@@ -175,10 +175,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           const SizedBox(height: 12),
           // period pills
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: _Period.values.map((p) {
               final sel = p == _period;
               return Padding(
-                padding: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: GestureDetector(
                   onTap: () => setState(() => _period = p),
                   child: Container(
