@@ -247,12 +247,21 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(label, style: AppTypography.caption2),
-          if (delta != null && delta != 0)
-            Text('${delta > 0 ? '↑' : '↓'} ${delta.abs()}',
-                style: AppTypography.caption2.copyWith(
-                    color: delta > 0 ? AppColors.accent : AppColors.danger)),
           const SizedBox(height: 2),
-          Text(value, style: AppTypography.title3),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(value, style: AppTypography.title3),
+              if (delta != null && delta != 0) ...[
+                const SizedBox(width: 4),
+                Text('${delta > 0 ? '↑' : '↓'}${delta.abs()}',
+                    style: AppTypography.caption2.copyWith(
+                        color: delta > 0 ? AppColors.accent : AppColors.danger)),
+              ],
+            ],
+          ),
         ],
       ),
     );
