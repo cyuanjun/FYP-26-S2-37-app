@@ -24,6 +24,11 @@ class AuthGateway {
       _client.auth.signInWithPassword(email: email, password: password);
 
   Future<void> signOut() => _client.auth.signOut();
+
+  /// Emails a password-reset link (#4 Forgot Password, #13.3 Change Password).
+  /// Succeeds silently for unknown emails — never reveals registration status.
+  Future<void> sendPasswordResetEmail(String email) =>
+      _client.auth.resetPasswordForEmail(email.trim());
 }
 
 /// Singleton gateway bound to the initialized Supabase client.

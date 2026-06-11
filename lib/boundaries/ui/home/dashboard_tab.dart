@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/authenticate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../common/avatar_button.dart';
 
 /// BOUNDARY (#5 Dashboard — minimal slice version). Greets the signed-in user
 /// and offers sign-out; the full digest (today card, weekly stats, goal) lands later.
@@ -17,13 +18,7 @@ class DashboardTab extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Wise Workout'),
-        actions: [
-          IconButton(
-            tooltip: 'Sign out',
-            icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authenticateProvider.notifier).signOut(),
-          ),
-        ],
+        actions: const [AvatarButton()],
       ),
       body: profile.when(
         loading: () => const Center(child: CircularProgressIndicator()),

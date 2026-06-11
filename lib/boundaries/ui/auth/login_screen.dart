@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/authenticate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import 'forgot_password_screen.dart';
 
 /// BOUNDARY (#2 Login). Authenticates an existing user. Signup is external
 /// (marketing website) — the app is login-only by design.
@@ -84,7 +85,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.bg))
                       : const Text('LOG IN'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: isLoading
+                      ? null
+                      : () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
+                  child: Text('Forgot password?',
+                      style: AppTypography.subheadline
+                          .copyWith(fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(height: 4),
                 Text('No account? Sign up on the Wise Workout website.',
                     style: AppTypography.footnote, textAlign: TextAlign.center),
               ],

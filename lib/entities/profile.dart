@@ -22,6 +22,7 @@ abstract class Profile with _$Profile {
     String? avatarUrl,
     @Default(PreferredUnits.metric) PreferredUnits preferredUnits,
     String? bio,
+    @Default(<String, dynamic>{}) Map<String, dynamic> notificationPrefs,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);

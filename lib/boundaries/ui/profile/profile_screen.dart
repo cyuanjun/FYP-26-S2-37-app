@@ -1,0 +1,232 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../controls/authenticate.dart';
+import '../../../controls/view_profile.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_typography.dart';
+import '../../../entities/fitness_profile.dart';
+import 'account_settings_screen.dart';
+import 'fitness_goals_screen.dart';
+import 'fitness_profile_screen.dart';
+import 'notifications_screen.dart';
+import 'profile_widgets.dart';
+import 'submit_feedback_screen.dart';
+
+/// BOUNDARY (#13 Profile). The account hub — identity, level/XP, headline
+/// stats, and entry points to all account-level sub-screens. Reached from the
+/// top-right avatar on tab landings; deliberately not a bottom-nav tab.
+class ProfileScreen extends ConsumerWidget {
+  const ProfileScreen({super.key});
+
+  void _soon(BuildContext context, String what) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('$what arrives in a later sprint.')));
+  }
+
+  void _push(BuildContext context, Widget screen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(currentProfileProvider).value;
+    final fitness = ref.watch(fitnessProfileProvider).value;
+    final stats = ref.watch(profileStatsProvider).value;
+
+    final initial =
+        (profile?.firstName?.isNotEmpty ?? false) ? profile!.firstName![0].toUpperCase() : '?';
+
+    return Scaffold(
+      appBar: AppBar(
+        titleSpacing: 0,
+        title: const Text('PROFILE', style: AppTypography.title1),
+        actions: [
+          if (!(profile?.isPremium ?? false))
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: GestureDetector(
+                onTap: () => _soon(context, 'Upgrade'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.star, size: 12, color: AppColors.bg),
+                      const SizedBox(width: 4),
+                      Text('GO PREMIUM',
+                          style: AppTypography.caption2.copyWith(
+                              color: AppColors.bg, fontWeight: FontWeight.w900)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        children: [
+          // ---- Identity block ----
+          Center(
+            child: Stack(
+              children: [
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration:
+                      const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: Text(initial,
+                      style: const TextStyle(
+                          fontSize: 40, fontWeight: FontWeight.w900, color: AppColors.accent)),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: GestureDetector(
+                    onTap: () => _soon(context, 'Photo upload'),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: AppColors.accent,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.bg, width: 3),
+                      ),
+                      child: const Icon(Icons.edit, size: 12, color: AppColors.bg),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(profile?.displayName.toUpperCase() ?? '',
+                style: AppTypography.title2.copyWith(fontWeight: FontWeight.w900)),
+          ),
+          if (profile?.username != null)
+            Center(child: Text('@${profile!.username}', style: AppTypography.subheadline)),
+          const SizedBox(height: 16),
+
+          // ---- Level + XP bar ----
+          if (fitness != null) _LevelBar(fitness: fitness),
+          const SizedBox(height: 20),
+
+          // ---- Stats row ----
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: const BoxDecoration(
+              border: Border.symmetric(horizontal: BorderSide(color: AppColors.faint)),
+            ),
+            child: Row(
+              children: [
+                _stat('${stats?.workouts ?? '—'}', 'WORKOUTS'),
+                _divider(),
+                _stat('${stats?.activeDays ?? '—'}', 'ACTIVE DAYS'),
+                _divider(),
+                _stat('${fitness?.currentStreak ?? 0}w', 'STREAK'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // ---- Menu ----
+          MenuRow(
+              emoji: '⚙️',
+              label: 'Account Settings',
+              onTap: () => _push(context, const AccountSettingsScreen())),
+          const Divider(color: AppColors.faint, height: 1),
+          MenuRow(
+              emoji: '💪',
+              label: 'Fitness Profile',
+              onTap: () => _push(context, const FitnessProfileScreen())),
+          const Divider(color: AppColors.faint, height: 1),
+          MenuRow(
+              emoji: '🎯',
+              label: 'Fitness Goals',
+              onTap: () => _push(context, const FitnessGoalsScreen())),
+          const Divider(color: AppColors.faint, height: 1),
+          MenuRow(
+              emoji: '🔔',
+              label: 'Notifications',
+              onTap: () => _push(context, const NotificationsScreen())),
+          const Divider(color: AppColors.faint, height: 1),
+          MenuRow(
+              emoji: '💬',
+              label: 'Submit Feedback',
+              onTap: () => _push(context, const SubmitFeedbackScreen())),
+          const SizedBox(height: 24),
+
+          // ---- Log out (outlined danger: reversible-ish) ----
+          OutlinedButton(
+            onPressed: () async {
+              await ref.read(authenticateProvider.notifier).signOut();
+              if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+            },
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.danger,
+              side: const BorderSide(color: AppColors.danger),
+              minimumSize: const Size.fromHeight(52),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: const Text('LOG OUT',
+                style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _stat(String value, String label) => Expanded(
+        child: Column(
+          children: [
+            Text(value,
+                style: AppTypography.title1.copyWith(fontWeight: FontWeight.w900)),
+            const SizedBox(height: 2),
+            Text(label, style: AppTypography.caption2.copyWith(letterSpacing: 1.2)),
+          ],
+        ),
+      );
+
+  Widget _divider() => Container(width: 1, height: 40, color: AppColors.faint);
+}
+
+class _LevelBar extends StatelessWidget {
+  const _LevelBar({required this.fitness});
+
+  final FitnessProfile fitness;
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = fitness.xpIntoLevel / FitnessProfile.xpPerLevel;
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('LEVEL ${fitness.level}',
+                style: AppTypography.caption2
+                    .copyWith(color: AppColors.accent, fontWeight: FontWeight.w800)),
+            Text('${fitness.xpIntoLevel} / ${FitnessProfile.xpPerLevel} XP',
+                style: AppTypography.caption2),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 6,
+            backgroundColor: AppColors.surface,
+            valueColor: const AlwaysStoppedAnimation(AppColors.accent),
+          ),
+        ),
+      ],
+    );
+  }
+}

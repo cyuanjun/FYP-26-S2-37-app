@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../entities/enums.dart';
 import '../../entities/profile.dart';
 
 /// BOUNDARY (gateway) — reads/writes the `profiles` table. Controls call this;
@@ -13,6 +14,16 @@ class ProfileGateway {
   Future<Profile> fetchProfile(String id) async {
     final row = await _client.from('profiles').select().eq('id', id).single();
     return Profile.fromJson(row);
+  }
+
+  /// Instant-commit preference toggle (#13.3 — no save button by design).
+  Future<void> updatePreferredUnits(String id, PreferredUnits units) async {
+    await _client.from('profiles').update({'preferred_units': units.name}).eq('id', id);
+  }
+
+  /// Replaces the whole notification_prefs map (#13.4 — per-flip commit).
+  Future<void> updateNotificationPrefs(String id, Map<String, dynamic> prefs) async {
+    await _client.from('profiles').update({'notification_prefs': prefs}).eq('id', id);
   }
 }
 
