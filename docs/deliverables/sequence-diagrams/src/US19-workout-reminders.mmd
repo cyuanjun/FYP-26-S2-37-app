@@ -1,0 +1,14 @@
+---
+title: "US19 — Workout reminders"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>NotificationsScreen
+  participant C as «Control»<br/>UpdateNotificationPrefs
+  participant G as «Gateway»<br/>NotificationGateway (local notifications)
+  A->>B: toggle "Daily reminder" on
+  B->>C: setEnabled(daily_reminder, true)
+  C->>G: schedule local notification (rule-based)
+  C-->>B: prefs saved (profiles.notification_prefs)
+  B-->>A: toggle on - reminder fires at preferred time
+  note over C,G: rule-based - no AI involved

@@ -1,0 +1,15 @@
+---
+title: "US30 — Browse / purchase expert content"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>ExpertDetailScreen
+  participant C as «Control»<br/>RequestService
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: browse expert content / offerings
+  B->>C: purchase(item)
+  C->>G: insert service_requests (simulated payment)
+  G-->>C: ok
+  C-->>B: purchased
+  B-->>A: content delivered via Deliverable
+  note over B,G: scope under review - may narrow to<br/>services-only (reconciliation log)

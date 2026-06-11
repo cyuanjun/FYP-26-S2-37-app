@@ -1,0 +1,14 @@
+---
+title: "US22 — View community posts"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>SocialScreen (Community)
+  participant C as «Control»<br/>ViewFeed
+  participant G as «Gateway»<br/>SocialGateway → Supabase
+  A->>B: open Social tab
+  B->>C: load feed
+  C->>G: select posts (workout_share, level_up, challenge_result)
+  G-->>C: post rows + authors
+  C-->>B: feed models
+  B-->>A: scrollable community feed

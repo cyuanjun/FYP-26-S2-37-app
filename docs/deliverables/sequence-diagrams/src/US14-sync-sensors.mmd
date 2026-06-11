@@ -1,0 +1,17 @@
+---
+title: "US14 — Sync phone sensors / wearables"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>ActiveWorkoutScreen
+  participant C as «Control»<br/>ActiveWorkout
+  participant G as «Gateway»<br/>WorkoutDataSource (PhoneSensorSource)
+  A->>B: workout running
+  B->>C: live state
+  C->>G: start() — geolocator + pedometer
+  loop every sensor tick
+    G-->>C: distance, steps, track point
+    C-->>B: live metrics
+    B-->>A: DISTANCE / PACE update
+  end
+  note over G: wearables later = new<br/>HealthSource / BleHeartRateSource class

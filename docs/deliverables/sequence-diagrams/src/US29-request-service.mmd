@@ -1,0 +1,15 @@
+---
+title: "US29 — Request expert service (paid add-on)"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>ServiceDetailScreen
+  participant C as «Control»<br/>RequestService
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: tap REQUEST SERVICE, confirm
+  B->>C: request(serviceId, note)
+  C->>G: insert service_requests (status=pending)
+  note right of G: payment simulated -<br/>price fields only, no gateway
+  G-->>C: ok
+  C-->>B: requested
+  B-->>A: request appears under My Purchases

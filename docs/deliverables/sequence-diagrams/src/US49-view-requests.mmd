@@ -1,0 +1,14 @@
+---
+title: "US49 — View service requests"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>RequestsScreen
+  participant C as «Control»<br/>ViewServiceRequests
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: open Requests tab
+  B->>C: load requests
+  C->>G: select service_requests for my services
+  G-->>C: pending / accepted / completed rows
+  C-->>B: request list
+  B-->>A: who asked, for what, when

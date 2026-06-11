@@ -1,0 +1,15 @@
+---
+title: "US41 — Register / apply as expert"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>Expert Application Page (website)
+  participant C as «Control»<br/>SubmitExpertApplication
+  participant G as «Gateway»<br/>SupabaseGateway + StorageGateway
+  A->>B: fill application, attach credentials
+  B->>C: submit(application)
+  C->>G: upload expert_verification_documents
+  C->>G: insert expert_profiles (status=pending)
+  G-->>C: ok
+  C-->>B: submitted
+  B-->>A: "application under review"

@@ -1,0 +1,19 @@
+---
+title: "US07 — Log in securely"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>LoginScreen
+  participant C as «Control»<br/>Authenticate
+  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  A->>B: enter email + password, tap LOG IN
+  B->>C: signIn(email, password)
+  C->>G: signInWithPassword()
+  G-->>C: session / AuthException
+  alt valid credentials
+    C-->>B: auth state = signed in
+    B-->>A: redirect to Home (role-aware)
+  else invalid credentials
+    C-->>B: AsyncError
+    B-->>A: "Incorrect email or password."
+  end

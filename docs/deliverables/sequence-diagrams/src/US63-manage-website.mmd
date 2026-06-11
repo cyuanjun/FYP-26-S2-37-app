@@ -1,0 +1,14 @@
+---
+title: "US63 — Manage marketing website"
+---
+sequenceDiagram
+  actor A as System Admin
+  participant B as «Boundary»<br/>WebsiteAdminScreen
+  participant C as «Control»<br/>ManageWebsiteContent
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: edit hero / pricing / FAQ / testimonials
+  B->>C: save(sectionContent)
+  C->>G: update website content tables
+  G-->>C: ok
+  C-->>B: published
+  B-->>A: marketing site reflects the change

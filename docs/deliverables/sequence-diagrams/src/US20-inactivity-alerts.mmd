@@ -1,0 +1,12 @@
+---
+title: "US20 — Inactivity alerts"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>NotificationsScreen
+  participant C as «Control»<br/>CheckInactivity (rule-based)
+  participant G as «Gateway»<br/>NotificationGateway
+  A->>B: inactivity alerts enabled
+  note over C: rule - no ended session<br/>for N days vs weekly commitment
+  C->>G: schedule inactivity notification
+  G-->>A: "You have not worked out since..."

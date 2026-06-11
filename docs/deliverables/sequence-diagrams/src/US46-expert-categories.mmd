@@ -1,0 +1,13 @@
+---
+title: "US46 — Manage expertise categories"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>ExpertProfileScreen
+  participant C as «Control»<br/>UpsertExpertProfile
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: pick specialty categories
+  B->>C: save(categoryIds)
+  C->>G: update expert profile ↔ expert_categories
+  G-->>C: ok
+  B-->>A: appears under those categories in Experts tab

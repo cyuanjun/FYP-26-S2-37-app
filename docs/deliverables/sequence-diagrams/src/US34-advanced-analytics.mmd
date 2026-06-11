@@ -1,0 +1,14 @@
+---
+title: "US34 — Advanced progress analytics"
+---
+sequenceDiagram
+  actor A as Registered Premium User
+  participant B as «Boundary»<br/>AdvancedAnalyticsScreen
+  participant C as «Control»<br/>ViewAdvancedAnalytics
+  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  A->>B: open Advanced Analytics
+  B->>C: load(range incl. All)
+  C->>G: lifetime sessions + aggregates
+  G-->>C: rows
+  C-->>B: trends, PBs, long-window charts
+  B-->>A: advanced analytics view

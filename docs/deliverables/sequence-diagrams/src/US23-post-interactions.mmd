@@ -1,0 +1,17 @@
+---
+title: "US23 — Create / like / comment on posts"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>SocialScreen / PostDetailScreen
+  participant C as «Control»<br/>CreateWorkoutSharePost · TogglePostLike · AddPostComment
+  participant G as «Gateway»<br/>SocialGateway → Supabase
+  A->>B: share a workout
+  B->>C: createWorkoutSharePost(caption)
+  C->>G: insert posts (kind=workout_share)
+  A->>B: tap like / write comment
+  B->>C: toggleLike(post) / addComment(text)
+  C->>G: insert/delete post_likes · insert post_comments
+  G-->>C: ok
+  C-->>B: updated counts
+  B-->>A: like + comment reflected

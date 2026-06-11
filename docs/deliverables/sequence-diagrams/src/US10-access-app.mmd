@@ -1,0 +1,19 @@
+---
+title: "US10 — Access the app after login"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>SplashScreen
+  participant C as «Control»<br/>Authenticate
+  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  A->>B: launch app
+  B->>C: check session
+  C->>G: currentSession
+  G-->>C: session / null
+  alt session valid
+    C-->>B: signed in
+    B-->>A: route to Home
+  else no session
+    C-->>B: signed out
+    B-->>A: route to Login
+  end

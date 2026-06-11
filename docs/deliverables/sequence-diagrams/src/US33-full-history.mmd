@@ -1,0 +1,15 @@
+---
+title: "US33 — View full workout history"
+---
+sequenceDiagram
+  actor A as Registered Premium User
+  participant B as «Boundary»<br/>HistoryScreen
+  participant C as «Control»<br/>ViewWorkoutHistory
+  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  A->>B: open History tab
+  B->>C: load sessions
+  C->>G: listEndedSessions(no date bound)
+  note right of G: lifetime query -<br/>Free month-cap not applied
+  G-->>C: all sessions
+  C-->>B: full grouped history
+  B-->>A: every recorded session

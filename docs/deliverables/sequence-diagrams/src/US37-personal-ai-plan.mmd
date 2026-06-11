@@ -1,0 +1,18 @@
+---
+title: "US37 — Personalised AI plan suggestions"
+---
+sequenceDiagram
+  actor A as Registered Premium User
+  participant B as «Boundary»<br/>TrainScreen
+  participant C as «Control»<br/>SuggestPlan (AI)
+  participant G as «Gateway»<br/>AiGateway → Edge Function
+  A->>B: tap "Suggest plan"
+  B->>C: suggestPlan(goal, profile)
+  C->>G: invoke suggest-plan
+  G-->>C: plan draft
+  alt accepted
+    C-->>B: save fitness_plans + planned_workouts
+    B-->>A: personalised plan active
+  else regenerate
+    B->>C: suggest again
+  end

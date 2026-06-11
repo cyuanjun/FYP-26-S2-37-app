@@ -1,0 +1,18 @@
+---
+title: "US47 — Create / manage service listings"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>ServicesScreen
+  participant C as «Control»<br/>PublishService
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: create listing (price, format, response time)
+  B->>C: publish(listing)
+  C->>G: insert/update expert_services
+  alt publish
+    G-->>C: status = live
+    B-->>A: visible in marketplace
+  else archive
+    G-->>C: status = archived
+    B-->>A: hidden from marketplace
+  end

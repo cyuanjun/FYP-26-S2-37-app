@@ -1,0 +1,15 @@
+---
+title: "US52 — Profile verified by admin"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>Admin ExpertsApprovalScreen
+  participant C as «Control»<br/>ReviewExpertVerification
+  participant G as «Gateway»<br/>SupabaseGateway
+  note over A: expert has submitted credentials (US41)
+  A->>B: (admin) reviews application
+  B->>C: approve(expertId)
+  C->>G: update verification_status = verified
+  G-->>C: ok
+  C-->>B: verified
+  B-->>A: expert gets VERIFIED badge in marketplace

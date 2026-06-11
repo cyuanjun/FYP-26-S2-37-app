@@ -1,0 +1,14 @@
+---
+title: "US64 — Maintain platform quality + reliability"
+---
+sequenceDiagram
+  actor A as System Admin
+  participant B as «Boundary»<br/>MonitorScreen
+  participant C as «Control»<br/>ViewPlatformStats
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: open platform dashboard
+  B->>C: load health stats
+  C->>G: aggregate users, sessions, errors, feedback
+  G-->>C: platform metrics
+  C-->>B: dashboard
+  B-->>A: spot issues, act via US56–US63 tools

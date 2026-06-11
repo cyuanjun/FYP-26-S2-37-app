@@ -1,0 +1,18 @@
+---
+title: "US57 — Review expert applications"
+---
+sequenceDiagram
+  actor A as System Admin
+  participant B as «Boundary»<br/>ExpertsApprovalScreen
+  participant C as «Control»<br/>ReviewExpertVerification
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: open pending application + documents
+  alt approve
+    B->>C: approve(expertId)
+    C->>G: verification_status = verified, role = expert
+    B-->>A: expert goes live
+  else reject
+    B->>C: reject(expertId, reason)
+    C->>G: verification_status = rejected
+    B-->>A: applicant notified
+  end

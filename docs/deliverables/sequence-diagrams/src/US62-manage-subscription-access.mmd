@@ -1,0 +1,14 @@
+---
+title: "US62 — Manage subscription access"
+---
+sequenceDiagram
+  actor A as System Admin
+  participant B as «Boundary»<br/>UsersScreen (detail)
+  participant C as «Control»<br/>ManageSubscriptionAccess
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: open a user's subscription
+  B->>C: grant / revoke premium
+  C->>G: update subscriptions + profiles.role
+  G-->>C: ok
+  C-->>B: tier updated
+  B-->>A: user's access level corrected
