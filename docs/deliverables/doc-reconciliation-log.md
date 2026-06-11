@@ -1,15 +1,17 @@
 # Document Reconciliation Log
 
-Tracks where the three **submitted deliverables** — **PRD v2.0**, **SRS v2.0**, **TDM v3.0** (5 Jun 2026) — diverge from each other or from current engineering decisions, and exactly what to fix on each document's next revision. Keep this current; it's the single source for "what still needs folding back."
+Tracks where the three **submitted deliverables** — **PRD v2/v3**, **SRS v2.0**, **TDM v5** (6 Jun 2026) — diverge from each other or from current engineering decisions, and exactly what to fix on each document's next revision. Keep this current; it's the single source for "what still needs folding back."
+
+> **Version decisions (12 Jun 2026):** **TDM v5 is canonical** — *except* its **§6 sequence diagrams, which the team confirmed are wrong** (replace from bce-design §5; see A3). **PRD v3 is textually identical to v2** — the §B edits were never folded in; the team will fix the PRD **after** the 13 Jun submission, since only the **PTD + PUM** are submitted. Anything the PTD copies from the PRD must apply §B during assembly.
 
 > Driver: engineering decisions lead, documents follow ("requirements change as we continue"). The build-plan ([../architecture/build-plan.md](../architecture/build-plan.md)) and BCE design ([../architecture/bce-design.md](../architecture/bce-design.md)) are the technical source of truth; this log is the to-do list for the Word deliverables.
 
 ## Submitted-document versions
 | Doc | Version | Date | Canonical for |
 |---|---|---|---|
-| PRD | v2.0 | — | Business model, market research, schedule/Gantt, roles, risk register, FR/NFR |
-| SRS | v2.0 | — | 64 use cases, FR/NFR tables, user classes |
-| **TDM** | **v3.0** | **5 Jun 2026** | **Architecture, activity diagrams, the ERD (§8), all wireframes** |
+| PRD | v3 (≡ v2 text) | — | Business model, market research, schedule/Gantt, roles, risk register, FR/NFR |
+| SRS | v2.0 | — | 64 use cases (mirrored with build status in [../requirements/user-stories.md](../requirements/user-stories.md)), FR/NFR tables, user classes |
+| **TDM** | **v5** | **6 Jun 2026** | **Architecture, activity diagrams, the ERD (§8), all wireframes — but NOT §6 sequence diagrams (wrong; use bce-design §5)** |
 
 The TDM is newest and supersedes earlier design material. Where the TDM and PRD/SRS disagree, **fix the older doc to match the TDM** unless noted.
 
@@ -21,7 +23,7 @@ The TDM is newest and supersedes earlier design material. Where the TDM and PRD/
 |---|---|---|---|
 | A1 | **Premium price contradicts itself.** Website pricing page shows **$9.90/mth**; the app's Upgrade and Subscription screens show **$9.99/mo**. | §7.1.1 pricing (p19) vs §7.2.32 (p40) + §7.3.5 (p43) | **DECIDED: standardise on $9.99/mo.** Fix the website pricing page (§7.1.1) and PRD §4 to match the app screens. |
 | A2 | **"SQLite DB" leakage.** Admin content-management wireframe caption says *"Edits are persisted to the SQLite DB."* That's leftover text from the React website mock. | §7.5.1 (p54) | Production backend is **Supabase Postgres**, not SQLite. Either reword the caption generically ("persisted to the database") or note the mock ran on SQLite while production uses Postgres. |
-| A3 | **§6 Sequence Diagrams is an empty placeholder.** | §6 (p16) | Populate from [../architecture/bce-design.md](../architecture/bce-design.md) §5 (7 Mermaid sequence diagrams already drawn) — render to PNG. This also feeds PTD §16. |
+| A3 | **§6 Sequence Diagrams: empty in v3; v5 filled it per user story, but the team confirms those diagrams are WRONG (12 Jun).** | §6 (p16) | **Replace §6 wholesale** from [../architecture/bce-design.md](../architecture/bce-design.md) §5 (7 Mermaid sequence diagrams, matching the as-built BCE code) — render to PNG. **Do not copy TDM v5 §6 into the PTD**; source the PTD's sequence diagrams from bce-design §5 directly. |
 | A4 | **Architecture is stack-agnostic.** §3.2/§4 describe a logical service layer (API Controller → Services → DAO → DB) without naming the stack. | §3.2, §4 | Add the concrete stack note (Supabase Postgres + Auth + Storage + Realtime, Edge Functions for AI/custom logic, Flutter client). See B1 — keep TDM, PRD, and PTD §12 identical. Flag the DAO/API-Controller tier as **logical**: physically, Flutter talks to Supabase directly (RLS-enforced) with Edge Functions for the AI proxy and custom rules. |
 
 ## B. PRD v2.0 edits to fold back

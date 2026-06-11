@@ -66,7 +66,7 @@ Yuan Jun = coordination/docs · Devanandi = mobile/UI · Foong = backend/DB/API 
 5. **§18 Glossary** (S).
 6. **Reconcile §12 Technical Stack** to Supabase — see the [reconciliation log](doc-reconciliation-log.md) (B1/A4). §16.3 DB design is **resolved** (use the TDM §8 ERD).
 
-The TDM (v3.0, 5 Jun) **covers §16 System Design well**: §4 architecture, §3.3 context DFD, §5 activity diagrams, §7 wireframes, §8 ERD. Its only gap is **§6 Sequence Diagrams (empty placeholder)** — fill from [../architecture/bce-design.md](../architecture/bce-design.md) §5.
+The TDM (**v5, 6 Jun — the canonical version**) **covers §16 System Design well**: §4 architecture, §3.3 context DFD, §5 activity diagrams, §7 wireframes, §8 ERD. ⚠️ **Its §6 sequence diagrams are wrong (team-confirmed 12 Jun)** — do **not** copy them; source the PTD's sequence diagrams from [../architecture/bce-design.md](../architecture/bce-design.md) §5 (7 Mermaid diagrams matching the as-built code) rendered to PNG. Also remember PRD v3 ≡ v2: apply the reconciliation log §B edits (Supabase stack, $9.99, simulated payment) to any PRD-sourced PTD section during assembly.
 
 ---
 

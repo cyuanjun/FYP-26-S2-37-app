@@ -27,8 +27,8 @@
 ## Open — team's Word assembly (no code, due ~13 Jun)
 - Assemble PTD: copy/reformat PRD+SRS+TDM into the 18-section structure; drop in the net-new drafts; render diagrams to PNG.
 - Assemble PUM: layout the net-new drafts + mock/TDM §7 screenshots.
-- **Fold reconciliation-log edits into the submitted docs** (Supabase stack, $9.99, simulated payment, AI scope).
-- **Fill TDM §6 Sequence Diagrams** (currently an empty placeholder) from bce-design.md §5.
+- **Apply reconciliation-log §B during PTD assembly** (Supabase stack, $9.99, simulated payment, AI scope) — PRD v3 didn't fold them in; the PRD itself is fixed *after* submission (only PTD+PUM are submitted — decided 12 Jun).
+- **PTD sequence diagrams: source from bce-design.md §5, NOT TDM §6** — TDM v5's §6 diagrams are wrong (team-confirmed 12 Jun; log A3). TDM v5 is otherwise canonical.
 
 > 📋 **Story-level progress:** [requirements/user-stories.md](requirements/user-stories.md) — all 64 SRS user stories with build status (✅/🟨/⬜), updated per cluster.
 
