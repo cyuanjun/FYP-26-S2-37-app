@@ -48,9 +48,9 @@ class DashboardTab extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Vertical slice', style: AppTypography.headline),
+                    const Text('Get moving', style: AppTypography.headline),
                     const SizedBox(height: 8),
-                    Text('Phase 1 ✓ auth. Next: Train → record a workout (Phase 2).',
+                    Text('Head to Train to record a workout, then check History for your stats and AI summary.',
                         style: AppTypography.subheadline),
                   ],
                 ),
