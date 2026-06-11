@@ -5,11 +5,11 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **12 Jun 2026** (after the Profile cluster).
+Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 10 built · 13 partial · 41 not started
+**Score:** 9 built · 14 partial · 41 not started
 
 
 ## Unregistered user (US01–US06)
@@ -35,18 +35,18 @@ Last updated **12 Jun 2026** (after the Profile cluster).
 | US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
 | US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | Manual entry UI not built (schema supports it: null device) |
 | US14 | 🟨 | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone sensors (GPS+steps) ✅; wearables are additive later |
-| US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 with Free cap banner + weekly analytics |
-| US16 | 🟨 | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | Calories/XP per session ✅; richer effect estimates pending |
+| US15 | 🟨 | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + weekly analytics ✅; Free cap banner is cosmetic — query enforcement pending |
+| US16 | 🟨 | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | XP per session ✅; calories not computed for live sessions yet (seeded data only) |
 | US17 | 🟨 | As a registered free user, I want to view simple charts or reports so that my fitness progress is easier to understand. | Analytics card with deltas ✅; charts pending |
 | US18 | 🟨 | As a registered free user, I want to receive basic AI progress summaries and basic AI-assisted fitness plan suggestions so that I can better understand my activity data and follow a simple workout routine. | AI progress summary ✅ (stub model); basic plan suggestion pending |
-| US19 | 🟨 | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Preference toggles #13.4 ✅; local notifications pending |
+| US19 | 🟨 | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Preference toggles #13.4 ✅; flutter_local_notifications wired but no scheduling yet |
 | US20 | ⬜ | As a registered free user, I want to receive inactivity alerts so that I am reminded when I have not met my scheduled exercise goals. | Pref toggles exist; rule-based alert engine pending |
 | US21 | ⬜ | As a registered free user, I want to receive rest alerts when I may be exercising too much so that I can avoid overtraining. | Pref toggles exist; rule-based alert engine pending |
 | US22 | ⬜ | As a registered free user, I want to view community posts so that I can stay connected with other fitness users. | Feed UI pending (posts already land in DB) |
 | US23 | 🟨 | As a registered free user, I want to create posts, like posts, and comment on posts so that I can participate in the Wise Workout community. | Workout-share post creation ✅; likes/comments pending |
 | US24 | ⬜ | As a registered free user, I want to follow other users so that I can keep up with their shared fitness progress. | Follow/friends pending |
-| US25 | ⬜ | As a registered free user, I want to join simple fitness challenges and earn badges so that I can stay motivated. | Challenges pending (XP/levels replace badges per schema-v2) |
-| US26 | ✅ | As a registered free user, I want to share selected achievements or challenge results so that I can show my progress while controlling what information is shared. | Share to Facebook/Instagram/Twitter/TikTok + share post |
+| US25 | ⬜ | As a registered free user, I want to join simple fitness challenges and earn badges so that I can stay motivated. | Challenges UI pending; earn mechanics already live (XP/levels + auto level-up posts) |
+| US26 | ✅ | As a registered free user, I want to share selected achievements or challenge results so that I can show my progress while controlling what information is shared. | Named FB/IG/Twitter/TikTok buttons + workout_share post ✅; buttons open the OS share sheet (deep links = later sprint) |
 | US27 | ⬜ | As a registered free user, I want to browse expert profiles and service listings so that I can find professional support when needed. | Experts marketplace — placeholder tab |
 | US28 | ⬜ | As a registered free user, I want to browse expert categories so that I can identify what type of expert support may suit my fitness goals. | Experts marketplace — placeholder tab |
 | US29 | ⬜ | As a registered free user, I want to request expert services as a paid add-on so that I can receive professional support when needed. | Experts marketplace — placeholder tab |
@@ -58,7 +58,7 @@ Last updated **12 Jun 2026** (after the Profile cluster).
 | ID | Status | User story | Build note |
 |---|---|---|---|
 | US32 | ✅ | As a registered premium user, I want to access all registered free user features so that I can use the full platform experience. | Premium role inherits all Free features (role-aware UI) |
-| US33 | ✅ | As a registered premium user, I want to view full workout history so that I can review my long-term activity records. | Premium History shows no cap/locks |
+| US33 | ✅ | As a registered premium user, I want to view full workout history so that I can review my long-term activity records. | Premium History shows no cap/locks (trivially true until the US15 cap is enforced) |
 | US34 | ⬜ | As a registered premium user, I want to access advanced progress analytics so that I can understand my fitness trends in more detail. | Advanced analytics / detailed estimates pending |
 | US35 | ⬜ | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Advanced analytics / detailed estimates pending |
 | US36 | 🟨 | As a registered premium user, I want to receive personalised AI progress summaries, fitness plan suggestions, and personalised fitness reports so that I can get more relevant guidance. | Summary works for Premium; personalisation pending (stub) |
@@ -95,8 +95,35 @@ Last updated **12 Jun 2026** (after the Profile cluster).
 | US57 | ⬜ | As a system admin, I want to review, approve, or reject expert applications so that only suitable experts can provide services on the platform. | Admin portal pending |
 | US58 | ⬜ | As a system admin, I want to manage expert categories so that expert services are organised clearly for users. | Admin portal pending |
 | US59 | ⬜ | As a system admin, I want to monitor expert content and service listings so that inappropriate or low-quality content can be handled. | Admin portal pending |
-| US60 | ⬜ | As a system admin, I want to manage feedback and platform activity so that the system remains reliable, organised, and trustworthy. | Admin portal pending |
+| US60 | ⬜ | As a system admin, I want to manage feedback and platform activity so that the system remains reliable, organised, and trustworthy. | Admin triage pending; the user-side feedback pipeline is already built (no story covers it) |
 | US61 | ⬜ | As a system admin, I want to monitor subscription-tier access so that premium features are only available to eligible users. | Admin portal pending |
 | US62 | ⬜ | As a system admin, I want to manage subscription access so that free and premium access levels can be controlled correctly. | Admin portal pending |
 | US63 | ⬜ | As a system admin, I want to manage the marketing website so that platform information, feature highlights, subscription details, and expert service information remain accurate. | Admin portal pending |
 | US64 | ⬜ | As a system admin, I want to maintain platform quality and reliability so that users and experts can use the system safely and consistently. | Admin portal pending |
+
+---
+
+## Cross-check findings (12 Jun 2026)
+
+Four-way trace: stories ↔ **PRD v3** ↔ **TDM v5** ↔ **latest WBS** ↔ **code**. Statuses above already reflect the code audit.
+
+### Latest WBS (post-review drawio) vs stories
+- **Stories with no WBS work package:** US13 manual entry (only a generic "Record Workout Activity" node), **US21 rest alerts — WBS plans them Premium-only but the SRS grants them to Free** (divergence to resolve), US30 + US48 expert *content* browse/purchase/upload (WBS only has service listings), US35 detailed effect estimates (nearest node is "View Advanced Workout Analytics"), US38 customise plan (absent from the Premium branch).
+- **WBS work packages with no story:** Change Password (all four roles), Update Posts, Create Challenge, Quit Challenge, Save Expert (bookmark), Submit Feedback (Free + Expert "Misc"), Search Workout History (Premium), View Followed Users.
+
+### PRD vs stories
+- **PRD v3's body text is byte-identical to v2** — the reconciliation-log §B edits (Supabase stack, OpenAI provider, simulated payment, $9.99) are **still not folded in**: §9.3 still names Node.js/Express + MySQL/PostgreSQL + Firebase, and no premium price appears in the text. Feature scope itself matches the 64 stories (same role feature sets).
+
+### TDM vs stories
+- **TDM v5 (6 Jun) supersedes the v3 the repo cites as canonical** — §6 Sequence Diagrams (empty in v3) is now populated, organised per user story. CLAUDE.md / STATUS / reconciliation log still say v3.
+- **Design with no story:** ExpertReview (rate/review experts), user-*created* challenges, the XP/level/streak system (US25 still says "badges"), in-app Submit Feedback, expert bookmarking, post edit/delete.
+- **Stories with weak/no design:** US20/US21/US39 (no alert-engine flow — prefs are just a JSON blob + toggles), US30/US48 (no content-library entity; only ExpertService → ServiceRequest → Deliverable), US61/US62 (no admin subscription screens).
+
+### Code beyond the stories
+Built and working, but mapped to no story: user-side Submit Feedback, XP/levels + auto level-up posts, weekly streak, Free-tier fitness goals, Day/Week/Month analytics with vs-prior deltas, custom health tags, AI-assisted labelling, metric/imperial preference, the 10-type notification catalog, pause/resume + GPS track points, anti-enumeration password reset.
+
+### Suggested follow-ups
+1. Fold reconciliation-log §B into the PRD (it was *not* done in v3) and re-cite TDM v5 as canonical.
+2. Resolve US21: rest alerts Free (SRS) vs Premium-only (WBS) — pick one, log it.
+3. Ask the team whether the no-story items (change password, in-app feedback, save expert, create/quit challenge, post edit/delete, XP/levels replacing badges) should become SRS stories or stay implementation detail — they're all in the WBS or TDM, so the SRS is the lagging document.
+4. Either enforce the Free history cap or drop the cap banner (US15).
