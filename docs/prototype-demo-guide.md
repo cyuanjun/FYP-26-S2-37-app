@@ -75,7 +75,8 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 1. Launch the app.
    - **See:** brief **WISE / WORKOUT** splash (lime accent), then the **Login** screen.
 2. Enter `free@wiseworkout.test` / `Password123!` → **LOG IN**.
-   - **See:** the **Home** dashboard — *"Hi, Mia 👋 · Free member"* — with a bottom nav (Home / Train / History).
+   - **See:** the **Home** dashboard — *"Hi, Mia 👋 · Free member"* — with the 5-tab bottom nav
+     (Home / Experts / Train / Social / History). Experts and Social are styled "later sprint" placeholders.
 3. **Negative check:** sign out (logout icon, top-right of Home), enter a wrong password → LOG IN.
    - **See:** red **"Incorrect email or password."** and no navigation.
 
@@ -194,8 +195,9 @@ catalogs: workout types, health tags, expert categories.)
   true per-app deep-linking is a later sprint.
 - **Real GPS needs a physical device** — emulators/simulators show 0 distance unless you mock location.
 - **Payment is simulated** (price fields only — premium = $9.99/mo, no gateway).
-- **Placeholders** (show "later sprint"): Set a goal, Add device, History search, Advanced analytics,
-  full plan. The Dashboard is a minimal greeting. These are scoped out of the slice, not broken.
+- **Placeholders** (show "later sprint"): the Experts and Social tabs, Set a goal, Add device,
+  History search, Advanced analytics, full plan. The Dashboard is a minimal greeting. These are
+  scoped out of the slice, not broken.
 
 ---
 
@@ -207,7 +209,7 @@ lib/
   controls/        Authenticate, ActiveWorkout, SaveWorkoutDetails, SummariseProgress,
                    CreateWorkoutSharePost, ShareWorkoutToSocial, DeleteWorkoutSession, history
   boundaries/
-    ui/            splash · auth · home · train · workout · history screens
+    ui/            splash · auth · home · experts · train · social · history · workout screens
     gateways/      auth, profile, workout, social, social_share, ai, workout_data_source
   core/            theme (palette + iOS type scale), format, seq_log, config/env
   router/          go_router (auth redirect)
