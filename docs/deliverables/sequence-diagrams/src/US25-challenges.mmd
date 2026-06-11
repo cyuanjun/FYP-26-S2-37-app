@@ -1,0 +1,20 @@
+---
+title: "US25 — Join challenges + earn rewards"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>ChallengeDetailScreen
+  participant C as «Control»<br/>JoinChallenge
+  participant G as «Gateway»<br/>SocialGateway → Supabase
+  A->>B: tap JOIN CHALLENGE
+  B->>C: join(challengeId)
+  C->>G: insert challenge_participants
+  alt joined
+    G-->>C: ok
+    C-->>B: participating
+    B-->>A: progress tracked - XP on completion
+  else deadline passed
+    G-->>C: rejected
+    B-->>A: "Challenge has ended"
+  end
+  note over C,G: rewards = XP / levels<br/>(replaces badges - schema v2)

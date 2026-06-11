@@ -1,0 +1,14 @@
+---
+title: "US42 — Expert log in"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>LoginScreen
+  participant C as «Control»<br/>Authenticate
+  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  A->>B: enter credentials
+  B->>C: signIn()
+  C->>G: signInWithPassword()
+  G-->>C: session, role = expert
+  C-->>B: signed in
+  B-->>A: route to Expert portal (5-tab shell)

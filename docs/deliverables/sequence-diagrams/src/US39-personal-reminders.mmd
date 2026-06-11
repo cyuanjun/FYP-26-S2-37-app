@@ -1,0 +1,13 @@
+---
+title: "US39 — Personalised reminders + alerts"
+---
+sequenceDiagram
+  actor A as Registered Premium User
+  participant B as «Boundary»<br/>NotificationsScreen
+  participant C as «Control»<br/>UpdateNotificationPrefs + rule controls
+  participant G as «Gateway»<br/>NotificationGateway
+  A->>B: enable personalised reminders
+  B->>C: setEnabled(...)
+  note over C: rules read the active plan -<br/>planned-workout times, rest days
+  C->>G: schedule plan-aware notifications
+  G-->>A: reminders tuned to the plan

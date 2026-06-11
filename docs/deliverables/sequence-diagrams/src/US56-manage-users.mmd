@@ -1,0 +1,15 @@
+---
+title: "US56 — Manage user accounts / roles / access"
+---
+sequenceDiagram
+  actor A as System Admin
+  participant B as «Boundary»<br/>UsersScreen
+  participant C as «Control»<br/>SetUserStatus
+  participant G as «Gateway»<br/>ProfileGateway → Supabase
+  A->>B: open a user account
+  B->>C: suspend(userId) / setRole(...)
+  C->>G: update profiles.status / role
+  note right of G: DB trigger - only admins<br/>may change role or status
+  G-->>C: ok
+  C-->>B: updated
+  B-->>A: user suspended / role changed

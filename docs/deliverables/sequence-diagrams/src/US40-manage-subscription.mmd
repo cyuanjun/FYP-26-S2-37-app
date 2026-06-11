@@ -1,0 +1,16 @@
+---
+title: "US40 — View / manage subscription"
+---
+sequenceDiagram
+  actor A as Registered Premium User
+  participant B as «Boundary»<br/>SubscriptionScreen
+  participant C as «Control»<br/>CancelSubscription / Resubscribe
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: open Subscription
+  B-->>A: status, renews-at, $9.99/mo (simulated)
+  A->>B: tap Cancel
+  B->>C: cancel()
+  C->>G: update subscriptions.status=cancelled
+  G-->>C: ok
+  C-->>B: cancelled (access until period end)
+  B-->>A: status updated

@@ -1,0 +1,14 @@
+---
+title: "US26 — Share achievements to social media"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>WorkoutSummaryScreen
+  participant C as «Control»<br/>CreateWorkoutSharePost · ShareWorkoutToSocial
+  participant G as «Gateway»<br/>SocialGateway + SocialShareGateway
+  A->>B: toggle "Share to Social" on, pick platform
+  B->>C: share(caption, platform)
+  C->>G: insert posts (public caption only)
+  note right of G: private notes are never shared
+  C->>G: shareTo(Facebook / Instagram / Twitter / TikTok)
+  G-->>A: OS share sheet opens with message

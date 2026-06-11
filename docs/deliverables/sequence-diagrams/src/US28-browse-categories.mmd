@@ -1,0 +1,14 @@
+---
+title: "US28 — Browse expert categories"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>ExpertsScreen (category chips)
+  participant C as «Control»<br/>BrowseExperts
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: tap a category chip
+  B->>C: filter(categoryId)
+  C->>G: select expert_categories + filtered experts
+  G-->>C: rows
+  C-->>B: filtered list
+  B-->>A: experts for that specialty

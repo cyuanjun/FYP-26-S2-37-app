@@ -1,0 +1,14 @@
+---
+title: "US24 — Follow other users"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>UserProfileScreen
+  participant C as «Control»<br/>FollowUser / UnfollowUser
+  participant G as «Gateway»<br/>SocialGateway → Supabase
+  A->>B: tap "Add Friend"
+  B->>C: follow(userId)
+  C->>G: insert follows
+  G-->>C: ok
+  C-->>B: following
+  B-->>A: button now "Unfriend" - their posts join the feed

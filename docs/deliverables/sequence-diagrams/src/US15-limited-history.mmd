@@ -1,0 +1,15 @@
+---
+title: "US15 — View limited history + summaries (Free)"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>HistoryScreen
+  participant C as «Control»<br/>ViewWorkoutHistory
+  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  A->>B: open History tab
+  B->>C: load sessions
+  C->>G: listEndedSessions(from = 1st of month)
+  note right of G: Free cap = current calendar<br/>month, enforced in the query
+  G-->>C: this month's sessions
+  C-->>B: grouped list + weekly analytics
+  B-->>A: sessions, deltas, cap banner + upsell

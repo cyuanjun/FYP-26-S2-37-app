@@ -1,0 +1,14 @@
+---
+title: "US27 — Browse expert profiles + listings"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>ExpertsScreen
+  participant C as «Control»<br/>BrowseExperts
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: open Experts tab, search / filter
+  B->>C: load experts + services
+  C->>G: select expert_profiles, expert_services (live)
+  G-->>C: rows
+  C-->>B: expert + service cards
+  B-->>A: directory with ratings + prices

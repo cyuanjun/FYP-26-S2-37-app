@@ -1,0 +1,14 @@
+---
+title: "US59 — Monitor expert content + listings"
+---
+sequenceDiagram
+  actor A as System Admin
+  participant B as «Boundary»<br/>MonitorScreen
+  participant C as «Control»<br/>ModerateServiceListing
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: review reported / new listings
+  B->>C: takeDown(listingId)
+  C->>G: update expert_services status = archived
+  G-->>C: ok
+  C-->>B: removed from marketplace
+  B-->>A: listing no longer visible

@@ -1,0 +1,14 @@
+---
+title: "US45 — Create / manage expert profile"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>ExpertProfileScreen
+  participant C as «Control»<br/>UpsertExpertProfile
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: edit bio, credentials, photo
+  B->>C: save(profile)
+  C->>G: update expert_profiles
+  G-->>C: ok
+  C-->>B: saved
+  B-->>A: public profile updated

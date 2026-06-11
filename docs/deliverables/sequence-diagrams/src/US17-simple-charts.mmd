@@ -1,0 +1,14 @@
+---
+title: "US17 — Simple charts / reports"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>HistoryScreen (analytics card)
+  participant C as «Control»<br/>ViewWorkoutHistory
+  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  A->>B: tap Day / Week / Month pill
+  B->>C: sessions for period
+  C->>G: listEndedSessions(...)
+  G-->>C: rows
+  C-->>B: aggregates + vs-prior deltas
+  B-->>A: sessions, active min, calories, HR tiles

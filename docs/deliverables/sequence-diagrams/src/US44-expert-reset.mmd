@@ -1,0 +1,13 @@
+---
+title: "US44 — Expert password reset"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>ForgotPasswordScreen
+  participant C as «Control»<br/>RequestPasswordReset
+  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  A->>B: enter email, send link
+  B->>C: send(email)
+  C->>G: sendPasswordResetEmail()
+  G-->>C: ok
+  B-->>A: "reset link sent" card

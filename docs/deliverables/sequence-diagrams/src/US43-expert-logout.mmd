@@ -1,0 +1,13 @@
+---
+title: "US43 — Expert log out"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>ExpertShell
+  participant C as «Control»<br/>Authenticate
+  participant G as «Gateway»<br/>AuthGateway → Supabase Auth
+  A->>B: tap log out
+  B->>C: signOut()
+  C->>G: signOut()
+  G-->>C: session cleared
+  B-->>A: back to Login

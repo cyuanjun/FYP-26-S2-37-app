@@ -1,0 +1,18 @@
+---
+title: "US16 — Basic exercise effect estimates"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>WorkoutSummaryScreen
+  participant C as «Control»<br/>EndWorkoutSession
+  participant E as «Entity»<br/>WorkoutType
+  participant G as «Gateway»<br/>WorkoutGateway → Supabase
+  A->>B: finish a workout
+  B->>C: end()
+  C->>E: estimateCalories(duration, weightKg)
+  note right of E: kcal = MET x kg x hours<br/>(70 kg fallback)
+  E-->>C: calories
+  C->>G: rpc end_workout_session(+calories)
+  G-->>C: xp_gained
+  C-->>B: stats
+  B-->>A: duration, calories, +XP

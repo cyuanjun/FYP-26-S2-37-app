@@ -1,0 +1,14 @@
+---
+title: "US51 — Respond with expert advice"
+---
+sequenceDiagram
+  actor A as Expert User
+  participant B as «Boundary»<br/>RequestDetailScreen
+  participant C as «Control»<br/>SendDeliverable
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: write advice / attach plan
+  B->>C: send(deliverable)
+  C->>G: insert deliverables
+  G-->>C: ok
+  C->>G: update request → completed (CompleteServiceRequest)
+  B-->>A: delivered - client sees it under purchases

@@ -1,0 +1,21 @@
+---
+title: "US18 — Basic AI summary + plan suggestion"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>HistoryScreen (AI sheet)
+  participant C as «Control»<br/>SummariseProgress
+  participant G as «Gateway»<br/>AiGateway → Edge Function
+  A->>B: tap AI summary
+  B->>C: summarise(range)
+  C->>G: invoke summarise-progress
+  note right of G: OpenAI (Gemini fallback) -<br/>basic tier = generic prose
+  G-->>C: summary / error
+  alt summary returned
+    C-->>B: text + model tag
+    B-->>A: summary, labelled "AI-assisted - not medical advice"
+  else AI unavailable
+    C-->>B: AsyncError
+    B-->>A: friendly error, retry
+  end
+  note over C: basic plan = BuildPlanSkeleton (rule-based, no AI)

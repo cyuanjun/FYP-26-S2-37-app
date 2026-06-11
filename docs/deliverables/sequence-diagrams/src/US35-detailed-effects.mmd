@@ -1,0 +1,14 @@
+---
+title: "US35 — Detailed effect estimates"
+---
+sequenceDiagram
+  actor A as Registered Premium User
+  participant B as «Boundary»<br/>AdvancedAnalyticsScreen
+  participant C as «Control»<br/>ComputeEffectEstimates (rule)
+  participant E as «Entity»<br/>WorkoutSession / FitnessProfile
+  A->>B: open effect estimates
+  B->>C: compute(range)
+  C->>E: sessions + body metrics + HR
+  E-->>C: short / long-term effect figures
+  C-->>B: estimates
+  B-->>A: detailed effect breakdown

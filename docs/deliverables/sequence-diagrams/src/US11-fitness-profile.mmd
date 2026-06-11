@@ -1,0 +1,19 @@
+---
+title: "US11 — Create / update fitness profile"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>FitnessProfileScreen
+  participant C as «Control»<br/>UpsertFitnessProfile
+  participant G as «Gateway»<br/>FitnessGateway → Supabase
+  A->>B: edit metrics, chips, tags - tap SAVE PROFILE
+  B->>C: save(patch)
+  C->>G: update fitness_profiles (one batched write)
+  G-->>C: ok / error
+  alt saved
+    C-->>B: refreshed profile
+    B-->>A: "Fitness profile saved."
+  else write fails
+    C-->>B: AsyncError
+    B-->>A: "Could not save. Please try again."
+  end

@@ -1,0 +1,13 @@
+---
+title: "US21 — Rest alerts (overtraining)"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>NotificationsScreen
+  participant C as «Control»<br/>CheckOvertraining (rule-based)
+  participant G as «Gateway»<br/>NotificationGateway
+  A->>B: rest alerts enabled
+  note over C: rule - sessions on too many<br/>consecutive days / volume spike
+  C->>G: schedule rest-day notification
+  G-->>A: "Consider a rest day"
+  note over B,G: tier TBD - SRS says Free, WBS says Premium<br/>(reconciliation pending)

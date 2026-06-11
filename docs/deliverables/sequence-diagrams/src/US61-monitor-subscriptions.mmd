@@ -1,0 +1,14 @@
+---
+title: "US61 — Monitor subscription-tier access"
+---
+sequenceDiagram
+  actor A as System Admin
+  participant B as «Boundary»<br/>MonitorScreen
+  participant C as «Control»<br/>ViewSubscriptionOverview
+  participant G as «Gateway»<br/>SupabaseGateway
+  A->>B: open subscription stats
+  B->>C: load overview
+  C->>G: aggregate subscriptions + roles
+  G-->>C: counts by tier / status
+  C-->>B: overview
+  B-->>A: premium gating is working as intended
