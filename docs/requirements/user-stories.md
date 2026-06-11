@@ -1,0 +1,102 @@
+# User Stories — build tracker
+
+All **64 user stories** from the **SRS v2.0 §3** (canonical; `../FYP_docs/Submissions/SRS/`),
+mirrored here with engineering build status. **The SRS is the source of truth for wording and
+scope** — update status here as features land; never edit story text without an SRS change
+(log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
+
+Last updated **12 Jun 2026** (after the Profile cluster).
+
+**Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
+
+**Score:** 10 built · 13 partial · 41 not started
+
+
+## Unregistered user (US01–US06)
+
+| ID | Status | User story | Build note |
+|---|---|---|---|
+| US01 | ⬜ | As an unregistered user, I want to view the Wise Workout marketing website so that I can understand the platform before creating an account. | Marketing website — separate deliverable, not the app |
+| US02 | ⬜ | As an unregistered user, I want to view app features, subscription highlights, and pricing so that I can understand the difference between free and premium access. | Marketing website — separate deliverable, not the app |
+| US03 | ⬜ | As an unregistered user, I want to view expert information so that I can understand what types of professional support are available through the platform. | Marketing website — separate deliverable, not the app |
+| US04 | ⬜ | As an unregistered user, I want to contact support so that I can ask questions about the platform before creating an account. | Marketing website — separate deliverable, not the app |
+| US05 | ⬜ | As an unregistered user, I want to create an account so that I can become a registered user and access the mobile application. | Signup lives on the website; app is login-only by design |
+| US06 | ⬜ | As an unregistered user, I want to apply as an expert so that I can offer professional fitness or wellness services through the platform after approval. | Expert application — website + admin approval flow |
+
+## Registered Free user (US07–US31)
+
+| ID | Status | User story | Build note |
+|---|---|---|---|
+| US07 | ✅ | As a registered free user, I want to log in securely so that I can access my account and use the basic features of the platform. | Login / log out (Profile #13) |
+| US08 | ✅ | As a registered free user, I want to log out of my account so that I can securely end my session after using the platform. | Login / log out (Profile #13) |
+| US09 | ✅ | As a registered free user, I want to reset my password so that I can regain access if I forget my login details. | Forgot Password #4 + Change Password (#13.3) reset email |
+| US10 | ✅ | As a registered free user, I want to access the mobile application after logging in so that I can install and use the application. | Session-aware splash + auth redirect |
+| US11 | ✅ | As a registered free user, I want to create and update my fitness profile so that the system can understand my goals, preferences, and fitness needs. | Fitness Profile #13.1 (batched save, custom tags) |
+| US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
+| US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | Manual entry UI not built (schema supports it: null device) |
+| US14 | 🟨 | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone sensors (GPS+steps) ✅; wearables are additive later |
+| US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 with Free cap banner + weekly analytics |
+| US16 | 🟨 | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | Calories/XP per session ✅; richer effect estimates pending |
+| US17 | 🟨 | As a registered free user, I want to view simple charts or reports so that my fitness progress is easier to understand. | Analytics card with deltas ✅; charts pending |
+| US18 | 🟨 | As a registered free user, I want to receive basic AI progress summaries and basic AI-assisted fitness plan suggestions so that I can better understand my activity data and follow a simple workout routine. | AI progress summary ✅ (stub model); basic plan suggestion pending |
+| US19 | 🟨 | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Preference toggles #13.4 ✅; local notifications pending |
+| US20 | ⬜ | As a registered free user, I want to receive inactivity alerts so that I am reminded when I have not met my scheduled exercise goals. | Pref toggles exist; rule-based alert engine pending |
+| US21 | ⬜ | As a registered free user, I want to receive rest alerts when I may be exercising too much so that I can avoid overtraining. | Pref toggles exist; rule-based alert engine pending |
+| US22 | ⬜ | As a registered free user, I want to view community posts so that I can stay connected with other fitness users. | Feed UI pending (posts already land in DB) |
+| US23 | 🟨 | As a registered free user, I want to create posts, like posts, and comment on posts so that I can participate in the Wise Workout community. | Workout-share post creation ✅; likes/comments pending |
+| US24 | ⬜ | As a registered free user, I want to follow other users so that I can keep up with their shared fitness progress. | Follow/friends pending |
+| US25 | ⬜ | As a registered free user, I want to join simple fitness challenges and earn badges so that I can stay motivated. | Challenges pending (XP/levels replace badges per schema-v2) |
+| US26 | ✅ | As a registered free user, I want to share selected achievements or challenge results so that I can show my progress while controlling what information is shared. | Share to Facebook/Instagram/Twitter/TikTok + share post |
+| US27 | ⬜ | As a registered free user, I want to browse expert profiles and service listings so that I can find professional support when needed. | Experts marketplace — placeholder tab |
+| US28 | ⬜ | As a registered free user, I want to browse expert categories so that I can identify what type of expert support may suit my fitness goals. | Experts marketplace — placeholder tab |
+| US29 | ⬜ | As a registered free user, I want to request expert services as a paid add-on so that I can receive professional support when needed. | Experts marketplace — placeholder tab |
+| US30 | ⬜ | As a registered free user, I want to browse and purchase expert-created content so that I can access professional fitness guidance when needed. | Experts marketplace — placeholder tab |
+| US31 | ⬜ | As a registered free user, I want to view upgrade options so that I can decide whether to subscribe to premium features. | Go Premium pill is a placeholder; Upgrade #16 pending |
+
+## Registered Premium user (US32–US40)
+
+| ID | Status | User story | Build note |
+|---|---|---|---|
+| US32 | ✅ | As a registered premium user, I want to access all registered free user features so that I can use the full platform experience. | Premium role inherits all Free features (role-aware UI) |
+| US33 | ✅ | As a registered premium user, I want to view full workout history so that I can review my long-term activity records. | Premium History shows no cap/locks |
+| US34 | ⬜ | As a registered premium user, I want to access advanced progress analytics so that I can understand my fitness trends in more detail. | Advanced analytics / detailed estimates pending |
+| US35 | ⬜ | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Advanced analytics / detailed estimates pending |
+| US36 | 🟨 | As a registered premium user, I want to receive personalised AI progress summaries, fitness plan suggestions, and personalised fitness reports so that I can get more relevant guidance. | Summary works for Premium; personalisation pending (stub) |
+| US37 | ⬜ | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | Personalised plans / reminders / subscription mgmt pending |
+| US38 | ⬜ | As a registered premium user, I want to customise plan duration, workout frequency, preferred workout categories, target calories, daily or weekly weight loss goals, and preferred rest days so that the fitness plan fits my schedule and needs. | Personalised plans / reminders / subscription mgmt pending |
+| US39 | ⬜ | As a registered premium user, I want to receive personalised workout reminders, inactivity alerts, and rest alerts so that I can maintain a balanced routine. | Personalised plans / reminders / subscription mgmt pending |
+| US40 | ⬜ | As a registered premium user, I want to view or manage my subscription status so that I can understand and control my paid access. | Personalised plans / reminders / subscription mgmt pending |
+
+## Expert user (US41–US52)
+
+| ID | Status | User story | Build note |
+|---|---|---|---|
+| US41 | ⬜ | As an expert user, I want to register or apply as an expert so that I can offer professional fitness or wellness services through the platform. | Expert portal pending |
+| US42 | 🟨 | As an expert user, I want to log in securely so that I can access my expert account and manage my expert functions. | Shared auth (login/logout/reset) works; expert portal pending |
+| US43 | 🟨 | As an expert user, I want to log out of my expert account so that I can securely end my session. | Shared auth (login/logout/reset) works; expert portal pending |
+| US44 | 🟨 | As an expert user, I want to reset my password so that I can regain access if I forget my login details. | Shared auth (login/logout/reset) works; expert portal pending |
+| US45 | ⬜ | As an expert user, I want to create and manage my expert profile so that users can understand my background, specialisation, and services. | Expert portal pending |
+| US46 | ⬜ | As an expert user, I want to manage my professional information and expertise categories so that my profile accurately represents my services. | Expert portal pending |
+| US47 | ⬜ | As an expert user, I want to create and manage service listings so that users can request the services I offer. | Expert portal pending |
+| US48 | ⬜ | As an expert user, I want to upload or manage expert-related content so that I can provide useful fitness or wellness information to users. | Expert portal pending |
+| US49 | ⬜ | As an expert user, I want to view user service requests so that I can understand what support users are asking for. | Expert portal pending |
+| US50 | ⬜ | As an expert user, I want to accept or reject service requests so that I can manage the services I provide through the platform. | Expert portal pending |
+| US51 | ⬜ | As an expert user, I want to respond with expert advice so that I can provide coaching advice, workout plans, nutrition support, or recovery guidance to users. | Expert portal pending |
+| US52 | ⬜ | As an expert user, I want my profile to be verified by an admin so that users can trust the professional services offered on the platform. | Expert portal pending |
+
+## System Admin (US53–US64)
+
+| ID | Status | User story | Build note |
+|---|---|---|---|
+| US53 | 🟨 | As a system admin, I want to log in securely so that I can access administrative functions. | Shared auth works; admin portal pending |
+| US54 | 🟨 | As a system admin, I want to log out securely so that I can end my administrative session. | Shared auth works; admin portal pending |
+| US55 | 🟨 | As a system admin, I want to reset my password so that I can regain access to the admin system if needed. | Shared auth works; admin portal pending |
+| US56 | ⬜ | As a system admin, I want to manage user accounts, roles, and access levels so that users can only access features suitable for their role and subscription tier. | Admin portal pending |
+| US57 | ⬜ | As a system admin, I want to review, approve, or reject expert applications so that only suitable experts can provide services on the platform. | Admin portal pending |
+| US58 | ⬜ | As a system admin, I want to manage expert categories so that expert services are organised clearly for users. | Admin portal pending |
+| US59 | ⬜ | As a system admin, I want to monitor expert content and service listings so that inappropriate or low-quality content can be handled. | Admin portal pending |
+| US60 | ⬜ | As a system admin, I want to manage feedback and platform activity so that the system remains reliable, organised, and trustworthy. | Admin portal pending |
+| US61 | ⬜ | As a system admin, I want to monitor subscription-tier access so that premium features are only available to eligible users. | Admin portal pending |
+| US62 | ⬜ | As a system admin, I want to manage subscription access so that free and premium access levels can be controlled correctly. | Admin portal pending |
+| US63 | ⬜ | As a system admin, I want to manage the marketing website so that platform information, feature highlights, subscription details, and expert service information remain accurate. | Admin portal pending |
+| US64 | ⬜ | As a system admin, I want to maintain platform quality and reliability so that users and experts can use the system safely and consistently. | Admin portal pending |
