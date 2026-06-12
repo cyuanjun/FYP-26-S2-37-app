@@ -87,20 +87,20 @@ void main() {
       return c;
     }
 
-    test('free user → rule-based plan persisted (positive)', () async {
+    test('free user → basic AI plan persisted (positive)', () async {
       final plans = FakePlanGateway();
-      final ai = FakeAiGateway();
+      final ai = FakeAiGateway()..planResult['strategy'] = 'basic';
       final c = makeContainer(role: UserRole.free, plans: plans, ai: ai);
       final plan = await c.read(generatePlanProvider.notifier).generate();
       expect(plan, isNotNull);
+      expect(ai.planCalls, 1); // Free uses AI too (basic depth) — WBS/SRS
       expect(plans.insertedPlans.single['generation_strategy'], 'basic');
-      expect(ai.planCalls, 0); // no AI at the basic tier
       expect(plans.insertedWorkouts.single, isNotEmpty);
     });
 
     test('premium user → AI-personalised plan (positive)', () async {
       final plans = FakePlanGateway();
-      final ai = FakeAiGateway();
+      final ai = FakeAiGateway()..planResult['strategy'] = 'personalised';
       final c = makeContainer(role: UserRole.premium, plans: plans, ai: ai);
       final plan = await c.read(generatePlanProvider.notifier).generate();
       expect(plan, isNotNull);
@@ -108,13 +108,15 @@ void main() {
       expect(plans.insertedPlans.single['generation_strategy'], 'personalised');
     });
 
-    test('premium + AI down → falls back to rule-based (resilience)', () async {
-      final plans = FakePlanGateway();
-      final ai = FakeAiGateway(throwOnCall: true);
-      final c = makeContainer(role: UserRole.premium, plans: plans, ai: ai);
-      final plan = await c.read(generatePlanProvider.notifier).generate();
-      expect(plan, isNotNull);
-      expect(plans.insertedPlans.single['generation_strategy'], 'basic');
+    test('AI down → rule-based fallback still delivers a plan (resilience)', () async {
+      for (final role in [UserRole.free, UserRole.premium]) {
+        final plans = FakePlanGateway();
+        final ai = FakeAiGateway(throwOnCall: true);
+        final c = makeContainer(role: role, plans: plans, ai: ai);
+        final plan = await c.read(generatePlanProvider.notifier).generate();
+        expect(plan, isNotNull);
+        expect(plans.insertedPlans.single['generation_strategy'], 'basic');
+      }
     });
 
     test('no active goal → error, nothing persisted (negative)', () async {

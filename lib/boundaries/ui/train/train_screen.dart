@@ -213,7 +213,7 @@ class _ActivePlanCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             '${plan.workoutsPerWeek}x per week · ${plan.durationWeeks} weeks · '
-            '${plan.isPersonalised ? 'AI-assisted' : 'rule-based'}',
+            'AI-assisted (${plan.isPersonalised ? 'personalised' : 'basic'})',
             style: AppTypography.caption2.copyWith(color: AppColors.accent),
           ),
           if (next != null) ...[

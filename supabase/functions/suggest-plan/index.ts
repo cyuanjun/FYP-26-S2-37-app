@@ -1,10 +1,12 @@
 // SuggestPlan AI proxy (STUB) — the second AI surface (build-plan §5).
 //
-// Builds a personalised weekly plan from the caller's own fitness profile +
-// active goal (RLS-scoped via their JWT). Deterministic — no API key needed.
-// To go live, replace `buildStubPlan` with an OpenAI/Gemini call using the
-// same `profile`/`goal` payload — the app contract (AiGateway → this
-// function) does not change.
+// Serves BOTH tiers (decided 12 Jun): Free gets a basic AI plan, Premium a
+// personalised one — same mechanics in the stub, different depth/labelling;
+// with a real model the tier controls prompt depth. Reads the caller's own
+// fitness profile + active goal (RLS-scoped via their JWT). Deterministic —
+// no API key needed. To go live, replace `buildStubPlan` with an
+// OpenAI/Gemini call using the same `profile`/`goal` payload — the app
+// contract (AiGateway → this function) does not change.
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -31,7 +33,7 @@ const DAY_SPREAD: Record<number, number[]> = {
   5: [1, 2, 4, 5, 6], 6: [1, 2, 3, 4, 5, 6], 7: [1, 2, 3, 4, 5, 6, 7],
 };
 
-function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[]) {
+function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[], personalised: boolean) {
   const days = Math.min(Math.max(goal.weekly_commitment_days ?? 3, 1), 7);
   const weeks = goal.timeline_weeks ?? 4;
   const exp = profile.training_experience ?? "beginner";
@@ -67,12 +69,15 @@ function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[]) {
 
   return {
     name: `${titles[goal.primary_goal] ?? "Balanced Week"} — ${weeks}-week plan`,
-    description:
-      `Personalised for your ${exp} level and ${days}-day week. ` +
-      `Repeats weekly for ${weeks} weeks toward your ${goal.primary_goal.replace(/_/g, " ")} goal.`,
+    description: personalised
+      ? `Personalised for your ${exp} level and ${days}-day week. ` +
+        `Repeats weekly for ${weeks} weeks toward your ${goal.primary_goal.replace(/_/g, " ")} goal.`
+      : `A simple ${days}-day week toward your ${goal.primary_goal.replace(/_/g, " ")} goal. ` +
+        `Repeats weekly for ${weeks} weeks. Upgrade for deeper personalisation.`,
     duration_weeks: weeks,
     workouts_per_week: days,
     model: "stub",
+    strategy: personalised ? "personalised" : "basic",
     workouts,
   };
 }
@@ -106,6 +111,9 @@ Deno.serve(async (req: Request) => {
       .select("activity_level, training_experience, preferred_workout_type_ids")
       .maybeSingle();
 
+    const { data: me } = await supabase.from("profiles").select("role").maybeSingle();
+    const personalised = me?.role === "premium" || me?.role === "expert";
+
     let preferredSlugs: string[] = [];
     const ids = profile?.preferred_workout_type_ids ?? [];
     if (ids.length > 0) {
@@ -115,7 +123,7 @@ Deno.serve(async (req: Request) => {
 
     return json(buildStubPlan(goal as Goal, (profile ?? {
       activity_level: null, training_experience: null, preferred_workout_type_ids: [],
-    }) as Profile, preferredSlugs));
+    }) as Profile, preferredSlugs, personalised));
   } catch (e) {
     return json({ error: String(e) }, 500);
   }
