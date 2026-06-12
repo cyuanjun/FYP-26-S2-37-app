@@ -17,6 +17,7 @@ import 'view_profile.dart';
 class PlannedSlot {
   const PlannedSlot({
     required this.slug,
+    required this.week,
     required this.dayOfWeek,
     required this.durationMinutes,
     required this.name,
@@ -24,6 +25,7 @@ class PlannedSlot {
   });
 
   final String slug;
+  final int week; // 1–4 within the monthly cycle
   final int dayOfWeek;
   final int durationMinutes;
   final String name;
@@ -54,9 +56,10 @@ const _daySpread = <int, List<int>>{
   5: [1, 2, 4, 5, 6], 6: [1, 2, 3, 4, 5, 6], 7: [1, 2, 3, 4, 5, 6, 7],
 };
 
-/// CONTROL (rule-based) — BuildPlanSkeleton. The basic plan for all tiers:
-/// deterministic weekly template from the goal + experience + preferences.
-/// No AI involved (build-plan §5).
+/// CONTROL (rule-based) — BuildPlanSkeleton. The offline/AI-down fallback:
+/// a deterministic 4-week monthly cycle (foundation / build / peak /
+/// recovery) from the goal + experience + preferences. Preferences are a
+/// contract — when present, ONLY preferred types are scheduled.
 PlanDraft buildPlanSkeleton({
   required PrimaryGoal goal,
   TrainingExperience? experience,
@@ -77,7 +80,8 @@ PlanDraft buildPlanSkeleton({
     PrimaryGoal.improveEndurance => ['running', 'cycling', 'rowing'],
     PrimaryGoal.maintainFitness => ['running', 'strength', 'yoga'],
   };
-  final rotation = {...preferredSlugs, ...fillers}.toList();
+  final rotation =
+      preferredSlugs.isNotEmpty ? preferredSlugs.toSet().toList() : fillers;
   final title = switch (goal) {
     PrimaryGoal.loseWeight => 'Lean & Consistent',
     PrimaryGoal.buildMuscle => 'Progressive Strength',
@@ -85,23 +89,30 @@ PlanDraft buildPlanSkeleton({
     PrimaryGoal.maintainFitness => 'Balanced Week',
   };
 
+  const weekBump = [0, 5, 10, -5]; // foundation / build / peak / recovery
   final slots = <PlannedSlot>[];
   final spread = _daySpread[days]!;
-  for (var i = 0; i < spread.length; i++) {
-    final slug = rotation[i % rotation.length];
-    final hard = i % 3 == 2;
-    slots.add(PlannedSlot(
-      slug: slug,
-      dayOfWeek: spread[i],
-      durationMinutes: hard ? base + 10 : base,
-      name: '${slug[0].toUpperCase()}${slug.substring(1)} ${hard ? 'push' : 'base'}',
-      descriptor: hard ? 'Slightly harder effort — finish strong' : 'Comfortable, repeatable effort',
-    ));
+  for (var wk = 1; wk <= 4; wk++) {
+    for (var i = 0; i < spread.length; i++) {
+      final slug = rotation[i % rotation.length];
+      final hard = i % 3 == 2;
+      slots.add(PlannedSlot(
+        slug: slug,
+        week: wk,
+        dayOfWeek: spread[i],
+        durationMinutes:
+            ((hard ? base + 10 : base) + weekBump[wk - 1]).clamp(15, 120),
+        name: '${slug[0].toUpperCase()}${slug.substring(1)} ${hard ? 'push' : 'base'}',
+        descriptor: wk == 4
+            ? 'Recovery week — keep it comfortable'
+            : hard ? 'Slightly harder effort — finish strong' : 'Comfortable, repeatable effort',
+      ));
+    }
   }
 
   return PlanDraft(
     name: '$title — $weeks-week plan',
-    description: 'A simple $days-day week, repeating for $weeks weeks '
+    description: 'A $days-day week in a 4-week cycle (build up, then recover) '
         'toward your ${goal.label.toLowerCase()} goal.',
     durationWeeks: weeks,
     workoutsPerWeek: days,
@@ -184,7 +195,7 @@ class GeneratePlan extends AsyncNotifier<void> {
             if (bySlug.containsKey(draft.slots[i].slug))
               {
                 'workout_type_id': bySlug[draft.slots[i].slug]!.id,
-                'week_number': 1, // weekly template; repeats for durationWeeks
+                'week_number': draft.slots[i].week, // 4-week monthly cycle
                 'day_of_week': draft.slots[i].dayOfWeek,
                 'duration_minutes': draft.slots[i].durationMinutes,
                 'name': draft.slots[i].name,
@@ -212,6 +223,7 @@ class GeneratePlan extends AsyncNotifier<void> {
         .whereType<Map>()
         .map((w) => PlannedSlot(
               slug: w['slug'] as String? ?? 'running',
+              week: ((w['week_number'] as num?)?.toInt() ?? 1).clamp(1, 4),
               dayOfWeek: (w['day_of_week'] as num?)?.toInt() ?? 1,
               durationMinutes: (w['duration_minutes'] as num?)?.toInt() ?? 30,
               name: w['name'] as String? ?? 'Workout',
