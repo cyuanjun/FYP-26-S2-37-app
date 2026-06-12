@@ -9,6 +9,7 @@ import '../../../entities/planned_workout.dart';
 import '../common/avatar_button.dart';
 import '../profile/fitness_goals_screen.dart';
 import '../workout/active_workout_screen.dart';
+import 'plan_detail_screen.dart';
 
 /// BOUNDARY (#7 Train). Active-plan card + device status + a sticky
 /// "Start Freeform Workout" CTA. Plans aren't built in the slice, so the plan
@@ -36,11 +37,17 @@ class TrainScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               children: [
-                _SectionHeader(
-                  label: 'AI SUGGESTED PLAN',
-                  action: 'VIEW FULL PLAN ›',
-                  onAction: () => _soon(context, 'Plan detail'),
-                ),
+                Consumer(builder: (context, ref, _) {
+                  final hasPlan = ref.watch(activePlanProvider).value != null;
+                  return _SectionHeader(
+                    label: 'AI SUGGESTED PLAN',
+                    action: 'VIEW FULL PLAN ›',
+                    onAction: hasPlan
+                        ? () => Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(builder: (_) => const PlanDetailScreen()))
+                        : () => _soon(context, 'Plan detail (set a goal first)'),
+                  );
+                }),
                 const SizedBox(height: 8),
                 Consumer(builder: (context, ref, _) {
                   final plan = ref.watch(activePlanProvider).value;

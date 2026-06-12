@@ -9,7 +9,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 11 built · 12 partial · 41 not started
+**Score:** 12 built · 11 partial · 41 not started
 
 
 ## Unregistered user (US01–US06)
@@ -62,7 +62,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US34 | ⬜ | As a registered premium user, I want to access advanced progress analytics so that I can understand my fitness trends in more detail. | Advanced analytics / detailed estimates pending |
 | US35 | ⬜ | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Advanced analytics / detailed estimates pending |
 | US36 | 🟨 | As a registered premium user, I want to receive personalised AI progress summaries, fitness plan suggestions, and personalised fitness reports so that I can get more relevant guidance. | Summary works for Premium; personalisation pending (stub) |
-| US37 | 🟨 | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | suggest-plan Edge Function serves personalised depth for Premium (stub); Train regenerate CTA pending |
+| US37 | ✅ | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | suggest-plan Edge Function (stub AI): personalised for Premium; Plan Detail #8 with regenerate (Free capped at 1) |
 | US38 | ⬜ | As a registered premium user, I want to customise plan duration, workout frequency, preferred workout categories, target calories, daily or weekly weight loss goals, and preferred rest days so that the fitness plan fits my schedule and needs. | Personalised plans / reminders / subscription mgmt pending |
 | US39 | ⬜ | As a registered premium user, I want to receive personalised workout reminders, inactivity alerts, and rest alerts so that I can maintain a balanced routine. | Personalised plans / reminders / subscription mgmt pending |
 | US40 | ⬜ | As a registered premium user, I want to view or manage my subscription status so that I can understand and control my paid access. | Personalised plans / reminders / subscription mgmt pending |

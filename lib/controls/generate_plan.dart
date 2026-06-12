@@ -163,6 +163,10 @@ class GeneratePlan extends AsyncNotifier<void> {
         draft = _skeleton(goal, fitness?.trainingExperience, preferredSlugs);
       }
 
+      // Regenerating (an active plan exists) carries the counter forward —
+      // Plan Detail gates Free users at 1 regeneration (#8 spec).
+      final prior = await ref.read(planGatewayProvider).fetchActivePlan(userId);
+
       SeqLog.msg('generate-plan', 'GeneratePlan', 'PlanGateway', 'insertPlan');
       created = await ref.read(planGatewayProvider).insertPlan(
         userId: userId,
@@ -173,6 +177,7 @@ class GeneratePlan extends AsyncNotifier<void> {
           'duration_weeks': draft.durationWeeks,
           'workouts_per_week': draft.workoutsPerWeek,
           'generation_strategy': draft.strategy.name,
+          'regenerated_count': prior == null ? 0 : prior.regeneratedCount + 1,
         },
         workouts: [
           for (var i = 0; i < draft.slots.length; i++)
