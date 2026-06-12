@@ -13,8 +13,24 @@ class WorkoutGateway {
   final SupabaseClient _client;
 
   Future<List<WorkoutType>> listWorkoutTypes() async {
-    final rows = await _client.from('workout_types').select().order('name');
+    final rows = await _client.from('workout_types').select().order('name', ascending: true);
     return rows.map(WorkoutType.fromJson).toList();
+  }
+
+  /// User-added catalog entry ("+ Add your own" in pickers). Slug derived from
+  /// the name; unknown slugs fall back to a moderate MET for calories.
+  Future<WorkoutType> addCustomWorkoutType({
+    required String userId,
+    required String name,
+  }) async {
+    final slug = name.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    final row = await _client.from('workout_types').insert({
+      'name': name.trim(),
+      'slug': slug,
+      'is_custom': true,
+      'created_by_user_id': userId,
+    }).select().single();
+    return WorkoutType.fromJson(row);
   }
 
   /// Inserts a fresh free-form session (StartWorkoutSession use case).

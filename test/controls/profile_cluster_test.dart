@@ -4,6 +4,7 @@ import 'package:wise_workout/boundaries/gateways/auth_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/feedback_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/fitness_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/profile_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/controls/authenticate.dart';
 import 'package:wise_workout/controls/manage_notification_prefs.dart';
 import 'package:wise_workout/controls/request_password_reset.dart';
@@ -300,6 +301,39 @@ void main() {
       addTearDown(c.dispose);
       await c.read(requestPasswordResetProvider.notifier).send('unknown@test');
       expect(c.read(requestPasswordResetProvider).hasError, isFalse);
+    });
+  });
+
+  // ---- Custom workout types (onboarding + #13.1 pickers) ----
+  group('addCustomWorkoutType', () {
+    test('inserts a custom type and returns it (positive)', () async {
+      final gw = FakeWorkoutGateway(types: [runningType]);
+      final c = ProviderContainer(overrides: [
+        workoutGatewayProvider.overrideWithValue(gw),
+        fitnessGatewayProvider.overrideWithValue(FakeFitnessGateway()),
+      ]);
+      addTearDown(c.dispose);
+      final t = await c
+          .read(updateFitnessProfileProvider.notifier)
+          .addCustomWorkoutType(userId: 'u1', name: 'Bouldering');
+      expect(t?.name, 'Bouldering');
+      expect(t?.isCustom, isTrue);
+      expect(t?.slug, 'bouldering');
+      expect(gw.types, hasLength(2));
+    });
+
+    test('rejects empty names (negative)', () async {
+      final gw = FakeWorkoutGateway(types: [runningType]);
+      final c = ProviderContainer(overrides: [
+        workoutGatewayProvider.overrideWithValue(gw),
+        fitnessGatewayProvider.overrideWithValue(FakeFitnessGateway()),
+      ]);
+      addTearDown(c.dispose);
+      final t = await c
+          .read(updateFitnessProfileProvider.notifier)
+          .addCustomWorkoutType(userId: 'u1', name: '   ');
+      expect(t, isNull);
+      expect(gw.types, hasLength(1));
     });
   });
 }

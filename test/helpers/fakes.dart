@@ -93,6 +93,18 @@ class FakeWorkoutGateway implements WorkoutGateway {
   Future<List<WorkoutType>> listWorkoutTypes() async => types;
 
   @override
+  Future<WorkoutType> addCustomWorkoutType(
+      {required String userId, required String name}) async {
+    final t = WorkoutType(
+        id: 'wt-custom-${types.length + 1}',
+        name: name.trim(),
+        slug: name.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-'),
+        isCustom: true);
+    types = [...types, t];
+    return t;
+  }
+
+  @override
   Future<WorkoutSession> startSession({required String userId, required String workoutTypeId}) async {
     startSessionCalls.add(StartSessionCall(userId, workoutTypeId));
     return WorkoutSession(
