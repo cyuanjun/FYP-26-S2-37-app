@@ -1,11 +1,11 @@
 ---
-title: "US18 — Basic AI summary + plan suggestion"
+title: "US18 — Basic AI summary + simple suggested routine"
 ---
 sequenceDiagram
   actor A as Registered Free User
-  participant B as «Boundary»<br/>HistoryScreen (AI sheet)
-  participant C as «Control»<br/>SummariseProgress
-  participant E as «Entity»<br/>WorkoutSession (week aggregates)
+  participant B as «Boundary»<br/>HistoryScreen (AI sheet) / TrainScreen
+  participant C as «Control»<br/>SummariseProgress · BuildPlanSkeleton
+  participant E as «Entity»<br/>WorkoutSession · FitnessPlan
   A->>B: tap AI summary
   B->>C: summarise(range)
   C->>E: gather session aggregates
@@ -17,4 +17,9 @@ sequenceDiagram
     C-->>B: AsyncError
     B-->>A: friendly error, retry
   end
-  note over E: AI call via AiGateway → Edge Function (OpenAI, Gemini fallback) -<br/>basic plan = BuildPlanSkeleton rule, no AI
+  A->>B: get a simple routine (Train tab)
+  B->>C: buildPlanSkeleton(goal)
+  C->>E: FitnessPlan (generation_strategy = basic)
+  E-->>C: simple weekly routine
+  B-->>A: basic plan to follow
+  note over C: summary = AI via AiGateway → Edge Function (OpenAI / Gemini) -<br/>basic routine = RULE-BASED, no AI (SRS wording fix queued, log C4)
