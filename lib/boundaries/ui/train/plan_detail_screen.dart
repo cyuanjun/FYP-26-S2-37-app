@@ -15,11 +15,18 @@ import '../workout/active_workout_screen.dart';
 /// BOUNDARY (#8 Plan Detail). Read-only view of the active plan: header +
 /// meta, current-week schedule (tap a row for the workout modal), and the
 /// Start-today / Regenerate actions. Reached from Train's "VIEW FULL PLAN ›".
-class PlanDetailScreen extends ConsumerWidget {
+class PlanDetailScreen extends ConsumerStatefulWidget {
   const PlanDetailScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlanDetailScreen> createState() => _PlanDetailScreenState();
+}
+
+class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
+  int? _selectedWeek; // null = current cycle week
+
+  @override
+  Widget build(BuildContext context) {
     final planAsync = ref.watch(activePlanProvider);
     final workouts = ref.watch(plannedWorkoutsProvider).value ?? [];
     final types = ref.watch(workoutTypesProvider).value ?? [];
@@ -48,9 +55,13 @@ class PlanDetailScreen extends ConsumerWidget {
                 child: Text('No active plan yet.', style: AppTypography.subheadline));
           }
           final today = DateTime.now().weekday;
-          final currentWeek = _currentWeek(plan);
-          final todays =
-              workouts.where((w) => w.dayOfWeek == today).toList();
+          final cycleWeek = _cycleWeek(plan);
+          final shownWeek = _selectedWeek ?? cycleWeek;
+          final weekWorkouts =
+              workouts.where((w) => w.weekNumber == shownWeek).toList();
+          final todays = workouts
+              .where((w) => w.weekNumber == cycleWeek && w.dayOfWeek == today)
+              .toList();
 
           return Column(
             children: [
@@ -96,14 +107,46 @@ class PlanDetailScreen extends ConsumerWidget {
                     ],
                     const SizedBox(height: 24),
 
-                    // ---- Current week schedule ----
+                    // ---- Monthly cycle: week selector ----
                     Row(
                       children: [
-                        Text('WEEK $currentWeek',
+                        for (var wk = 1; wk <= 4; wk++) ...[
+                          GestureDetector(
+                            onTap: () => setState(() => _selectedWeek = wk),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: shownWeek == wk
+                                    ? AppColors.accent
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: shownWeek == wk
+                                        ? AppColors.accent
+                                        : AppColors.faint),
+                              ),
+                              child: Text('W$wk',
+                                  style: AppTypography.caption2.copyWith(
+                                      color: shownWeek == wk
+                                          ? AppColors.bg
+                                          : AppColors.muted,
+                                      fontWeight: FontWeight.w800)),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text('WEEK $shownWeek',
                             style: AppTypography.caption2.copyWith(letterSpacing: 1.4)),
-                        Text(' · CURRENT',
-                            style: AppTypography.caption2
-                                .copyWith(color: AppColors.accent, letterSpacing: 1.4)),
+                        if (shownWeek == cycleWeek)
+                          Text(' · CURRENT',
+                              style: AppTypography.caption2
+                                  .copyWith(color: AppColors.accent, letterSpacing: 1.4)),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -114,12 +157,13 @@ class PlanDetailScreen extends ConsumerWidget {
                       ),
                       child: Column(
                         children: [
-                          for (var i = 0; i < workouts.length; i++) ...[
+                          for (var i = 0; i < weekWorkouts.length; i++) ...[
                             if (i > 0)
                               const Divider(color: AppColors.faint, height: 1),
-                            _scheduleRow(context, workouts[i], byId,
-                                isToday: workouts[i].dayOfWeek == today,
-                                currentWeek: currentWeek,
+                            _scheduleRow(context, weekWorkouts[i], byId,
+                                isToday: shownWeek == cycleWeek &&
+                                    weekWorkouts[i].dayOfWeek == today,
+                                currentWeek: shownWeek,
                                 isPremium: isPremium),
                           ],
                         ],
@@ -127,7 +171,8 @@ class PlanDetailScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Repeats weekly for ${plan.durationWeeks} weeks.',
+                      '4-week cycle (foundation → build → peak → recovery), '
+                      'repeating for ${plan.durationWeeks} weeks.',
                       style: AppTypography.caption1,
                     ),
                     const SizedBox(height: 16),
@@ -160,11 +205,11 @@ class PlanDetailScreen extends ConsumerWidget {
     );
   }
 
-  int _currentWeek(FitnessPlan plan) {
+  /// Week within the repeating 4-week cycle (1–4).
+  int _cycleWeek(FitnessPlan plan) {
     final started = plan.startedAt;
     if (started == null) return 1;
-    final weeks = DateTime.now().difference(started).inDays ~/ 7 + 1;
-    return weeks.clamp(1, plan.durationWeeks);
+    return (DateTime.now().difference(started).inDays ~/ 7) % 4 + 1;
   }
 
   Widget _scheduleRow(BuildContext context, PlannedWorkout w,

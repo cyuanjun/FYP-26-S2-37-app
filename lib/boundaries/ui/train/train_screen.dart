@@ -202,9 +202,17 @@ class _ActivePlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now().weekday;
-    final next = workouts.isEmpty
+    // Current week within the repeating 4-week cycle.
+    final started = plan.startedAt;
+    final cycleWeek = started == null
+        ? 1
+        : (DateTime.now().difference(started).inDays ~/ 7) % 4 + 1;
+    final thisWeek =
+        workouts.where((w) => w.weekNumber == cycleWeek).toList();
+    final next = thisWeek.isEmpty
         ? null
-        : workouts.firstWhere((w) => w.dayOfWeek >= today, orElse: () => workouts.first);
+        : thisWeek.firstWhere((w) => w.dayOfWeek >= today,
+            orElse: () => thisWeek.first);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -237,6 +245,7 @@ class _ActivePlanCard extends StatelessWidget {
                   child: Text('${next.name ?? 'Workout'} · ${next.durationMinutes} min',
                       style: AppTypography.subheadline.copyWith(color: AppColors.ink)),
                 ),
+                Text('WEEK $cycleWeek/4', style: AppTypography.caption2),
               ],
             ),
           ],
@@ -245,7 +254,7 @@ class _ActivePlanCard extends StatelessWidget {
             spacing: 6,
             runSpacing: 6,
             children: [
-              for (final w in workouts)
+              for (final w in thisWeek)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(

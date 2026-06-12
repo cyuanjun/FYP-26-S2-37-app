@@ -34,6 +34,7 @@ interface Profile {
 }
 interface Slot {
   slug: string;
+  week_number: number;
   day_of_week: number;
   duration_minutes: number;
   name: string;
@@ -69,25 +70,37 @@ function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[], p
   const weeks = goal.timeline_weeks ?? 4;
   const exp = profile.training_experience ?? "beginner";
   const base = baseMinutes(exp);
-  const rotation = [...new Set([...preferredSlugs, ...(FILLERS[goal.primary_goal] ?? FILLERS.maintain_fitness)])];
+  // Preferences are a contract: when present, ONLY preferred types are used.
+  const rotation = preferredSlugs.length > 0
+    ? [...new Set(preferredSlugs)]
+    : (FILLERS[goal.primary_goal] ?? FILLERS.maintain_fitness);
 
-  const workouts = DAY_SPREAD[days].map((day, i) => {
-    const slug = rotation[i % rotation.length];
-    const hard = i % 3 === 2;
-    return {
-      slug,
-      day_of_week: day,
-      duration_minutes: hard ? base + 10 : base,
-      name: `${slug[0].toUpperCase()}${slug.slice(1)} ${hard ? "push" : "base"}`,
-      descriptor: hard ? "Slightly harder effort — finish strong" : "Comfortable, repeatable effort",
-    };
-  });
+  // One MONTH = 4 distinct weeks: foundation / build / peak / recovery.
+  const weekBump = [0, 5, 10, -5];
+  const weekTag = ["foundation", "build", "peak", "recovery"];
+  const workouts: Slot[] = [];
+  for (let wk = 1; wk <= 4; wk++) {
+    DAY_SPREAD[days].forEach((day, i) => {
+      const slug = rotation[i % rotation.length];
+      const hard = i % 3 === 2;
+      workouts.push({
+        slug,
+        week_number: wk,
+        day_of_week: day,
+        duration_minutes: Math.max(15, (hard ? base + 10 : base) + weekBump[wk - 1]),
+        name: `${slug[0].toUpperCase()}${slug.slice(1)} ${hard ? "push" : "base"}`,
+        descriptor: wk === 4
+          ? "Recovery week — keep it comfortable"
+          : hard ? `Week ${wk} ${weekTag[wk - 1]} — finish strong` : "Comfortable, repeatable effort",
+      });
+    });
+  }
 
   return {
     name: `${TITLES[goal.primary_goal] ?? "Balanced Week"} — ${weeks}-week plan`,
     description: personalised
-      ? `Personalised for your ${exp} level and ${days}-day week. Repeats weekly for ${weeks} weeks toward your ${goal.primary_goal.replace(/_/g, " ")} goal.`
-      : `A simple ${days}-day week toward your ${goal.primary_goal.replace(/_/g, " ")} goal. Repeats weekly for ${weeks} weeks. Upgrade for deeper personalisation.`,
+      ? `Personalised ${days}-day weeks in a 4-week cycle (build up, then recover), repeating toward your ${weeks}-week ${goal.primary_goal.replace(/_/g, " ")} goal.`
+      : `A ${days}-day week in a 4-week cycle toward your ${goal.primary_goal.replace(/_/g, " ")} goal. Upgrade for deeper personalisation.`,
     duration_weeks: weeks,
     workouts_per_week: days,
     model: "stub",
@@ -101,15 +114,16 @@ function planPrompt(
   days: number, weeks: number, personalised: boolean,
 ): string {
   const exp = profile.training_experience ?? "beginner";
+  const usable = preferredSlugs.length > 0 ? preferredSlugs : allowedSlugs;
   return [
-    "You are a fitness coach generating ONE week of a repeating training plan.",
-    `Goal: ${goal.primary_goal.replace(/_/g, " ")}. Experience: ${exp}. Plan length: ${weeks} weeks.`,
-    `Exactly ${days} workouts on ${days} DISTINCT days (day_of_week: 1=Monday … 7=Sunday), sensibly spread (avoid back-to-back hard days).`,
-    `Allowed workout slugs (use ONLY these): ${allowedSlugs.join(", ")}.`,
+    "You are a fitness coach generating ONE MONTH (4 distinct weeks) of a training plan.",
+    `Goal: ${goal.primary_goal.replace(/_/g, " ")}. Experience: ${exp}. The 4-week cycle repeats toward a ${weeks}-week goal.`,
+    `Each week (week_number 1-4): exactly ${days} workouts on ${days} DISTINCT days (day_of_week: 1=Monday … 7=Sunday), sensibly spread.`,
+    "Progress across the month: week 1 foundation, weeks 2-3 build volume/intensity gradually, week 4 lighter recovery.",
     preferredSlugs.length > 0
-      ? `The user prefers: ${preferredSlugs.join(", ")} — feature them prominently.`
-      : "No stated preferences - pick types that fit the goal.",
-    `Durations around ${baseMinutes(exp)} minutes (15-120 allowed). Vary intensity across the week.`,
+      ? `The user chose their preferred workout types. Use ONLY these slugs: ${usable.join(", ")}.`
+      : `No stated preferences - pick goal-appropriate types from ONLY these slugs: ${usable.join(", ")}.`,
+    `Durations around ${baseMinutes(exp)} minutes (15-120 allowed), reflecting the weekly progression.`,
     personalised
       ? "PERSONALISED tier: tailor names/descriptors to the goal and experience; descriptors give a concrete focus cue."
       : "BASIC tier: keep names/descriptors simple and generic.",
@@ -131,9 +145,10 @@ function planSchema(allowedSlugs: string[]) {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["slug", "day_of_week", "duration_minutes", "name", "descriptor"],
+          required: ["slug", "week_number", "day_of_week", "duration_minutes", "name", "descriptor"],
           properties: {
             slug: { type: "string", enum: allowedSlugs },
+            week_number: { type: "integer" },
             day_of_week: { type: "integer" },
             duration_minutes: { type: "integer" },
             name: { type: "string" },
@@ -152,7 +167,7 @@ async function callOpenAI(prompt: string, schema: unknown, key: string): Promise
     body: JSON.stringify({
       model: OPENAI_MODEL,
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 900,
+      max_tokens: 3000,
       temperature: 0.6,
       response_format: {
         type: "json_schema",
@@ -176,7 +191,7 @@ async function callGemini(prompt: string, key: string): Promise<unknown> {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: prompt + '\n\nRespond with ONLY a JSON object: {"name": string, "description": string, "workouts": [{"slug": string, "day_of_week": int, "duration_minutes": int, "name": string, "descriptor": string}]}',
+            text: prompt + '\n\nRespond with ONLY a JSON object: {"name": string, "description": string, "workouts": [{"slug": string, "week_number": int (1-4), "day_of_week": int, "duration_minutes": int, "name": string, "descriptor": string}]}',
           }],
         }],
         generationConfig: { responseMimeType: "application/json", temperature: 0.6 },
@@ -196,36 +211,42 @@ function validatePlan(
   goal: Goal, profile: Profile, preferredSlugs: string[], personalised: boolean,
 ) {
   const obj = raw as Record<string, unknown>;
-  const allowed = new Set(allowedSlugs);
-  const seenDays = new Set<number>();
-  const slots: Slot[] = [];
-
-  for (const w of (Array.isArray(obj.workouts) ? obj.workouts : []) as Record<string, unknown>[]) {
-    const slug = String(w.slug ?? "");
-    const day = Math.round(Number(w.day_of_week ?? 0));
-    if (!allowed.has(slug)) continue;
-    if (day < 1 || day > 7 || seenDays.has(day)) continue;
-    seenDays.add(day);
-    slots.push({
-      slug,
-      day_of_week: day,
-      duration_minutes: Math.min(Math.max(Math.round(Number(w.duration_minutes ?? 30)), 15), 120),
-      name: String(w.name ?? slug).slice(0, 40) || slug,
-      descriptor: String(w.descriptor ?? "").slice(0, 160),
-    });
-  }
-
-  // Top up if the model under-delivered; trim if it over-delivered.
+  // Preferences are a contract: when stated, only preferred slugs survive.
+  const allowed = new Set(preferredSlugs.length > 0 ? preferredSlugs : allowedSlugs);
   const stub = buildStubPlan(goal, profile, preferredSlugs, personalised);
-  for (const s of stub.workouts) {
-    if (slots.length >= days) break;
-    if (!seenDays.has(s.day_of_week)) {
-      seenDays.add(s.day_of_week);
-      slots.push(s);
+  const workouts: Slot[] = [];
+
+  for (let wk = 1; wk <= 4; wk++) {
+    const seenDays = new Set<number>();
+    const weekSlots: Slot[] = [];
+    for (const w of (Array.isArray(obj.workouts) ? obj.workouts : []) as Record<string, unknown>[]) {
+      if (Math.round(Number(w.week_number ?? 1)) !== wk) continue;
+      const slug = String(w.slug ?? "");
+      const day = Math.round(Number(w.day_of_week ?? 0));
+      if (!allowed.has(slug)) continue;
+      if (day < 1 || day > 7 || seenDays.has(day)) continue;
+      if (weekSlots.length >= days) break;
+      seenDays.add(day);
+      weekSlots.push({
+        slug,
+        week_number: wk,
+        day_of_week: day,
+        duration_minutes: Math.min(Math.max(Math.round(Number(w.duration_minutes ?? 30)), 15), 120),
+        name: String(w.name ?? slug).slice(0, 40) || slug,
+        descriptor: String(w.descriptor ?? "").slice(0, 160),
+      });
     }
+    // Top up an under-delivered week from the stub's same week.
+    for (const s of stub.workouts.filter((x) => x.week_number === wk)) {
+      if (weekSlots.length >= days) break;
+      if (!seenDays.has(s.day_of_week)) {
+        seenDays.add(s.day_of_week);
+        weekSlots.push(s);
+      }
+    }
+    weekSlots.sort((a, b) => a.day_of_week - b.day_of_week);
+    workouts.push(...weekSlots);
   }
-  slots.sort((a, b) => a.day_of_week - b.day_of_week);
-  const workouts = slots.slice(0, days);
   if (workouts.length === 0) throw new Error("ai plan had no usable workouts");
 
   const aiName = String(obj.name ?? "").trim().slice(0, 35);
@@ -235,7 +256,7 @@ function validatePlan(
     name: `${aiName || (TITLES[goal.primary_goal] ?? "Balanced Week")} — ${weeks}-week plan`,
     description: aiDesc || stub.description,
     duration_weeks: weeks,
-    workouts_per_week: workouts.length,
+    workouts_per_week: days,
     strategy: personalised ? "personalised" : "basic",
     workouts,
   };

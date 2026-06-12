@@ -16,7 +16,7 @@ import '../helpers/fakes.dart';
 void main() {
   // ---- BuildPlanSkeleton (pure rule) ----
   group('buildPlanSkeleton rule', () {
-    test('honours commitment days and timeline (positive)', () {
+    test('honours commitment days, timeline, and 4-week cycle (positive)', () {
       final d = buildPlanSkeleton(
         goal: PrimaryGoal.loseWeight,
         experience: TrainingExperience.intermediate,
@@ -25,18 +25,20 @@ void main() {
       );
       expect(d.workoutsPerWeek, 4);
       expect(d.durationWeeks, 12);
-      expect(d.slots, hasLength(4));
+      expect(d.slots, hasLength(16)); // 4 days x 4 distinct weeks (a month)
       expect(d.strategy, GenerationStrategy.basic);
-      expect(d.slots.map((s) => s.dayOfWeek), [1, 3, 5, 6]); // spread, no clumping
+      final week1 = d.slots.where((s) => s.week == 1).toList();
+      expect(week1.map((s) => s.dayOfWeek), [1, 3, 5, 6]); // spread, no clumping
+      expect(d.slots.map((s) => s.week).toSet(), {1, 2, 3, 4});
     });
 
-    test('preferred workouts lead the rotation', () {
+    test('preferences are a contract — only preferred types scheduled', () {
       final d = buildPlanSkeleton(
         goal: PrimaryGoal.maintainFitness,
         preferredSlugs: ['yoga'],
         weeklyCommitmentDays: 3,
       );
-      expect(d.slots.first.slug, 'yoga');
+      expect(d.slots.map((s) => s.slug).toSet(), {'yoga'});
     });
 
     test('experience scales duration (beginner < advanced)', () {
@@ -46,6 +48,13 @@ void main() {
           goal: PrimaryGoal.buildMuscle, experience: TrainingExperience.advanced);
       expect(beginner.slots.first.durationMinutes,
           lessThan(advanced.slots.first.durationMinutes));
+    });
+
+    test('week 4 is a recovery week (lighter than week 3)', () {
+      final d = buildPlanSkeleton(goal: PrimaryGoal.improveEndurance);
+      final w3 = d.slots.firstWhere((s) => s.week == 3);
+      final w4 = d.slots.firstWhere((s) => s.week == 4);
+      expect(w4.durationMinutes, lessThan(w3.durationMinutes));
     });
 
     test('commitment days clamp to 1–7 (negative input)', () {
