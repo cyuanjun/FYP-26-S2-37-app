@@ -18,11 +18,11 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **Auth** | Login (email/password), session-aware splash, sign-out, role-aware routing | Sign-up is on the marketing website (app is login-only by design) |
 | **Capture** | Train → free-form workout → live timer + phone GPS/steps → finish → summary | `end_workout_session` RPC: XP + weekly streak + level-up post (atomic) |
 | **History** | Analytics card (Day/Week/Month + vs-prior deltas), sessions grouped by week, detail with edit/delete | Free tier shows upsell/cap/search-lock; Premium hides them |
-| **AI summary** | "✨" on History → data-driven progress summary | Stub Edge Function (no API key); swappable for OpenAI/Gemini with no app change |
+| **AI summary** | "✨" on History → progress summary written by **OpenAI (gpt-4o-mini)** from your real stats | Premium summaries include goal context; Gemini fallback → deterministic stub if keys/AI fail |
 | **Share** | Summary → "Share to Social" toggle → caption + Facebook/Instagram/Twitter/TikTok | Creates a `workout_share` Post; platform buttons open the OS share |
 | **Profile cluster** | Avatar (top-right) → Profile hub: level/XP bar, lifetime stats, Fitness Profile (#13.1), Fitness Goals (#13.2), Account Settings (#13.3), Notifications (#13.4), Submit Feedback (#13.5), log out | All live writes: fitness_profiles, fitness_goals (active-goal upsert), notification_prefs jsonb, feedback |
 | **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
-| **Onboarding + plan** | First login → wizard (about you → how you train → goal) → AI-generated weekly plan → Train shows it | Both tiers AI via `suggest-plan` (stub): Free basic, Premium personalised; rule fallback. Gate: `profiles.onboarding_completed_at` |
+| **Onboarding + plan** | First login → wizard (about you → how you train → goal) → **real AI weekly plan (OpenAI)** → Train shows it | Both tiers: Free basic, Premium personalised; strict JSON schema + server-side validation; Gemini → rule fallback. Gate: `profiles.onboarding_completed_at` |
 | **Plan Detail (#8)** | Train → VIEW FULL PLAN → header + current-week schedule → tap a row for the workout modal → Start today's workout (pre-selected activity) · Regenerate | Free: 1 regeneration, then "Upgrade for unlimited"; today's row highlighted |
 
 **Architecture:** Flutter · Riverpod · go_router · freezed · `supabase_flutter`. Strict **Boundary–Control–Entity**
@@ -233,8 +233,9 @@ catalogs: workout types, health tags, expert categories.)
 
 ## 8. Known limitations (intentional for the prototype)
 
-- **AI summary is a deterministic stub** — real numbers, templated prose, labelled AI-assisted. The Edge
-  Function (`supabase/functions/summarise-progress`) swaps to OpenAI/Gemini with **no app change**.
+- **AI is live (OpenAI `gpt-4o-mini`, key in Supabase Edge Function secrets — never in the app).**
+  Both functions degrade gracefully: OpenAI → Gemini → deterministic stub, same response shape, so the
+  app renders all three identically (the `model` field says which produced it).
 - **Sharing opens the OS share sheet** — the named-platform buttons are present (the graded requirement);
   true per-app deep-linking is a later sprint.
 - **Real GPS needs a physical device** — emulators/simulators show 0 distance unless you mock location.
