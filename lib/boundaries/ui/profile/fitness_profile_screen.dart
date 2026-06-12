@@ -219,11 +219,25 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
         SectionLabel(
           label: 'Preferred Workouts',
           onAction: () async {
+            final userId = ref.read(currentUserIdProvider);
             final picked = await showTagPicker(
               context,
               title: 'Preferred Workouts',
-              options: [for (final t in types) PickerOption(id: t.id, label: t.name)],
+              options: [
+                for (final t in types)
+                  PickerOption(id: t.id, label: t.name, isCustom: t.isCustom)
+              ],
               selected: _workoutTypeIds,
+              onAddCustom: userId == null
+                  ? null
+                  : (name) async {
+                      final type = await ref
+                          .read(updateFitnessProfileProvider.notifier)
+                          .addCustomWorkoutType(userId: userId, name: name);
+                      return type == null
+                          ? null
+                          : PickerOption(id: type.id, label: type.name, isCustom: true);
+                    },
             );
             if (picked != null) setState(() => _workoutTypeIds = picked);
           },

@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../boundaries/gateways/fitness_gateway.dart';
+import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/enums.dart';
 import '../entities/health_tag.dart';
+import '../entities/workout_type.dart';
 import 'view_profile.dart';
 
 /// CONTROL — Update Fitness Profile (#13.1 Save Profile). Batches every edited
@@ -24,6 +26,22 @@ class UpdateFitnessProfile extends AsyncNotifier<void> {
       ref.invalidate(fitnessProfileProvider);
     });
     return !state.hasError;
+  }
+
+  /// "+ Add your own" workout type — inserts the custom type and refreshes
+  /// the catalog (#13.1 / onboarding preferred-workouts pickers).
+  Future<WorkoutType?> addCustomWorkoutType({
+    required String userId,
+    required String name,
+  }) async {
+    if (name.trim().isEmpty) return null;
+    SeqLog.msg('update-fitness-profile', 'UpdateFitnessProfile', 'WorkoutGateway',
+        'addCustomWorkoutType($name)');
+    final type = await ref
+        .read(workoutGatewayProvider)
+        .addCustomWorkoutType(userId: userId, name: name);
+    ref.invalidate(workoutTypesProvider);
+    return type;
   }
 
   /// "+ Add X" in a picker — inserts the custom tag and refreshes the catalog.

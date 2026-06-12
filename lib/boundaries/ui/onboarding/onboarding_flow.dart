@@ -114,6 +114,38 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     // currentProfileProvider invalidated by the control → HomeShell takes over.
   }
 
+  Future<void> _addCustomWorkout() async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+    final ctl = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text('Add your own workout', style: AppTypography.headline),
+        content: TextField(
+          controller: ctl,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(hintText: 'e.g. Bouldering'),
+          onSubmitted: (_) => Navigator.of(ctx).pop(ctl.text),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(ctl.text), child: const Text('Add')),
+        ],
+      ),
+    );
+    if (name == null || name.trim().isEmpty) return;
+    final type = await ref
+        .read(updateFitnessProfileProvider.notifier)
+        .addCustomWorkoutType(userId: userId, name: name);
+    if (type != null && mounted) {
+      setState(() => _workoutTypeIds.add(type.id)); // appears selected in the chips
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final firstName =
@@ -320,6 +352,11 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                     ? _workoutTypeIds.remove(t.id)
                     : _workoutTypeIds.add(t.id)),
               ),
+            SelectChip(
+              label: '+ Add your own',
+              selected: false,
+              onTap: _addCustomWorkout,
+            ),
           ],
         ),
       ],
