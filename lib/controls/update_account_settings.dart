@@ -22,6 +22,20 @@ class UpdateAccountSettings extends AsyncNotifier<void> {
     ref.invalidate(currentProfileProvider);
   }
 
+  /// Fills in the user's name (onboarding fallback when the website signup
+  /// metadata was missing; later also #13.3 per-field editing).
+  Future<bool> saveName({required String firstName, String? lastName}) async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null || firstName.trim().isEmpty) return false;
+    SeqLog.msg('account-settings', 'UpdateAccountSettings', 'ProfileGateway',
+        'updateName($firstName)');
+    await ref
+        .read(profileGatewayProvider)
+        .updateName(userId, firstName: firstName, lastName: lastName);
+    ref.invalidate(currentProfileProvider);
+    return true;
+  }
+
   /// Emails the signed-in user a password-reset link.
   Future<bool> sendChangePasswordEmail(String email) async {
     SeqLog.msg('account-settings', 'UpdateAccountSettings', 'AuthGateway',

@@ -261,6 +261,34 @@ void main() {
       expect(fake.unitWrites, isEmpty);
     });
 
+    test('saveName writes the onboarding name fallback (positive)', () async {
+      final fake = FakeProfileGateway();
+      final c = ProviderContainer(overrides: [
+        profileGatewayProvider.overrideWithValue(fake),
+        currentUserIdProvider.overrideWithValue('user-1'),
+      ]);
+      addTearDown(c.dispose);
+      final ok = await c
+          .read(updateAccountSettingsProvider.notifier)
+          .saveName(firstName: 'Mia', lastName: 'Patel');
+      expect(ok, isTrue);
+      expect(fake.nameWrites.single, ('Mia', 'Patel'));
+    });
+
+    test('saveName rejects empty first name (negative)', () async {
+      final fake = FakeProfileGateway();
+      final c = ProviderContainer(overrides: [
+        profileGatewayProvider.overrideWithValue(fake),
+        currentUserIdProvider.overrideWithValue('user-1'),
+      ]);
+      addTearDown(c.dispose);
+      final ok = await c
+          .read(updateAccountSettingsProvider.notifier)
+          .saveName(firstName: '   ');
+      expect(ok, isFalse);
+      expect(fake.nameWrites, isEmpty);
+    });
+
     test('sendChangePasswordEmail success/failure', () async {
       final fake = FakeAuthGateway();
       final c = ProviderContainer(

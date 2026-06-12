@@ -315,6 +315,12 @@ class FakeProfileGateway implements ProfileGateway {
 
   @override
   Future<void> completeOnboarding(String id) async => onboardingCompletions.add(id);
+
+  final nameWrites = <(String, String?)>[];
+
+  @override
+  Future<void> updateName(String id, {required String firstName, String? lastName}) async =>
+      nameWrites.add((firstName, lastName));
 }
 
 /// Fake FeedbackGateway — records submissions, optionally throws.
