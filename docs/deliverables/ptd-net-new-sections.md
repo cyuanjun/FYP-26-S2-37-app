@@ -2,7 +2,7 @@
 
 Draft content for the PTD sections that aren't already in the PRD/SRS/TDM. Copy these into the Word template under the matching section number, then adjust wording to the team voice. Diagrams (DFD) are given as both a renderable form and a redraw spec so they can be drawn in draw.io to match the TDM's notation.
 
-Sourcing: derived from **PRD v2.0** (market research, value prop, schedule, roles, risk), **SRS v2.0** (use cases, NFRs), and **TDM v3.0** (architecture, ERD, DFD context diagram). Reconcile any figures against the [reconciliation log](doc-reconciliation-log.md) before final render (e.g. premium price = **$9.99/mo**).
+Sourcing: derived from **PRD v2.0** (market research, value prop, schedule, roles, risk), **SRS v2.0** (use cases, NFRs), and **TDM v5** (architecture, ERD, DFD context diagram). Reconcile any figures against the [reconciliation log](doc-reconciliation-log.md) before final render (e.g. premium price = **$9.99/mo**).
 
 ---
 

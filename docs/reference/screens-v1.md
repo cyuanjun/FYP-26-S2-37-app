@@ -1,8 +1,14 @@
 # Wise Workout — Free User Screens (v1)
 
-Index of the 16 Free-user screens. Each screen has its own file under [screens/free/](screens/free/) with purpose, UI elements (referencing [palette.md](palette.md) for colours and [typography.md](typography.md) for type sizes), and incoming/outgoing edges. Data each screen touches is tracked in parallel in [database-v1.md](database-v1.md).
+Index of the Free-user screens (27 spec files; Premium/Expert/Admin tracked below). Each screen has its own file under [screens/free/](screens/free/) with purpose, UI elements (referencing [palette.md](palette.md) for colours and [typography.md](typography.md) for type sizes), and incoming/outgoing edges. Data each screen touches is tracked in parallel in [database-v1.md](database-v1.md).
 
 Status legend: ✅ done · 🟡 in progress · ⬜ pending · 🟪 temporary stub · 📐 spec-only (design locked, code not built)
+
+> ⚠️ **The Status column below tracks the React mock, not the Flutter app.** The Flutter build
+> state of each screen lives in its spec file's frontmatter `status:` (`built` | `spec-only` |
+> `draft`). As of 12 Jun, built in Flutter: #1, #2, #3 (onboarding wizard — no spec file;
+> see `lib/boundaries/ui/onboarding/onboarding_flow.dart`), #4, #4.1, #5 (minimal), #7, #7.1,
+> #8, #9, #10, #12, #12.1, #13, #13.1–#13.5.
 
 ## Auth & onboarding
 
@@ -10,7 +16,7 @@ Status legend: ✅ done · 🟡 in progress · ⬜ pending · 🟪 temporary stu
 |---|---|---|---|
 | 1 | Splash | [screens/free/01-splash.md](screens/free/01-splash.md) | ✅ |
 | 2 | Login | [screens/free/02-login.md](screens/free/02-login.md) | ✅ |
-| 3 | Onboarding (post-login) | _pending_ | 🟪 |
+| 3 | Onboarding (post-login) | _no spec file — built directly; wizard in `onboarding_flow.dart`_ | ✅ (Flutter) |
 | 4 | Forgot password | [screens/free/04-forgot-password.md](screens/free/04-forgot-password.md) | ✅ |
 | 4.1 | Forgot password — link sent (sub) | [screens/free/04.1-forgot-password-sent.md](screens/free/04.1-forgot-password-sent.md) | ✅ |
 

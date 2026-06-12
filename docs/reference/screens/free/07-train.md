@@ -2,7 +2,7 @@
 screen: 07-train
 role: free
 group: main
-status: spec-only
+status: built
 ---
 
 # 7. Train (tab)

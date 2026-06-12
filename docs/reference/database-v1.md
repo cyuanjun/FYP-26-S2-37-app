@@ -1,6 +1,6 @@
 # Wise Workout — Database (v1)
 
-> ⚠️ **The schema of record is the TDM v3.0 §8 ERD** (team-approved, 5 Jun 2026). This file is the **working source** that predates it (built from the React mock). **Aligned to the TDM §8 ERD on 10 Jun 2026** — the rosters match at **26 entities** ([reconciliation log](../deliverables/doc-reconciliation-log.md) §D); the TDM settled the open questions (`ExpertReview` kept; expert layer = `ExpertService → ServiceRequest → Deliverable`; payment simulated via price fields). The generated Postgres DDL + RLS + seed now live in [`/supabase/`](../../supabase/) (`supabase/migrations/` + `supabase/seed.sql`) — regenerate those from this file, not by hand.
+> ⚠️ **The schema of record is the TDM v5 §8 ERD** (team-approved, 5 Jun 2026). This file is the **working source** that predates it (built from the React mock). **Aligned to the TDM §8 ERD on 10 Jun 2026** — the rosters match at **26 entities** ([reconciliation log](../deliverables/doc-reconciliation-log.md) §D); the TDM settled the open questions (`ExpertReview` kept; expert layer = `ExpertService → ServiceRequest → Deliverable`; payment simulated via price fields). The generated Postgres DDL + RLS + seed now live in [`/supabase/`](../../supabase/) (`supabase/migrations/` + `supabase/seed.sql`) — regenerate those from this file, not by hand.
 
 Schema built up incrementally as we walk through screens in [screens-v1.md](screens-v1.md). Each entity records which screen first required it, so every column traces back to a UI need.
 
@@ -24,7 +24,7 @@ Most entities are read by a product screen. As of the schema-v2 simplification (
 - **Surfaced — read by product screens:** all but the one below. The `HealthTag` + `WorkoutType` catalogs are read **and** written on **#13.1 Fitness Profile** — multi-select chips backed by the catalogs, persisted into `FitnessProfile.healthTagIds` / `FitnessProfile.preferredWorkoutTypeIds` (folded from the former `UserHealthTag` / `UserWorkoutPreference` junctions in schema-v2).
 - **Write-only (intentional):** `Feedback` — created on #13.5 Submit Feedback (fire-and-forget per the "honest" note); never read back in-app.
 
-A built-out **Onboarding (#3, currently a stub)** would additionally *capture* the #13.1 tags at signup; custom-tag creation (the catalogs' `isCustom` / `createdByUserId`) is a possible follow-on.
+A built-out **Onboarding (#3, built 12 Jun — wizard + AI plan generation)** would additionally *capture* the #13.1 tags at signup; custom-tag creation (the catalogs' `isCustom` / `createdByUserId`) is a possible follow-on.
 
 ---
 

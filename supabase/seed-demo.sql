@@ -52,7 +52,8 @@ begin
     end if;
 
     update public.profiles
-      set role = rec.role::user_role, first_name = rec.first_name, last_name = rec.last_name
+      set role = rec.role::user_role, first_name = rec.first_name, last_name = rec.last_name,
+          onboarding_completed_at = coalesce(profiles.onboarding_completed_at, now())
       where id = uid;
     insert into public.fitness_profiles (id) values (uid) on conflict (id) do nothing;
     if rec.role = 'premium' then

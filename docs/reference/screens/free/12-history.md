@@ -2,7 +2,7 @@
 screen: 12-history
 role: free
 group: main
-status: spec-only
+status: built
 ---
 
 # 12. History (tab)

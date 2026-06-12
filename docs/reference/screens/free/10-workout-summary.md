@@ -2,7 +2,7 @@
 screen: 10-workout-summary
 role: free
 group: main
-status: spec-only
+status: built
 ---
 
 # 10. Workout Summary

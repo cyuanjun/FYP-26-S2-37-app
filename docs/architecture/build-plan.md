@@ -100,9 +100,9 @@ The AI scope is **deliberately narrow** (a graded, defensible boundary): AI does
 | Job | Engine | Notes |
 |---|---|---|
 | Reminders, inactivity, **rest/over-training** alerts | **Rule-based** (deterministic, configurable) | Thresholds over recent 7/30-day frequency + schedule; transparent and testable. |
-| **Basic plan structure** (week skeleton from goal + preferred types + rest days) | **Rule-based** | Free users get this; the AI then *suggests* refinements. |
+| **Basic plan structure** (fallback skeleton from goal + preferred types + rest days) | **Rule-based fallback** | Used only when the AI is unavailable — since 12 Jun both tiers get AI-generated plans (decision per WBS/SRS, recon log C4-cancelled). |
 | **Progress summary** (interpret the data in plain language) | **AI** | "Your frequency is up, consistency dipped mid-week, on track for your goal." Free = basic; Premium = personalised w/ longer history + wearable metrics. |
-| **Plan suggestion** (personalise the rule-based skeleton) | **AI** | Free = basic; Premium = full personalisation (duration, intensity, category mix). |
+| **Plan suggestion** (generate the 4-week monthly cycle) | **AI** (suggest-plan Edge Function, gpt-4o-mini live) | Free = basic depth; Premium = personalised. Preferences are a strict contract (only chosen types scheduled); rule skeleton is the offline fallback. |
 | Coaching / custom plans / nutrition / recovery | **Human expert** (paid layer) | Explicitly *not* AI — the interface must label which is which (SRS §3.8.1, NFR-USA-02/03). |
 
 **Implementation:**
@@ -120,7 +120,7 @@ The AI scope is **deliberately narrow** (a graded, defensible boundary): AI does
 |---|---|
 | Collect exercise data (phone / wearable) | §4 capture → `WorkoutSession` + `trackPoints` |
 | Estimate effects & analysis (day/week/month) | History + Advanced Analytics; rule-based trend engine + **AI progress summary** (§5) |
-| Fitness advice + schedulable, customisable plan | Rule-based plan skeleton + **AI plan suggestion** (§5); goals + customisation (Premium) |
+| Fitness advice + schedulable, customisable plan | **AI plan generation both tiers** (§5; rule fallback); goals + customisation (Premium) |
 | Remind to exercise / rest | Local notifications driven by the rule-based reminder/inactivity/**rest** engine |
 | Social + competitions + share to named platforms | Social feed, `Challenge`, native share to **Facebook / Instagram / Twitter / TikTok** |
 | User profiling | Onboarding + Fitness Profile (goals, preferences, health tags) |
@@ -166,7 +166,7 @@ The full risk register is **PRD §8.5**. Engineering call-outs:
 
 ## 10. Doc reconciliation — see the log
 
-The running list of edits needed across **PRD v2.0 / SRS v2.0 / TDM v3.0** to keep the submitted deliverables consistent with current engineering decisions now lives in **[../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)**. Highlights:
+The running list of edits needed across **PRD v2.0 / SRS v2.0 / TDM v5** to keep the submitted deliverables consistent with current engineering decisions now lives in **[../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)**. Highlights:
 
 - **Backend → Supabase** + Edge Functions (PRD §9.3, SRS §3.8, TDM §4) — supersedes Node/Express + MySQL + Firebase.
 - **AI = summaries + suggestions only** — confirmed by TDM §3.4; rest rule-based/expert.

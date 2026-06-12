@@ -2,7 +2,7 @@
 screen: 13-profile
 role: free
 group: main
-status: draft
+status: built
 ---
 
 # 13. Profile

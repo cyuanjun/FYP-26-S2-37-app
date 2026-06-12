@@ -2,7 +2,7 @@
 screen: 02-login
 role: free
 group: auth
-status: draft
+status: built
 ---
 
 # 2. Login

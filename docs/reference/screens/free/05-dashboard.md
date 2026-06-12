@@ -2,7 +2,7 @@
 screen: 05-dashboard
 role: free
 group: main
-status: built
+status: built  # minimal greeting only — full digest pending
 ---
 
 # 5. Dashboard (Home)

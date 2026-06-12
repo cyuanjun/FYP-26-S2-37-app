@@ -63,7 +63,7 @@ The 26 schema entities, grouped. Each is a freezed model; data-owned rules (e.g.
 - **Marketplace:** `ExpertService`, `ServiceRequest`, `Deliverable`, `ExpertReview`, `ExpertVerificationDocument`
 - **Back-office:** `Feedback`, `ContactMessage`
 
-> **AI scope note (SRS §3.9, TDM §3.4):** the `AiGateway` covers only **progress summaries** + **plan suggestions**. Reminders/inactivity/rest alerts and the basic plan skeleton are **rule-based** Controls (no AI). Coaching/custom plans are **human-expert** (the `Deliverable` flow). Plans are modelled as a rule-based `BuildPlanSkeleton` (all tiers) + AI `SuggestPlan` (Premium personalisation); `SummariseProgress` is the AI summary control. The §2.4 control list, §3 traceability matrix, and §4.2/§5.3 diagrams are all aligned to this.
+> **AI scope note (SRS §3.9, TDM §3.4):** the `AiGateway` covers only **progress summaries** + **plan suggestions**. Reminders/inactivity/rest alerts and the basic plan skeleton are **rule-based** Controls (no AI). Coaching/custom plans are **human-expert** (the `Deliverable` flow). Plans (UPDATED 12 Jun, recon log C4-cancelled): **both tiers get AI plans** via the suggest-plan Edge Function (Free basic depth, Premium personalised), realized as one `GeneratePlan` control with `BuildPlanSkeleton` as the rule-based offline fallback; `SummariseProgress` is the AI summary control. The §2.4 control list, §3 traceability matrix, and §4.2/§5.3 diagrams are all aligned to this.
 
 ### 2.2 Gateway boundaries (`lib/boundaries/gateways/`)
 
@@ -89,7 +89,7 @@ Each is one of the mock's store actions = one use case = one Control class.
 |---|---|
 | Auth | `Authenticate`, `RequestPasswordReset` |
 | Profiling | `UpsertFitnessProfile`, `ToggleHealthTag`, `ToggleWorkoutPreference`, `SaveFitnessGoal`, `UpdateNotificationPrefs`, `UpdateAccountSettings` |
-| Plans | `BuildPlanSkeleton` (rule-based), `SuggestPlan` (AI, Premium), `RegeneratePlan` |
+| Plans | `GeneratePlan` (AI both tiers — realizes `SuggestPlan`; `BuildPlanSkeleton` rule fallback), `RegeneratePlan` (Plan Detail; Free capped at 1) |
 | AI summaries | `SummariseProgress` (AI) |
 | Devices | `ManageConnectedDevice` |
 | Capture | `StartWorkoutSession`, `EndWorkoutSession`, `LogExercise`, `UpdateWorkoutSession` |
@@ -102,8 +102,8 @@ Each is one of the mock's store actions = one use case = one Control class.
 | Admin | `SetUserStatus`, `ReviewExpertVerification`, `TriageFeedback`, `ResolveContactMessage` |
 
 > **As-built (vertical slice).** §2.2–§2.4 are the full design for all 64 use cases; the shipped vertical slice implements a subset, with two deliberate realizations:
-> - **Gateways:** the logical `SupabaseGateway` is realized as **three feature gateways** — `ProfileGateway`, `WorkoutGateway`, `SocialGateway` (plus the as-designed `AuthGateway`, `AiGateway`, `WorkoutDataSource`, `SocialShareGateway`). `NotificationGateway` / `StorageGateway` are not built yet.
-> - **Controls built:** `Authenticate`, `ActiveWorkout` (realizes `StartWorkoutSession` + `EndWorkoutSession` as one live-capture Notifier — SEQ participant `ActiveWorkout`, calling the `end_workout_session` RPC), `SaveWorkoutDetails` (realizes `UpdateWorkoutSession`), `DeleteWorkoutSession`, `SummariseProgress`, `CreateWorkoutSharePost`, `ShareWorkoutToSocial`. All other §2.4 controls are pending.
+> - **Gateways:** the logical `SupabaseGateway` is realized as **seven feature gateways** — `ProfileGateway`, `WorkoutGateway`, `SocialGateway`, `FitnessGateway`, `PlanGateway`, `FeedbackGateway`, `DeviceGateway` (plus the as-designed `AuthGateway`, `AiGateway`, `WorkoutDataSource` incl. `WearableHrSource`/`CompositeWorkoutDataSource`, `SocialShareGateway`). `NotificationGateway` / `StorageGateway` are not built yet.
+> - **Controls built (12 Jun):** `Authenticate`, `RequestPasswordReset`, `ActiveWorkout` (realizes `StartWorkoutSession` + `EndWorkoutSession`, calls the `end_workout_session` RPC, links sessions to their source device), `SaveWorkoutDetails`, `DeleteWorkoutSession`, `SummariseProgress`, `CreateWorkoutSharePost`, `ShareWorkoutToSocial`, `GeneratePlan` + `CompleteOnboarding`, `ManageConnectedDevice`, `UpsertFitnessProfile` (as `UpdateFitnessProfile`), `SetFitnessGoal`, `UpdateAccountSettings`, `ManageNotificationPrefs`, `SubmitFeedback`, `ViewProfile` (read-side). Pending: social interactions, challenges, marketplace, subscription, admin controls.
 
 ---
 
@@ -143,6 +143,11 @@ Conventions: `(A)` actor · `[B]` boundary · `<C>` control · `{E}` entity. Eve
    <EndWorkoutSession> persists via [SupabaseGateway]
    <EndWorkoutSession> → [WorkoutSummaryScreen] → (User)
 ```
+
+> **12 Jun update:** the robustness/sequence analyses below were drawn when plan AI was
+> Premium-only. As built, **both tiers** call `suggestPlan` (Free basic / Premium personalised)
+> through the single `GeneratePlan` control; `BuildPlanSkeleton` is the offline fallback.
+> Treat "Premium only" annotations in §4.2/§5.3 as superseded.
 
 ### 4.2 Suggest Fitness Plan (rule skeleton + AI personalisation)
 
