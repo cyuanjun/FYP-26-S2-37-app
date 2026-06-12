@@ -1,0 +1,15 @@
+---
+title: "US18b — Simple suggested workout routine (rule-based)"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>TrainScreen
+  participant C as «Control»<br/>BuildPlanSkeleton (rule-based)
+  participant E as «Entity»<br/>FitnessPlan · PlannedWorkout
+  A->>B: get a simple routine
+  B->>C: buildPlanSkeleton(goal)
+  C->>E: FitnessPlan (generation_strategy = basic)<br/>+ weekly PlannedWorkouts
+  E-->>C: simple routine
+  C-->>B: plan active
+  B-->>A: basic weekly plan to follow
+  note over C: RULE-BASED - no AI at the basic tier<br/>(SRS wording fix queued, log C4) - persisted via SupabaseGateway

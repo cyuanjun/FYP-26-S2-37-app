@@ -1,0 +1,20 @@
+---
+title: "US18a — Basic AI progress summary"
+---
+sequenceDiagram
+  actor A as Registered Free User
+  participant B as «Boundary»<br/>HistoryScreen (AI sheet)
+  participant C as «Control»<br/>SummariseProgress
+  participant E as «Entity»<br/>WorkoutSession (week aggregates)
+  A->>B: tap AI summary
+  B->>C: summarise(range)
+  C->>E: gather session aggregates
+  E-->>C: stats
+  alt summary returned
+    C-->>B: text + model tag
+    B-->>A: summary, labelled "AI-assisted - not medical advice"
+  else AI unavailable
+    C-->>B: AsyncError
+    B-->>A: friendly error, retry
+  end
+  note over C: AI via AiGateway → Edge Function (OpenAI, Gemini fallback) -<br/>basic tier = generic prose, Premium personalises (US36)
