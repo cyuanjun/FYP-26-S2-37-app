@@ -1,17 +1,22 @@
 ---
-title: "US14 — Sync phone sensors / wearables"
+title: "US14 — Connect / pair sensors and wearables"
 ---
 sequenceDiagram
   actor A as Registered Free User
-  participant B as «Boundary»<br/>ActiveWorkoutScreen
-  participant C as «Control»<br/>ActiveWorkout
-  participant E as «Entity»<br/>WorkoutSession (live metrics)
-  A->>B: workout running
-  B->>C: live state
-  C->>E: start sensor capture
-  loop every sensor tick
-    E-->>C: distance, steps, track point
-    C-->>B: live metrics
-    B-->>A: DISTANCE / PACE update
+  participant B as «Boundary»<br/>ConnectedDevicesScreen
+  participant C as «Control»<br/>ManageConnectedDevice
+  participant E as «Entity»<br/>ConnectedDevice
+  A->>B: open Devices (Train tab)
+  B-->>A: Phone sensors - CONNECTED (default)
+  A->>B: tap + ADD DEVICE, pick a wearable
+  B->>C: pair(device)
+  C->>E: new ConnectedDevice (type, name, active)
+  alt paired
+    E-->>C: device registered
+    C-->>B: connected
+    B-->>A: device listed - its data feeds recordings (US12)
+  else pairing fails
+    C-->>B: error
+    B-->>A: "Could not connect - try again"
   end
-  note over E: fed by WorkoutDataSource (geolocator + pedometer) -<br/>wearables later = new HealthSource / BLE source class
+  note over E: device_type incl. phone_sensors, apple_watch, fitbit, garmin... -<br/>persisted via SupabaseGateway, sessions link via connectedDeviceId
