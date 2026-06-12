@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../boundaries/gateways/workout_data_source.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
+import '../entities/connected_device.dart';
 import '../entities/workout_type.dart';
 import 'authenticate.dart';
+import 'manage_connected_device.dart';
 import 'view_profile.dart';
 import 'workout_history.dart';
 
@@ -21,6 +23,8 @@ class ActiveWorkoutState {
     this.elapsed = Duration.zero,
     this.distanceMeters = 0,
     this.steps = 0,
+    this.heartRate,
+    this.wearableName,
   });
 
   final WorkoutStatus status;
@@ -29,6 +33,8 @@ class ActiveWorkoutState {
   final Duration elapsed;
   final double distanceMeters;
   final int steps;
+  final int? heartRate;
+  final String? wearableName;
 
   bool get isActive => status != WorkoutStatus.idle;
 
@@ -39,6 +45,8 @@ class ActiveWorkoutState {
     Duration? elapsed,
     double? distanceMeters,
     int? steps,
+    int? heartRate,
+    String? wearableName,
   }) =>
       ActiveWorkoutState(
         status: status ?? this.status,
@@ -47,6 +55,8 @@ class ActiveWorkoutState {
         elapsed: elapsed ?? this.elapsed,
         distanceMeters: distanceMeters ?? this.distanceMeters,
         steps: steps ?? this.steps,
+        heartRate: heartRate ?? this.heartRate,
+        wearableName: wearableName ?? this.wearableName,
       );
 }
 
@@ -55,6 +65,7 @@ class ActiveWorkoutState {
 class ActiveWorkout extends Notifier<ActiveWorkoutState> {
   Timer? _timer;
   WorkoutDataSource? _source;
+  ConnectedDevice? _wearable;
   StreamSubscription<LiveMetrics>? _metricsSub;
   Duration _accumulated = Duration.zero;
   DateTime? _segmentStart;
@@ -68,16 +79,34 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
   Future<void> start(WorkoutType type) async {
     final userId = ref.read(currentUserIdProvider)!;
     SeqLog.msg('start-workout', 'ActiveWorkoutScreen', 'ActiveWorkout', 'start(${type.slug})');
-    SeqLog.msg('start-workout', 'ActiveWorkout', 'WorkoutGateway', 'startSession');
-    final session = await ref
-        .read(workoutGatewayProvider)
-        .startSession(userId: userId, workoutTypeId: type.id);
 
-    _source = ref.read(workoutDataSourceFactoryProvider)();
-    SeqLog.msg('start-workout', 'ActiveWorkout', 'WorkoutDataSource', 'start()');
+    // Capture source: phone sensors, plus the active wearable's HR stream
+    // when one is paired (#7.1). The session records its source device.
+    ConnectedDevice? wearable;
+    ConnectedDevice? phone;
+    try {
+      wearable = await ref.read(activeWearableProvider.future);
+      phone = await ref.read(phoneSensorsDeviceProvider.future);
+    } catch (_) {} // device lookup is best-effort; capture works regardless
+    _wearable = wearable;
+
+    SeqLog.msg('start-workout', 'ActiveWorkout', 'WorkoutGateway', 'startSession');
+    final session = await ref.read(workoutGatewayProvider).startSession(
+          userId: userId,
+          workoutTypeId: type.id,
+          connectedDeviceId: wearable?.id ?? phone?.id,
+        );
+
+    final phoneSource = ref.read(workoutDataSourceFactoryProvider)();
+    _source = wearable != null
+        ? CompositeWorkoutDataSource(phoneSource, WearableHrSource())
+        : phoneSource;
+    SeqLog.msg('start-workout', 'ActiveWorkout', 'WorkoutDataSource',
+        'start(${wearable != null ? 'phone+${wearable.deviceName}' : 'phone'})');
     await _source!.start();
     _metricsSub = _source!.metrics.listen((m) {
-      state = state.copyWith(distanceMeters: m.distanceMeters, steps: m.steps);
+      state = state.copyWith(
+          distanceMeters: m.distanceMeters, steps: m.steps, heartRate: m.heartRate);
     });
 
     _accumulated = Duration.zero;
@@ -92,6 +121,7 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
       status: WorkoutStatus.running,
       type: type,
       sessionId: session.id,
+      wearableName: wearable?.deviceName,
     );
   }
 
@@ -116,16 +146,16 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
     final elapsed = _elapsed();
     SeqLog.msg('end-workout', 'ActiveWorkoutScreen', 'ActiveWorkout', 'end($sessionId)');
 
-    await _source?.stop();
-    _timer?.cancel();
-    await _metricsSub?.cancel();
-
-    // Calorie estimate is a data-owned rule on WorkoutType (MET-based);
-    // weight comes from the fitness profile, defaulting inside the entity.
+    // Fetch the calorie weight BEFORE tearing down sensors — keeps the
+    // network round-trip clear of any platform-channel teardown stalls.
     double? weightKg;
     try {
       weightKg = (await ref.read(fitnessProfileProvider.future))?.weightKg;
     } catch (_) {} // profile unavailable → entity falls back to 70 kg
+
+    _timer?.cancel();
+    await _metricsSub?.cancel();
+    await _source?.stop();
     final calories =
         type.estimateCalories(durationSeconds: elapsed.inSeconds, weightKg: weightKg);
 
@@ -135,6 +165,12 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
       if (type.isCardio) 'distance_meters': state.distanceMeters.round(),
       if (_source != null && _source!.trackPoints.isNotEmpty)
         'track_points': _source!.trackPoints,
+      // Wearable HR (simulated stream for the FYP) → avg/max persisted by the RPC.
+      if (_source is CompositeWorkoutDataSource &&
+          (_source as CompositeWorkoutDataSource).avgHeartRate != null) ...{
+        'avg_heart_rate': (_source as CompositeWorkoutDataSource).avgHeartRate,
+        'max_heart_rate': (_source as CompositeWorkoutDataSource).maxHeartRate,
+      },
     };
 
     SeqLog.msg('end-workout', 'ActiveWorkout', 'WorkoutGateway', 'endSession(rpc)');
@@ -142,7 +178,16 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
         .read(workoutGatewayProvider)
         .endSession(sessionId: sessionId, metrics: metrics);
 
+    // Wearable contributed data → bump its last-synced stamp (#7.1).
+    final syncedWearable = _wearable;
+    if (syncedWearable != null) {
+      try {
+        await ref.read(manageConnectedDeviceProvider).markSynced(syncedWearable.id);
+      } catch (_) {}
+    }
+
     _source = null;
+    _wearable = null;
     state = const ActiveWorkoutState();
     ref.invalidate(historyProvider);
     return result;

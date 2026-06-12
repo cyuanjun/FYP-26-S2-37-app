@@ -23,6 +23,31 @@ enum HealthTagKind { diet, allergy, injury }
 enum GenerationStrategy { basic, personalised }
 
 @JsonEnum(fieldRename: FieldRename.snake)
+enum DeviceType { appleWatch, fitbit, garmin, polar, oura, phoneSensors, other }
+
+extension DeviceTypeLabel on DeviceType {
+  String get label => switch (this) {
+        DeviceType.appleWatch => 'Apple Watch',
+        DeviceType.fitbit => 'Fitbit',
+        DeviceType.garmin => 'Garmin',
+        DeviceType.polar => 'Polar',
+        DeviceType.oura => 'Oura',
+        DeviceType.phoneSensors => 'Phone sensors',
+        DeviceType.other => 'Other device',
+      };
+
+  String get emoji => switch (this) {
+        DeviceType.appleWatch => '⌚',
+        DeviceType.fitbit => '📟',
+        DeviceType.garmin => '⌚',
+        DeviceType.polar => '❤️',
+        DeviceType.oura => '💍',
+        DeviceType.phoneSensors => '📱',
+        DeviceType.other => '📡',
+      };
+}
+
+@JsonEnum(fieldRename: FieldRename.snake)
 enum PrimaryGoal { loseWeight, buildMuscle, improveEndurance, maintainFitness }
 
 @JsonEnum(fieldRename: FieldRename.snake)

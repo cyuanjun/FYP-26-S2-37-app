@@ -23,6 +23,7 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **Profile cluster** | Avatar (top-right) → Profile hub: level/XP bar, lifetime stats, Fitness Profile (#13.1), Fitness Goals (#13.2), Account Settings (#13.3), Notifications (#13.4), Submit Feedback (#13.5), log out | All live writes: fitness_profiles, fitness_goals (active-goal upsert), notification_prefs jsonb, feedback |
 | **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
 | **Onboarding + plan** | First login → wizard (about you → how you train → goal) → **real AI weekly plan (OpenAI)** → Train shows it | Both tiers: Free basic, Premium personalised; strict JSON schema + server-side validation; Gemini → rule fallback. Gate: `profiles.onboarding_completed_at` |
+| **Devices (#7.1)** | Train → Devices card → paired list (phone sensors pinned) → + ADD DEVICE → mock BLE scan → pair a watch → next workout shows live ♥ HR; avg/max saved, session linked to the device | HR stream is simulated (spec-sanctioned) — real BLE/HealthKit drops in behind the same interface |
 | **Plan Detail (#8)** | Train → VIEW FULL PLAN → header + current-week schedule → tap a row for the workout modal → Start today's workout (pre-selected activity) · Regenerate | Free: 1 regeneration, then "Upgrade for unlimited"; today's row highlighted |
 
 **Architecture:** Flutter · Riverpod · go_router · freezed · `supabase_flutter`. Strict **Boundary–Control–Entity**
@@ -155,6 +156,20 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
      it locks after 1 regeneration ("Upgrade for unlimited").
 3. **Re-trigger the wizard** for a demo:
    `update profiles set onboarding_completed_at = null where email = 'free@wiseworkout.test';`
+
+### B2. Pair a wearable → live heart rate
+1. Train → tap the **Devices** card (or **+ ADD DEVICE**).
+   - **See:** **CONNECTED DEVICES** — "Phone sensors · Built-in · always available" pinned (no
+     toggle/remove), then any paired wearables with CONNECTED pill, toggle, and remove.
+2. **+ ADD DEVICE** → "Scanning for devices…" → pick **Apple Watch Series 9**.
+   - **See:** snackbar "…connected — its heart rate feeds your next workout"; row shows
+     "Last synced: just now".
+3. Record a workout (step B).
+   - **See:** a live **♥ N bpm · Apple Watch Series 9** readout under the metric tiles, climbing
+     from ~70 as you "warm up" (simulated stream). After saving: avg/max HR on the session in
+     History, and the watch row's last-synced updates.
+4. **Negative check:** toggle the watch OFF (or remove it) → next workout has no HR readout and
+   the session links to phone sensors instead.
 
 ### F2. Profile & account flows
 1. On any tab, tap the **avatar (top-right)**.

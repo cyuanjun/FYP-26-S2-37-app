@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wise_workout/boundaries/gateways/ai_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/auth_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/device_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/feedback_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/fitness_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/plan_gateway.dart';
@@ -11,6 +12,7 @@ import 'package:wise_workout/boundaries/gateways/social_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/social_share_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
+import 'package:wise_workout/entities/connected_device.dart';
 import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/fitness_goal.dart';
 import 'package:wise_workout/entities/fitness_plan.dart';
@@ -61,9 +63,10 @@ class FakeAuthGateway implements AuthGateway {
 }
 
 class StartSessionCall {
-  StartSessionCall(this.userId, this.workoutTypeId);
+  StartSessionCall(this.userId, this.workoutTypeId, [this.connectedDeviceId]);
   final String userId;
   final String workoutTypeId;
+  final String? connectedDeviceId;
 }
 
 class EndSessionCall {
@@ -105,8 +108,9 @@ class FakeWorkoutGateway implements WorkoutGateway {
   }
 
   @override
-  Future<WorkoutSession> startSession({required String userId, required String workoutTypeId}) async {
-    startSessionCalls.add(StartSessionCall(userId, workoutTypeId));
+  Future<WorkoutSession> startSession(
+      {required String userId, required String workoutTypeId, String? connectedDeviceId}) async {
+    startSessionCalls.add(StartSessionCall(userId, workoutTypeId, connectedDeviceId));
     return WorkoutSession(
       id: 'session-${startSessionCalls.length}',
       userId: userId,
@@ -378,6 +382,58 @@ class FakePlanGateway implements PlanGateway {
     );
     return activePlan!;
   }
+}
+
+/// Fake DeviceGateway — in-memory connected_devices (#7.1).
+class FakeDeviceGateway implements DeviceGateway {
+  final devices = <ConnectedDevice>[];
+  int ensureCalls = 0;
+  final syncedIds = <String>[];
+
+  @override
+  Future<List<ConnectedDevice>> listDevices(String userId) async =>
+      devices.where((d) => d.userId == userId).toList();
+
+  @override
+  Future<ConnectedDevice> ensurePhoneSensors(String userId) async {
+    ensureCalls++;
+    final existing = devices.where(
+        (d) => d.userId == userId && d.deviceType == DeviceType.phoneSensors);
+    if (existing.isNotEmpty) return existing.first;
+    final d = ConnectedDevice(
+        id: 'dev-phone-$userId',
+        userId: userId,
+        deviceType: DeviceType.phoneSensors,
+        deviceName: 'Phone sensors');
+    devices.add(d);
+    return d;
+  }
+
+  @override
+  Future<ConnectedDevice> addDevice(
+      {required String userId, required DeviceType type, required String name}) async {
+    final d = ConnectedDevice(
+        id: 'dev-${devices.length + 1}',
+        userId: userId,
+        deviceType: type,
+        deviceName: name.trim(),
+        lastSyncedAt: DateTime(2026, 6, 12));
+    devices.add(d);
+    return d;
+  }
+
+  @override
+  Future<void> setActive(String deviceId, bool active) async {
+    final i = devices.indexWhere((d) => d.id == deviceId);
+    if (i >= 0) devices[i] = devices[i].copyWith(isActive: active);
+  }
+
+  @override
+  Future<void> removeDevice(String deviceId) async =>
+      devices.removeWhere((d) => d.id == deviceId);
+
+  @override
+  Future<void> touchLastSynced(String deviceId) async => syncedIds.add(deviceId);
 }
 
 /// Common test fixtures.

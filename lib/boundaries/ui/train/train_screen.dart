@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/generate_plan.dart';
+import '../../../controls/manage_connected_device.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../entities/enums.dart';
 import '../../../entities/fitness_plan.dart';
 import '../../../entities/planned_workout.dart';
 import '../common/avatar_button.dart';
 import '../profile/fitness_goals_screen.dart';
 import '../workout/active_workout_screen.dart';
+import 'connected_devices_screen.dart';
 import 'plan_detail_screen.dart';
 
 /// BOUNDARY (#7 Train). Active-plan card + device status + a sticky
@@ -64,10 +67,34 @@ class TrainScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
                 const _SectionHeader(label: 'DEVICES'),
                 const SizedBox(height: 8),
-                const _PhoneDeviceCard(),
+                Consumer(builder: (context, ref, _) {
+                  final devices =
+                      ref.watch(connectedDevicesProvider).value ?? [];
+                  final active = devices.where((d) => d.isActive).toList();
+                  final wearables =
+                      active.where((d) => !d.isPhoneSensors).toList();
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                            builder: (_) => const ConnectedDevicesScreen())),
+                    child: _DevicesCard(
+                      title: wearables.isEmpty
+                          ? 'Phone sensors'
+                          : wearables.first.deviceName,
+                      subtitle: wearables.isEmpty
+                          ? 'GPS + steps ready'
+                          : 'HR + phone GPS ready',
+                      emoji: wearables.isEmpty ? '📱' : wearables.first.deviceType.emoji,
+                      extra: active.length > 1 ? '${active.length} sources' : null,
+                    ),
+                  );
+                }),
                 const SizedBox(height: 12),
                 OutlinedButton(
-                  onPressed: () => _soon(context, 'Add device'),
+                  onPressed: () => Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                          builder: (_) => const ConnectedDevicesScreen())),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.muted,
                     side: const BorderSide(color: AppColors.faint),
@@ -154,8 +181,14 @@ class _NoPlanCard extends StatelessWidget {
   }
 }
 
-class _PhoneDeviceCard extends StatelessWidget {
-  const _PhoneDeviceCard();
+class _DevicesCard extends StatelessWidget {
+  const _DevicesCard(
+      {required this.title, required this.subtitle, required this.emoji, this.extra});
+
+  final String title;
+  final String subtitle;
+  final String emoji;
+  final String? extra;
 
   @override
   Widget build(BuildContext context) {
@@ -167,14 +200,15 @@ class _PhoneDeviceCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Text('📱', style: TextStyle(fontSize: 28)),
+          Text(emoji, style: const TextStyle(fontSize: 28)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Phone sensors', style: AppTypography.headline),
-                Text('GPS + steps ready', style: AppTypography.caption1),
+                Text(title, style: AppTypography.headline),
+                Text(extra == null ? subtitle : '$subtitle · $extra',
+                    style: AppTypography.caption1),
               ],
             ),
           ),
