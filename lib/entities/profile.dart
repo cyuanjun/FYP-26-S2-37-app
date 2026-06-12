@@ -23,6 +23,7 @@ abstract class Profile with _$Profile {
     @Default(PreferredUnits.metric) PreferredUnits preferredUnits,
     String? bio,
     @Default(<String, dynamic>{}) Map<String, dynamic> notificationPrefs,
+    DateTime? onboardingCompletedAt,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
@@ -35,4 +36,8 @@ abstract class Profile with _$Profile {
   }
 
   bool get isPremium => role == UserRole.premium;
+
+  /// First-time users complete the post-login onboarding wizard (#3) before
+  /// reaching the main shell.
+  bool get needsOnboarding => onboardingCompletedAt == null;
 }

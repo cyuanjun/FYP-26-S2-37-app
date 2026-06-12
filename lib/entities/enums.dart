@@ -20,6 +20,8 @@ enum TrainingExperience { beginner, intermediate, advanced }
 
 enum HealthTagKind { diet, allergy, injury }
 
+enum GenerationStrategy { basic, personalised }
+
 @JsonEnum(fieldRename: FieldRename.snake)
 enum PrimaryGoal { loseWeight, buildMuscle, improveEndurance, maintainFitness }
 

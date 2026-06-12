@@ -5,6 +5,7 @@ import 'package:wise_workout/boundaries/gateways/ai_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/auth_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/feedback_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/fitness_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/plan_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/profile_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/social_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/social_share_gateway.dart';
@@ -12,7 +13,9 @@ import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/fitness_goal.dart';
+import 'package:wise_workout/entities/fitness_plan.dart';
 import 'package:wise_workout/entities/fitness_profile.dart';
+import 'package:wise_workout/entities/planned_workout.dart';
 import 'package:wise_workout/entities/health_tag.dart';
 import 'package:wise_workout/entities/profile.dart';
 import 'package:wise_workout/entities/workout_session.dart';
@@ -170,6 +173,25 @@ class FakeAiGateway implements AiGateway {
     if (throwOnCall) throw Exception('AI unavailable');
     return result;
   }
+
+  Map<String, dynamic> planResult = {
+    'name': 'Personalised plan',
+    'description': 'stub plan',
+    'duration_weeks': 4,
+    'workouts_per_week': 3,
+    'model': 'stub',
+    'workouts': [
+      {'slug': 'running', 'day_of_week': 1, 'duration_minutes': 30, 'name': 'Run', 'descriptor': ''},
+    ],
+  };
+  int planCalls = 0;
+
+  @override
+  Future<Map<String, dynamic>> suggestPlan() async {
+    planCalls++;
+    if (throwOnCall) throw Exception('AI unavailable');
+    return planResult;
+  }
 }
 
 /// Fake SocialGateway — records created/deleted posts.
@@ -276,6 +298,11 @@ class FakeProfileGateway implements ProfileGateway {
   @override
   Future<void> updateNotificationPrefs(String id, Map<String, dynamic> prefs) async =>
       prefsWrites.add(prefs);
+
+  final onboardingCompletions = <String>[];
+
+  @override
+  Future<void> completeOnboarding(String id) async => onboardingCompletions.add(id);
 }
 
 /// Fake FeedbackGateway — records submissions, optionally throws.
@@ -291,6 +318,47 @@ class FakeFeedbackGateway implements FeedbackGateway {
   }) async {
     if (throwOnSubmit) throw Exception('insert failed');
     submissions.add((userId, category, body));
+  }
+}
+
+/// Fake PlanGateway — records inserted plans/workouts in memory.
+class FakePlanGateway implements PlanGateway {
+  FitnessPlan? activePlan;
+  List<PlannedWorkout> planned = [];
+  bool throwOnInsert = false;
+
+  final insertedPlans = <Map<String, dynamic>>[];
+  final insertedWorkouts = <List<Map<String, dynamic>>>[];
+
+  @override
+  Future<FitnessPlan?> fetchActivePlan(String userId) async => activePlan;
+
+  @override
+  Future<List<PlannedWorkout>> listPlannedWorkouts(String planId) async => planned;
+
+  @override
+  Future<FitnessPlan> insertPlan({
+    required String userId,
+    required String fitnessGoalId,
+    required Map<String, dynamic> plan,
+    required List<Map<String, dynamic>> workouts,
+  }) async {
+    if (throwOnInsert) throw Exception('insert failed');
+    insertedPlans.add(plan);
+    insertedWorkouts.add(workouts);
+    activePlan = FitnessPlan(
+      id: 'plan-${insertedPlans.length}',
+      userId: userId,
+      fitnessGoalId: fitnessGoalId,
+      name: plan['name'] as String? ?? 'Plan',
+      description: plan['description'] as String?,
+      durationWeeks: plan['duration_weeks'] as int? ?? 4,
+      workoutsPerWeek: plan['workouts_per_week'] as int? ?? 3,
+      generationStrategy: plan['generation_strategy'] == 'personalised'
+          ? GenerationStrategy.personalised
+          : GenerationStrategy.basic,
+    );
+    return activePlan!;
   }
 }
 

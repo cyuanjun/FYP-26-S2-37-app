@@ -9,7 +9,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 10 built · 12 partial · 42 not started
+**Score:** 11 built · 12 partial · 41 not started
 
 
 ## Unregistered user (US01–US06)
@@ -38,7 +38,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + analytics ✅; Free cap = current calendar month, enforced at the query level (12 Jun) |
 | US16 | ✅ | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | MET-based calorie estimate per session (entity rule, profile weight w/ 70 kg fallback) + XP; computed live since 12 Jun |
 | US17 | 🟨 | As a registered free user, I want to view simple charts or reports so that my fitness progress is easier to understand. | Analytics tiles with +/- deltas ✅ - no graphical charts at basic tier by design. **Wording change queued (log C5): drop "charts"** |
-| US18 | 🟨 | As a registered free user, I want to receive basic AI progress summaries and basic AI-assisted fitness plan suggestions so that I can better understand my activity data and follow a simple workout routine. | AI summary ✅ (stub model); basic routine = rule-based skeleton, pending. **Wording change queued (log C4): basic plan suggestion is rule-based, not AI** |
+| US18 | ✅ | As a registered free user, I want to receive basic AI progress summaries and basic AI-assisted fitness plan suggestions so that I can better understand my activity data and follow a simple workout routine. | AI summary ✅ (stub model) + simple routine ✅ (rule-based BuildPlanSkeleton via onboarding, 12 Jun). Wording fix queued (log C4) |
 | US19 | 🟨 | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Preference toggles #13.4 ✅; flutter_local_notifications wired but no scheduling yet |
 | US20 | ⬜ | As a registered free user, I want to receive inactivity alerts so that I am reminded when I have not met my scheduled exercise goals. | Pref toggles exist; rule-based alert engine pending |
 | US21 | ⬜ | As a registered free user, I want to receive rest alerts when I may be exercising too much so that I can avoid overtraining. | Pref toggles exist; rule-based alert engine pending |
@@ -62,7 +62,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US34 | ⬜ | As a registered premium user, I want to access advanced progress analytics so that I can understand my fitness trends in more detail. | Advanced analytics / detailed estimates pending |
 | US35 | ⬜ | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Advanced analytics / detailed estimates pending |
 | US36 | 🟨 | As a registered premium user, I want to receive personalised AI progress summaries, fitness plan suggestions, and personalised fitness reports so that I can get more relevant guidance. | Summary works for Premium; personalisation pending (stub) |
-| US37 | ⬜ | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | Personalised plans / reminders / subscription mgmt pending |
+| US37 | 🟨 | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | Premium onboarding calls suggest-plan Edge Function (stub AI, falls back to rule); Train regenerate CTA pending |
 | US38 | ⬜ | As a registered premium user, I want to customise plan duration, workout frequency, preferred workout categories, target calories, daily or weekly weight loss goals, and preferred rest days so that the fitness plan fits my schedule and needs. | Personalised plans / reminders / subscription mgmt pending |
 | US39 | ⬜ | As a registered premium user, I want to receive personalised workout reminders, inactivity alerts, and rest alerts so that I can maintain a balanced routine. | Personalised plans / reminders / subscription mgmt pending |
 | US40 | ⬜ | As a registered premium user, I want to view or manage my subscription status so that I can understand and control my paid access. | Personalised plans / reminders / subscription mgmt pending |

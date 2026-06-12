@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../controls/generate_plan.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../entities/fitness_plan.dart';
+import '../../../entities/planned_workout.dart';
 import '../common/avatar_button.dart';
 import '../profile/fitness_goals_screen.dart';
 import '../workout/active_workout_screen.dart';
@@ -39,11 +42,18 @@ class TrainScreen extends ConsumerWidget {
                   onAction: () => _soon(context, 'Plan detail'),
                 ),
                 const SizedBox(height: 8),
-                _NoPlanCard(
-                  onSetGoal: () => Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(builder: (_) => const FitnessGoalsScreen()),
-                  ),
-                ),
+                Consumer(builder: (context, ref, _) {
+                  final plan = ref.watch(activePlanProvider).value;
+                  final workouts = ref.watch(plannedWorkoutsProvider).value ?? [];
+                  if (plan == null) {
+                    return _NoPlanCard(
+                      onSetGoal: () => Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(builder: (_) => const FitnessGoalsScreen()),
+                      ),
+                    );
+                  }
+                  return _ActivePlanCard(plan: plan, workouts: workouts);
+                }),
                 const SizedBox(height: 24),
                 const _SectionHeader(label: 'DEVICES'),
                 const SizedBox(height: 8),
@@ -169,6 +179,77 @@ class _PhoneDeviceCard extends StatelessWidget {
             ),
             child: Text('CONNECTED',
                 style: AppTypography.caption2.copyWith(color: AppColors.accent)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActivePlanCard extends StatelessWidget {
+  const _ActivePlanCard({required this.plan, required this.workouts});
+
+  final FitnessPlan plan;
+  final List<PlannedWorkout> workouts;
+
+  @override
+  Widget build(BuildContext context) {
+    final today = DateTime.now().weekday;
+    final next = workouts.isEmpty
+        ? null
+        : workouts.firstWhere((w) => w.dayOfWeek >= today, orElse: () => workouts.first);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(plan.name, style: AppTypography.headline),
+          const SizedBox(height: 4),
+          Text(
+            '${plan.workoutsPerWeek}x per week · ${plan.durationWeeks} weeks · '
+            '${plan.isPersonalised ? 'AI-assisted' : 'rule-based'}',
+            style: AppTypography.caption2.copyWith(color: AppColors.accent),
+          ),
+          if (next != null) ...[
+            const SizedBox(height: 12),
+            const Divider(color: AppColors.faint, height: 1),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text(next.dayOfWeek == today ? 'TODAY' : next.dayName.toUpperCase(),
+                    style: AppTypography.caption2.copyWith(
+                        color: AppColors.accent, fontWeight: FontWeight.w800)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text('${next.name ?? 'Workout'} · ${next.durationMinutes} min',
+                      style: AppTypography.subheadline.copyWith(color: AppColors.ink)),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final w in workouts)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.bg,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.faint),
+                  ),
+                  child: Text('${w.dayName} · ${w.name ?? ''}',
+                      style: AppTypography.caption2),
+                ),
+            ],
           ),
         ],
       ),
