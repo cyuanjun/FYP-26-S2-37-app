@@ -9,7 +9,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 12 built · 11 partial · 41 not started
+**Score:** 13 built · 10 partial · 41 not started
 
 
 ## Unregistered user (US01–US06)
@@ -34,7 +34,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US11 | ✅ | As a registered free user, I want to create and update my fitness profile so that the system can understand my goals, preferences, and fitness needs. | Fitness Profile #13.1 (batched save, custom tags) |
 | US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
 | US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | Manual entry UI not built (schema supports it: null device) |
-| US14 | 🟨 | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone sensors (GPS+steps) ✅; wearables are additive later |
+| US14 | ✅ | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone GPS/steps ✅ + wearable pairing (#7.1, mock BLE scan per spec) with simulated HR streaming into sessions (avg/max persisted, device linked); real BLE/HealthKit slots in behind the same WorkoutDataSource later |
 | US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + analytics ✅; Free cap = current calendar month, enforced at the query level (12 Jun) |
 | US16 | ✅ | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | MET-based calorie estimate per session (entity rule, profile weight w/ 70 kg fallback) + XP; computed live since 12 Jun |
 | US17 | 🟨 | As a registered free user, I want to view simple charts or reports so that my fitness progress is easier to understand. | Analytics tiles with +/- deltas ✅ - no graphical charts at basic tier by design. **Wording change queued (log C5): drop "charts"** |

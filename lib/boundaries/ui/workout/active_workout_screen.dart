@@ -152,6 +152,20 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                             ],
                     ),
                   ),
+                  // Live HR from the active wearable (#7.1; simulated stream).
+                  if (s.heartRate != null) ...[
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('♥ ', style: TextStyle(color: AppColors.danger, fontSize: 18)),
+                        Text('${s.heartRate} bpm',
+                            style: AppTypography.title3.copyWith(color: AppColors.ink)),
+                        if (s.wearableName != null)
+                          Text('  ·  ${s.wearableName}', style: AppTypography.caption2),
+                      ],
+                    ),
+                  ],
                   const Spacer(),
                   // Control row
                   Padding(

@@ -34,13 +34,17 @@ class WorkoutGateway {
   }
 
   /// Inserts a fresh free-form session (StartWorkoutSession use case).
+  /// [connectedDeviceId] records the capture source (phone-sensors row for
+  /// in-app GPS capture, a wearable row when one is active; null = manual).
   Future<WorkoutSession> startSession({
     required String userId,
     required String workoutTypeId,
+    String? connectedDeviceId,
   }) async {
     final row = await _client.from('workout_sessions').insert({
       'user_id': userId,
       'workout_type_id': workoutTypeId,
+      'connected_device_id': ?connectedDeviceId,
       'started_at': DateTime.now().toUtc().toIso8601String(),
     }).select().single();
     return WorkoutSession.fromJson(row);
