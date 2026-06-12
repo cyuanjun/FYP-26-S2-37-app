@@ -1,5 +1,5 @@
 ---
-title: "US17 — Simple charts / reports"
+title: "US17 — Simple charts / reports (numeric tiles + deltas)"
 ---
 sequenceDiagram
   actor A as Registered Free User
@@ -7,9 +7,10 @@ sequenceDiagram
   participant C as «Control»<br/>ViewWorkoutHistory
   participant E as «Entity»<br/>WorkoutSession
   A->>B: tap Day / Week / Month pill
-  B->>C: sessions for period
+  B->>C: sessions for the period
   C->>E: aggregate per period
   E-->>C: totals + vs-prior deltas
   C-->>B: analytics view state
-  B-->>A: sessions, active min, calories, HR tiles
+  B-->>A: numeric tiles - sessions, active min,<br/>calories, avg/max HR with up/down values
+  note over B: no graphical charts at the basic tier -<br/>words and +/- deltas only (charts = Premium US34)
   note over E: read via WorkoutGateway → Supabase
