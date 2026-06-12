@@ -1,5 +1,5 @@
 ---
-title: "US12 — Record and manage workouts"
+title: "US12 — Record and manage workout activities"
 ---
 sequenceDiagram
   actor A as Registered Free User
@@ -9,10 +9,17 @@ sequenceDiagram
   A->>B: tap START
   B->>C: start(type)
   C->>E: create WorkoutSession (startedAt)
+  loop continuously while recording
+    C->>E: append live data - GPS track points,<br/>heart rate, steps, elapsed time
+    C-->>B: live metrics
+    B-->>A: TIME / DISTANCE / PACE / HR update
+  end
+  A->>B: pause / resume as needed
   A->>B: tap END → Save & Finish
   B->>C: end()
   C->>E: finalise - duration, distance, calories, XP, streak
   E-->>C: xp_gained, streak, leveled_up
   C-->>B: summary result
   B-->>A: Workout complete (+XP, streak)
-  note over E: persisted via WorkoutGateway - atomic<br/>end_workout_session RPC on Supabase
+  note over B,E: manage afterwards from History detail -<br/>rename, rate, edit notes (UpdateWorkoutSession) or delete (DeleteWorkoutSession)
+  note over E: sensors stream via WorkoutDataSource (phone GPS + steps now,<br/>HR via wearables later) - persisted via WorkoutGateway end_workout_session RPC
