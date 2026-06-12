@@ -118,6 +118,59 @@ class SelectChip extends StatelessWidget {
   }
 }
 
+/// Boxed numeric-entry dialog (height/weight etc.) — visible input field with
+/// a unit suffix, used by Fitness Profile (#13.1) and Onboarding (#3).
+Future<void> showNumberInputDialog(
+  BuildContext context, {
+  required String title,
+  required String unit,
+  double? current,
+  required double min,
+  required double max,
+  required void Function(double) onSet,
+}) async {
+  final ctl = TextEditingController(text: current?.toString() ?? '');
+  final v = await showDialog<double>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.surface,
+      title: Text(title, style: AppTypography.headline),
+      content: TextField(
+        controller: ctl,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        autofocus: true,
+        style: AppTypography.title3,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: AppColors.bg,
+          hintText: '0',
+          hintStyle: AppTypography.title3.copyWith(color: AppColors.faint),
+          suffixText: unit,
+          suffixStyle: AppTypography.subheadline,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.faint),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.accent),
+          ),
+        ),
+        onSubmitted: (_) => Navigator.of(ctx).pop(double.tryParse(ctl.text.trim())),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(double.tryParse(ctl.text.trim())),
+          child: const Text('Set'),
+        ),
+      ],
+    ),
+  );
+  if (v != null && v >= min && v <= max) onSet(v);
+}
+
 /// One pickable option in [showTagPicker].
 class PickerOption {
   const PickerOption({required this.id, required this.label, this.isCustom = false});

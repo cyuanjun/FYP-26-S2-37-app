@@ -111,15 +111,25 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
               SettingRow(
                 label: 'Height',
                 value: _heightCm == null ? 'Not set' : '$_heightCm cm',
-                onTap: () => _pickNumber('Height (cm)', _heightCm?.toDouble(), 100, 250,
-                    (v) => setState(() => _heightCm = v.round())),
+                onTap: () => showNumberInputDialog(context,
+                    title: 'Height',
+                    unit: 'cm',
+                    current: _heightCm?.toDouble(),
+                    min: 100,
+                    max: 250,
+                    onSet: (v) => setState(() => _heightCm = v.round())),
               ),
               const Divider(color: AppColors.faint, height: 1),
               SettingRow(
                 label: 'Weight',
                 value: _weightKg == null ? 'Not set' : '${_weightKg!.toStringAsFixed(1)} kg',
-                onTap: () => _pickNumber('Weight (kg)', _weightKg, 30, 250,
-                    (v) => setState(() => _weightKg = v)),
+                onTap: () => showNumberInputDialog(context,
+                    title: 'Weight',
+                    unit: 'kg',
+                    current: _weightKg,
+                    min: 30,
+                    max: 250,
+                    onSet: (v) => setState(() => _weightKg = v)),
               ),
               const SizedBox(height: 24),
 
@@ -370,32 +380,4 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     if (picked != null) setState(() => _activity = picked);
   }
 
-  Future<void> _pickNumber(
-      String title, double? current, double min, double max, void Function(double) onSet) async {
-    final ctl = TextEditingController(text: current?.toString() ?? '');
-    final v = await showDialog<double>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(title, style: AppTypography.headline),
-        content: TextField(
-          controller: ctl,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          autofocus: true,
-          decoration: const InputDecoration(isDense: true),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              final parsed = double.tryParse(ctl.text.trim());
-              Navigator.of(ctx).pop(parsed);
-            },
-            child: const Text('Set'),
-          ),
-        ],
-      ),
-    );
-    if (v != null && v >= min && v <= max) onSet(v);
-  }
 }
