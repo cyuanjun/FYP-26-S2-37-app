@@ -150,17 +150,16 @@ class GeneratePlan extends AsyncNotifier<void> {
           if (fitness?.preferredWorkoutTypeIds.contains(t.id) ?? false) t.slug,
       ];
 
+      // Both tiers use AI (decided 12 Jun, per WBS/SRS): Free = basic depth,
+      // Premium = personalised — the Edge Function decides from the role.
+      // BuildPlanSkeleton remains the offline/rule fallback for either tier.
       PlanDraft draft;
-      if (profile?.isPremium ?? false) {
-        SeqLog.msg('generate-plan', 'GeneratePlan', 'AiGateway', 'suggestPlan()');
-        try {
-          draft = _draftFromAi(await ref.read(aiGatewayProvider).suggestPlan());
-        } catch (_) {
-          // AI unavailable → honest fallback to the rule-based skeleton.
-          draft = _skeleton(goal, fitness?.trainingExperience, preferredSlugs);
-        }
-      } else {
-        SeqLog.msg('generate-plan', 'GeneratePlan', 'BuildPlanSkeleton', 'rule-based');
+      SeqLog.msg('generate-plan', 'GeneratePlan', 'AiGateway',
+          'suggestPlan(${(profile?.isPremium ?? false) ? 'personalised' : 'basic'})');
+      try {
+        draft = _draftFromAi(await ref.read(aiGatewayProvider).suggestPlan());
+      } catch (_) {
+        SeqLog.msg('generate-plan', 'GeneratePlan', 'BuildPlanSkeleton', 'AI down → rule fallback');
         draft = _skeleton(goal, fitness?.trainingExperience, preferredSlugs);
       }
 
@@ -216,11 +215,13 @@ class GeneratePlan extends AsyncNotifier<void> {
         .toList();
     if (workouts.isEmpty) throw Exception('AI returned no workouts');
     return PlanDraft(
-      name: data['name'] as String? ?? 'Personalised plan',
+      name: data['name'] as String? ?? 'Suggested plan',
       description: data['description'] as String? ?? '',
       durationWeeks: (data['duration_weeks'] as num?)?.toInt() ?? 4,
       workoutsPerWeek: (data['workouts_per_week'] as num?)?.toInt() ?? workouts.length,
-      strategy: GenerationStrategy.personalised,
+      strategy: data['strategy'] == 'personalised'
+          ? GenerationStrategy.personalised
+          : GenerationStrategy.basic,
       slots: workouts,
     );
   }

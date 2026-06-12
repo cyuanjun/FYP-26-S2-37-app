@@ -475,7 +475,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
             Text(
               premium
                   ? 'Personalising your plan with AI…'
-                  : 'Building your weekly plan…',
+                  : 'Creating your plan with AI…',
               textAlign: TextAlign.center,
               style: AppTypography.headline,
             ),
@@ -499,8 +499,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                   Text(_plan!.description ?? '', style: AppTypography.subheadline),
                   const SizedBox(height: 8),
                   Text(
-                    '${_plan!.workoutsPerWeek}x per week · ${_plan!.durationWeeks} weeks'
-                    '${_plan!.isPersonalised ? ' · AI-assisted' : ' · rule-based'}',
+                    '${_plan!.workoutsPerWeek}x per week · ${_plan!.durationWeeks} weeks · '
+                    'AI-assisted (${_plan!.isPersonalised ? 'personalised' : 'basic'})',
                     style: AppTypography.caption2.copyWith(color: AppColors.accent),
                   ),
                 ],
