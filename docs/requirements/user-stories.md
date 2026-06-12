@@ -9,7 +9,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 11 built · 12 partial · 41 not started
+**Score:** 10 built · 12 partial · 42 not started
 
 
 ## Unregistered user (US01–US06)
@@ -30,7 +30,7 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US07 | ✅ | As a registered free user, I want to log in securely so that I can access my account and use the basic features of the platform. | Login / log out (Profile #13) |
 | US08 | ✅ | As a registered free user, I want to log out of my account so that I can securely end my session after using the platform. | Login / log out (Profile #13) |
 | US09 | ✅ | As a registered free user, I want to reset my password so that I can regain access if I forget my login details. | Forgot Password #4 + Change Password (#13.3) reset email |
-| US10 | ✅ | As a registered free user, I want to access the mobile application after logging in so that I can install and use the application. | Session-aware splash + auth redirect |
+| US10 | ⬜ | As a registered free user, I want to access the mobile application after logging in so that I can install and use the application. | Website flow: log in on the site → download the app (clarified 12 Jun). The in-app splash auto-login (built) belongs to US07; website not built |
 | US11 | ✅ | As a registered free user, I want to create and update my fitness profile so that the system can understand my goals, preferences, and fitness needs. | Fitness Profile #13.1 (batched save, custom tags) |
 | US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
 | US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | Manual entry UI not built (schema supports it: null device) |
