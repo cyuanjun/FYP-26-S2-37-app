@@ -1,22 +1,14 @@
 ---
-title: "US10 — Access / download the mobile app (website)"
+title: "US10 — Download the mobile app (website)"
 ---
 sequenceDiagram
   actor A as Registered Free User
-  participant B as «Boundary»<br/>Marketing Website (login + download page)
-  participant C as «Control»<br/>Authenticate (website)
-  participant E as «Entity»<br/>Profile
-  A->>B: log in on the website
-  B->>C: signIn(email, password)
-  C->>E: verify credentials, load account
-  alt valid account
-    E-->>C: session + Profile
-    C-->>B: signed in
-    B-->>A: download page - Android APK / iOS install
-    A->>B: download + install the app
-    B-->>A: app installed (sign in via US07)
-  else not registered
-    C-->>B: no account
-    B-->>A: prompt to create an account first (US05)
-  end
-  note over E: accounts are created on the website only (US05) -<br/>the app itself is login-only by design
+  participant B as «Boundary»<br/>Marketing Website (download page)
+  participant C as «Control»<br/>AccessMobileApp
+  participant E as «Entity»<br/>App release (APK / App Store link)
+  A->>B: tap "Download mobile app" (logged in)
+  B->>C: requestDownload(platform)
+  C->>E: latest app build link
+  E-->>C: Android APK / iOS install link
+  C-->>B: download starts
+  B-->>A: install, then sign in on the app (US07)
