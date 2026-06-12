@@ -2,7 +2,7 @@
 screen: 01-splash
 role: free
 group: auth
-status: draft
+status: built
 ---
 
 # 1. Splash

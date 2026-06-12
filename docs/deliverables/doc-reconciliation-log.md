@@ -23,7 +23,7 @@ The TDM is newest and supersedes earlier design material. Where the TDM and PRD/
 |---|---|---|---|
 | A1 | **Premium price contradicts itself.** Website pricing page shows **$9.90/mth**; the app's Upgrade and Subscription screens show **$9.99/mo**. | §7.1.1 pricing (p19) vs §7.2.32 (p40) + §7.3.5 (p43) | **DECIDED: standardise on $9.99/mo.** Fix the website pricing page (§7.1.1) and PRD §4 to match the app screens. |
 | A2 | **"SQLite DB" leakage.** Admin content-management wireframe caption says *"Edits are persisted to the SQLite DB."* That's leftover text from the React website mock. | §7.5.1 (p54) | Production backend is **Supabase Postgres**, not SQLite. Either reword the caption generically ("persisted to the database") or note the mock ran on SQLite while production uses Postgres. |
-| A3 | **§6 Sequence Diagrams: empty in v3; v5 filled it per user story, but the team confirms those diagrams are WRONG (12 Jun).** | §6 (p16) | **Replace §6 wholesale** from [../architecture/bce-design.md](../architecture/bce-design.md) §5 (7 Mermaid sequence diagrams, matching the as-built BCE code) — **DONE 12 Jun: all 58 per-story diagrams rendered** → [sequence-diagrams/](sequence-diagrams/) (PNG + Mermaid sources). Drop these into TDM §6 / PTD §16; do not use TDM v5 §6. |
+| A3 | **§6 Sequence Diagrams: empty in v3; v5 filled it per user story, but the team confirms those diagrams are WRONG (12 Jun).** | §6 (p16) | **Replace §6 wholesale** with the per-story diagram set (which superseded the earlier plan to render bce-design §5's 7 diagrams) — **DONE 12 Jun: all 59 per-story diagrams rendered (US18 split into US18a/US18b)** → [sequence-diagrams/](sequence-diagrams/) (PNG + Mermaid sources). Drop these into TDM §6 / PTD §16; do not use TDM v5 §6. |
 | A4 | **Architecture is stack-agnostic.** §3.2/§4 describe a logical service layer (API Controller → Services → DAO → DB) without naming the stack. | §3.2, §4 | Add the concrete stack note (Supabase Postgres + Auth + Storage + Realtime, Edge Functions for AI/custom logic, Flutter client). See B1 — keep TDM, PRD, and PTD §12 identical. Flag the DAO/API-Controller tier as **logical**: physically, Flutter talks to Supabase directly (RLS-enforced) with Edge Functions for the AI proxy and custom rules. |
 
 ## B. PRD v2.0 edits to fold back
@@ -55,11 +55,11 @@ The TDM is newest and supersedes earlier design material. Where the TDM and PRD/
 ### TDM §8 ERD — entity roster (the schema of record, ~26 entities)
 `User` · `FitnessProfile` · `FitnessGoal` · `FitnessPlan` · `PlannedWorkout` · `WorkoutType` · `WorkoutSession` · `ExerciseLog` · `ConnectedDevice` · `HealthTag` · `Subscription` · `Follow` · `Post` · `PostComment` · `PostLike` · `Challenge` · `ChallengeParticipant` · `ExpertProfile` · `ExpertService` · `ExpertCategory` · `ServiceRequest` · `Deliverable` · `ExpertReview` · `ExpertVerificationDocument` · `Feedback` · `ContactMessage`
 
-Notable: AI **progress summaries are not a stored entity** (generated on demand); `FitnessPlan.GenerationStrategy` + `RegeneratedCount` distinguish rule-based (basic) from AI-suggested (personalised) plans; `WorkoutSession.Notes` stays private (privacy invariant).
+Notable: AI **progress summaries are not a stored entity** (generated on demand); `FitnessPlan.GenerationStrategy` records the AI depth tier — `basic` (Free) vs `personalised` (Premium); both are AI-generated since 12 Jun (C4-cancelled), with the rule skeleton as offline fallback. `RegeneratedCount` gates Free regenerations; `WorkoutSession.Notes` stays private (privacy invariant).
 
 ---
 
 ## How to use this log
 - Before re-rendering any deliverable (PTD/PUM included), clear the rows that touch it.
 - The **PTD's tech-stack (§12) and architecture (§16.2) must match B1/A4** or the PTD contradicts itself — see [ptd-pum-assembly.md](ptd-pum-assembly.md) §12/§16.
-- When a row is folded into a submitted doc, move it to a "Done" note with the doc's new revision number.
+- When a row is resolved, mark it inline (**DONE**/**CANCELLED** with date) — the convention used for A3 and C4.

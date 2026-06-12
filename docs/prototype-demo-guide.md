@@ -1,6 +1,6 @@
 # Wise Workout — Prototype Demo & Test Guide
 
-How to run, demo, and verify the **vertical-slice prototype**. Last updated **10 Jun 2026**.
+How to run, demo, and verify the prototype. Last updated **12 Jun 2026**.
 
 The prototype implements the app's demo spine end-to-end:
 
@@ -27,9 +27,10 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **Plan Detail (#8)** | Train → VIEW FULL PLAN → header + current-week schedule → tap a row for the workout modal → Start today's workout (pre-selected activity) · Regenerate | Free: 1 regeneration, then "Upgrade for unlimited"; today's row highlighted |
 
 **Architecture:** Flutter · Riverpod · go_router · freezed · `supabase_flutter`. Strict **Boundary–Control–Entity**
-(`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`). **Backend:** 26 tables + 49 RLS policies +
-2 privacy views + `end_workout_session` RPC + `summarise-progress` Edge Function, all on Supabase project
-`zbeyytgilrqruttvecdc`. **Tests:** 71 unit/control tests (`flutter test`).
+(`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`). **Backend:** 26 tables + RLS +
+2 privacy views + `end_workout_session` RPC + **two Edge Functions (`summarise-progress`, `suggest-plan`)
+running OpenAI `gpt-4o-mini`** (Gemini → deterministic-stub fallback), all on Supabase project
+`zbeyytgilrqruttvecdc`. **Tests:** 107 unit/control tests (`flutter test`).
 
 ---
 
@@ -87,8 +88,9 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ### B. Record a workout *(the core demo)*
 1. Bottom nav → **Train**.
-   - **See:** "TRAIN" header, an **AI Suggested Plan** card ("No active plan · Set a goal"), a **Devices**
-     card ("Phone sensors · CONNECTED"), and a sticky **▶ START FREEFORM WORKOUT** button.
+   - **See:** "TRAIN" header, the **AI Suggested Plan card** (your active plan: name, cadence,
+     TODAY line, weekly chips — or "No active plan · Set a goal" if onboarding was skipped), a
+     **Devices** card, and a sticky **▶ START FREEFORM WORKOUT** button.
 2. Tap **START FREEFORM WORKOUT**.
    - **See:** the **Active Workout** pre-start screen — dim **00:00** timer, an **activity pill** (defaults
      to *Running*), a big lime **START**, "TAP TO BEGIN". (Tap the pill to switch activity — e.g. Yoga shows
@@ -103,7 +105,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 5. (Optional) set a feel chip + name, leave Share off, tap **SAVE & FINISH**.
    - **See:** back at the Train tab.
 
-> **XP formula:** `20 + 1/min + 5/km (cardio) + 10 (planned)`. Level = `floor(XP/200)+1`. Crossing a level
+> **XP formula:** `20 + 1/min + 5/km (cardio) + 10 (planned — not yet reachable, OPEN-003)`. Level = `floor(XP/200)+1`. Crossing a level
 > threshold auto-posts a *level-up* to the feed.
 
 ### C. History & detail
@@ -122,9 +124,11 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ### D. AI progress summary
 1. On **History**, tap the **✨** icon (top-right).
-   - **See:** a bottom sheet **"AI PROGRESS SUMMARY"** with a real, data-driven line — e.g.
-     *"This week you logged 3 workouts (127 active min). You covered 23.6 km. …"* — and the disclaimer
-     **"AI-assisted · for information only, not medical advice."**
+   - **See:** a bottom sheet **"AI PROGRESS SUMMARY"** with 2–3 sentences of **real model-written
+     prose** (OpenAI `gpt-4o-mini`) about your actual weekly numbers — wording varies per call;
+     Premium summaries reference your goal — plus the disclaimer
+     **"AI-assisted · for information only, not medical advice."** (If the AI is unreachable it
+     degrades to a deterministic template, same format.)
 
 ### E. Share a workout
 1. Record a quick workout (step B) but on the **Workout complete** screen, turn **Share to Social** ON.
@@ -139,7 +143,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
    - **See:** back at the Login screen (session cleared).
 
 ### A2. First-time onboarding *(once per account)*
-1. On a first-ever login (or after a reseed), the app opens the **onboarding wizard** instead of Home.
+1. On a first-ever login (or after the re-trigger SQL in step 3 — a reseed alone does **not** reset the gate), the app opens the **onboarding wizard** instead of Home.
    - **See:** "WELCOME, MIA" with a 5-segment progress bar → **ABOUT YOU** (DOB/sex/height/weight —
      CONTINUE stays disabled until all four are set) → **HOW YOU TRAIN** (activity, experience,
      preferred workouts) → **YOUR GOAL** (goal cards; target/timeline hidden for Maintain Fitness) →
@@ -204,14 +208,16 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ```bash
 flutter analyze     # static analysis — should report "No issues found!"
-flutter test        # 71 tests — should end "All tests passed!"
+flutter test        # 107 tests — should end "All tests passed!"
 ```
 
-Coverage (positive **and** negative cases per flow): entity rules (`Profile`, `WorkoutType.isCardio`,
-`WorkoutSession`), formatters (duration/km/pace/icons/dates), and the controls — `Authenticate`
-(success/failure), `ActiveWorkout` (start/end cardio vs non-cardio, pause/resume guards), history load +
-delete, `SummariseProgress` (success/error), and share (post insert + named platforms). Gateways are faked
-behind Riverpod overrides, so no live backend is needed.
+Coverage (positive **and** negative cases per flow): entity rules (`Profile`, `WorkoutType` incl. MET
+calories, `WorkoutSession`, `FitnessProfile` level/XP, `FitnessGoal`), formatters, and the controls —
+`Authenticate`, `ActiveWorkout` (incl. wearable HR + device linkage), history (Free month-cap vs Premium
+lifetime), `SummariseProgress`, share, the Profile cluster (fitness profile/goals/settings/notifications/
+feedback/password reset), `GeneratePlan` (both tiers, AI-down fallback, no-goal), `buildPlanSkeleton`
+rules (4-week cycle, preference contract), and connected devices (pairing, phone-device seeding,
+HR curve). Gateways are faked behind Riverpod overrides, so no live backend is needed.
 
 ---
 
@@ -251,12 +257,16 @@ catalogs: workout types, health tags, expert categories.)
 - **AI is live (OpenAI `gpt-4o-mini`, key in Supabase Edge Function secrets — never in the app).**
   Both functions degrade gracefully: OpenAI → Gemini → deterministic stub, same response shape, so the
   app renders all three identically (the `model` field says which produced it).
+- **Planned-workout XP bonus (+10) is not yet reachable** — sessions started from the plan don't link
+  `planned_workout_id` yet (bug-log OPEN-003).
+- **Wearable HR is a simulated stream** behind the mock pairing (#7.1 spec); real BLE/HealthKit slots in
+  behind the same `WorkoutDataSource` interface later.
 - **Sharing opens the OS share sheet** — the named-platform buttons are present (the graded requirement);
   true per-app deep-linking is a later sprint.
 - **Real GPS needs a physical device** — emulators/simulators show 0 distance unless you mock location.
 - **Payment is simulated** (price fields only — premium = $9.99/mo, no gateway).
-- **Placeholders** (show "later sprint"): the Experts and Social tabs, Add device, History search,
-  Advanced analytics, full plan, Upgrade flow, photo upload, per-field name/username/email edits.
+- **Placeholders** (show "later sprint"): the Experts and Social tabs, History search,
+  Advanced analytics, Upgrade flow, photo upload, per-field name/username/email edits.
   The Dashboard is a minimal greeting. These are scoped out, not broken.
 
 ---
@@ -265,24 +275,27 @@ catalogs: workout types, health tags, expert categories.)
 
 ```
 lib/
-  entities/        Profile, FitnessProfile, FitnessGoal, HealthTag, WorkoutSession,
-                   WorkoutType, enums  (freezed models)
-  controls/        Authenticate, ActiveWorkout, SaveWorkoutDetails, SummariseProgress,
-                   CreateWorkoutSharePost, ShareWorkoutToSocial, DeleteWorkoutSession, history,
-                   ViewProfile, UpdateFitnessProfile, SetFitnessGoal, UpdateAccountSettings,
-                   ManageNotificationPrefs, SubmitFeedback, RequestPasswordReset
+  entities/        Profile, FitnessProfile, FitnessGoal, FitnessPlan, PlannedWorkout,
+                   ConnectedDevice, HealthTag, WorkoutSession, WorkoutType, enums
+  controls/        Authenticate, RequestPasswordReset, ActiveWorkout, SaveWorkoutDetails,
+                   DeleteWorkoutSession, history, SummariseProgress, CreateWorkoutSharePost,
+                   ShareWorkoutToSocial, GeneratePlan + CompleteOnboarding (+ buildPlanSkeleton),
+                   ManageConnectedDevice, ViewProfile, UpdateFitnessProfile, SetFitnessGoal,
+                   UpdateAccountSettings, ManageNotificationPrefs, SubmitFeedback
   boundaries/
-    ui/            splash · auth (login, forgot pwd) · home · experts · train · social ·
-                   history · workout · profile (hub + 5 sub-screens) · common
-    gateways/      auth, profile, fitness, feedback, workout, social, social_share, ai,
-                   workout_data_source
+    ui/            splash · auth (login, forgot pwd) · onboarding (wizard) · home · experts ·
+                   train (+ plan detail, connected devices) · social · history · workout ·
+                   profile (hub + 5 sub-screens) · common
+    gateways/      auth, profile, fitness, plan, device, feedback, workout, social,
+                   social_share, ai, workout_data_source (phone + simulated wearable HR)
   core/            theme (palette + iOS type scale), format, seq_log, config/env
   router/          go_router (auth redirect)
 supabase/
-  migrations/      schema · RLS · end_workout_session RPC · signup-trigger fix
-  functions/       summarise-progress  (AI Edge Function)
+  migrations/      schema · RLS · end_workout_session RPC · signup-trigger fix ·
+                   onboarding_completed_at · private custom catalog entries
+  functions/       summarise-progress · suggest-plan  (AI Edge Functions, gpt-4o-mini)
   seed.sql         install catalogs       seed-demo.sql  demo accounts + data
-test/              entity · core · control suites (43 tests)
+test/              entity · core · control suites (107 tests)
 ```
 
 Design references: [STATUS.md](STATUS.md) (progress), [architecture/build-plan.md](architecture/build-plan.md),

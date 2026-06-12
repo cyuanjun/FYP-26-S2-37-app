@@ -2,7 +2,7 @@
 screen: 08-plan-detail
 role: free
 group: main
-status: spec-only
+status: built
 ---
 
 # 8. Plan Detail

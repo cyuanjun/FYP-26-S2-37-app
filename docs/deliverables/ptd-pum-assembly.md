@@ -5,7 +5,7 @@ How to assemble the two deliverables due **~10–13 June** (basic-prototype mile
 - **PTD** — Preliminary Technical Documentation (the comprehensive technical doc; sample ≈184 pp, 18 sections)
 - **PUM** — Preliminary User Manual (focused; sample ≈33 pp, 4 sections)
 
-**The big realisation:** you've already written most of the PTD. It is essentially your **PRD v2.0 + SRS v2.0 + TDM v3.0** (5 Jun system-design doc — architecture, activity diagrams, ERD, wireframes) reorganised into the sample PTD structure. The genuine remaining work is **(a) consolidation/reformatting** and **(b) a handful of small net-new sections** (SWOT, USP, charter, comms plan, level-1 DFD, glossary). Don't rewrite what the PRD/SRS/TDM already contain. Before assembling, clear the [reconciliation log](doc-reconciliation-log.md) rows that touch the stack/architecture.
+**The big realisation:** you've already written most of the PTD. It is essentially your **PRD v2/v3 + SRS v2.0 + TDM v5** (5 Jun system-design doc — architecture, activity diagrams, ERD, wireframes) reorganised into the sample PTD structure. The genuine remaining work is **(a) consolidation/reformatting** and **(b) a handful of small net-new sections** (SWOT, USP, charter, comms plan, level-1 DFD, glossary). Don't rewrite what the PRD/SRS/TDM already contain. Before assembling, clear the [reconciliation log](doc-reconciliation-log.md) rows that touch the stack/architecture.
 
 ### Status legend
 - 🟢 **Have** — content exists in PRD/SRS/TDM; copy/reformat

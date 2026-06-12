@@ -2,7 +2,7 @@
 screen: 09-active-workout
 role: free
 group: main
-status: spec-only
+status: built
 ---
 
 # 9. Active Workout

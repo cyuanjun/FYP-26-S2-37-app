@@ -84,7 +84,7 @@ When you finish, the **Workout Complete** summary shows duration, distance, pace
 Open **History** for your past workouts and basic analytics (day/week/month, with vs-last-week comparison). Tap a workout to see its details — duration, calories, heart-rate graph, and training effect. Premium unlocks full history and advanced analytics.
 
 ### 4.6 AI Suggested Plan *(TDM §7.2.20–7.2.21)*
-In **Train**, open **View full plan** to see your AI/rule-based suggested plan — a weekly schedule of sessions. Tap a session for details. Premium upgrades these to personalised plans with sets, reps, target zones, and coaching cues.
+In **Train**, open **View full plan** to see your AI-suggested plan (both tiers; rule-based fallback) — a weekly schedule of sessions. Tap a session for details. Premium upgrades these to personalised plans with sets, reps, target zones, and coaching cues.
 
 ### 4.7 Experts & Services *(TDM §7.2.15–7.2.18)*
 Open **Experts** to browse verified experts or their **service listings**, filter by category, and sort by rating. Open an expert to see their profile, credentials, specialties, and reviews; open a listing to see what's included and the price, then **Request** the service.

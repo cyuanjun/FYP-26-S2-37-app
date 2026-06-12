@@ -1,6 +1,10 @@
 # Sequence diagrams — one per user story (US07–US64)
 
-**58 simplified BCE sequence diagrams**, one per SRS user story, generated 12 Jun 2026.
+**59 simplified BCE sequence diagrams** — one per SRS user story (US18 split into
+**US18a** basic AI summary + **US18b** basic AI plan), generated/maintained 12 Jun 2026.
+A story-by-story review with the team is **in progress** — resume it with the
+`/seq-diagrams` skill (`.claude/skills/seq-diagrams/SKILL.md`), which tracks which
+diagrams are user-confirmed vs not yet reviewed.
 These **replace TDM §6** (the v5 diagrams are wrong — reconciliation log A3) and are the
 source for the **PTD §16** sequence-diagram figures. US01–US06 (marketing website) have no
 app flow, matching the TDM's own scope.

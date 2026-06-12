@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Wise Workout** (FYP-26-S2-37) — a cross-platform (Android + iOS) mobile fitness app, the Final Year Project of a 4-person team at UOW/SIM. Think Strava-style: capture workouts from phone sensors (wearables later), AI-generated training plans, analytics, a social feed with challenges, an expert marketplace, and Free/Premium/Expert/Admin roles.
 
-**Current state: docs only — the Flutter app has not been scaffolded yet.** This directory holds the planning, design, and reference material that fully specs the app. When you scaffold or build code, it goes in this repo root alongside `docs/`. The design decisions below are **already made** — implement to them; don't reopen them without being asked.
+**Current state: the Flutter app is built and running** (Android emulator + iOS simulator) against a live Supabase backend — vertical slice complete plus onboarding, AI plans (live OpenAI), Plan Detail, connected devices, and the full Profile cluster; 107 tests. `docs/` holds the planning/design/reference material; **[docs/STATUS.md](docs/STATUS.md) is the up-to-date state**. The design decisions below are **already made** — implement to them; don't reopen them without being asked.
 
 ## Where the knowledge lives
 
@@ -18,7 +18,7 @@ Start at [docs/README.md](docs/README.md) for the index. The load-bearing docs i
 
 - [docs/STATUS.md](docs/STATUS.md) — **current progress + next steps** (read this first when resuming).
 - [docs/architecture/build-plan.md](docs/architecture/build-plan.md) — the **engineering plan**: scope/three-layer model, tech stack, AI scope, schedule pointers, rubric map, and the doc-reconciliation pointer (§10).
-- [docs/architecture/bce-design.md](docs/architecture/bce-design.md) — BCE architecture, Boundary/Control/Entity inventory, traceability matrix, robustness + Mermaid sequence diagrams, runtime logging convention. (AI controls: `BuildPlanSkeleton` rule-based + `SuggestPlan`/`SummariseProgress` AI.)
+- [docs/architecture/bce-design.md](docs/architecture/bce-design.md) — BCE architecture, Boundary/Control/Entity inventory, traceability matrix, robustness + Mermaid sequence diagrams, runtime logging convention. (AI: one `GeneratePlan` control — both tiers AI via the suggest-plan Edge Function, `BuildPlanSkeleton` rule fallback — plus `SummariseProgress`.)
 - [docs/reference/database-v1.md](docs/reference/database-v1.md) — the **working data model** (from the React mock). The **TDM §8 ERD is now the schema of record**; align this file to it before generating DDL (reconciliation log §D — `ExpertReview` kept, expert layer = `ExpertService → ServiceRequest → Deliverable`, payment simulated). Companions: [database.dbml](docs/reference/database.dbml) (machine-readable, paste into dbdiagram.io) and [erd-relationships.md](docs/reference/erd-relationships.md) (the cardinality / crow's-foot checklist).
 - [docs/reference/screens/](docs/reference/screens/) — **per-screen UI blueprints** (~28 files, indexed by [screens-v1.md](docs/reference/screens-v1.md)): purpose, UI elements, states, and incoming/outgoing edges per screen, citing [palette.md](docs/reference/palette.md) + [typography.md](docs/reference/typography.md). This is the spec to build each Flutter screen against — read the relevant file before implementing a Boundary. Frontmatter `status:` (e.g. `spec-only` = design locked, code not built).
 - [docs/deliverables/](docs/deliverables/) — FYP deliverable prep: [doc-reconciliation-log.md](docs/deliverables/doc-reconciliation-log.md) (cross-doc edits), [ptd-pum-assembly.md](docs/deliverables/ptd-pum-assembly.md) (PTD/PUM mapping), and the net-new drafts [ptd-net-new-sections.md](docs/deliverables/ptd-net-new-sections.md) / [pum-net-new-sections.md](docs/deliverables/pum-net-new-sections.md).
@@ -26,15 +26,15 @@ Start at [docs/README.md](docs/README.md) for the index. The load-bearing docs i
 
 **Settled figures:** premium = **$9.99/mo**; payment is **simulated** (price fields only, no gateway/ledger).
 
-There is no app source yet. The React flow-explorer mock these docs derive from is a **separate** repo (`../app-ui-FINAL/`) — an executable spec, not code to port verbatim.
+The React flow-explorer mock these docs derive from is a **separate** repo (`../app-ui-FINAL/`) — an executable spec, not code to port verbatim.
 
 ## Locked architecture (do not re-litigate)
 
 - **App:** Flutter (stable channel). **State:** Riverpod. **Routing:** go_router (role-based redirects). **Models:** freezed + json_serializable for the ~26 entities in the TDM §8 ERD.
 - **Backend: Supabase** — Postgres + Auth + Storage + Realtime + Edge Functions. The schema in `database-v1.md` maps ~1:1 to Postgres; `User` becomes a `profiles` table keyed on `auth.users.id`; the shared-key specialization tables (`FitnessProfile`, `ExpertProfile`, `Subscription`) are 1:1 off the user id. Row-level security enforces the documented invariants (e.g. `WorkoutSession.Notes` is always private).
 - **AI: OpenAI** (Gemini fallback; not Anthropic/Claude) via a Supabase **Edge Function** so the key never ships in the app. **AI scope is exactly two functions: progress *summaries* + plan *suggestions*** (build-plan §5, SRS §3.9). Reminders/inactivity/**rest** alerts are **rule-based**, not AI (plans: both tiers call `suggestPlan` — Free basic depth, Premium personalised; the rule-based skeleton is the offline fallback — decided 12 Jun); coaching/custom plans are **human-expert**. Wrap as `summariseProgress(...)` / `suggestPlan(...)`. Free = basic, Premium = personalised. Label AI output as AI-assisted; never imply medical advice.
-- **Sensors:** one `WorkoutDataSource` interface. `PhoneSensorSource` (geolocator + pedometer) and manual entry now; `HealthSource` (HealthKit/Health Connect) and `BleHeartRateSource` (flutter_blue_plus) are **additive later** — new classes, not a refactor. The schema already supports this (`ConnectedDevice.deviceType` includes `phone_sensors`; null `ConnectedDeviceID` = manual).
-- **Notifications:** `flutter_local_notifications` now (exercise/rest reminders); FCM/push later.
+- **Sensors:** one `WorkoutDataSource` interface. Built: `PhoneSensorSource` (geolocator + pedometer) + `WearableHrSource` (simulated BLE HR behind mock pairing, #7.1) merged via `CompositeWorkoutDataSource`; sessions record their source device (null `ConnectedDeviceID` = manual; manual-entry UI itself still pending, US13). Real `BleHeartRateSource` (flutter_blue_plus) / `HealthSource` (HealthKit/Health Connect) are **additive later** — class swaps, not refactors.
+- **Notifications:** preference toggles built (#13.4, jsonb on profiles); `flutter_local_notifications` is a dependency but scheduling is not wired yet (US19–21 pending); FCM/push later.
 
 ## BCE — the architectural rule that governs all app code
 
@@ -44,7 +44,7 @@ The app follows **Boundary–Control–Entity** (Jacobson). This is an FYP desig
 lib/entities/              ENTITY   — freezed models of the ~26 TDM §8 entities + data-owned rules (XP/level/streak)
 lib/controls/              CONTROL  — one class per use case (= the mock's store actions, e.g. EndWorkoutSession)
 lib/boundaries/ui/         BOUNDARY — actor-facing screens/widgets
-lib/boundaries/gateways/   BOUNDARY — system-facing adapters (SupabaseGateway, AuthGateway, AiGateway, WorkoutDataSource, SocialShareGateway, NotificationGateway, StorageGateway)
+lib/boundaries/gateways/   BOUNDARY — system-facing adapters (Auth/Profile/Fitness/Plan/Workout/Social/Feedback/Device gateways + AiGateway, WorkoutDataSource, SocialShareGateway; Notification/Storage gateways pending)
 ```
 
 **The rule:** `Actor ─ Boundary ─ Control ─ Entity`. A screen NEVER touches an entity or the database directly — a Control always mediates. No Boundary↔Boundary or Boundary↔Entity calls. Riverpod implements a Control as a Notifier the UI watches, so idiomatic Flutter and BCE coincide. The mock's store actions (`endWorkoutSession`, `generatePlan`, `joinChallenge`, `requestService`, `startPremium`, …) each become exactly one Control — they are the use-case inventory, enumerated in `bce-design.md` §2.4.
@@ -65,7 +65,7 @@ Optimise for **rubric coverage**, build **core-first** (PRD §10.3 sprints + ris
 
 ## Commands
 
-No build system exists yet (app not scaffolded). Once scaffolded as a standard Flutter project, expect:
+Standard Flutter project:
 
 ```bash
 flutter pub get                          # install dependencies

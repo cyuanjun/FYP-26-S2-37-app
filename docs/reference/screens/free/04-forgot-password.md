@@ -2,7 +2,7 @@
 screen: 04-forgot-password
 role: free
 group: auth
-status: draft
+status: built
 ---
 
 # 4. Forgot password

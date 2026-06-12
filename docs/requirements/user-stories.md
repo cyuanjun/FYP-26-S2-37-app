@@ -115,7 +115,7 @@ Four-way trace: stories ↔ **PRD v3** ↔ **TDM v5** ↔ **latest WBS** ↔ **c
 - **PRD v3's body text is byte-identical to v2** — the reconciliation-log §B edits (Supabase stack, OpenAI provider, simulated payment, $9.99) are **still not folded in**: §9.3 still names Node.js/Express + MySQL/PostgreSQL + Firebase, and no premium price appears in the text. Feature scope itself matches the 64 stories (same role feature sets).
 
 ### TDM vs stories
-- **TDM v5 (6 Jun) supersedes the v3 the repo cites as canonical** — §6 Sequence Diagrams (empty in v3) is now populated, organised per user story. CLAUDE.md / STATUS / reconciliation log still say v3.
+- **TDM v5 (6 Jun) supersedes v3** — §6 Sequence Diagrams (empty in v3) is populated but wrong (replaced by our per-story set). ~~CLAUDE.md / STATUS / reconciliation log still say v3~~ → all repo docs re-cited to v5 (12 Jun consistency pass).
 - **Design with no story:** ExpertReview (rate/review experts), user-*created* challenges, the XP/level/streak system (US25 still says "badges"), in-app Submit Feedback, expert bookmarking, post edit/delete.
 - **Stories with weak/no design:** US20/US21/US39 (no alert-engine flow — prefs are just a JSON blob + toggles), US30/US48 (no content-library entity; only ExpertService → ServiceRequest → Deliverable), US61/US62 (no admin subscription screens).
 
@@ -123,7 +123,7 @@ Four-way trace: stories ↔ **PRD v3** ↔ **TDM v5** ↔ **latest WBS** ↔ **c
 Built and working, but mapped to no story: user-side Submit Feedback, XP/levels + auto level-up posts, weekly streak, Free-tier fitness goals, Day/Week/Month analytics with vs-prior deltas, custom health tags, AI-assisted labelling, metric/imperial preference, the 10-type notification catalog, pause/resume + GPS track points, anti-enumeration password reset.
 
 ### Suggested follow-ups
-1. Fold reconciliation-log §B into the PRD (it was *not* done in v3) and re-cite TDM v5 as canonical.
+1. Fold reconciliation-log §B into the PRD (it was *not* done in v3) — deferred post-submission by decision. ~~Re-cite TDM v5 as canonical~~ ✅ done across all repo docs (12 Jun).
 2. Resolve US21: rest alerts Free (SRS) vs Premium-only (WBS) — pick one, log it.
 3. Ask the team whether the no-story items (change password, in-app feedback, save expert, create/quit challenge, post edit/delete, XP/levels replacing badges) should become SRS stories or stay implementation detail — they're all in the WBS or TDM, so the SRS is the lagging document.
 4. ~~Either enforce the Free history cap or drop the cap banner (US15).~~ ✅ Done 12 Jun — cap enforced at the query level; Profile lifetime stats intentionally bypass it (#13 spec).

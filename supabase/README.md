@@ -1,7 +1,7 @@
 # Supabase backend — Wise Workout (FYP-26-S2-37)
 
 Postgres schema, RLS, and seed for the Wise Workout app. **Generated from
-[docs/reference/database-v1.md](../docs/reference/database-v1.md)**, which is aligned to the **TDM v3.0 §8
+[docs/reference/database-v1.md](../docs/reference/database-v1.md)**, which is aligned to the **TDM v5 §8
 ERD** (the schema of record — 26 entities). Treat the docs as the source of truth: change the schema there
 first, then regenerate these files — don't hand-edit DDL in isolation.
 
@@ -13,6 +13,8 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | `migrations/20260610090100_rls_policies.sql` | Helper `is_admin()`, RLS enabled on every table, per-table policies, the role/status self-escalation guard, the two privacy views, and the trigger-function EXECUTE revokes. |
 | `migrations/20260610120000_end_workout_session_rpc.sql` | The `end_workout_session` SECURITY DEFINER RPC (finalize session + XP + weekly streak + level_up post). |
 | `migrations/20260610130000_fitness_profile_on_signup.sql` | Extends the signup trigger to also create the 1:1 `fitness_profiles` row (so `workout_sessions.user_id` FK resolves); backfills existing accounts. |
+| `migrations/20260612090000_onboarding_completed_at.sql` | First-login onboarding gate on `profiles` (existing accounts backfilled complete). |
+| `migrations/20260612100000_private_custom_catalog_entries.sql` | RLS: custom workout types + health tags visible only to their creator. |
 | `seed.sql` | The three install-time catalogs: `workout_types`, `health_tags`, `expert_categories`. |
 | `seed-demo.sql` | **Demo data** (not install data): two login accounts (`free@`/`premium@wiseworkout.test`, pw `Password123!`) + varied workout sessions, XP/streak, and share posts. Idempotent — re-run to reset the demo. |
 
@@ -63,7 +65,7 @@ These are the deliberate translations from the PascalCase ERD to the physical sc
   `public_workout_sessions` view, which omits `notes`. That enforces the documented invariant at the DB layer.
 - **`public_profiles` view** exposes safe identity columns + computed `level` / `current_streak` (for Social
   #11.2) while keeping `email` and `notification_prefs` off-limits. Base `profiles` is self/admin only.
-- **Public reads** for the social graph and marketplace: `posts`, `post_likes`, `post_comments`,
+- **Reads** for the social graph and marketplace: `posts`, `post_likes`, `post_comments`,
   `challenges`, `challenge_participants`, `follows`, `expert_profiles`, `expert_reviews`, live
   `expert_services`, and the catalogs.
 - **Admin-only**: reading `feedback` / `contact_messages`, suspending users (`role`/`status` changes are
@@ -77,3 +79,23 @@ Multi-step atomic mutations live in **SECURITY DEFINER RPCs**, added as their co
   status-transition rules (client cancels / expert accepts+completes).
 
 The RLS here gates *row access*; these RPCs enforce the *column-level transition* logic.
+
+
+## Edge Functions (`functions/`)
+
+| Function | Purpose |
+|---|---|
+| `summarise-progress` | AI progress summary from the caller's own weekly aggregates (RLS-scoped). |
+| `suggest-plan` | AI plan generation, BOTH tiers (Free basic / Premium personalised), one 4-week monthly cycle, strict JSON schema + server-side validation. |
+
+Both call **OpenAI `gpt-4o-mini`** with **Gemini fallback** and degrade to a deterministic stub
+(same response shape) when no key is set or the AI fails. Secrets (Dashboard → Edge Functions →
+Secrets): `OPENAI_API_KEY`, optional `GEMINI_API_KEY` — never shipped in the app.
+
+## seed-demo.sql caveats
+
+- Leaves `profiles.onboarding_completed_at` and `fitness_plans` untouched — reseeding does NOT
+  re-trigger onboarding; use
+  `update profiles set onboarding_completed_at = null where email = '<demo email>';`
+- Seeded sessions carry no `connected_device_id` (null = manual entry per schema) even though
+  they include HR values — cosmetic; live captures do link their source device.

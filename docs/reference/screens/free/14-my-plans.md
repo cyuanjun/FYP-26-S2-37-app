@@ -1,3 +1,10 @@
+---
+screen: 14-my-plans
+role: free
+group: main
+status: spec-only
+---
+
 # 14 — My Plans
 
 [← back to screens index](../../screens-v1.md)

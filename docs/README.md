@@ -14,6 +14,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 | **[reference/](reference/)** | The spec carried over from the design phase — data model, design system, screen-by-screen specs | [database-v1.md](reference/database-v1.md), [screens-v1.md](reference/screens-v1.md) |
 | **[testing/](testing/)** | QA evidence — the running **[bug-log.md](testing/bug-log.md)** (symptom → root cause → fix → commit), feeds PTD testing + module testing | [bug-log.md](testing/bug-log.md) |
 | **[archive/](archive/)** | Legacy docs for the React flow-explorer mock (kept for provenance; not the build target) | — |
+| [prototype-demo-guide.md](prototype-demo-guide.md) | **Run & demo the prototype** — setup, walkthroughs, test accounts, backend verification | start here to demo |
 | [project-description.md](project-description.md) | The FYP project brief | — |
 
 ## Reading order for someone new
@@ -21,7 +22,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 0. [STATUS.md](STATUS.md) — current progress + what's next (if you're resuming).
 0b. [prototype-demo-guide.md](prototype-demo-guide.md) — **run & demo the prototype**: setup, manual-test walkthrough (do this → see this), test accounts, backend verification.
 1. [project-description.md](project-description.md) — what we're required to build.
-2. **PRD v2.0 + SRS v2.0 + TDM v3.0** (the team's submitted docs) — canonical requirements (PRD/SRS) and system design: architecture, ERD (§8), wireframes (TDM). Divergences between them and engineering decisions are tracked in [deliverables/doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md). ([requirements/urs.md](requirements/urs.md) is deprecated.)
+2. **PRD v2/v3 + SRS v2.0 + TDM v5** (the team's submitted docs; TDM §6 superseded by our sequence-diagram set) — canonical requirements (PRD/SRS) and system design: architecture, ERD (§8), wireframes (TDM). Divergences between them and engineering decisions are tracked in [deliverables/doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md). ([requirements/urs.md](requirements/urs.md) is deprecated.)
 3. [architecture/build-plan.md](architecture/build-plan.md) — scope, stack, roadmap, team split.
 4. [architecture/bce-design.md](architecture/bce-design.md) — BCE architecture + robustness/sequence diagrams + traceability.
 5. [reference/database-v1.md](reference/database-v1.md) — the 26-entity schema and screen→data map.

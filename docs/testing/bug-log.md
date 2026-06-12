@@ -3,7 +3,7 @@
 Every defect found while building the prototype — symptom, root cause, fix, and where it landed.
 Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity: **H**igh
 (blocks a core flow / data integrity), **M**edium (feature wrong but workaround exists),
-**L**ow (cosmetic/dev-experience). Last updated **12 Jun 2026**.
+**L**ow (cosmetic/dev-experience). Last updated **12 Jun 2026** (post consistency pass).
 
 ## Fixed — application code
 
@@ -33,8 +33,9 @@ Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity
 | DOC-001 | 12 Jun | M | Tracker honesty | US15 marked ✅ while the cap was unenforced; US16 note claimed calories worked; US26 note hid that platform buttons share one OS sheet (code-audit findings) | Statuses corrected, then the two real gaps fixed in code (BUG-009/010) | `f214f3c` |
 | DOC-002 | 12 Jun | M | Requirements | US10 misread as in-app splash auto-login; actually the **website's** login-gated app download (user-clarified) | Diagram redrawn as the website flow; tracker re-scoped; splash work credited to US07 | `c85baa5` |
 | DOC-003 | 12 Jun | M | Requirements | US18 wording vs locked AI scope conflict (basic plan rule-based vs "AI-assisted") | Resolved the other way: **Free gets basic AI plans** (matches SRS + WBS); C4 rename cancelled; engineering realigned | `7b949a6` |
-| DOC-004 | 12 Jun | L | Diagrams | 6 of 58 sequence diagrams failed to render | Semicolons in Mermaid message labels act as statement separators | Replaced with dashes; noted in folder README | `4cfecd0` |
+| DOC-004 | 12 Jun | L | Diagrams | 6 of 58 (now 59 after the US18a/b split) sequence diagrams failed to render | Semicolons in Mermaid message labels act as statement separators | Replaced with dashes; noted in folder README | `4cfecd0` |
 | DOC-005 | 12 Jun | M | Sequence diagrams | TDM v5 §6 diagrams wrong (team-confirmed); first regeneration used «Gateway» where the sample PTD convention expects «Entity» | All 58 redrawn to sample 3-lifeline B-C-E form with correct names; gateway truth kept as a note | `9969744` |
+| DOC-006 | 12 Jun | L | Reporting | Assistant reported "118 tests" after the devices cluster; authoritative `flutter test` count was 107 | Arithmetic slip in the summary, not in CI — all docs now cite 107 | consistency pass |
 
 ## Environment / process issues (not app defects)
 

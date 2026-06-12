@@ -5,7 +5,7 @@ description: Continue the per-user-story BCE sequence diagram review/redraw for 
 
 # Sequence-diagram review & redraw (Wise Workout FYP)
 
-You are continuing an in-progress, story-by-story review of the 58 sequence diagrams
+You are continuing an in-progress, story-by-story review of the 59 sequence diagrams (US18 split into US18a/US18b)
 (one per SRS user story US07–US64; US01–US06 are the marketing website and have no
 app diagram). The user confirms or corrects each diagram's *meaning*; you redraw,
 re-render, and commit.
