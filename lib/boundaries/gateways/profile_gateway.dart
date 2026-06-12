@@ -26,6 +26,15 @@ class ProfileGateway {
     await _client.from('profiles').update({'notification_prefs': prefs}).eq('id', id);
   }
 
+  /// Fills in the user's name when the website signup didn't provide one
+  /// (onboarding fallback) — also backs future #13.3 name editing.
+  Future<void> updateName(String id, {required String firstName, String? lastName}) async {
+    await _client.from('profiles').update({
+      'first_name': firstName.trim(),
+      if (lastName != null && lastName.trim().isNotEmpty) 'last_name': lastName.trim(),
+    }).eq('id', id);
+  }
+
   /// Marks first-time onboarding done — Splash/Login stop routing to the wizard.
   Future<void> completeOnboarding(String id) async {
     await _client

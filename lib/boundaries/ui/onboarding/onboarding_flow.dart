@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/authenticate.dart';
 import '../../../controls/generate_plan.dart';
 import '../../../controls/set_fitness_goal.dart';
+import '../../../controls/update_account_settings.dart';
 import '../../../controls/update_fitness_profile.dart';
 import '../../../core/format.dart';
 import '../../../core/seq_log.dart';
@@ -29,7 +30,9 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   final _page = PageController();
   int _step = 0;
 
-  // Step 1 — body metrics
+  // Step 1 — body metrics (+ name fallback when website signup gave none)
+  final _firstName = TextEditingController();
+  final _lastName = TextEditingController();
   DateTime? _dob;
   Sex? _sex;
   int? _heightCm;
@@ -55,8 +58,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   @override
   void dispose() {
     _page.dispose();
+    _firstName.dispose();
+    _lastName.dispose();
     super.dispose();
   }
+
+  bool get _needsName =>
+      ref.read(currentProfileProvider).value?.firstName == null;
 
   void _go(int step) {
     setState(() => _step = step);
@@ -65,7 +73,11 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   }
 
   bool get _step1Valid =>
-      _dob != null && _sex != null && _heightCm != null && _weightKg != null;
+      _dob != null &&
+      _sex != null &&
+      _heightCm != null &&
+      _weightKg != null &&
+      (!_needsName || _firstName.text.trim().isNotEmpty);
   bool get _step2Valid => _activity != null && _experience != null;
 
   Future<void> _generate() async {
@@ -226,9 +238,31 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       title: 'ABOUT YOU',
       subtitle: 'These calibrate calories, intensity, and your plan.',
       valid: _step1Valid,
-      onNext: () => _go(2),
+      onNext: () async {
+        if (_needsName) {
+          // Website signup didn't provide a name — capture it here.
+          await ref.read(updateAccountSettingsProvider.notifier).saveName(
+              firstName: _firstName.text, lastName: _lastName.text);
+        }
+        _go(2);
+      },
       onBack: () => _go(0),
       children: [
+        if (_needsName) ...[
+          TextField(
+            controller: _firstName,
+            textCapitalization: TextCapitalization.words,
+            onChanged: (_) => setState(() {}),
+            decoration: const InputDecoration(labelText: 'FIRST NAME'),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _lastName,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(labelText: 'LAST NAME (OPTIONAL)'),
+          ),
+          const SizedBox(height: 16),
+        ],
         SettingRow(
           label: 'Date of Birth',
           value: _dob == null
