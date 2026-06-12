@@ -32,6 +32,17 @@ class AiGateway {
     }
     throw Exception('Unexpected AI response: $data');
   }
+
+  /// Premium plan personalisation (the second AI surface, build-plan §5).
+  /// Returns the raw suggested-plan payload: { name, description,
+  /// duration_weeks, workouts_per_week, model, workouts: [{slug, day_of_week,
+  /// duration_minutes, name, descriptor}] }. GeneratePlan maps slugs → ids.
+  Future<Map<String, dynamic>> suggestPlan() async {
+    final res = await _client.functions.invoke('suggest-plan');
+    final data = res.data;
+    if (data is Map) return Map<String, dynamic>.from(data);
+    throw Exception('Unexpected AI response: $data');
+  }
 }
 
 final aiGatewayProvider = Provider<AiGateway>((ref) => AiGateway(Supabase.instance.client));

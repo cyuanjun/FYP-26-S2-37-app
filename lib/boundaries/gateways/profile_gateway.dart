@@ -25,6 +25,14 @@ class ProfileGateway {
   Future<void> updateNotificationPrefs(String id, Map<String, dynamic> prefs) async {
     await _client.from('profiles').update({'notification_prefs': prefs}).eq('id', id);
   }
+
+  /// Marks first-time onboarding done — Splash/Login stop routing to the wizard.
+  Future<void> completeOnboarding(String id) async {
+    await _client
+        .from('profiles')
+        .update({'onboarding_completed_at': DateTime.now().toUtc().toIso8601String()})
+        .eq('id', id);
+  }
 }
 
 final profileGatewayProvider = Provider<ProfileGateway>(

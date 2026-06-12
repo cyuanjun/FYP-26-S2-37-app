@@ -22,6 +22,7 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **Share** | Summary → "Share to Social" toggle → caption + Facebook/Instagram/Twitter/TikTok | Creates a `workout_share` Post; platform buttons open the OS share |
 | **Profile cluster** | Avatar (top-right) → Profile hub: level/XP bar, lifetime stats, Fitness Profile (#13.1), Fitness Goals (#13.2), Account Settings (#13.3), Notifications (#13.4), Submit Feedback (#13.5), log out | All live writes: fitness_profiles, fitness_goals (active-goal upsert), notification_prefs jsonb, feedback |
 | **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
+| **Onboarding + plan** | First login → wizard (about you → how you train → goal) → generated weekly plan → Train shows it | Free = rule-based skeleton; Premium = `suggest-plan` Edge Function (stub). Gate: `profiles.onboarding_completed_at` |
 
 **Architecture:** Flutter · Riverpod · go_router · freezed · `supabase_flutter`. Strict **Boundary–Control–Entity**
 (`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`). **Backend:** 26 tables + 49 RLS policies +
@@ -134,6 +135,19 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 ### F. Sign out
 1. Home tab → logout icon (top-right).
    - **See:** back at the Login screen (session cleared).
+
+### A2. First-time onboarding *(once per account)*
+1. On a first-ever login (or after a reseed), the app opens the **onboarding wizard** instead of Home.
+   - **See:** "WELCOME, MIA" with a 5-segment progress bar → **ABOUT YOU** (DOB/sex/height/weight —
+     CONTINUE stays disabled until all four are set) → **HOW YOU TRAIN** (activity, experience,
+     preferred workouts) → **YOUR GOAL** (goal cards; target/timeline hidden for Maintain Fitness) →
+     **GENERATE MY PLAN** → "YOUR PLAN IS READY" card → **START TRAINING** lands on Home.
+2. Open **Train**.
+   - **See:** the **active plan card** — plan name, "3x per week · N weeks · rule-based"
+     (Premium says AI-assisted), a **TODAY** line when a workout is scheduled today, and one chip
+     per weekly slot (e.g. `Mon · Running base`).
+3. **Re-trigger the wizard** for a demo:
+   `update profiles set onboarding_completed_at = null where email = 'free@wiseworkout.test';`
 
 ### F2. Profile & account flows
 1. On any tab, tap the **avatar (top-right)**.
