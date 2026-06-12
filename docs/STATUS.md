@@ -30,6 +30,8 @@
 - **Apply reconciliation-log §B during PTD assembly** (Supabase stack, $9.99, simulated payment, AI scope) — PRD v3 didn't fold them in; the PRD itself is fixed *after* submission (only PTD+PUM are submitted — decided 12 Jun).
 - **PTD sequence diagrams: source from bce-design.md §5, NOT TDM §6** — TDM v5's §6 diagrams are wrong (team-confirmed 12 Jun; log A3). TDM v5 is otherwise canonical.
 
+> 🐛 **Bug log:** [testing/bug-log.md](testing/bug-log.md) — every defect with root cause + fix commit (16 app bugs fixed, 5 doc defects, 4 open watch items).
+
 > 📋 **Story-level progress:** [requirements/user-stories.md](requirements/user-stories.md) — all 64 SRS user stories with build status (✅/🟨/⬜), updated per cluster.
 
 ## Next — engineering (after the 13th; not blocked)

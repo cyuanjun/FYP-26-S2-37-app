@@ -12,6 +12,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 | **[deliverables/](deliverables/)** | FYP submission-document prep — assembly checklists, cross-doc change log, and the PTD/PUM net-new drafts | [ptd-pum-assembly.md](deliverables/ptd-pum-assembly.md), [doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md), [ptd-net-new-sections.md](deliverables/ptd-net-new-sections.md), [pum-net-new-sections.md](deliverables/pum-net-new-sections.md) |
 | **[architecture/](architecture/)** | How the real Flutter app is built | [build-plan.md](architecture/build-plan.md), [bce-design.md](architecture/bce-design.md) |
 | **[reference/](reference/)** | The spec carried over from the design phase — data model, design system, screen-by-screen specs | [database-v1.md](reference/database-v1.md), [screens-v1.md](reference/screens-v1.md) |
+| **[testing/](testing/)** | QA evidence — the running **[bug-log.md](testing/bug-log.md)** (symptom → root cause → fix → commit), feeds PTD testing + module testing | [bug-log.md](testing/bug-log.md) |
 | **[archive/](archive/)** | Legacy docs for the React flow-explorer mock (kept for provenance; not the build target) | — |
 | [project-description.md](project-description.md) | The FYP project brief | — |
 
