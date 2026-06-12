@@ -13,7 +13,10 @@ import 'workout_summary_screen.dart';
 /// landing does NOT start the session — the user confirms/swaps the activity,
 /// then taps START. Same layout pre-start and in-session (values switch on).
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
-  const ActiveWorkoutScreen({super.key});
+  const ActiveWorkoutScreen({super.key, this.initialTypeId});
+
+  /// Pre-selects the activity (e.g. "Start today's workout" from Plan Detail).
+  final String? initialTypeId;
 
   @override
   ConsumerState<ActiveWorkoutScreen> createState() => _ActiveWorkoutScreenState();
@@ -118,7 +121,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('Could not load activities.\n$e', style: AppTypography.footnote)),
           data: (types) {
-            _selected ??= types.firstWhere((t) => t.slug == 'running', orElse: () => types.first);
+            _selected ??= types.firstWhere((t) => t.id == widget.initialTypeId,
+                orElse: () => types.firstWhere((t) => t.slug == 'running',
+                    orElse: () => types.first));
             // While recording, the type is locked to the session's type.
             final type = s.type ?? _selected;
             final cardio = type?.isCardio ?? false;
