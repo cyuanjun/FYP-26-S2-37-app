@@ -1,16 +1,21 @@
 ---
-title: "US16 — Basic exercise effect estimates"
+title: "US16 — Basic exercise effect estimates (computed + saved)"
 ---
 sequenceDiagram
   actor A as Registered Free User
-  participant B as «Boundary»<br/>WorkoutSummaryScreen
-  participant C as «Control»<br/>EndWorkoutSession
-  participant E as «Entity»<br/>WorkoutType
-  A->>B: finish a workout
+  participant B as «Boundary»<br/>WorkoutSummaryScreen / HistoryDetailScreen
+  participant C as «Control»<br/>EndWorkoutSession / ViewWorkoutHistory
+  participant E as «Entity»<br/>WorkoutSession
+  A->>B: finish a workout (END)
   B->>C: end()
-  C->>E: estimateCalories(duration, weightKg)
-  note right of E: kcal = MET x kg x hours<br/>(70 kg fallback)
-  E-->>C: calories
-  C-->>B: stats (+XP from the end RPC)
+  C->>E: compute estimates - calories (MET x kg x hours,<br/>rule on WorkoutType) + XP
+  C->>E: save to the session row (calories_burned) + profile XP
+  E-->>C: stored values
+  C-->>B: summary stats
   B-->>A: duration, calories, +XP
-  note over E: calorie rule lives on the Entity -<br/>persisted via WorkoutGateway RPC
+  A->>B: revisit the session later (History detail)
+  B->>C: load session
+  C->>E: read saved estimates
+  E-->>C: calories, XP (as stored)
+  B-->>A: same figures - saved once, not recomputed
+  note over E: persisted atomically via WorkoutGateway<br/>end_workout_session RPC on Supabase
