@@ -1,8 +1,8 @@
 # PUM — Net-New Sections (drop-in drafts)
 
-Draft content for the **Preliminary User Manual**. The PUM is the smaller deliverable (sample ≈33 pp, 4 sections): mostly **prototype/TDM screenshots + walkthrough text**. Use current Flutter screenshots for implemented flows and TDM/mock wireframes for flows that are still preliminary.
+Draft content for the **Preliminary User Manual**. The PUM is the smaller deliverable (sample ≈33 pp, 4 sections): mostly **app/TDM screenshots + walkthrough text**. Use current Flutter screenshots for implemented flows and TDM/mock wireframes for flows that are still preliminary.
 
-Copy into the Word template, drop the matching **prototype or TDM §7 screenshot** above each walkthrough, and adjust to team voice. Figures consistent with the [reconciliation log](doc-reconciliation-log.md) (premium = **$9.99/mo**, payment simulated).
+Copy into the Word template, drop the matching **app or TDM §7 screenshot** above each walkthrough, and adjust to team voice. Figures consistent with the [reconciliation log](doc-reconciliation-log.md) (premium = **$9.99/mo**, payment simulated).
 
 ---
 
@@ -18,7 +18,7 @@ Copy into the Word template, drop the matching **prototype or TDM §7 screenshot
 
 **Wise Workout** is a cross-platform mobile fitness application (Android + iOS) that helps users record workouts, track progress, receive AI-assisted summaries and plan suggestions, connect with verified fitness experts, and stay motivated through a social feed and challenges.
 
-This Preliminary User Manual introduces the application's main features and walks through the key screens a user encounters. It is written for **end users** — primarily registered free and premium users — and previews the interface and core flows of the app at its current design stage. Because the system is still in development, the screens shown are **prototype screens and preliminary wireframes** and may change in the final release.
+This Preliminary User Manual introduces the application's main features and walks through the key screens a user encounters. It is written for **end users** — primarily registered free and premium users — and walks through the interface and core flows of the app. Some screens shown reflect the current design and may change in a later release.
 
 The app supports five roles — unregistered visitor, registered free user, registered premium user, verified expert, and system administrator — but this manual focuses on the everyday user journey (free and premium). Expert and admin tools are summarised briefly.
 
@@ -83,7 +83,7 @@ When you finish, the **Workout Complete** summary shows duration, distance, pace
 ### 4.5 View History *(TDM §7.2.29–7.2.30)*
 Open **History** for your past workouts and basic analytics (day/week/month, with vs-last-week comparison). Tap a workout to see its details — duration, calories, heart-rate graph, and training effect. Premium unlocks full history and advanced analytics.
 
-### 4.6 My Plans and AI Suggested Plan *(prototype Train / My Plans / Plan Detail)*
+### 4.6 My Plans and AI Suggested Plan *(Train / My Plans / Plan Detail)*
 In **Train**, tap **View Plans** to open **My Plans**. The active plan appears at the top and saved plans appear below it. Tap any plan to view its full week-by-week schedule in **Plan Detail**. If the selected plan is not active, tap **Use This Plan** to make it the active plan. Generated plans follow the goal timeline selected by the user; for example, a 12-week goal creates a 12-week plan rather than a fixed one-month plan.
 
 Inside **Plan Detail**, choose a week from the horizontal selector and tap a workout row to read its duration, type, descriptor, and start action. Premium plans add richer personalisation from the user's fitness profile, training history, limitations, preferences, gender, height, and weight.

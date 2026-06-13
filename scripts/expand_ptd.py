@@ -274,6 +274,127 @@ for sec in sections:
     else:
         merged.extend(sec["blocks"])
 
+# ---------- scrub sample-template leftovers + reframe prototype->whole-app ----------
+# The PTD/PUM describe the WHOLE app, not a prototype. Keep simulated payment / mock
+# wearable / 107-tests only as brief honest notes (mostly in Appendix C).
+_scrub = {
+    # sample-template leftovers
+    "public property datasets": "external or third-party datasets",
+    # --- prototype -> whole-app reframes (product/feature/requirement text) ---
+    "technical design for the prototype.": "technical design for Wise Workout.",
+    "product direction, technical design, prototype scope, and implementation approach":
+        "product direction, technical design, scope, and implementation approach",
+    "current prototype repository": "current implementation repository",
+    "Deliver a functional prototype": "Deliver a functional application",
+    "The prototype implementation follows the current engineering direction":
+        "The implementation follows the current engineering direction",
+    "Prototype timeline limits the depth of production features. Some features such as payment and wearable integration are simulated. Full app store release is outside the immediate prototype scope.":
+        "Development timeline limits the depth of some production features. Payment and wearable integration are currently simulated. Full app-store release is a later step.",
+    "$9.99 per month for the prototype documentation.": "$9.99 per month.",
+    "Free-tier or student-friendly hosting options may be used for the prototype.":
+        "Free-tier or student-friendly hosting options may be used during early development.",
+    "access the prototype mobile application.": "access the mobile application.",
+    "For the current FYP prototype, the Android application may be distributed through the marketing website as an APK after registration. If the product is developed further, official app store distribution through the Apple App Store and Google Play Store may be considered.":
+        "Initially the Android application is distributed through the marketing website as an APK after registration. Official app store distribution through the Apple App Store and Google Play Store is planned for later releases.",
+    "the project deliverables, prototype, documentation, and final presentation.":
+        "the project deliverables, the application, documentation, and final presentation.",
+    "data needed to support the prototype.": "data needed to support the platform.",
+    "Prototype demonstration of workout capture and wearable-supported activity tracking.":
+        "Workout capture and wearable-supported activity tracking.",
+    "Phone sensors and mock wearable pairing": "Phone sensors and wearable pairing",
+    "GPS movement, activity data, simulated wearable heart rate, and connected-device status.":
+        "GPS movement, activity data, wearable heart rate, and connected-device status.",
+    "Mock BLE pairing and simulated wearable heart rate data for prototype validation.":
+        "BLE pairing and wearable heart-rate data from connected devices.",
+    "Collect only data required for the prototype functions and user workflows.":
+        "Collect only data required for the app's functions and user workflows.",
+    "Use simulated payment handling in the prototype instead of storing real card details.":
+        "Do not store real payment card details (payment is simulated).",
+    "End-of-Term-1 Review and prototype progress demonstration":
+        "End-of-Term-1 Review and progress demonstration",
+    "The prototype phase focused on Flutter scaffolding": "The build phase focused on Flutter scaffolding",
+    "Design and develop a prototype mobile fitness platform":
+        "Design and develop a mobile fitness platform",
+    "prototype can be demonstrated on Android emulator and iOS simulator, tests pass":
+        "the application can be demonstrated on Android and iOS, tests pass",
+    "Prototype demo and final presentation": "Application demo and final presentation",
+    "The PTD scope covers the prototype design and implementation of Wise Workout.":
+        "The PTD covers the design and implementation of Wise Workout.",
+    "subscription access, simulated payment handling, and administrative management.":
+        "subscription access (payment simulated), and administrative management.",
+    "outside the immediate prototype scope.": "outside the current scope.",
+    "repository implementation status, and prototype demonstration requirements.":
+        "repository implementation status, and demonstration requirements.",
+    "Support simulated or prototype-based subscription access": "Support simulated subscription access",
+    "The prototype must provide dependable behaviour": "The system must provide dependable behaviour",
+    "Performance targets must remain realistic for an FYP prototype while still supporting a credible user experience.":
+        "Performance targets must remain realistic while supporting a credible user experience.",
+    "Under normal prototype conditions,": "Under normal operating conditions,",
+    "The prototype should support at least 50 concurrent active users":
+        "The system should support at least 50 concurrent active users",
+    "The prototype shall be maintainable by team members": "The system shall be maintainable by team members",
+    "supporting growth from prototype testing usage to at least 1,000 registered users":
+        "supporting growth from initial usage to at least 1,000 registered users",
+    "Prototype payment is simulated and should not request or store real payment card details.":
+        "Payment is simulated and does not request or store real payment card details.",
+    "Automatic data collection may be limited in the prototype":
+        "Automatic data collection may be limited initially",
+    "Support manual workout input and selected prototype-level integration where possible.":
+        "Support manual workout input and selected device integration where possible.",
+    "Focus the prototype on functional demonstration, while future development may include cloud scaling and performance optimisation.":
+        "Focus on functional demonstration first, while future development may include cloud scaling and performance optimisation.",
+    "user flows, and prototype screens are refined": "user flows, and app screens are refined",
+    "keeping the prototype aligned with the project requirements.":
+        "keeping the application aligned with the project requirements.",
+    "The prototype uses Flutter for cross-platform mobile application development.":
+        "Wise Workout uses Flutter for cross-platform mobile application development.",
+    "hosted backend services suitable for the prototype.": "hosted backend services suitable for the platform.",
+    "and prototype application access. The Flutter app connects":
+        "and application access. The Flutter app connects",
+    "Supabase functions as the server-side application layer for the prototype.":
+        "Supabase functions as the server-side application layer.",
+    "This reduces the need for a separately managed server during the FYP prototype stage.":
+        "This reduces the need for a separately managed server.",
+    "verified on Android emulator and iOS simulator against a live backend. The repository currently reports 107 passing tests and successful prototype flows including":
+        "verified on Android and iOS against a live backend. The repository currently reports 107 passing tests and successful flows including",
+    "Access Prototype Mobile Application": "Access Mobile Application",
+    "the prototype application access or download instructions":
+        "the mobile application access or download instructions",
+    "downloads and installs the prototype application": "downloads and installs the mobile application",
+    "grants access to the prototype application features": "grants access to the mobile application features",
+    "If the prototype application is not available for the user's device":
+        "If the mobile application is not available for the user's device",
+    "The prototype application is available for download or access through the marketing website.":
+        "The mobile application is available for download or access through the marketing website.",
+    "selects the option to access or download the prototype application.":
+        "selects the option to access or download the mobile application.",
+    "navigation structure used in the prototype.": "navigation structure used in Wise Workout.",
+    "updating the technical stack and prototype status based on the current implementation repository.":
+        "updating the technical stack and implementation status based on the current repository.",
+    "The current prototype demonstrates key system capabilities including login, onboarding, AI plan generation, plan details, phone-GPS workout capture, paired-wearable heart rate simulation,":
+        "Wise Workout currently demonstrates key system capabilities including login, onboarding, AI plan generation, plan details, phone-GPS workout capture, paired-wearable heart rate (simulated),",
+    "toward the final project demonstration.": "toward the final demonstration.",
+    "Appendix C: Prototype Status Notes": "Appendix C: Implementation Status Notes",
+    "Payment handling is simulated in the prototype.": "Payment handling is simulated.",
+    "Mock BLE pairing and simulated wearable heart rate are used for wearable demonstration.":
+        "Mock BLE pairing and simulated wearable heart rate are used pending real BLE / HealthKit integration.",
+    "Repository reports 107 passing tests and successful verification on Android emulator and iOS simulator.":
+        "Repository reports 107 passing tests and successful verification on Android and iOS.",
+}
+# drop the appendix bullet that cites the sample document
+merged = [b for b in merged if not (
+    b.get("type") == "p" and "Sample Preliminary Technical Documentation" in b.get("text", ""))]
+def _apply_scrub(s):
+    for _a, _c in _scrub.items():
+        if _a in s:
+            s = s.replace(_a, _c)
+    return s
+for _b in merged:
+    if _b.get("type") == "p":
+        _b["text"] = _apply_scrub(_b.get("text", ""))
+    elif _b.get("type") == "t":
+        _b["rows"] = [[_apply_scrub(c) for c in row] for row in _b["rows"]]
+
 # ---------- figure fixes: repoint §15 to use-case diagrams, then renumber 1..N ----------
 import re as _re
 _ucd = {

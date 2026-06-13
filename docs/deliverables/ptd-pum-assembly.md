@@ -10,7 +10,8 @@ How to assemble the two deliverables due **~10–13 June** (basic-prototype mile
 > copy-ready sources `PTD-content.md` + `PTD-content-tabs.txt` alongside it. ~23k words / 93 tables
 > at PRD/SRS depth (all 64 user stories + 64 full use cases, FR1-12, 6 NFR categories, 15-risk
 > register, business model tables, SWOT, charter, comms plan, glossary, appendix). All net-new
-> sections below are written **and dropped in**. Figures numbered 1-20. **Remaining:** insert the
+> sections below are written **and dropped in**. Figures numbered 1-20. Sample-template wording
+> scrubbed (no "property datasets" / sample-citation leftovers). **Remaining:** insert the
 > 20 figure images + draw the level-1 DFD (§16.1); update the Word TOC field; apply the 2 deferred
 > fixes (reconciliation **B5** matrix-vs-USP, and confirm **107** via `flutter test`).
 
