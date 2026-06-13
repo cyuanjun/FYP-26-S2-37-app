@@ -274,6 +274,46 @@ for sec in sections:
     else:
         merged.extend(sec["blocks"])
 
+# ---------- charter: add Project Supervisor row + insert §5.7 Roles and Responsibilities ----------
+for _b in merged:
+    if _b.get("type") == "t" and _b.get("rows") and _b["rows"][0] == ["Field", "Details"]:
+        for _i, _row in enumerate(_b["rows"]):
+            if _row and _row[0] == "Project Manager":
+                _b["rows"].insert(_i + 1, ["Project Supervisor", "Mr Premrajan"])
+                break
+        break
+_roles_blocks = [
+    {"type": "p", "style": "Heading 2", "text": "5.7 Roles and Responsibilities"},
+    {"type": "p", "style": "Normal", "text":
+        "Project responsibilities are divided across the four team members, with the supervisor "
+        "providing advisory oversight. The assessor is an external evaluator and is listed under "
+        "Section 3 Stakeholders."},
+    {"type": "t", "rows": [
+        ["Team Member", "Main Role", "Responsibilities"],
+        ["Chia Yuan Jun", "Project coordination, documentation, and system planning",
+         "Coordinate project direction, maintain document structure, review section consistency, "
+         "prepare the project schedule, support requirement analysis, assist with system planning, "
+         "and prepare final presentation materials."],
+        ["Devanandi Praveen", "Mobile application development and UI",
+         "Develop mobile application screens and user-facing functions - fitness profile, workout "
+         "recording, progress dashboard, expert discovery - and assist with UI testing."],
+        ["Foong Jun Yan", "Backend, database, and API development",
+         "Design the database structure, develop backend services and APIs, manage user accounts, "
+         "workout records, expert profiles, service requests, and subscription access, and support "
+         "system integration."],
+        ["Jedidiah Goh Chor Szer", "Marketing website, expert features, and admin support",
+         "Develop marketing website pages, support expert profile and service-request features, "
+         "assist with admin management functions, and contribute to testing and documentation."],
+        ["Mr Premrajan", "Project Supervisor (advisory)",
+         "Provides guidance and direction, reviews milestone deliverables, and gives feedback and "
+         "sign-off before each submission."],
+    ]},
+]
+for _i, _b in enumerate(merged):
+    if _b.get("type") == "p" and _b.get("style") == "Heading 1" and _b.get("text", "").strip().startswith("6. Requirement Definition"):
+        merged[_i:_i] = _roles_blocks
+        break
+
 # ---------- scrub sample-template leftovers + reframe prototype->whole-app ----------
 # The PTD/PUM describe the WHOLE app, not a prototype. Keep simulated payment / mock
 # wearable / 107-tests only as brief honest notes (mostly in Appendix C).
