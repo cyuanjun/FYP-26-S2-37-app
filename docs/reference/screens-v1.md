@@ -4,6 +4,8 @@ Index of the Free-user screens (27 spec files; Premium/Expert/Admin tracked belo
 
 Status legend: ✅ done · 🟡 in progress · ⬜ pending · 🟪 temporary stub · 📐 spec-only (design locked, code not built)
 
+> **⚠️ Spec-vs-build drift (noted 13 Jun, from the PUM screenshot pass):** these specs describe the **design intent**; some built screens are currently simpler. Known cases: **Dashboard (#5)** is a minimal "Get moving" slice (no digest/weekly-stats/goal card); **Fitness Goals (#13.2)** has no target/timeline controls (only primary goal + weekly commitment); **Account Settings (#13.3)** has no phone field; **Login (#2)** has no "Remember me"; **Train (#7)** card is compact (no VIEW WORKOUT/START PLAN buttons). The PUM walkthrough was written from the **actual build** (see [STATUS.md](../STATUS.md)); reconcile these specs to the build when revisiting them.
+
 > ⚠️ **The Status column below tracks the React mock, not the Flutter app.** The Flutter build
 > state of each screen lives in its spec file's frontmatter `status:` (`built` | `spec-only` |
 > `draft`). As of 12 Jun, built in Flutter: #1, #2, #3 (onboarding wizard — no spec file;
