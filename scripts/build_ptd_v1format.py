@@ -130,6 +130,8 @@ repls = {
     "Technical Design Manual (TDM)": "Preliminary Technical Document (PTD)",
     "19th May 2026": "13th Jun 2026",
     "21st May 2026": "13th Jun 2026",
+    "—": "-",  # em dash -> hyphen (cover/template parts; content handled in expand step)
+    "–": "-",  # en dash -> hyphen
 }
 for sec in doc.sections:
     fix_text(sec.header.paragraphs, repls)

@@ -164,7 +164,7 @@ def business_model():
 def risk_register():
     return [
         {"t":"p","s":"Normal","x":
-            "Risk analysis is important because the system spans several connected components - "
+            "Risk analysis is important because the system spans several connected components: "
             "the mobile app, marketing website, backend, database, AI features, sensor/wearable "
             "data acquisition, expert workflows, subscriptions, social features, and admin "
             "management. The main risks relate to scope, integration, data privacy, AI output "
@@ -179,8 +179,8 @@ def nfr_sections():
     from docx.text.paragraph import Paragraph
     from docx.table import Table
     blocks=[{"t":"p","s":"Normal","x":
-        "The non-functional requirements are specified across six categories - security, "
-        "reliability, performance, maintainability, scalability, and usability - each as a set "
+        "The non-functional requirements are specified across six categories (security, "
+        "reliability, performance, maintainability, scalability, and usability), each as a set "
         "of identified requirements with related roles and priority, consolidated from the SRS."}]
     cap=False; label=None; intro_done=set()
     for b in SRS.iter_inner_content():
@@ -295,8 +295,8 @@ _roles_blocks = [
          "prepare the project schedule, support requirement analysis, assist with system planning, "
          "and prepare final presentation materials."],
         ["Devanandi Praveen", "Mobile application development and UI",
-         "Develop mobile application screens and user-facing functions - fitness profile, workout "
-         "recording, progress dashboard, expert discovery - and assist with UI testing."],
+         "Develop mobile application screens and user-facing functions (fitness profile, workout "
+         "recording, progress dashboard, expert discovery), and assist with UI testing."],
         ["Foong Jun Yan", "Backend, database, and API development",
          "Design the database structure, develop backend services and APIs, manage user accounts, "
          "workout records, expert profiles, service requests, and subscription access, and support "
@@ -312,6 +312,56 @@ _roles_blocks = [
 for _i, _b in enumerate(merged):
     if _b.get("type") == "p" and _b.get("style") == "Heading 1" and _b.get("text", "").strip().startswith("6. Requirement Definition"):
         merged[_i:_i] = _roles_blocks
+        break
+
+# ---------- insert §12.9 Justification of Technology Choices (before §13) ----------
+_techjust_blocks = [
+    {"type": "p", "style": "Heading 2", "text": "12.9 Justification of Technology Choices"},
+    {"type": "p", "style": "Normal", "text":
+        "The table below summarises why each major technology was selected, including the "
+        "alternatives that were considered."},
+    {"type": "t", "rows": [
+        ["Layer / Technology", "Choice", "Why chosen (alternatives considered)"],
+        ["Cross-platform framework", "Flutter (Dart)",
+         "One codebase builds both Android and iOS, cutting duplicated work for a small team on a "
+         "fixed timeline. It offers a mature widget toolkit, hot reload for fast UI iteration, and "
+         "a strong plugin ecosystem for sensors (GPS, pedometer, BLE). Considered React Native "
+         "(weaker type safety, less consistent UI) and native Kotlin plus Swift (roughly double "
+         "the effort)."],
+        ["State management", "Riverpod",
+         "Compile-safe, testable state that maps cleanly onto the BCE control layer (one notifier "
+         "per use case). Considered Provider and BLoC (more boilerplate or less type safety)."],
+        ["Routing", "go_router",
+         "Declarative routing with role-based redirects, which fits the five-role access model."],
+        ["Data models", "freezed + json_serializable",
+         "Immutable, type-safe models with automatic snake_case JSON mapping to database rows, "
+         "reducing manual serialisation errors."],
+        ["Backend platform", "Supabase",
+         "Managed Postgres, Auth, Storage, Realtime, and Edge Functions out of the box mean no "
+         "server to build or operate, which suits a four-person team within the FYP timeline. "
+         "Row-Level Security enforces privacy at the data layer and the free tier fits the budget. "
+         "Considered Firebase (NoSQL, weaker fit for a highly relational 26-entity schema) and a "
+         "custom Node or Flask backend (more control but far more build and operations effort)."],
+        ["Database", "PostgreSQL (via Supabase)",
+         "The data model is highly relational (26 entities with many relationships and "
+         "constraints), which suits an ACID relational database with row-level security rather "
+         "than a NoSQL store."],
+        ["AI provider", "OpenAI gpt-4o-mini (Gemini then rule-based fallback)",
+         "Strong quality at low cost and latency for the two narrow AI surfaces (progress "
+         "summaries and plan suggestions), with structured-output support for reliable JSON "
+         "parsing. Calls run inside a Supabase Edge Function so the API key never ships in the "
+         "app, and the fallback chain keeps the feature resilient. Training a custom model was "
+         "out of scope for these narrow tasks."],
+        ["Marketing website hosting", "Vercel",
+         "Zero-operations hosting with Git-based continuous deployment and a free tier suited to "
+         "the project."],
+        ["Source control and deployment", "GitHub",
+         "Version control and collaboration for the team, with a clear path to future CI/CD."],
+    ]},
+]
+for _i, _b in enumerate(merged):
+    if _b.get("type") == "p" and _b.get("style") == "Heading 1" and _b.get("text", "").strip().startswith("13. User Stories"):
+        merged[_i:_i] = _techjust_blocks
         break
 
 # ---------- scrub sample-template leftovers + reframe prototype->whole-app ----------
@@ -428,6 +478,7 @@ def _apply_scrub(s):
     for _a, _c in _scrub.items():
         if _a in s:
             s = s.replace(_a, _c)
+    s = s.replace("—", "-").replace("–", "-")  # em/en dash -> plain hyphen
     return s
 for _b in merged:
     if _b.get("type") == "p":
