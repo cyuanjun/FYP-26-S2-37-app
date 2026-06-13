@@ -12,19 +12,13 @@ import '../common/avatar_button.dart';
 import '../profile/fitness_goals_screen.dart';
 import '../workout/active_workout_screen.dart';
 import 'connected_devices_screen.dart';
-import 'plan_detail_screen.dart';
+import 'my_plans_screen.dart';
 
 /// BOUNDARY (#7 Train). Active-plan card + device status + a sticky
 /// "Start Freeform Workout" CTA. Plans aren't built in the slice, so the plan
 /// card shows the no-plan variant; the free-form path is the live one.
 class TrainScreen extends ConsumerWidget {
   const TrainScreen({super.key});
-
-  void _soon(BuildContext context, String what) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$what arrives in a later sprint.')),
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,17 +34,13 @@ class TrainScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               children: [
-                Consumer(builder: (context, ref, _) {
-                  final hasPlan = ref.watch(activePlanProvider).value != null;
-                  return _SectionHeader(
-                    label: 'AI SUGGESTED PLAN',
-                    action: 'VIEW FULL PLAN ›',
-                    onAction: hasPlan
-                        ? () => Navigator.of(context, rootNavigator: true).push(
-                            MaterialPageRoute(builder: (_) => const PlanDetailScreen()))
-                        : () => _soon(context, 'Plan detail (set a goal first)'),
-                  );
-                }),
+                _SectionHeader(
+                  label: 'AI SUGGESTED PLAN',
+                  action: 'VIEW PLANS ›',
+                  onAction: () => Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (_) => const MyPlansScreen()),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Consumer(builder: (context, ref, _) {
                   final plan = ref.watch(activePlanProvider).value;
@@ -236,11 +226,13 @@ class _ActivePlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now().weekday;
-    // Current week within the repeating 4-week cycle.
+    // Current week within the generated full timeline.
     final started = plan.startedAt;
     final cycleWeek = started == null
         ? 1
-        : (DateTime.now().difference(started).inDays ~/ 7) % 4 + 1;
+        : ((DateTime.now().difference(started).inDays ~/ 7) + 1)
+            .clamp(1, plan.durationWeeks)
+            .toInt();
     final thisWeek =
         workouts.where((w) => w.weekNumber == cycleWeek).toList();
     final next = thisWeek.isEmpty
@@ -279,7 +271,7 @@ class _ActivePlanCard extends StatelessWidget {
                   child: Text('${next.name ?? 'Workout'} · ${next.durationMinutes} min',
                       style: AppTypography.subheadline.copyWith(color: AppColors.ink)),
                 ),
-                Text('WEEK $cycleWeek/4', style: AppTypography.caption2),
+                Text('WEEK $cycleWeek/${plan.durationWeeks}', style: AppTypography.caption2),
               ],
             ),
           ],

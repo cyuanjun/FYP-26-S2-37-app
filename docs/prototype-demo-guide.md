@@ -24,7 +24,7 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
 | **Onboarding + plan** | First login → wizard (about you → how you train → goal) → **real AI weekly plan (OpenAI)** → Train shows it | Both tiers: Free basic, Premium personalised; strict JSON schema + server-side validation; Gemini → rule fallback. Gate: `profiles.onboarding_completed_at` |
 | **Devices (#7.1)** | Train → Devices card → paired list (phone sensors pinned) → + ADD DEVICE → mock BLE scan → pair a watch → next workout shows live ♥ HR; avg/max saved, session linked to the device | HR stream is simulated (spec-sanctioned) — real BLE/HealthKit drops in behind the same interface |
-| **Plan Detail (#8)** | Train → VIEW FULL PLAN → header + current-week schedule → tap a row for the workout modal → Start today's workout (pre-selected activity) · Regenerate | Free: 1 regeneration, then "Upgrade for unlimited"; today's row highlighted |
+| **Plans + Plan Detail (#8)** | Train → VIEW PLANS → choose a saved plan → header + current-week schedule → tap a row for the workout modal → Use This Plan / Start today's workout (pre-selected activity) · Regenerate | Free: 1 regeneration, then "Upgrade for unlimited"; today's row highlighted |
 
 **Architecture:** Flutter · Riverpod · go_router · freezed · `supabase_flutter`. Strict **Boundary–Control–Entity**
 (`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`). **Backend:** 26 tables + RLS +
@@ -152,7 +152,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
    - **See:** the **active plan card** — plan name, "3x per week · N weeks · AI-assisted (basic)"
      (Premium says personalised), a **TODAY** line when a workout is scheduled today, and one chip
      per weekly slot (e.g. `Mon · Running base`).
-2b. Tap **VIEW FULL PLAN ›**.
+2b. Tap **VIEW PLANS ›**, then open the active plan.
    - **See:** **Plan Detail (#8)** — big plan name, "12 WEEKS · 3X/WEEK · INTERMEDIATE" meta,
      the AI description, **WEEK N · CURRENT** schedule card (today's row tinted lime), and
      **START TODAY'S WORKOUT** pinned at the bottom. Tap a row → workout modal (descriptor,
@@ -208,7 +208,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ```bash
 flutter analyze     # static analysis — should report "No issues found!"
-flutter test        # 107 tests — should end "All tests passed!"
+flutter test        # 109 tests — should end "All tests passed!"
 ```
 
 Coverage (positive **and** negative cases per flow): entity rules (`Profile`, `WorkoutType` incl. MET
@@ -295,7 +295,7 @@ supabase/
                    onboarding_completed_at · private custom catalog entries
   functions/       summarise-progress · suggest-plan  (AI Edge Functions, gpt-4o-mini)
   seed.sql         install catalogs       seed-demo.sql  demo accounts + data
-test/              entity · core · control suites (107 tests)
+test/              entity · core · control suites (109 tests)
 ```
 
 Design references: [STATUS.md](STATUS.md) (progress), [architecture/build-plan.md](architecture/build-plan.md),

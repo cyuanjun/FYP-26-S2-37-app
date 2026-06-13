@@ -102,7 +102,7 @@ The AI scope is **deliberately narrow** (a graded, defensible boundary): AI does
 | Reminders, inactivity, **rest/over-training** alerts | **Rule-based** (deterministic, configurable) | Thresholds over recent 7/30-day frequency + schedule; transparent and testable. |
 | **Basic plan structure** (fallback skeleton from goal + preferred types + rest days) | **Rule-based fallback** | Used only when the AI is unavailable — since 12 Jun both tiers get AI-generated plans (decision per WBS/SRS, recon log C4-cancelled). |
 | **Progress summary** (interpret the data in plain language) | **AI** | "Your frequency is up, consistency dipped mid-week, on track for your goal." Free = basic; Premium = personalised w/ longer history + wearable metrics. |
-| **Plan suggestion** (generate the 4-week monthly cycle) | **AI** (suggest-plan Edge Function, gpt-4o-mini live) | Free = basic depth; Premium = personalised. Preferences are a strict contract (only chosen types scheduled); rule skeleton is the offline fallback. |
+| **Plan suggestion** (generate the full goal timeline) | **AI** (suggest-plan Edge Function, gpt-4o-mini live) | Free = basic depth; Premium = personalised. Preferences are a strict contract (only chosen types scheduled); rule skeleton is the offline fallback. |
 | Coaching / custom plans / nutrition / recovery | **Human expert** (paid layer) | Explicitly *not* AI — the interface must label which is which (SRS §3.8.1, NFR-USA-02/03). |
 
 **Implementation:**

@@ -12,23 +12,28 @@ import '../../../entities/workout_type.dart';
 import '../../gateways/workout_gateway.dart';
 import '../workout/active_workout_screen.dart';
 
-/// BOUNDARY (#8 Plan Detail). Read-only view of the active plan: header +
-/// meta, current-week schedule (tap a row for the workout modal), and the
-/// Start-today / Regenerate actions. Reached from Train's "VIEW FULL PLAN ›".
+/// BOUNDARY (#8 Plan Detail). Read-only view of an active or saved plan:
+/// header + meta, week schedule, and active-plan actions.
 class PlanDetailScreen extends ConsumerStatefulWidget {
-  const PlanDetailScreen({super.key});
+  const PlanDetailScreen({super.key, this.planId});
+
+  final String? planId;
 
   @override
   ConsumerState<PlanDetailScreen> createState() => _PlanDetailScreenState();
 }
 
 class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
-  int? _selectedWeek; // null = current cycle week
+  int? _selectedWeek; // null = current active week, or week 1 for inactive plans
 
   @override
   Widget build(BuildContext context) {
-    final planAsync = ref.watch(activePlanProvider);
-    final workouts = ref.watch(plannedWorkoutsProvider).value ?? [];
+    final planAsync = widget.planId == null
+        ? ref.watch(activePlanProvider)
+        : ref.watch(planByIdProvider(widget.planId!));
+    final workouts = widget.planId == null
+        ? ref.watch(plannedWorkoutsProvider).value ?? []
+        : ref.watch(plannedWorkoutsForPlanProvider(widget.planId!)).value ?? [];
     final types = ref.watch(workoutTypesProvider).value ?? [];
     final profile = ref.watch(currentProfileProvider).value;
     final experience =
@@ -107,36 +112,39 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                     ],
                     const SizedBox(height: 24),
 
-                    // ---- Monthly cycle: week selector ----
-                    Row(
-                      children: [
-                        for (var wk = 1; wk <= 4; wk++) ...[
-                          GestureDetector(
-                            onTap: () => setState(() => _selectedWeek = wk),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                color: shownWeek == wk
-                                    ? AppColors.accent
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                    color: shownWeek == wk
-                                        ? AppColors.accent
-                                        : AppColors.faint),
-                              ),
-                              child: Text('W$wk',
-                                  style: AppTypography.caption2.copyWith(
+                    // ---- Full timeline: week selector ----
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (var wk = 1; wk <= plan.durationWeeks; wk++) ...[
+                            GestureDetector(
+                              onTap: () => setState(() => _selectedWeek = wk),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                margin: const EdgeInsets.only(right: 8),
+                                decoration: BoxDecoration(
+                                  color: shownWeek == wk
+                                      ? AppColors.accent
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
                                       color: shownWeek == wk
-                                          ? AppColors.bg
-                                          : AppColors.muted,
-                                      fontWeight: FontWeight.w800)),
+                                          ? AppColors.accent
+                                          : AppColors.faint),
+                                ),
+                                child: Text('W$wk',
+                                    style: AppTypography.caption2.copyWith(
+                                        color: shownWeek == wk
+                                            ? AppColors.bg
+                                            : AppColors.muted,
+                                        fontWeight: FontWeight.w800)),
+                              ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -171,14 +179,16 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      '4-week cycle (foundation → build → peak → recovery), '
-                      'repeating for ${plan.durationWeeks} weeks.',
+                      'Full ${plan.durationWeeks}-week timeline: foundation → build → peak → recovery.',
                       style: AppTypography.caption1,
                     ),
                     const SizedBox(height: 16),
-                    Center(
-                      child: _RegenerateLink(plan: plan, isPremium: isPremium),
-                    ),
+                    if (plan.isActive) ...[
+                      const SizedBox(height: 16),
+                      Center(
+                        child: _RegenerateLink(plan: plan, isPremium: isPremium),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -186,17 +196,19 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
               // ---- Sticky primary action ----
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                child: ElevatedButton.icon(
-                  onPressed: todays.isEmpty
-                      ? null
-                      : () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => ActiveWorkoutScreen(
-                              initialTypeId: todays.first.workoutTypeId))),
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: Text(todays.isEmpty
-                      ? 'NO WORKOUT SCHEDULED TODAY'
-                      : "START TODAY'S WORKOUT"),
-                ),
+                child: plan.isActive
+                    ? ElevatedButton.icon(
+                        onPressed: todays.isEmpty
+                            ? null
+                            : () => Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => ActiveWorkoutScreen(
+                                    initialTypeId: todays.first.workoutTypeId))),
+                        icon: const Icon(Icons.play_arrow_rounded),
+                        label: Text(todays.isEmpty
+                            ? 'NO WORKOUT SCHEDULED TODAY'
+                            : "START TODAY'S WORKOUT"),
+                      )
+                    : _UsePlanButton(plan: plan),
               ),
             ],
           );
@@ -205,11 +217,13 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
     );
   }
 
-  /// Week within the repeating 4-week cycle (1–4).
+  /// Week within the generated full timeline.
   int _cycleWeek(FitnessPlan plan) {
     final started = plan.startedAt;
-    if (started == null) return 1;
-    return (DateTime.now().difference(started).inDays ~/ 7) % 4 + 1;
+    if (!plan.isActive || started == null) return 1;
+    return ((DateTime.now().difference(started).inDays ~/ 7) + 1)
+        .clamp(1, plan.durationWeeks)
+        .toInt();
   }
 
   Widget _scheduleRow(BuildContext context, PlannedWorkout w,
@@ -382,6 +396,39 @@ class _RegenerateLink extends ConsumerWidget {
           Text('Upgrade for unlimited regenerations',
               style: AppTypography.caption2.copyWith(color: AppColors.muted)),
       ],
+    );
+  }
+}
+
+class _UsePlanButton extends ConsumerWidget {
+  const _UsePlanButton({required this.plan});
+
+  final FitnessPlan plan;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selecting = ref.watch(selectFitnessPlanProvider).isLoading;
+    return ElevatedButton.icon(
+      onPressed: selecting
+          ? null
+          : () async {
+              final ok =
+                  await ref.read(selectFitnessPlanProvider.notifier).select(plan.id);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(ok
+                    ? 'Plan is now active.'
+                    : 'Could not activate this plan. Try again.'),
+              ));
+            },
+      icon: selecting
+          ? const SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.check_circle_outline),
+      label: const Text('USE THIS PLAN'),
     );
   }
 }

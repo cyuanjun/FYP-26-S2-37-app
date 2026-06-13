@@ -346,14 +346,36 @@ class FakeFeedbackGateway implements FeedbackGateway {
 /// Fake PlanGateway — records inserted plans/workouts in memory.
 class FakePlanGateway implements PlanGateway {
   FitnessPlan? activePlan;
+  List<FitnessPlan> plans = [];
   List<PlannedWorkout> planned = [];
   bool throwOnInsert = false;
+  bool throwOnSelect = false;
 
   final insertedPlans = <Map<String, dynamic>>[];
   final insertedWorkouts = <List<Map<String, dynamic>>>[];
+  final selectedPlanIds = <String>[];
 
   @override
   Future<FitnessPlan?> fetchActivePlan(String userId) async => activePlan;
+
+  @override
+  Future<FitnessPlan?> fetchPlan(String planId) async {
+    for (final p in [
+      ?activePlan,
+      ...plans,
+    ]) {
+      if (p.id == planId) return p;
+    }
+    return null;
+  }
+
+  @override
+  Future<List<FitnessPlan>> listPlans(String userId) async {
+    return [
+      ?activePlan,
+      ...plans,
+    ].where((p) => p.userId == userId).toList();
+  }
 
   @override
   Future<List<PlannedWorkout>> listPlannedWorkouts(String planId) async => planned;
@@ -381,6 +403,29 @@ class FakePlanGateway implements PlanGateway {
           : GenerationStrategy.basic,
     );
     return activePlan!;
+  }
+
+  @override
+  Future<void> setActivePlan({required String userId, required String planId}) async {
+    if (throwOnSelect) throw Exception('select failed');
+    selectedPlanIds.add(planId);
+    final all = [
+      ?activePlan,
+      ...plans,
+    ];
+    FitnessPlan? selected;
+    for (final p in all) {
+      if (p.id == planId && p.userId == userId) {
+        selected = p;
+        break;
+      }
+    }
+    if (selected == null) return;
+    activePlan = selected.copyWith(isActive: true, startedAt: DateTime.now());
+    plans = all
+        .where((p) => p.id != planId)
+        .map((p) => p.copyWith(isActive: false))
+        .toList();
   }
 }
 

@@ -22,6 +22,25 @@ class PlanGateway {
     return row == null ? null : FitnessPlan.fromJson(row);
   }
 
+  Future<FitnessPlan?> fetchPlan(String planId) async {
+    final row = await _client
+        .from('fitness_plans')
+        .select()
+        .eq('id', planId)
+        .maybeSingle();
+    return row == null ? null : FitnessPlan.fromJson(row);
+  }
+
+  Future<List<FitnessPlan>> listPlans(String userId) async {
+    final rows = await _client
+        .from('fitness_plans')
+        .select()
+        .eq('user_id', userId)
+        .order('is_active', ascending: false)
+        .order('started_at', ascending: false);
+    return rows.map(FitnessPlan.fromJson).toList();
+  }
+
   Future<List<PlannedWorkout>> listPlannedWorkouts(String planId) async {
     final rows = await _client
         .from('planned_workouts')
@@ -61,6 +80,22 @@ class PlanGateway {
       ]);
     }
     return created;
+  }
+
+  Future<void> setActivePlan({
+    required String userId,
+    required String planId,
+  }) async {
+    await _client
+        .from('fitness_plans')
+        .update({'is_active': false})
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+    await _client.from('fitness_plans').update({
+      'is_active': true,
+      'started_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('id', planId).eq('user_id', userId);
   }
 }
 

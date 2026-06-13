@@ -15,6 +15,7 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | `migrations/20260610130000_fitness_profile_on_signup.sql` | Extends the signup trigger to also create the 1:1 `fitness_profiles` row (so `workout_sessions.user_id` FK resolves); backfills existing accounts. |
 | `migrations/20260612090000_onboarding_completed_at.sql` | First-login onboarding gate on `profiles` (existing accounts backfilled complete). |
 | `migrations/20260612100000_private_custom_catalog_entries.sql` | RLS: custom workout types + health tags visible only to their creator. |
+| `migrations/20260612110000_admin_write_policy_checks.sql` | RLS: admin write policies keep owner checks for users while allowing admins to update target-user rows. |
 | `seed.sql` | The three install-time catalogs: `workout_types`, `health_tags`, `expert_categories`. |
 | `seed-demo.sql` | **Demo data** (not install data): two login accounts (`free@`/`premium@wiseworkout.test`, pw `Password123!`) + varied workout sessions, XP/streak, and share posts. Idempotent — re-run to reset the demo. |
 
