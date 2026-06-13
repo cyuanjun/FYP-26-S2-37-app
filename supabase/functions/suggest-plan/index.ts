@@ -65,9 +65,75 @@ function baseMinutes(exp: string): number {
   return exp === "advanced" ? 50 : exp === "intermediate" ? 40 : 30;
 }
 
+function planWeeks(goal: Goal): number {
+  return Math.min(Math.max(goal.timeline_weeks ?? 4, 1), 52);
+}
+
+function phaseForWeek(week: number, totalWeeks: number): "foundation" | "build" | "peak" | "recovery" {
+  if (week === totalWeeks && totalWeeks > 1) return "recovery";
+  const progress = week / totalWeeks;
+  if (progress <= 0.25) return "foundation";
+  if (progress <= 0.75) return "build";
+  return "peak";
+}
+
+function weekBump(week: number, totalWeeks: number, phase: ReturnType<typeof phaseForWeek>): number {
+  if (phase === "recovery") return -5;
+  const ramp = totalWeeks <= 1 ? 0 : Math.round(((week - 1) / (totalWeeks - 1)) * 15);
+  if (phase === "foundation") return Math.min(Math.max(ramp, 0), 5);
+  if (phase === "build") return Math.min(Math.max(ramp, 5), 12);
+  return Math.min(Math.max(ramp, 10), 18);
+}
+
+function clampDuration(value: number, fallback = 30): number {
+  if (!Number.isFinite(value)) value = fallback;
+  return Math.min(Math.max(Math.round(value), 15), 120);
+}
+
+function weeklyDurations(base: number, week: number, totalWeeks: number, count: number): number[] {
+  const bump = weekBump(week, totalWeeks, phaseForWeek(week, totalWeeks));
+  if (count <= 1) return [clampDuration(base + bump)];
+
+  let short = clampDuration(base - 10 + bump);
+  let long = Math.max(clampDuration(base + 15 + bump), Math.ceil(short * 1.5));
+  if (long > 120) {
+    long = 120;
+    short = Math.min(short, 80); // keeps long >= 1.5x short inside the 120 min cap
+  }
+
+  return Array.from({ length: count }, (_, i) =>
+    clampDuration(short + ((long - short) * i) / (count - 1))
+  );
+}
+
+function enforceWeeklyDurationContract(slots: Slot[], totalWeeks: number): void {
+  if (slots.length <= 1) return;
+
+  const min = Math.min(...slots.map((s) => s.duration_minutes));
+  const max = Math.max(...slots.map((s) => s.duration_minutes));
+  const namedLong = slots.some((s) => /^long (run|ride)\b/i.test(s.name.trim()));
+  const namedLongIsLongest = slots
+    .filter((s) => /^long (run|ride)\b/i.test(s.name.trim()))
+    .every((s) => s.duration_minutes === max);
+  const alreadyValid = max >= Math.ceil(min * 1.5) && (!namedLong || namedLongIsLongest);
+  if (alreadyValid) return;
+
+  const base = Math.round(slots.reduce((sum, s) => sum + s.duration_minutes, 0) / slots.length);
+  const durations = weeklyDurations(base, slots[0].week_number, totalWeeks, slots.length);
+  const ranked = [...slots].sort((a, b) => {
+    const aLong = /^long (run|ride)\b/i.test(a.name.trim());
+    const bLong = /^long (run|ride)\b/i.test(b.name.trim());
+    if (aLong != bLong) return aLong ? 1 : -1;
+    return a.duration_minutes - b.duration_minutes;
+  });
+  ranked.forEach((slot, i) => {
+    slot.duration_minutes = durations[i];
+  });
+}
+
 function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[], personalised: boolean) {
   const days = Math.min(Math.max(goal.weekly_commitment_days ?? 3, 1), 7);
-  const weeks = goal.timeline_weeks ?? 4;
+  const weeks = planWeeks(goal);
   const exp = profile.training_experience ?? "beginner";
   const base = baseMinutes(exp);
   // Preferences are a contract: when present, ONLY preferred types are used.
@@ -75,11 +141,10 @@ function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[], p
     ? [...new Set(preferredSlugs)]
     : (FILLERS[goal.primary_goal] ?? FILLERS.maintain_fitness);
 
-  // One MONTH = 4 distinct weeks: foundation / build / peak / recovery.
-  const weekBump = [0, 5, 10, -5];
-  const weekTag = ["foundation", "build", "peak", "recovery"];
   const workouts: Slot[] = [];
-  for (let wk = 1; wk <= 4; wk++) {
+  for (let wk = 1; wk <= weeks; wk++) {
+    const phase = phaseForWeek(wk, weeks);
+    const durations = weeklyDurations(base, wk, weeks, DAY_SPREAD[days].length);
     DAY_SPREAD[days].forEach((day, i) => {
       const slug = rotation[i % rotation.length];
       const hard = i % 3 === 2;
@@ -87,11 +152,11 @@ function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[], p
         slug,
         week_number: wk,
         day_of_week: day,
-        duration_minutes: Math.max(15, (hard ? base + 10 : base) + weekBump[wk - 1]),
+        duration_minutes: durations[i],
         name: `${slug[0].toUpperCase()}${slug.slice(1)} ${hard ? "push" : "base"}`,
-        descriptor: wk === 4
+        descriptor: phase === "recovery"
           ? "Recovery week — keep it comfortable"
-          : hard ? `Week ${wk} ${weekTag[wk - 1]} — finish strong` : "Comfortable, repeatable effort",
+          : hard ? `Week ${wk} ${phase} — finish strong` : "Comfortable, repeatable effort",
       });
     });
   }
@@ -99,8 +164,8 @@ function buildStubPlan(goal: Goal, profile: Profile, preferredSlugs: string[], p
   return {
     name: `${TITLES[goal.primary_goal] ?? "Balanced Week"} — ${weeks}-week plan`,
     description: personalised
-      ? `Personalised ${days}-day weeks in a 4-week cycle (build up, then recover), repeating toward your ${weeks}-week ${goal.primary_goal.replace(/_/g, " ")} goal.`
-      : `A ${days}-day week in a 4-week cycle toward your ${goal.primary_goal.replace(/_/g, " ")} goal. Upgrade for deeper personalisation.`,
+      ? `Personalised ${days}-day weeks across your full ${weeks}-week ${goal.primary_goal.replace(/_/g, " ")} timeline.`
+      : `A ${days}-day week across your full ${weeks}-week ${goal.primary_goal.replace(/_/g, " ")} timeline. Upgrade for deeper personalisation.`,
     duration_weeks: weeks,
     workouts_per_week: days,
     model: "stub",
@@ -116,14 +181,14 @@ function planPrompt(
   const exp = profile.training_experience ?? "beginner";
   const usable = preferredSlugs.length > 0 ? preferredSlugs : allowedSlugs;
   return [
-    "You are a fitness coach generating ONE MONTH (4 distinct weeks) of a training plan.",
-    `Goal: ${goal.primary_goal.replace(/_/g, " ")}. Experience: ${exp}. The 4-week cycle repeats toward a ${weeks}-week goal.`,
-    `Each week (week_number 1-4): exactly ${days} workouts on ${days} DISTINCT days (day_of_week: 1=Monday … 7=Sunday), sensibly spread.`,
-    "Progress across the month: week 1 foundation, weeks 2-3 build volume/intensity gradually, week 4 lighter recovery.",
+    `You are a fitness coach generating a FULL ${weeks}-week training plan.`,
+    `Goal: ${goal.primary_goal.replace(/_/g, " ")}. Experience: ${exp}. Timeline: ${weeks} weeks.`,
+    `Each week (week_number 1-${weeks}): exactly ${days} workouts on ${days} DISTINCT days (day_of_week: 1=Monday … 7=Sunday), sensibly spread.`,
+    "Progress across the full timeline: early weeks build foundation, middle weeks build volume/intensity gradually, later weeks peak or sharpen, and the final week is lighter recovery/deload.",
     preferredSlugs.length > 0
       ? `The user chose their preferred workout types. Use ONLY these slugs: ${usable.join(", ")}.`
       : `No stated preferences - pick goal-appropriate types from ONLY these slugs: ${usable.join(", ")}.`,
-    `Durations around ${baseMinutes(exp)} minutes (15-120 allowed), reflecting the weekly progression.`,
+    `Durations 15-120 minutes. Base around ${baseMinutes(exp)} min, growing week-on-week. WITHIN each week vary durations: one shorter easy session, one clearly longer session — the longest must be at least 50% more minutes than the shortest. A workout named "Long Run" or "Long Ride" MUST be the week's longest session. Never give every session in a week the same duration.`,
     personalised
       ? "PERSONALISED tier: tailor names/descriptors to the goal and experience; descriptors give a concrete focus cue."
       : "BASIC tier: keep names/descriptors simple and generic.",
@@ -167,7 +232,7 @@ async function callOpenAI(prompt: string, schema: unknown, key: string): Promise
     body: JSON.stringify({
       model: OPENAI_MODEL,
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 3000,
+      max_tokens: 12000,
       temperature: 0.6,
       response_format: {
         type: "json_schema",
@@ -182,7 +247,7 @@ async function callOpenAI(prompt: string, schema: unknown, key: string): Promise
   return JSON.parse(text);
 }
 
-async function callGemini(prompt: string, key: string): Promise<unknown> {
+async function callGemini(prompt: string, key: string, weeks: number): Promise<unknown> {
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
     {
@@ -191,7 +256,7 @@ async function callGemini(prompt: string, key: string): Promise<unknown> {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: prompt + '\n\nRespond with ONLY a JSON object: {"name": string, "description": string, "workouts": [{"slug": string, "week_number": int (1-4), "day_of_week": int, "duration_minutes": int, "name": string, "descriptor": string}]}',
+            text: prompt + `\n\nRespond with ONLY a JSON object: {"name": string, "description": string, "workouts": [{"slug": string, "week_number": int (1-${weeks}), "day_of_week": int, "duration_minutes": int, "name": string, "descriptor": string}]}`,
           }],
         }],
         generationConfig: { responseMimeType: "application/json", temperature: 0.6 },
@@ -216,7 +281,7 @@ function validatePlan(
   const stub = buildStubPlan(goal, profile, preferredSlugs, personalised);
   const workouts: Slot[] = [];
 
-  for (let wk = 1; wk <= 4; wk++) {
+  for (let wk = 1; wk <= weeks; wk++) {
     const seenDays = new Set<number>();
     const weekSlots: Slot[] = [];
     for (const w of (Array.isArray(obj.workouts) ? obj.workouts : []) as Record<string, unknown>[]) {
@@ -231,7 +296,7 @@ function validatePlan(
         slug,
         week_number: wk,
         day_of_week: day,
-        duration_minutes: Math.min(Math.max(Math.round(Number(w.duration_minutes ?? 30)), 15), 120),
+        duration_minutes: clampDuration(Number(w.duration_minutes ?? 30)),
         name: String(w.name ?? slug).slice(0, 40) || slug,
         descriptor: String(w.descriptor ?? "").slice(0, 160),
       });
@@ -245,6 +310,7 @@ function validatePlan(
       }
     }
     weekSlots.sort((a, b) => a.day_of_week - b.day_of_week);
+    enforceWeeklyDurationContract(weekSlots, weeks);
     workouts.push(...weekSlots);
   }
   if (workouts.length === 0) throw new Error("ai plan had no usable workouts");
@@ -273,11 +339,17 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) return json({ error: "Missing Authorization header" }, 401);
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: req.headers.get("Authorization")! } } },
+      { global: { headers: { Authorization: authHeader } } },
     );
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return json({ error: "Unauthorized" }, 401);
 
     const { data: goal } = await supabase
       .from("fitness_goals")
@@ -308,7 +380,7 @@ Deno.serve(async (req: Request) => {
       activity_level: null, training_experience: null, preferred_workout_type_ids: [],
     }) as Profile;
     const days = Math.min(Math.max(g.weekly_commitment_days ?? 3, 1), 7);
-    const weeks = g.timeline_weeks ?? 4;
+    const weeks = planWeeks(g);
 
     const prompt = planPrompt(g, p, preferredSlugs, allowedSlugs, days, weeks, personalised);
     const openaiKey = Deno.env.get("OPENAI_API_KEY");
@@ -323,7 +395,7 @@ Deno.serve(async (req: Request) => {
     }
     if (geminiKey) {
       try {
-        const raw = await callGemini(prompt, geminiKey);
+        const raw = await callGemini(prompt, geminiKey, weeks);
         const plan = validatePlan(raw, allowedSlugs, days, weeks, g, p, preferredSlugs, personalised);
         return json({ ...plan, model: GEMINI_MODEL });
       } catch (_) { /* fall through */ }

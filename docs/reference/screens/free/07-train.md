@@ -28,7 +28,7 @@ The Quick Start button is **anchored to the bottom** of the screen (outside the 
 **Avatar is Dashboard-only.** Dashboard (#5) uses the personal "Hi, [name]" greeting + top-right circular avatar link to Profile. Train, Experts, Social, and History all use a leaner header — just the section title, **no avatar**. Profile is reached only via the Home tab. The `TabHeader` component's `title` variant enforces this (no avatar slot).
 
 ### AI Suggested Plan section
-Section header has the label "AI SUGGESTED PLAN" on the left and a "VIEW FULL PLAN ›" link on the right (in `accent`, **Caption 2** uppercase) that opens #8 Plan Detail showing the complete week-by-week schedule.
+Section header has the label "AI SUGGESTED PLAN" on the left and a "VIEW PLANS ›" link on the right (in `accent`, **Caption 2** uppercase) that opens My Plans. Users can open the active or saved plans, then view #8 Plan Detail for the complete week-by-week schedule.
 
 Below the header: large rounded-2xl `surface` card with 1 px `faint` ring.
 

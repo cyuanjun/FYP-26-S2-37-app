@@ -9,6 +9,7 @@ import 'package:wise_workout/controls/authenticate.dart';
 import 'package:wise_workout/controls/generate_plan.dart';
 import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/fitness_goal.dart';
+import 'package:wise_workout/entities/fitness_plan.dart';
 import 'package:wise_workout/entities/profile.dart';
 
 import '../helpers/fakes.dart';
@@ -16,7 +17,7 @@ import '../helpers/fakes.dart';
 void main() {
   // ---- BuildPlanSkeleton (pure rule) ----
   group('buildPlanSkeleton rule', () {
-    test('honours commitment days, timeline, and 4-week cycle (positive)', () {
+    test('honours commitment days and generates the full timeline (positive)', () {
       final d = buildPlanSkeleton(
         goal: PrimaryGoal.loseWeight,
         experience: TrainingExperience.intermediate,
@@ -25,11 +26,11 @@ void main() {
       );
       expect(d.workoutsPerWeek, 4);
       expect(d.durationWeeks, 12);
-      expect(d.slots, hasLength(16)); // 4 days x 4 distinct weeks (a month)
+      expect(d.slots, hasLength(48)); // 4 days x 12 weeks
       expect(d.strategy, GenerationStrategy.basic);
       final week1 = d.slots.where((s) => s.week == 1).toList();
       expect(week1.map((s) => s.dayOfWeek), [1, 3, 5, 6]); // spread, no clumping
-      expect(d.slots.map((s) => s.week).toSet(), {1, 2, 3, 4});
+      expect(d.slots.map((s) => s.week).toSet(), equals({for (var wk = 1; wk <= 12; wk++) wk}));
     });
 
     test('preferences are a contract — only preferred types scheduled', () {
@@ -135,6 +136,85 @@ void main() {
       expect(plan, isNull);
       expect(c.read(generatePlanProvider).hasError, isTrue);
       expect(plans.insertedPlans, isEmpty);
+    });
+  });
+
+  // ---- My Plans / SelectFitnessPlan ----
+  group('Saved plans', () {
+    test('plansProvider lists the signed-in user plans', () async {
+      final gw = FakePlanGateway()
+        ..activePlan = FitnessPlan(
+          id: 'p1',
+          userId: 'u1',
+          fitnessGoalId: 'g1',
+          name: 'Active',
+          durationWeeks: 8,
+          workoutsPerWeek: 3,
+        )
+        ..plans = const [
+          FitnessPlan(
+            id: 'p2',
+            userId: 'u1',
+            fitnessGoalId: 'g1',
+            name: 'Saved',
+            durationWeeks: 12,
+            workoutsPerWeek: 4,
+            isActive: false,
+          ),
+          FitnessPlan(
+            id: 'other',
+            userId: 'u2',
+            fitnessGoalId: 'g2',
+            name: 'Other user',
+            durationWeeks: 4,
+            workoutsPerWeek: 2,
+            isActive: false,
+          ),
+        ];
+      final c = ProviderContainer(overrides: [
+        currentUserIdProvider.overrideWithValue('u1'),
+        planGatewayProvider.overrideWithValue(gw),
+      ]);
+      addTearDown(c.dispose);
+
+      final plans = await c.read(plansProvider.future);
+      expect(plans.map((p) => p.id), ['p1', 'p2']);
+    });
+
+    test('SelectFitnessPlan activates a saved plan', () async {
+      final gw = FakePlanGateway()
+        ..activePlan = FitnessPlan(
+          id: 'p1',
+          userId: 'u1',
+          fitnessGoalId: 'g1',
+          name: 'Active',
+          durationWeeks: 8,
+          workoutsPerWeek: 3,
+        )
+        ..plans = const [
+          FitnessPlan(
+            id: 'p2',
+            userId: 'u1',
+            fitnessGoalId: 'g1',
+            name: 'Saved',
+            durationWeeks: 12,
+            workoutsPerWeek: 4,
+            isActive: false,
+          ),
+        ];
+      final c = ProviderContainer(overrides: [
+        currentUserIdProvider.overrideWithValue('u1'),
+        planGatewayProvider.overrideWithValue(gw),
+      ]);
+      addTearDown(c.dispose);
+
+      final ok = await c.read(selectFitnessPlanProvider.notifier).select('p2');
+      expect(ok, isTrue);
+      expect(gw.selectedPlanIds, ['p2']);
+      expect(gw.activePlan?.id, 'p2');
+      expect(gw.activePlan?.isActive, isTrue);
+      expect(gw.plans.single.id, 'p1');
+      expect(gw.plans.single.isActive, isFalse);
     });
   });
 

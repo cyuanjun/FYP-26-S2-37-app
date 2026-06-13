@@ -25,7 +25,7 @@ class PlannedSlot {
   });
 
   final String slug;
-  final int week; // 1–4 within the monthly cycle
+  final int week; // 1..durationWeeks within the generated timeline
   final int dayOfWeek;
   final int durationMinutes;
   final String name;
@@ -57,9 +57,9 @@ const _daySpread = <int, List<int>>{
 };
 
 /// CONTROL (rule-based) — BuildPlanSkeleton. The offline/AI-down fallback:
-/// a deterministic 4-week monthly cycle (foundation / build / peak /
-/// recovery) from the goal + experience + preferences. Preferences are a
-/// contract — when present, ONLY preferred types are scheduled.
+/// a deterministic full-timeline plan from the goal + experience +
+/// preferences. Preferences are a contract — when present, ONLY preferred
+/// types are scheduled.
 PlanDraft buildPlanSkeleton({
   required PrimaryGoal goal,
   TrainingExperience? experience,
@@ -68,7 +68,7 @@ PlanDraft buildPlanSkeleton({
   int? timelineWeeks,
 }) {
   final days = (weeklyCommitmentDays ?? 3).clamp(1, 7);
-  final weeks = timelineWeeks ?? 4;
+  final weeks = (timelineWeeks ?? 4).clamp(1, 52).toInt();
   final base = switch (experience) {
     TrainingExperience.advanced => 50,
     TrainingExperience.intermediate => 40,
@@ -89,10 +89,11 @@ PlanDraft buildPlanSkeleton({
     PrimaryGoal.maintainFitness => 'Balanced Week',
   };
 
-  const weekBump = [0, 5, 10, -5]; // foundation / build / peak / recovery
   final slots = <PlannedSlot>[];
   final spread = _daySpread[days]!;
-  for (var wk = 1; wk <= 4; wk++) {
+  for (var wk = 1; wk <= weeks; wk++) {
+    final phase = _timelinePhase(wk, weeks);
+    final bump = _weekBump(wk, weeks, phase);
     for (var i = 0; i < spread.length; i++) {
       final slug = rotation[i % rotation.length];
       final hard = i % 3 == 2;
@@ -101,9 +102,9 @@ PlanDraft buildPlanSkeleton({
         week: wk,
         dayOfWeek: spread[i],
         durationMinutes:
-            ((hard ? base + 10 : base) + weekBump[wk - 1]).clamp(15, 120),
+            ((hard ? base + 10 : base) + bump).clamp(15, 120),
         name: '${slug[0].toUpperCase()}${slug.substring(1)} ${hard ? 'push' : 'base'}',
-        descriptor: wk == 4
+        descriptor: phase == _PlanPhase.recovery
             ? 'Recovery week — keep it comfortable'
             : hard ? 'Slightly harder effort — finish strong' : 'Comfortable, repeatable effort',
       ));
@@ -112,13 +113,34 @@ PlanDraft buildPlanSkeleton({
 
   return PlanDraft(
     name: '$title — $weeks-week plan',
-    description: 'A $days-day week in a 4-week cycle (build up, then recover) '
+    description: 'A $days-day week across your full $weeks-week timeline '
         'toward your ${goal.label.toLowerCase()} goal.',
     durationWeeks: weeks,
     workoutsPerWeek: days,
     strategy: GenerationStrategy.basic,
     slots: slots,
   );
+}
+
+enum _PlanPhase { foundation, build, peak, recovery }
+
+_PlanPhase _timelinePhase(int week, int totalWeeks) {
+  if (week == totalWeeks && totalWeeks > 1) return _PlanPhase.recovery;
+  final progress = week / totalWeeks;
+  if (progress <= 0.25) return _PlanPhase.foundation;
+  if (progress <= 0.75) return _PlanPhase.build;
+  return _PlanPhase.peak;
+}
+
+int _weekBump(int week, int totalWeeks, _PlanPhase phase) {
+  if (phase == _PlanPhase.recovery) return -5;
+  final ramp = totalWeeks <= 1 ? 0 : ((week - 1) / (totalWeeks - 1) * 15).round();
+  return switch (phase) {
+    _PlanPhase.foundation => ramp.clamp(0, 5).toInt(),
+    _PlanPhase.build => ramp.clamp(5, 12).toInt(),
+    _PlanPhase.peak => ramp.clamp(10, 18).toInt(),
+    _PlanPhase.recovery => -5,
+  };
 }
 
 /// The user's active plan (Train card) and its weekly template.
@@ -132,6 +154,21 @@ final plannedWorkoutsProvider = FutureProvider<List<PlannedWorkout>>((ref) async
   final plan = await ref.watch(activePlanProvider.future);
   if (plan == null) return const <PlannedWorkout>[];
   return ref.watch(planGatewayProvider).listPlannedWorkouts(plan.id);
+});
+
+final plansProvider = FutureProvider<List<FitnessPlan>>((ref) {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return Future.value(const <FitnessPlan>[]);
+  return ref.watch(planGatewayProvider).listPlans(userId);
+});
+
+final planByIdProvider = FutureProvider.family<FitnessPlan?, String>((ref, planId) {
+  return ref.watch(planGatewayProvider).fetchPlan(planId);
+});
+
+final plannedWorkoutsForPlanProvider =
+    FutureProvider.family<List<PlannedWorkout>, String>((ref, planId) {
+  return ref.watch(planGatewayProvider).listPlannedWorkouts(planId);
 });
 
 /// CONTROL — GeneratePlan. Free tier → rule-based BuildPlanSkeleton;
@@ -195,7 +232,7 @@ class GeneratePlan extends AsyncNotifier<void> {
             if (bySlug.containsKey(draft.slots[i].slug))
               {
                 'workout_type_id': bySlug[draft.slots[i].slug]!.id,
-                'week_number': draft.slots[i].week, // 4-week monthly cycle
+                'week_number': draft.slots[i].week,
                 'day_of_week': draft.slots[i].dayOfWeek,
                 'duration_minutes': draft.slots[i].durationMinutes,
                 'name': draft.slots[i].name,
@@ -205,6 +242,8 @@ class GeneratePlan extends AsyncNotifier<void> {
         ],
       );
       ref.invalidate(activePlanProvider);
+      ref.invalidate(plannedWorkoutsProvider);
+      ref.invalidate(plansProvider);
     });
     return state.hasError ? null : created;
   }
@@ -219,11 +258,12 @@ class GeneratePlan extends AsyncNotifier<void> {
       );
 
   PlanDraft _draftFromAi(Map<String, dynamic> data) {
+    final durationWeeks = ((data['duration_weeks'] as num?)?.toInt() ?? 4).clamp(1, 52).toInt();
     final workouts = (data['workouts'] as List? ?? const [])
         .whereType<Map>()
         .map((w) => PlannedSlot(
               slug: w['slug'] as String? ?? 'running',
-              week: ((w['week_number'] as num?)?.toInt() ?? 1).clamp(1, 4),
+              week: ((w['week_number'] as num?)?.toInt() ?? 1).clamp(1, durationWeeks),
               dayOfWeek: (w['day_of_week'] as num?)?.toInt() ?? 1,
               durationMinutes: (w['duration_minutes'] as num?)?.toInt() ?? 30,
               name: w['name'] as String? ?? 'Workout',
@@ -234,7 +274,7 @@ class GeneratePlan extends AsyncNotifier<void> {
     return PlanDraft(
       name: data['name'] as String? ?? 'Suggested plan',
       description: data['description'] as String? ?? '',
-      durationWeeks: (data['duration_weeks'] as num?)?.toInt() ?? 4,
+      durationWeeks: durationWeeks,
       workoutsPerWeek: (data['workouts_per_week'] as num?)?.toInt() ?? workouts.length,
       strategy: data['strategy'] == 'personalised'
           ? GenerationStrategy.personalised
@@ -245,6 +285,36 @@ class GeneratePlan extends AsyncNotifier<void> {
 }
 
 final generatePlanProvider = AsyncNotifierProvider<GeneratePlan, void>(GeneratePlan.new);
+
+/// CONTROL — SelectFitnessPlan. Makes a saved plan the active training plan.
+class SelectFitnessPlan extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
+
+  Future<bool> select(String planId) async {
+    SeqLog.msg('select-plan', 'PlanDetailScreen', 'SelectFitnessPlan', 'select($planId)');
+    state = const AsyncLoading();
+    var ok = false;
+    state = await AsyncValue.guard(() async {
+      final userId = ref.read(currentUserIdProvider);
+      if (userId == null) throw StateError('Not signed in');
+      SeqLog.msg('select-plan', 'SelectFitnessPlan', 'PlanGateway', 'setActivePlan');
+      await ref
+          .read(planGatewayProvider)
+          .setActivePlan(userId: userId, planId: planId);
+      ref.invalidate(activePlanProvider);
+      ref.invalidate(plannedWorkoutsProvider);
+      ref.invalidate(plansProvider);
+      ref.invalidate(planByIdProvider(planId));
+      ref.invalidate(plannedWorkoutsForPlanProvider(planId));
+      ok = true;
+    });
+    return ok;
+  }
+}
+
+final selectFitnessPlanProvider =
+    AsyncNotifierProvider<SelectFitnessPlan, void>(SelectFitnessPlan.new);
 
 /// CONTROL — CompleteOnboarding. Marks the wizard done; Splash/Login stop
 /// routing here (profiles.onboarding_completed_at).
