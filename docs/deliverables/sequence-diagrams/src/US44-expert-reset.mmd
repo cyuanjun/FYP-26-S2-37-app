@@ -6,9 +6,10 @@ sequenceDiagram
   participant B as «Boundary»<br/>ForgotPasswordScreen
   participant C as «Control»<br/>RequestPasswordReset
   participant E as «Entity»<br/>User credentials (auth.users)
-  A->>B: enter email, send link
+  A->>B: enter email, tap SEND RESET LINK
   B->>C: send(email)
-  C->>E: request reset link
-  E-->>C: ok
-  B-->>A: "reset link sent" card
-  note over E: owned by Supabase Auth via AuthGateway
+  C->>E: resetPasswordForEmail(email)
+  E-->>C: ok (no account disclosure)
+  C-->>B: state = AsyncData (sent)
+  B-->>A: "If that email exists, a reset link was sent."
+  note over E: resetPasswordForEmail via AuthGateway → Supabase Auth.<br/>same confirmation always shown (anti-enumeration)

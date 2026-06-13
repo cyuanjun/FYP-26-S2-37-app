@@ -5,13 +5,14 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>UpgradeScreen
   participant C as «Control»<br/>StartPremium
-  participant E as «Entity»<br/>Subscription
+  participant E as «Entity»<br/>Subscription · User
   A->>B: tap GO PREMIUM
   B-->>A: plan comparison ($9.99/mo, simulated)
   A->>B: confirm upgrade
   B->>C: startPremium()
-  C->>E: new Subscription (active) + role = premium
-  E-->>C: premium active
-  C-->>B: done
+  C->>E: updateSubscription(tier = premium, status = active)
+  note right of E: payment simulated —<br/>price fields only, no gateway
+  E-->>C: Subscription (active), role = premium
+  C-->>B: state = AsyncData (premium)
   B-->>A: premium surfaces unlock
-  note over E: persisted via SupabaseGateway (SECURITY DEFINER RPC)
+  note over E: planned — updateSubscription via SupabaseGateway<br/>(SECURITY DEFINER RPC, RLS)

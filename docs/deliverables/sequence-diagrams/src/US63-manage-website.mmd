@@ -2,14 +2,19 @@
 title: "US63 — Manage marketing website"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>WebsiteAdminScreen
   participant C as «Control»<br/>ManageWebsiteContent
-  participant E as «Entity»<br/>Website content (site CMS)
-  A->>B: edit hero / pricing / FAQ / testimonials
-  B->>C: save(sectionContent)
-  C->>E: update content sections
-  E-->>C: published
-  C-->>B: done
+  participant E as «Entity»<br/>WebsiteContent
+  A->>B: open Website tab
+  B->>C: loadContent(section)
+  C->>E: fetchWebsiteContent(section)
+  E-->>C: WebsiteContent (section)
+  C-->>B: state = AsyncData (content)
+  A->>B: edit hero / pricing / FAQ / testimonials, tap PUBLISH
+  B->>C: save(section, content)
+  C->>E: updateWebsiteContent(section, content)
+  E-->>C: WebsiteContent (published)
+  C-->>B: state = AsyncData (published)
   B-->>A: marketing site reflects the change
-  note over E: site CMS tables sit outside the 26-entity app ERD -<br/>persisted via SupabaseGateway
+  note over E: fetchWebsiteContent / updateWebsiteContent via SupabaseGateway (RLS admin-only).<br/>content stored in DB, not hardcoded

@@ -7,9 +7,15 @@ sequenceDiagram
   participant C as «Control»<br/>FollowUser / UnfollowUser
   participant E as «Entity»<br/>Follow
   A->>B: tap "Add Friend"
-  B->>C: follow(userId)
-  C->>E: new Follow (follower → followed)
-  E-->>C: created
-  C-->>B: following
+  B->>C: follow(targetId)
+  C->>E: followUser(targetId)
+  E-->>C: Follow (follower → followed)
+  C-->>B: state = AsyncData (following)
   B-->>A: button now "Unfriend" - their posts join the feed
-  note over E: persisted via SocialGateway → Supabase
+  A->>B: tap "Unfriend"
+  B->>C: unfollow(targetId)
+  C->>E: unfollowUser(targetId)
+  E-->>C: removed
+  C-->>B: state = AsyncData (not following)
+  B-->>A: button back to "Add Friend"
+  note over E: followUser / unfollowUser via SocialGateway → follows (RLS) [planned]

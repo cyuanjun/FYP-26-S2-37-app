@@ -4,12 +4,14 @@ title: "US19 — Workout reminders"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>NotificationsScreen
-  participant C as «Control»<br/>UpdateNotificationPrefs
+  participant C as «Control»<br/>ManageNotificationPrefs / ScheduleReminder
   participant E as «Entity»<br/>Profile (notification_prefs)
   A->>B: toggle "Daily reminder" on
-  B->>C: setEnabled(daily_reminder, true)
-  C->>E: update prefs map, persist
+  B->>C: setEnabled(workout_reminder, true)
+  C->>E: updateNotificationPrefs(userId, prefs)
   E-->>C: saved
-  C-->>B: toggle committed
-  B-->>A: reminder fires at preferred time
-  note over E: prefs via ProfileGateway → Supabase -<br/>scheduling rule-based via NotificationGateway (no AI)
+  C->>E: scheduleReminder(workout_reminder, time)
+  E-->>C: scheduled
+  C-->>B: state = AsyncData (prefs)
+  B-->>A: reminder fires at preferred time (rule-based, not AI)
+  note over E: prefs via ProfileGateway → profiles (RLS) [BUILT] -<br/>scheduleReminder via NotificationGateway (flutter_local_notifications) [planned] - rule-based, no AI

@@ -2,14 +2,19 @@
 title: "US62 — Manage subscription access"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>UsersScreen (detail)
   participant C as «Control»<br/>ManageSubscriptionAccess
-  participant E as «Entity»<br/>Subscription · Profile
-  A->>B: open a user's subscription
-  B->>C: grant / revoke premium
-  C->>E: Subscription status + Profile role change
-  E-->>C: updated
-  C-->>B: tier updated
+  participant E as «Entity»<br/>Subscription · User
+  A->>B: open a user's subscription detail
+  B->>C: loadSubscription(userId)
+  C->>E: fetchSubscription(userId)
+  E-->>C: Subscription (current tier)
+  C-->>B: state = AsyncData (subscription)
+  A->>B: select tier, tap APPLY
+  B->>C: setTier(userId, tier)
+  C->>E: updateSubscriptionAccess(userId, tier)
+  E-->>C: Subscription (updated tier)
+  C-->>B: state = AsyncData (updated)
   B-->>A: user's access level corrected
-  note over E: persisted via SupabaseGateway
+  note over E: fetchSubscription / updateSubscriptionAccess via SupabaseGateway (RLS admin-only).<br/>manual tier assignment — payment is simulated

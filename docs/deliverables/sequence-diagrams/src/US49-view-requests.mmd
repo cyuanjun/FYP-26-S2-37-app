@@ -7,9 +7,15 @@ sequenceDiagram
   participant C as «Control»<br/>ViewServiceRequests
   participant E as «Entity»<br/>ServiceRequest
   A->>B: open Requests tab
-  B->>C: load requests
-  C->>E: requests for my services
-  E-->>C: pending / accepted / completed
-  C-->>B: request list
-  B-->>A: who asked, for what, when
-  note over E: read via SupabaseGateway
+  B->>C: load(expertId)
+  C->>E: listServiceRequests(expertId)
+  alt requests found
+    E-->>C: List of ServiceRequest (pending / accepted / completed)
+    C-->>B: state = AsyncData (request list)
+    B-->>A: who asked, for what, when
+  else none yet
+    E-->>C: empty list
+    C-->>B: state = AsyncData (empty)
+    B-->>A: "No requests yet."
+  end
+  note over E: listServiceRequests via SupabaseGateway → service_requests (RLS — own services only)

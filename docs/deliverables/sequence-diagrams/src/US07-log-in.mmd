@@ -8,14 +8,16 @@ sequenceDiagram
   participant E as «Entity»<br/>Profile
   A->>B: enter email + password, tap LOG IN
   B->>C: signIn(email, password)
-  C->>E: verify credentials, load Profile
+  C->>E: signInWithPassword(email, password)
   alt valid credentials
-    E-->>C: session + Profile (role)
-    C-->>B: auth state = signed in
+    E-->>C: AuthResponse (session)
+    C->>E: fetchProfile(userId)
+    E-->>C: Profile (role)
+    C-->>B: state = AsyncData (signed in)
     B-->>A: redirect to Home (role-aware)
   else invalid credentials
     E-->>C: AuthException
-    C-->>B: error state
+    C-->>B: state = AsyncError
     B-->>A: "Incorrect email or password."
   end
-  note over E: credential check by Supabase Auth,<br/>reached via AuthGateway
+  note over E: signInWithPassword via AuthGateway → Supabase Auth.<br/>fetchProfile via ProfileGateway → profiles (RLS)

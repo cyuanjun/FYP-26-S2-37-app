@@ -4,12 +4,18 @@ title: "US22 — View community posts"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>SocialScreen (Community)
-  participant C as «Control»<br/>ViewFeed
+  participant C as «Control»<br/>LoadFeed
   participant E as «Entity»<br/>Post
   A->>B: open Social tab
-  B->>C: load feed
-  C->>E: posts (workout_share, level_up, challenge_result)
-  E-->>C: feed items + authors
-  C-->>B: feed models
-  B-->>A: scrollable community feed
-  note over E: read via SocialGateway → Supabase
+  B->>C: load()
+  C->>E: listFeed()
+  alt posts found
+    E-->>C: Post list (workout_share, level_up, challenge_result)
+    C-->>B: state = AsyncData (feed models)
+    B-->>A: scrollable community feed
+  else empty
+    E-->>C: empty list
+    C-->>B: state = AsyncData (empty)
+    B-->>A: "No posts yet"
+  end
+  note over E: listFeed via SocialGateway → posts (RLS) [planned]

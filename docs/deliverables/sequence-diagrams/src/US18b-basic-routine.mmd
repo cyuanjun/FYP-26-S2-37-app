@@ -4,17 +4,21 @@ title: "US18b — Basic AI fitness plan suggestion"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>OnboardingFlow / TrainScreen
-  participant C as «Control»<br/>GeneratePlan (SuggestPlan, basic)
+  participant C as «Control»<br/>GeneratePlan
   participant E as «Entity»<br/>FitnessPlan · PlannedWorkout
-  A->>B: generate my plan
+  A->>B: tap Generate my plan
   B->>C: generate()
+  C->>E: fetchActiveGoal(userId) + fetchFitnessProfile(userId)
+  E-->>C: FitnessGoal + FitnessProfile
   alt AI available
-    C->>E: FitnessPlan (generation_strategy = basic)<br/>+ weekly PlannedWorkouts
-    E-->>C: basic AI plan
+    C->>E: suggestPlan() (basic depth)
+    E-->>C: plan draft (generation_strategy = basic)
   else AI unavailable
-    C->>E: rule-based skeleton fallback (BuildPlanSkeleton)
-    E-->>C: fallback plan
+    C->>E: buildPlanSkeleton(...) rule fallback
+    E-->>C: skeleton draft
   end
-  C-->>B: plan active
+  C->>E: insertPlan(...) + setActivePlan(...)
+  E-->>C: FitnessPlan (active)
+  C-->>B: state = AsyncData (plan active)
   B-->>A: weekly plan, labelled AI-assisted (basic)
-  note over E: AI via AiGateway → suggest-plan Edge Function (OpenAI gpt-4o-mini LIVE, Gemini/stub fallback) -<br/>Free = basic depth, Premium = personalised (US37) - persisted via PlanGateway
+  note over E: suggestPlan via AiGateway → suggest-plan Edge Function (OpenAI gpt-4o-mini LIVE, Gemini/stub fallback) -<br/>Free = basic depth, Premium = personalised (US37) - goal/profile via FitnessGateway - persisted via PlanGateway

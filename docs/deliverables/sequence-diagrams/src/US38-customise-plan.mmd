@@ -5,11 +5,13 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>PlanDetailScreen
   participant C as «Control»<br/>RegeneratePlan
-  participant E as «Entity»<br/>FitnessPlan
+  participant E as «Entity»<br/>FitnessPlan · PlannedWorkout
   A->>B: change duration / frequency / preferences
-  B->>C: regenerate(options)
-  C->>E: update FitnessPlan (regenerated_count + 1)
-  E-->>C: updated plan
-  C-->>B: plan persisted
+  B->>C: generate() (regenerate)
+  C->>E: suggestPlan() (revised options)
+  E-->>C: AI plan draft
+  C->>E: insertPlan(regenerated_count + 1) + setActivePlan(...)
+  E-->>C: FitnessPlan + PlannedWorkouts (updated)
+  C-->>B: state = AsyncData (plan persisted)
   B-->>A: plan reflects custom parameters
-  note over E: AI re-draft via AiGateway - persisted via SupabaseGateway
+  note over E: suggestPlan via AiGateway → suggest-plan Edge Function —<br/>persisted via PlanGateway (RLS). Free capped at 1 regenerate

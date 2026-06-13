@@ -9,14 +9,15 @@ sequenceDiagram
   A->>B: open Devices (Train tab)
   B-->>A: Phone sensors - CONNECTED (default)
   A->>B: tap + ADD DEVICE, pick a wearable
-  B->>C: pair(device)
-  C->>E: new ConnectedDevice (type, name, active)
+  B->>C: pair(type, name)
+  C->>E: addDevice(type, name, active)
   alt paired
-    E-->>C: device registered
-    C-->>B: connected
+    E-->>C: ConnectedDevice (registered)
+    C-->>B: state = AsyncData (connected)
     B-->>A: device listed - its data feeds recordings (US12)
   else pairing fails
-    C-->>B: error
+    E-->>C: error
+    C-->>B: state = AsyncError
     B-->>A: "Could not connect - try again"
   end
-  note over E: device_type incl. phone_sensors, apple_watch, fitbit, garmin... -<br/>persisted via SupabaseGateway, sessions link via connectedDeviceId
+  note over E: mock-BLE pairing + simulated wearable HR.<br/>addDevice via DeviceGateway → connected_devices (RLS), sessions link via connectedDeviceId

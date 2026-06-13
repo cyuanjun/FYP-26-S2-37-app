@@ -2,14 +2,16 @@
 title: "US64 — Maintain platform quality + reliability"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>MonitorScreen
   participant C as «Control»<br/>ViewPlatformStats
-  participant E as «Entity»<br/>Feedback · WorkoutSession (aggregates)
-  A->>B: open platform dashboard
-  B->>C: load health stats
-  C->>E: aggregate users, sessions, errors, feedback
-  E-->>C: platform metrics
-  C-->>B: dashboard
-  B-->>A: spot issues, act via US56-US63 tools
-  note over E: read via SupabaseGateway
+  participant E as «Entity»<br/>Feedback · Post (aggregates)
+  A->>B: open platform health dashboard
+  B->>C: loadHealth()
+  C->>E: listReportedContent()
+  E-->>C: List of reported content
+  C->>E: listFeedback()
+  E-->>C: List of Feedback (open issues)
+  C-->>B: state = AsyncData (health metrics)
+  B-->>A: review quality, act via US56–US63 tools
+  note over E: listReportedContent / listFeedback via SupabaseGateway (RLS admin-only).<br/>oversight flow — reuses moderation + feedback reads

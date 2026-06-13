@@ -8,9 +8,9 @@ sequenceDiagram
   participant E as «Entity»<br/>WorkoutSession
   A->>B: open History tab
   B->>C: load sessions
-  C->>E: all sessions (no date bound)
-  note right of E: lifetime query -<br/>Free month-cap not applied
-  E-->>C: every session
-  C-->>B: full grouped history
+  C->>E: listEndedSessions(userId, from: lifetime)
+  note right of E: Premium — no date bound,<br/>Free month-cap not applied
+  E-->>C: List (every WorkoutSession)
+  C-->>B: state = AsyncData (full grouped history)
   B-->>A: every recorded session
-  note over E: read via WorkoutGateway → Supabase
+  note over E: listEndedSessions via WorkoutGateway → Supabase (RLS)

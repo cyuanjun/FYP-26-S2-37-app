@@ -2,13 +2,14 @@
 title: "US54 — Admin log out"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>AdminShell
   participant C as «Control»<br/>Authenticate
   participant E as «Entity»<br/>Profile
-  A->>B: tap log out
+  A->>B: tap LOG OUT
   B->>C: signOut()
-  C->>E: end session, clear cached Profile
-  E-->>C: cleared
-  B-->>A: back to Login
-  note over E: via AuthGateway → Supabase Auth
+  C->>E: signOut()
+  E-->>C: session cleared
+  C-->>B: state = AsyncData (signed out)
+  B-->>A: redirect to LoginScreen
+  note over E: signOut via AuthGateway → Supabase Auth.<br/>cached Profile cleared on sign-out

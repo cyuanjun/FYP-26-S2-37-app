@@ -4,15 +4,21 @@ title: "US37 — Personalised AI plan suggestions"
 sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>TrainScreen
-  participant C as «Control»<br/>SuggestPlan (AI)
+  participant C as «Control»<br/>GeneratePlan
   participant E as «Entity»<br/>FitnessPlan · PlannedWorkout
   A->>B: tap "Suggest plan"
-  B->>C: suggestPlan(goal, profile)
-  alt accepted
-    C->>E: FitnessPlan + PlannedWorkouts (personalised)
-    E-->>C: plan active
-    B-->>A: personalised plan on Train tab
-  else regenerate
-    B->>C: suggest again
+  B->>C: generate()
+  C->>E: fetchActiveGoal(userId) + fetchFitnessProfile(userId)
+  E-->>C: goal + profile context
+  alt AI available
+    C->>E: suggestPlan() (personalised)
+    E-->>C: AI plan draft
+  else AI unavailable
+    C->>E: BuildPlanSkeleton (rule fallback)
+    E-->>C: fallback plan
   end
-  note over E: AI draft via AiGateway → Edge Function -<br/>persisted via SupabaseGateway
+  C->>E: insertPlan(...) + setActivePlan(...)
+  E-->>C: FitnessPlan + PlannedWorkouts (active)
+  C-->>B: state = AsyncData (plan active)
+  B-->>A: personalised plan on Train tab
+  note over E: suggestPlan via AiGateway → suggest-plan Edge Function —<br/>persisted via PlanGateway (RLS). Premium = personalised depth (US18b basic)

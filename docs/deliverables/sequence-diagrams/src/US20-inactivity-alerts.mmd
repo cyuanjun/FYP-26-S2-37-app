@@ -4,11 +4,14 @@ title: "US20 — Inactivity alerts"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>NotificationsScreen
-  participant C as «Control»<br/>CheckInactivity (rule-based)
-  participant E as «Entity»<br/>WorkoutSession
-  A->>B: inactivity alerts enabled
-  C->>E: scan recent sessions vs weekly commitment
-  E-->>C: no ended session for N days
-  C-->>B: schedule alert
-  B-->>A: "You have not worked out since..."
-  note over E: delivered via NotificationGateway (local notifications)
+  participant C as «Control»<br/>ManageNotificationPrefs / ScheduleReminder
+  participant E as «Entity»<br/>Profile (notification_prefs) · WorkoutSession
+  A->>B: toggle "Inactivity alerts" on
+  B->>C: setEnabled(inactivity_alert, true)
+  C->>E: updateNotificationPrefs(userId, prefs)
+  E-->>C: saved
+  C->>E: scheduleReminder(inactivity_alert) - scan listEndedSessions vs commitment
+  E-->>C: no ended session for N days → scheduled
+  C-->>B: state = AsyncData (prefs)
+  B-->>A: "You have not worked out since..." (rule-based, not AI)
+  note over E: prefs via ProfileGateway → profiles (RLS) [BUILT] -<br/>scheduleReminder via NotificationGateway over WorkoutGateway.listEndedSessions [planned] - rule-based, no AI

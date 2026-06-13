@@ -2,14 +2,26 @@
 title: "US58 — Manage expert categories"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>CategoriesScreen
-  participant C as «Control»<br/>UpsertExpertCategory
+  participant C as «Control»<br/>ManageExpertCategories
   participant E as «Entity»<br/>ExpertCategory
-  A->>B: create / rename / suspend a category
-  B->>C: save(category)
-  C->>E: category changes
-  E-->>C: updated
-  C-->>B: catalog updated
-  B-->>A: marketplace filters reflect it
-  note over E: persisted via SupabaseGateway
+  alt create
+    A->>B: enter name, tap ADD CATEGORY
+    B->>C: create(name)
+    C->>E: insertExpertCategory(name)
+    E-->>C: ExpertCategory (new)
+  else rename
+    A->>B: edit name, tap SAVE
+    B->>C: rename(categoryId, name)
+    C->>E: updateExpertCategory(categoryId, name)
+    E-->>C: ExpertCategory (updated)
+  else remove
+    A->>B: tap DELETE
+    B->>C: remove(categoryId)
+    C->>E: deleteExpertCategory(categoryId)
+    E-->>C: ok
+  end
+  C-->>B: state = AsyncData (categories)
+  B-->>A: marketplace filters reflect the change
+  note over E: insertExpertCategory / updateExpertCategory / deleteExpertCategory via SupabaseGateway (RLS admin-only)

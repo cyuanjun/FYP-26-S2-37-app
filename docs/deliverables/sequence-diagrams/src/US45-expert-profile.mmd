@@ -4,12 +4,18 @@ title: "US45 — Create / manage expert profile"
 sequenceDiagram
   actor A as Expert User
   participant B as «Boundary»<br/>ExpertProfileScreen
-  participant C as «Control»<br/>UpsertExpertProfile
+  participant C as «Control»<br/>UpdateExpertProfile
   participant E as «Entity»<br/>ExpertProfile
-  A->>B: edit bio, credentials, photo
+  A->>B: edit bio, credentials, photo, tap SAVE
   B->>C: save(profile)
-  C->>E: apply edits, persist
-  E-->>C: updated
-  C-->>B: saved
-  B-->>A: public profile updated
-  note over E: persisted via SupabaseGateway
+  C->>E: saveExpertProfile(profile)
+  alt saved
+    E-->>C: ExpertProfile (updated)
+    C-->>B: state = AsyncData (saved)
+    B-->>A: public profile updated
+  else save failed
+    E-->>C: PostgrestException
+    C-->>B: state = AsyncError
+    B-->>A: "Could not save profile. Try again."
+  end
+  note over E: saveExpertProfile via SupabaseGateway → expert_profiles (RLS)

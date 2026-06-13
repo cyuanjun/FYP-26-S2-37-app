@@ -8,13 +8,15 @@ sequenceDiagram
   participant E as «Entity»<br/>Challenge · ChallengeParticipant
   A->>B: tap JOIN CHALLENGE
   B->>C: join(challengeId)
-  C->>E: check deadline, add participant
+  C->>E: joinChallenge(challengeId)
   alt joined
-    E-->>C: participating
+    E-->>C: ChallengeParticipant (participating)
+    C-->>B: state = AsyncData (joined)
     B-->>A: progress tracked - XP on completion
   else deadline passed
-    E-->>C: challenge ended
+    E-->>C: Exception (challenge ended)
+    C-->>B: state = AsyncError
     B-->>A: "Challenge has ended"
   end
-  note over C,E: rewards = XP / levels<br/>(replaces badges - schema v2)
-  note over E: persisted via SocialGateway → Supabase
+  note over C,E: rewards = XP / levels (replaces badges - schema v2)
+  note over E: joinChallenge via SocialGateway → challenges · challenge_participants (RLS) [planned]

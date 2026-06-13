@@ -2,13 +2,14 @@
 title: "US55 — Admin password reset"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>ForgotPasswordScreen
   participant C as «Control»<br/>RequestPasswordReset
   participant E as «Entity»<br/>User credentials (auth.users)
-  A->>B: enter email, send link
+  A->>B: enter email, tap SEND RESET LINK
   B->>C: send(email)
-  C->>E: request reset link
-  E-->>C: ok
-  B-->>A: "reset link sent" card
-  note over E: owned by Supabase Auth via AuthGateway
+  C->>E: resetPasswordForEmail(email)
+  E-->>C: ok (no account disclosure)
+  C-->>B: state = AsyncData (sent)
+  B-->>A: "If an account exists, a reset link was sent."
+  note over E: resetPasswordForEmail via AuthGateway → Supabase Auth.<br/>same confirmation regardless of account existence (anti-enumeration)

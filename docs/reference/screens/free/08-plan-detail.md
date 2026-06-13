@@ -7,7 +7,7 @@ status: built
 
 # 8. Plan Detail
 
-**Purpose:** Read-only view of the user's active AI-generated fitness plan. Shows the full week-by-week schedule, today's workout, personalisation context (Premium), and offers a Regenerate action. Reached from #7 Train's "View plan" link.
+**Purpose:** View a generated fitness plan. Shows the full week-by-week schedule, today's workout when the plan is active, personalisation context (Premium), and either a Regenerate action for the active plan or a Use This Plan action for saved plans. Reached from #7 Train's "View Plans" link via #14 My Plans.
 
 (Previously titled "Workout detail" — repurposed since plans are AI-generated, not user-authored.)
 
@@ -74,7 +74,7 @@ Tapping Regenerate opens a `Modal`:
 
 ## Edges
 
-- **From:** Train (#7) — "View plan" link from Active Plan card
+- **From:** My Plans (#14) — tapping the active or a saved generated plan
 - **To:**
   - Back (←) → Train (#7) — hard-wired `Link`
   - Active Workout (#9) — "Start today's workout"
@@ -89,7 +89,8 @@ See [../../database-v1.md](../../database-v1.md).
 
 ## Notes / non-obvious
 
-- **"AI" is mock.** The regeneration function deterministically constructs a plan from the user's `FitnessGoal` + `UserFitnessProfile`. No external API call. Premium variants include richer logic (e.g. exclude high-impact workouts when `UserInjury` includes "Knee pain").
+- **AI generation path.** The prototype calls the `suggest-plan` Supabase Edge Function. It builds the plan from the user's `FitnessGoal`, `UserFitnessProfile`, preferences, limitations, and subscription tier; OpenAI is the primary provider, Gemini is a fallback, and the app retains a deterministic rule fallback if the provider call fails.
+- **Timeline-aware generation.** Plans use the user's selected goal timeline (`durationWeeks`) instead of a fixed 4-week cycle. Week selectors and progress labels scale to the generated plan length.
 - **Regeneration limit (Free).** Enforced client-side via `FitnessPlan.RegeneratedCount` on the active plan, reset monthly server-side in production. For the FYP mock, just block when count ≥ 1.
 - **Old plans aren't deleted.** Setting `CompletedAt` retains history — useful for future "your past plans" or comparison features. Only one plan has `IsActive = true` at a time.
 - **Per-cell tap behaviour**: every schedule row opens the Workout Detail modal. This is the only place the full descriptor is shown (the row stays single-line) and is the natural hook for Premium-only coaching content.

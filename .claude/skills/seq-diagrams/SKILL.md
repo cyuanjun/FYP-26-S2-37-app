@@ -45,7 +45,19 @@ Rules learned the hard way:
   §D). Auth flows with no domain entity use `User credentials (auth.users)` + a note that
   Supabase Auth owns it. Never show an entity validating credentials.
 - **No semicolons in message labels** (Mermaid statement separator — broke 6 renders). Use
-  dashes. Avoid double quotes inside labels except short UI strings.
+  dashes. Avoid double quotes inside labels except short UI strings. Also avoid raw `<...>`
+  angle-bracket entities inside an arrow label (broke US22) — write "Post list" not `<Post>`.
+- **Message labels are REAL function names** (13 Jun pass, user-approved on the US07 sample —
+  "the things on top of arrows should be the functions we use"). Per arrow:
+  Actor→Boundary = a user **gesture** (prose, e.g. "tap LOG IN"); Boundary→Control = the real
+  **Control method** (`signIn(email, password)`); Control→Entity = the real **gateway/RPC/Edge**
+  function (`fetchProfile(userId)`, `endSession(...)`, `end_workout_session(...)`, `suggestPlan()`);
+  return arrows = the returned **type/data** (`Profile (role)`, `xp_gained, streak, leveled_up`).
+  Built stories use exact names from `lib/` (controls + the 7 feature gateways + the two Edge
+  Functions + the `end_workout_session` RPC); unbuilt stories use the bce-design §2.4 planned
+  Control name + a plausible camelCase gateway method, with the closing note saying
+  "via SupabaseGateway (RLS)". When a feature later gets built, swap the placeholder gateway
+  names for the real ones.
 - Keep diagrams SIMPLE: one flow, ≤ ~12 messages, one alt block max.
 - Architecture facts to keep truthful where relevant: Free history cap = current calendar
   month (query-level); calories = MET × kg × h computed at session end and SAVED;
@@ -77,6 +89,15 @@ npx -y @mermaid-js/mermaid-cli -i src/USnn-<slug>.mmd -o USnn-<slug>.png -b whit
 
 ## Review state (UPDATE THIS SECTION as you go)
 
+- **Function-name pass — DONE 13 Jun (all 59):** every diagram's arrow labels were rewritten to
+  real function names (see the "Message labels are REAL function names" rule above), rendered, and
+  verified (no semicolons, all PNGs fresh). US07 was the user-approved gold-standard sample. This
+  was a *labelling* pass — the per-story **meaning** review below still stands (US19 still paused).
+  Judgment calls made during the pass: US11 `UpsertFitnessProfile`→`UpdateFitnessProfile` and
+  US12/US16 → real `ActiveWorkout` control (matched to code); US18a draws the real path where the
+  session read is server-side in the Edge Function; US26 reworded "OS share sheet" → named platform;
+  US48 collapsed to one `PublishContent` control; US52 redrawn from the expert's side (receives the
+  verification outcome; admin side is US57). Unbuilt gateway method names are plausible placeholders.
 - **Reviewed & confirmed:** US07–US09, US11, US13, US15
 - **Reviewed & corrected:** US10 (website login-gated app download — just the download,
   no auth sub-flow), US12 (continuous recording loop: GPS/HR/steps + manage note),

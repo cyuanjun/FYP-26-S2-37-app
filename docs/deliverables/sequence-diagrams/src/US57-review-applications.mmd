@@ -2,18 +2,26 @@
 title: "US57 — Review expert applications"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>ExpertsApprovalScreen
   participant C as «Control»<br/>ReviewExpertVerification
-  participant E as «Entity»<br/>ExpertVerificationDocument · ExpertProfile
+  participant E as «Entity»<br/>ExpertProfile · ExpertVerificationDocument
   A->>B: open pending application + documents
-  B->>C: review(expertId)
-  C->>E: inspect documents
+  B->>C: loadApplication(applicationId)
+  C->>E: fetchExpertVerification(applicationId)
+  E-->>C: ExpertProfile + ExpertVerificationDocument
+  C-->>B: state = AsyncData (application)
   alt approve
-    C->>E: verification_status → verified, role → expert
+    A->>B: tap APPROVE
+    B->>C: decide(applicationId, "verified")
+    C->>E: updateExpertVerification(applicationId, "verified")
+    E-->>C: ExpertProfile (status = verified)
     B-->>A: expert goes live
   else reject
-    C->>E: verification_status → rejected (+reason)
+    A->>B: tap REJECT (+ reason)
+    B->>C: decide(applicationId, "rejected")
+    C->>E: updateExpertVerification(applicationId, "rejected")
+    E-->>C: ExpertProfile (status = rejected)
     B-->>A: applicant notified
   end
-  note over E: persisted via SupabaseGateway
+  note over E: fetchExpertVerification / updateExpertVerification via SupabaseGateway (RLS admin-only)

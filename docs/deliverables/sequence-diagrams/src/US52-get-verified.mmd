@@ -3,14 +3,20 @@ title: "US52 — Profile verified by admin"
 ---
 sequenceDiagram
   actor A as Expert User
-  participant B as «Boundary»<br/>Admin ExpertsApprovalScreen
-  participant C as «Control»<br/>ReviewExpertVerification
-  participant E as «Entity»<br/>ExpertProfile
-  note over A: expert has submitted credentials (US41)
-  A->>B: (admin) reviews application
-  B->>C: approve(expertId)
-  C->>E: verification_status → verified
-  E-->>C: verified
-  C-->>B: done
-  B-->>A: expert gets VERIFIED badge in marketplace
-  note over E: persisted via SupabaseGateway
+  participant B as «Boundary»<br/>ExpertProfileScreen
+  participant C as «Control»<br/>WatchVerificationStatus
+  participant E as «Entity»<br/>ExpertProfile · ExpertVerificationDocument
+  note over A: expert submitted credentials (US41) — admin reviews them (US57)
+  A->>B: open profile / verification banner
+  B->>C: watchStatus(expertId)
+  C->>E: fetchExpertProfile(expertId)
+  alt admin approved
+    E-->>C: ExpertProfile (status = verified)
+    C-->>B: state = AsyncData (verified)
+    B-->>A: VERIFIED badge shown, listings go live
+  else admin rejected
+    E-->>C: ExpertProfile (status = rejected, reason)
+    C-->>B: state = AsyncData (rejected)
+    B-->>A: rejection reason + resubmit credentials
+  end
+  note over E: fetchExpertProfile via SupabaseGateway → expert_profiles (RLS).<br/>status set by admin in ReviewExpertVerification (US57)

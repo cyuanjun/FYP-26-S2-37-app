@@ -6,10 +6,18 @@ sequenceDiagram
   participant B as «Boundary»<br/>Expert Application Page (website)
   participant C as «Control»<br/>SubmitExpertApplication
   participant E as «Entity»<br/>ExpertProfile · ExpertVerificationDocument
-  A->>B: fill application, attach credentials
-  B->>C: submit(application)
-  C->>E: ExpertProfile (pending) + verification documents
-  E-->>C: submitted
-  C-->>B: done
-  B-->>A: "application under review"
-  note over E: files via StorageGateway - rows via SupabaseGateway
+  A->>B: fill professional details, attach credential files, tap SUBMIT
+  B->>C: submit(application, files)
+  C->>E: uploadVerificationDocument(file)
+  E-->>C: ExpertVerificationDocument (storage path)
+  C->>E: submitExpertApplication(application, docIds)
+  alt submitted
+    E-->>C: ExpertProfile (status = pending)
+    C-->>B: state = AsyncData (submitted)
+    B-->>A: "application under review"
+  else upload / insert failed
+    E-->>C: StorageException / PostgrestException
+    C-->>B: state = AsyncError
+    B-->>A: "Could not submit application. Try again."
+  end
+  note over E: uploadVerificationDocument via StorageGateway → expert-docs bucket.<br/>submitExpertApplication via SupabaseGateway → expert_profiles (RLS)

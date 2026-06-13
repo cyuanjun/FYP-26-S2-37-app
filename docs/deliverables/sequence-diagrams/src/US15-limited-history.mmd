@@ -7,10 +7,10 @@ sequenceDiagram
   participant C as «Control»<br/>ViewWorkoutHistory
   participant E as «Entity»<br/>WorkoutSession
   A->>B: open History tab
-  B->>C: load sessions
-  C->>E: sessions from 1st of current month
-  note right of E: Free cap = current calendar<br/>month, enforced in the query
+  B->>C: load()
+  C->>E: listEndedSessions(userId, from = 1st of current month)
+  note right of E: Free cap = current calendar<br/>month, enforced by the from filter
   E-->>C: this month's sessions
   C-->>B: grouped list + weekly analytics
   B-->>A: sessions, deltas, cap banner + upsell
-  note over E: read via WorkoutGateway → Supabase
+  note over E: listEndedSessions via WorkoutGateway → workout_sessions (RLS: own rows)
