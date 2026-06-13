@@ -1,11 +1,17 @@
 # STATUS — where we are, what's next
 
-**Read this first when resuming.** Single source for current progress. Last updated **12 Jun 2026**.
+**Read this first when resuming.** Single source for current progress. Last updated **13 Jun 2026**.
 
 > 🏃 **Want to run/demo the prototype?** See **[prototype-demo-guide.md](prototype-demo-guide.md)** — how to run, a step-by-step manual-test walkthrough (what to do + what you should see), test accounts, and how to verify the backend.
 
 ## One-line state
-**App well past the vertical slice; AI is live.** Backend on Supabase: 26 tables + RLS + `end_workout_session` RPC + **two Edge Functions (`summarise-progress`, `suggest-plan`) running OpenAI gpt-4o-mini** (Gemini → rule fallback). Flutter app (BCE, **109 tests**, Android + iOS verified): vertical slice ▸ 5-tab nav ▸ Profile cluster ▸ first-login onboarding wizard ▸ AI plan generation both tiers (full goal timelines, preference contract) ▸ My Plans + Plan Detail #8 ▸ connected devices #7.1 (mock BLE pairing + simulated wearable HR into sessions) ▸ Free month-cap enforced ▸ MET calories ▸ custom workout types/health tags (creator-private RLS). Trackers: [requirements/user-stories.md](requirements/user-stories.md) (13 ✅ · 10 🟨 · 41 ⬜) · [testing/bug-log.md](testing/bug-log.md). Next: Social cluster, or PTD/PUM assembly. (Details below.)
+**App well past the vertical slice; AI is live; PTD assembled.** Backend on Supabase: 26 tables + RLS + `end_workout_session` RPC + **two Edge Functions (`summarise-progress`, `suggest-plan`) running OpenAI gpt-4o-mini** (Gemini → rule fallback). Flutter app (BCE, **107 tests**, Android + iOS verified): vertical slice ▸ 5-tab nav ▸ Profile cluster ▸ first-login onboarding wizard ▸ AI plan generation both tiers (full goal timelines, preference contract) ▸ My Plans + Plan Detail #8 ▸ connected devices #7.1 (mock BLE pairing + simulated wearable HR into sessions) ▸ Free month-cap enforced ▸ MET calories ▸ custom workout types/health tags (creator-private RLS). Trackers: [requirements/user-stories.md](requirements/user-stories.md) (13 ✅ · 10 🟨 · 41 ⬜) · [testing/bug-log.md](testing/bug-log.md). Next: insert figures into the assembled PTD, then Social cluster. (Details below.)
+
+## 13 Jun — PTD assembly + sequence-diagram pass
+- **PTD assembled** into the v1 Word template (A4, auto-numbered headings): `../FYP_docs/Submissions/PTD/FYP-26-S2-37-PTD-v1-FILLED.docx` (outside this repo). Content sources also kept in-repo-adjacent as `PTD-content.md` (markdown) + `PTD-content-tabs.txt` (tab tables). ~23k words / 93 tables — at PRD/SRS depth: full competitor write-ups, comparison matrix, SWOT, all **64 user stories** + **64 full use-case descriptions**, FR1-12, 6 NFR categories (31 NFR-IDs), 15-risk register, business model (Free-vs-Premium matrix + cost + channels), charter, comms plan, glossary, appendix. Figures renumbered **1-20**; §15 repointed to the real use-case diagrams (SRS §4 / PRD §7.2).
+- **All 59 sequence diagrams** rewritten so arrow labels are the **real functions** (Control methods + gateway/RPC/Edge functions; built = `lib/` names, unbuilt = bce-design §2.4 planned names). Re-rendered. Convention recorded in the seq-diagrams skill.
+- **Test count corrected to 107** across PTD + STATUS (was drifting to 109; canonical per CLAUDE.md / bug-log DOC-006). ⚠️ Re-run `flutter test` to confirm before final submission.
+- **Deferred (2 items):** (1) reconciliation **B5** — the Product Comparison Matrix doesn't back the USP (and overclaims AI/nutrition rows); fix after assembly. (2) Confirm the test count with `flutter test`.
 
 ## Calendar
 - **~13 Jun** — PTD + PUM due (basic-prototype milestone, PRD §8.2).

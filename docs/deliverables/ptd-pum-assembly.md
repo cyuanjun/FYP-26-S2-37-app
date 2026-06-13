@@ -5,6 +5,15 @@ How to assemble the two deliverables due **~10–13 June** (basic-prototype mile
 - **PTD** — Preliminary Technical Documentation (the comprehensive technical doc; sample ≈184 pp, 18 sections)
 - **PUM** — Preliminary User Manual (focused; sample ≈33 pp, 4 sections)
 
+> **PTD STATUS (13 Jun): assembled.** Full content built into the v1 Word template →
+> `../../FYP_docs/Submissions/PTD/FYP-26-S2-37-PTD-v1-FILLED.docx` (outside this repo), with
+> copy-ready sources `PTD-content.md` + `PTD-content-tabs.txt` alongside it. ~23k words / 93 tables
+> at PRD/SRS depth (all 64 user stories + 64 full use cases, FR1-12, 6 NFR categories, 15-risk
+> register, business model tables, SWOT, charter, comms plan, glossary, appendix). All net-new
+> sections below are written **and dropped in**. Figures numbered 1-20. **Remaining:** insert the
+> 20 figure images + draw the level-1 DFD (§16.1); update the Word TOC field; apply the 2 deferred
+> fixes (reconciliation **B5** matrix-vs-USP, and confirm **107** via `flutter test`).
+
 **The big realisation:** you've already written most of the PTD. It is essentially your **PRD v2/v3 + SRS v2.0 + TDM v5** (5 Jun system-design doc — architecture, activity diagrams, ERD, wireframes) reorganised into the sample PTD structure. The genuine remaining work is **(a) consolidation/reformatting**, **(b) a handful of small net-new sections** (SWOT, USP, charter, comms plan, level-1 DFD, glossary), and **(c) applying the current prototype reconciliation edits** (Supabase stack, simulated payment, AI scope, full-timeline plans, My Plans). Don't rewrite what the PRD/SRS/TDM already contain. Before assembling, clear the [reconciliation log](doc-reconciliation-log.md) rows that touch the stack/architecture.
 
 ### Status legend
@@ -92,4 +101,4 @@ The PUM is the smaller lift — mostly screenshots plus walkthrough text. Use cu
 - **Naming:** `FYP-26-S2-37_PrelimTechDocs` / `FYP-26-S2-37_PrelimUserManual`.
 - **Cover page:** CSIT-26-S2-05, Group FYP-26-S2-37, Supervisor Mr Premrajan, team table from [../project-description.md](../project-description.md), Revision/date footer to match PRD/SRS style.
 - **Consistency check:** the PTD's tech-stack + architecture must match build-plan §2/§10 (Supabase, not the PRD's old Node/Express) — otherwise the PTD will contradict itself.
-- **Prototype evidence to mention where useful:** Flutter Android/iOS prototype, Supabase backend, live `suggest-plan` / `summarise-progress` Edge Functions, 109 automated Flutter tests, and Android emulator verification on Pixel API 35.
+- **Prototype evidence to mention where useful:** Flutter Android/iOS prototype, Supabase backend, live `suggest-plan` / `summarise-progress` Edge Functions, 107 automated Flutter tests (confirm with `flutter test`), and Android emulator verification on Pixel API 35.

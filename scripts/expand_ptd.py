@@ -274,6 +274,31 @@ for sec in sections:
     else:
         merged.extend(sec["blocks"])
 
+# ---------- figure fixes: repoint §15 to use-case diagrams, then renumber 1..N ----------
+import re as _re
+_ucd = {
+    "Unregistered user activity flow": "Unregistered user use case diagram",
+    "Registered free user activity flow": "Registered free user use case diagram",
+    "Registered premium user activity flow": "Registered premium user use case diagram",
+    "Verified expert user activity flow": "Verified expert user use case diagram",
+    "System admin activity flow": "System administrator use case diagram",
+}
+for _b in merged:
+    if _b.get("type") == "p" and _b.get("text", "").startswith("Figure") and "activity flow from TDM" in _b["text"]:
+        _t = _b["text"]
+        for _a, _c in _ucd.items():
+            _t = _t.replace(_a, _c)
+        _t = _re.sub(r"from TDM, page 1[1-5]", "from SRS Section 4 / PRD Section 7.2", _t)
+        _b["text"] = _t
+# Sequential renumber of every figure caption in document order (handles "Figure:" and "Figure N:")
+_fig = 0
+for _b in merged:
+    if _b.get("type") == "p":
+        _m = _re.match(r"^Figure(?:\s+\d+)?\s*:\s*(.*)$", _b.get("text", ""))
+        if _m:
+            _fig += 1
+            _b["text"] = f"Figure {_fig}: {_m.group(1)}"
+
 # ---------- emit markdown ----------
 def md_table(rows):
     w=len(rows[0]); L=[]
