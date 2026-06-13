@@ -1,15 +1,18 @@
 ---
-title: "US39 — Personalised reminders + alerts"
+title: "US39 — Personalised reminders + alerts (rule-based)"
 ---
 sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>NotificationsScreen
-  participant C as «Control»<br/>UpdateNotificationPrefs + rule controls
-  participant E as «Entity»<br/>PlannedWorkout · Profile (prefs)
+  participant C as «Control»<br/>ManageNotificationPrefs
+  participant E as «Entity»<br/>Profile (prefs) · PlannedWorkout
   A->>B: enable personalised reminders
-  B->>C: setEnabled(...)
-  C->>E: read active plan - workout times, rest days
-  E-->>C: schedule inputs
-  C-->>B: scheduled
+  B->>C: setEnabled(typeKey, true)
+  C->>E: updateNotificationPrefs(userId, prefs)
+  E-->>C: prefs saved
+  C-->>B: state = AsyncData (enabled)
+  note over C: planned ScheduleReminder reads active plan<br/>workout times + rest days (rule-based, NOT AI)
+  C->>E: scheduleReminder(plan times, rest days)
+  E-->>C: scheduled
   B-->>A: reminders tuned to the plan
-  note over E: delivered via NotificationGateway (rule-based)
+  note over E: updateNotificationPrefs via ProfileGateway (built) —<br/>scheduleReminder via NotificationGateway (planned, rule-based)

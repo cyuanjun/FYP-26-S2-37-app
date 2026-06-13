@@ -4,22 +4,22 @@ title: "US12 — Record and manage workout activities"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ActiveWorkoutScreen
-  participant C as «Control»<br/>StartWorkoutSession / EndWorkoutSession
+  participant C as «Control»<br/>ActiveWorkout
   participant E as «Entity»<br/>WorkoutSession
   A->>B: tap START
   B->>C: start(type)
-  C->>E: create WorkoutSession (startedAt)
+  C->>E: startSession(type, deviceId)
   loop continuously while recording
-    C->>E: append live data - GPS track points,<br/>heart rate, steps, elapsed time
+    C->>E: WorkoutDataSource.start() - GPS, HR, steps stream
     C-->>B: live metrics
     B-->>A: TIME / DISTANCE / PACE / HR update
   end
   A->>B: pause / resume as needed
   A->>B: tap END → Save & Finish
   B->>C: end()
-  C->>E: finalise - duration, distance, calories, XP, streak
+  C->>E: end_workout_session(p_session_id, p_metrics)
   E-->>C: xp_gained, streak, leveled_up
   C-->>B: summary result
   B-->>A: Workout complete (+XP, streak)
-  note over B,E: manage afterwards from History detail -<br/>rename, rate, edit notes (UpdateWorkoutSession) or delete (DeleteWorkoutSession)
-  note over E: sensors stream via WorkoutDataSource (phone GPS + steps now,<br/>HR via wearables later) - persisted via WorkoutGateway end_workout_session RPC
+  note over B,E: manage afterwards from History detail -<br/>SaveWorkoutDetails(...) or DeleteWorkoutSession(sessionId)
+  note over E: WorkoutDataSource = phone GPS + steps now, HR via wearables later -<br/>finalised atomically via WorkoutGateway end_workout_session RPC

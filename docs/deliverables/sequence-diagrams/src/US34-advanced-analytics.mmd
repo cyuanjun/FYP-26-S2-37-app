@@ -8,8 +8,9 @@ sequenceDiagram
   participant E as «Entity»<br/>WorkoutSession
   A->>B: open Advanced Analytics
   B->>C: load(range incl. All)
-  C->>E: long-window aggregates, trends, PBs
-  E-->>C: analytics
-  C-->>B: charts view state
+  C->>E: listEndedSessions(userId, from: range)
+  E-->>C: List (WorkoutSession)
+  note over C: compute trends / PBs / aggregates client-side<br/>(charts — basic tier = numeric tiles only)
+  C-->>B: state = AsyncData (charts view state)
   B-->>A: advanced analytics view
-  note over E: read via WorkoutGateway → Supabase
+  note over E: listEndedSessions via WorkoutGateway → Supabase (RLS)

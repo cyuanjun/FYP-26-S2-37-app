@@ -4,12 +4,15 @@ title: "US21 — Rest alerts (overtraining)"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>NotificationsScreen
-  participant C as «Control»<br/>CheckOvertraining (rule-based)
-  participant E as «Entity»<br/>WorkoutSession
-  A->>B: rest alerts enabled
-  C->>E: scan consecutive training days / volume spike
-  E-->>C: overtraining signal
-  C-->>B: schedule rest-day alert
-  B-->>A: "Consider a rest day"
-  note over B,E: tier TBD - SRS says Free, WBS says Premium<br/>(reconciliation pending)
-  note over E: delivered via NotificationGateway
+  participant C as «Control»<br/>ManageNotificationPrefs / ScheduleReminder
+  participant E as «Entity»<br/>Profile (notification_prefs) · WorkoutSession
+  A->>B: toggle "Rest alerts" on
+  B->>C: setEnabled(rest_alert, true)
+  C->>E: updateNotificationPrefs(userId, prefs)
+  E-->>C: saved
+  C->>E: scheduleReminder(rest_alert) - scan consecutive days / volume spike
+  E-->>C: overtraining signal → scheduled
+  C-->>B: state = AsyncData (prefs)
+  B-->>A: "Consider a rest day" (rule-based, not AI)
+  note over B,E: tier TBD - SRS says Free, WBS says Premium (reconciliation pending)
+  note over E: prefs via ProfileGateway → profiles (RLS) [BUILT] -<br/>scheduleReminder via NotificationGateway over WorkoutGateway.listEndedSessions [planned] - rule-based, no AI

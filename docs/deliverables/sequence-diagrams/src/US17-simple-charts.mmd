@@ -7,10 +7,10 @@ sequenceDiagram
   participant C as «Control»<br/>ViewWorkoutHistory
   participant E as «Entity»<br/>WorkoutSession
   A->>B: tap Day / Week / Month pill
-  B->>C: sessions for the period
-  C->>E: aggregate per period
-  E-->>C: totals + vs-prior deltas
-  C-->>B: analytics view state
+  B->>C: load()
+  C->>E: listEndedSessions(userId, from = period start)
+  E-->>C: sessions for the period
+  C-->>B: tiles computed client-side (totals + vs-prior deltas)
   B-->>A: numeric tiles - sessions, active min,<br/>calories, avg/max HR with up/down values
   note over B: no graphical charts at the basic tier -<br/>words and +/- deltas only (charts = Premium US34)
-  note over E: read via WorkoutGateway → Supabase
+  note over E: listEndedSessions via WorkoutGateway → workout_sessions (RLS)

@@ -4,15 +4,16 @@ title: "US23 — Create / like / comment on posts"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>SocialScreen / PostDetailScreen
-  participant C as «Control»<br/>CreateWorkoutSharePost · TogglePostLike · AddPostComment
+  participant C as «Control»<br/>TogglePostLike / AddPostComment
   participant E as «Entity»<br/>Post · PostLike · PostComment
-  A->>B: share a workout
-  B->>C: createWorkoutSharePost(caption)
-  C->>E: new Post (kind = workout_share)
-  A->>B: tap like / write comment
-  B->>C: toggleLike(post) / addComment(text)
-  C->>E: new PostLike / PostComment
-  E-->>C: updated counts
-  C-->>B: state
+  A->>B: tap like
+  B->>C: toggle(postId)
+  C->>E: togglePostLike(postId)
+  E-->>C: PostLike (added/removed) + like count
+  A->>B: write a comment, tap Post
+  B->>C: addComment(postId, body)
+  C->>E: addPostComment(postId, body)
+  E-->>C: PostComment + comment count
+  C-->>B: state = AsyncData (updated counts)
   B-->>A: like + comment reflected
-  note over E: persisted via SocialGateway → Supabase
+  note over E: togglePostLike / addPostComment via SocialGateway → post_likes · post_comments (RLS) [planned]

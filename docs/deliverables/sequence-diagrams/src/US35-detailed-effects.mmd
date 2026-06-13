@@ -5,11 +5,12 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>AdvancedAnalyticsScreen
   participant C as «Control»<br/>ComputeEffectEstimates (rule)
-  participant E as «Entity»<br/>WorkoutSession · FitnessProfile
+  participant E as «Entity»<br/>WorkoutSession · WorkoutType
   A->>B: open effect estimates
   B->>C: compute(range)
-  C->>E: sessions + body metrics + HR
-  E-->>C: short / long-term effect figures
-  C-->>B: estimates
+  C->>E: listEndedSessions(userId, from: range)
+  E-->>C: List (WorkoutSession + WorkoutType)
+  note over C: WorkoutType effect rules applied client-side<br/>(rule-based, no AI)
+  C-->>B: state = AsyncData (short / long-term effects)
   B-->>A: detailed effect breakdown
-  note over E: rule-based computation on Entity data (no AI)
+  note over E: listEndedSessions via WorkoutGateway → Supabase (RLS)

@@ -4,11 +4,18 @@ title: "US46 — Manage expertise categories"
 sequenceDiagram
   actor A as Expert User
   participant B as «Boundary»<br/>ExpertProfileScreen
-  participant C as «Control»<br/>UpsertExpertProfile
+  participant C as «Control»<br/>UpdateExpertProfile
   participant E as «Entity»<br/>ExpertProfile · ExpertCategory
-  A->>B: pick specialty categories
-  B->>C: save(categoryIds)
-  C->>E: link profile to categories
-  E-->>C: linked
-  B-->>A: appears under those categories in Experts tab
-  note over E: persisted via SupabaseGateway
+  A->>B: pick specialty categories, tap SAVE
+  B->>C: saveCategories(categoryIds)
+  C->>E: setExpertCategories(expertId, categoryIds)
+  alt saved
+    E-->>C: ExpertCategory rows (linked)
+    C-->>B: state = AsyncData (saved)
+    B-->>A: appears under those categories in Experts tab
+  else save failed
+    E-->>C: PostgrestException
+    C-->>B: state = AsyncError
+    B-->>A: "Could not update categories. Try again."
+  end
+  note over E: setExpertCategories via SupabaseGateway → expert_categories (RLS).<br/>master category list owned by admin (US58)

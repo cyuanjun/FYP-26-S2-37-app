@@ -1,17 +1,20 @@
 ---
-title: "US60 — Manage feedback + platform activity"
+title: "US60 — Manage feedback + contact messages"
 ---
 sequenceDiagram
-  actor A as System Admin
-  participant B as «Boundary»<br/>MonitorScreen
-  participant C as «Control»<br/>TriageFeedback / ResolveContactMessage
+  actor A as System Administrator
+  participant B as «Boundary»<br/>FeedbackScreen
+  participant C as «Control»<br/>TriageFeedback
   participant E as «Entity»<br/>Feedback · ContactMessage
   A->>B: open feedback inbox
-  B->>C: markReviewed(feedbackId)
-  C->>E: Feedback status → reviewed
-  A->>B: open contact request
-  B->>C: respond(messageId, reply)
-  C->>E: ContactMessage response + resolved
-  E-->>C: updated
-  B-->>A: queues cleared
-  note over E: persisted via SupabaseGateway
+  B->>C: loadFeedback()
+  C->>E: listFeedback()
+  E-->>C: List of Feedback + ContactMessage
+  C-->>B: state = AsyncData (inbox)
+  A->>B: tap Mark Reviewed / Resolved
+  B->>C: setStatus(feedbackId, status)
+  C->>E: updateFeedbackStatus(feedbackId, status)
+  E-->>C: Feedback (updated status)
+  C-->>B: state = AsyncData (updated)
+  B-->>A: queue cleared
+  note over E: listFeedback / updateFeedbackStatus via SupabaseGateway (RLS admin-only).<br/>user-side SubmitFeedback writes via FeedbackGateway.submitFeedback

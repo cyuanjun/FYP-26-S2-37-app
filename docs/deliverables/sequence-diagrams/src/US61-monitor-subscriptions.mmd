@@ -2,14 +2,14 @@
 title: "US61 — Monitor subscription-tier access"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>MonitorScreen
   participant C as «Control»<br/>ViewSubscriptionOverview
   participant E as «Entity»<br/>Subscription
-  A->>B: open subscription stats
-  B->>C: load overview
-  C->>E: aggregate by tier / status
-  E-->>C: counts
-  C-->>B: dashboard tiles
-  B-->>A: premium gating is working as intended
-  note over E: read via SupabaseGateway
+  A->>B: open Subscriptions tab
+  B->>C: loadOverview()
+  C->>E: listSubscriptions()
+  E-->>C: List of Subscription (tier, status)
+  C-->>B: state = AsyncData (overview)
+  B-->>A: dashboard tiles (counts by tier / status)
+  note over E: listSubscriptions via SupabaseGateway (RLS admin-only).<br/>payment simulated — price fields only, no gateway/ledger

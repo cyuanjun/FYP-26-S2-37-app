@@ -2,15 +2,19 @@
 title: "US56 — Manage user accounts / roles / access"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>UsersScreen
   participant C as «Control»<br/>SetUserStatus
-  participant E as «Entity»<br/>Profile
-  A->>B: open a user account
-  B->>C: suspend(userId) / setRole(...)
-  C->>E: Profile status / role change
-  note right of E: DB trigger - only admins<br/>may change role or status
-  E-->>C: updated
-  C-->>B: done
-  B-->>A: user suspended / role changed
-  note over E: persisted via ProfileGateway → Supabase
+  participant E as «Entity»<br/>User
+  A->>B: open Users tab, filter list
+  B->>C: listUsers(filter)
+  C->>E: listUsers(filter)
+  E-->>C: List of User
+  C-->>B: state = AsyncData (users)
+  A->>B: tap Suspend / Activate on a user
+  B->>C: setStatus(userId, status)
+  C->>E: updateUserStatus(userId, status)
+  E-->>C: User (updated status)
+  C-->>B: state = AsyncData (updated)
+  B-->>A: user suspended / activated
+  note over E: listUsers / updateUserStatus via SupabaseGateway → profiles (RLS admin-only)

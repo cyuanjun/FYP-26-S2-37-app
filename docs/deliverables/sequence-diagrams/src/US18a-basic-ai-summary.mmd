@@ -5,16 +5,17 @@ sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>HistoryScreen (AI sheet)
   participant C as «Control»<br/>SummariseProgress
-  participant E as «Entity»<br/>WorkoutSession (week aggregates)
+  participant E as «Entity»<br/>ProgressSummary
   A->>B: tap AI summary
-  B->>C: summarise(range)
-  C->>E: gather session aggregates
-  E-->>C: stats
+  B->>C: call()
+  C->>E: summariseProgress(range)
   alt summary returned
-    C-->>B: text + model tag
+    E-->>C: ProgressSummary (text + model tag)
+    C-->>B: state = AsyncData (ProgressSummary)
     B-->>A: summary, labelled "AI-assisted - not medical advice"
   else AI unavailable
-    C-->>B: AsyncError
+    E-->>C: Exception
+    C-->>B: state = AsyncError
     B-->>A: friendly error, retry
   end
-  note over C: AI via AiGateway → Edge Function (OpenAI, Gemini fallback) -<br/>basic tier = generic prose, Premium personalises (US36)
+  note over E: summariseProgress via AiGateway → summarise-progress Edge Function<br/>(OpenAI gpt-4o-mini, Gemini/stub fallback) - reads ended sessions server-side -<br/>basic tier = generic prose, Premium personalises (US36)

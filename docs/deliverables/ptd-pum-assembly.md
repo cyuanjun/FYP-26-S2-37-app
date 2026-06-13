@@ -5,7 +5,7 @@ How to assemble the two deliverables due **~10–13 June** (basic-prototype mile
 - **PTD** — Preliminary Technical Documentation (the comprehensive technical doc; sample ≈184 pp, 18 sections)
 - **PUM** — Preliminary User Manual (focused; sample ≈33 pp, 4 sections)
 
-**The big realisation:** you've already written most of the PTD. It is essentially your **PRD v2/v3 + SRS v2.0 + TDM v5** (5 Jun system-design doc — architecture, activity diagrams, ERD, wireframes) reorganised into the sample PTD structure. The genuine remaining work is **(a) consolidation/reformatting** and **(b) a handful of small net-new sections** (SWOT, USP, charter, comms plan, level-1 DFD, glossary). Don't rewrite what the PRD/SRS/TDM already contain. Before assembling, clear the [reconciliation log](doc-reconciliation-log.md) rows that touch the stack/architecture.
+**The big realisation:** you've already written most of the PTD. It is essentially your **PRD v2/v3 + SRS v2.0 + TDM v5** (5 Jun system-design doc — architecture, activity diagrams, ERD, wireframes) reorganised into the sample PTD structure. The genuine remaining work is **(a) consolidation/reformatting**, **(b) a handful of small net-new sections** (SWOT, USP, charter, comms plan, level-1 DFD, glossary), and **(c) applying the current prototype reconciliation edits** (Supabase stack, simulated payment, AI scope, full-timeline plans, My Plans). Don't rewrite what the PRD/SRS/TDM already contain. Before assembling, clear the [reconciliation log](doc-reconciliation-log.md) rows that touch the stack/architecture.
 
 ### Status legend
 - 🟢 **Have** — content exists in PRD/SRS/TDM; copy/reformat
@@ -48,7 +48,7 @@ Yuan Jun = coordination/docs · Devanandi = mobile/UI · Foong = backend/DB/API 
 | 14 | Use Case Descriptions | 🟢 | **SRS §4.x.2** — full descriptions already written for the major use cases | |
 | 15 | Use Case Diagrams | 🟢 | **SRS §4.x / PRD §7.2** (5 PlantUML diagrams) | |
 | 16.1 | Data Flow Diagram | 🟡 | **TDM §3.3** already has the **context-level DFD** (the Wise Workout Platform Process figure, p8) — reuse it; only the **level-1 DFD** is net-new | |
-| 16.2 | System Architecture Design | 🟢 | **TDM §4** (client-server architecture diagram, p10) + [../architecture/bce-design.md](../architecture/bce-design.md) — name the concrete stack (Supabase/Edge/AI) per reconciliation A4 | |
+| 16.2 | System Architecture Design | 🟢 | **TDM §4** (client-server architecture diagram, p10) + [../architecture/bce-design.md](../architecture/bce-design.md) — name the concrete stack (Flutter + Supabase Postgres/Auth/Storage/Realtime + Edge Functions + OpenAI/Gemini fallback) per reconciliation A4 | |
 | 16.3 | Database Design | 🟢 | **TDM §8 ERD is the schema of record** (reconciliation **D1 — resolved**); render it directly. [../reference/database-v1.md](../reference/database-v1.md) is the working copy to align to it | |
 | 16.4 | Wireframe Design | 🟢 | **TDM** wireframes + flow-explorer mock renders + [../reference/screens-v1.md](../reference/screens-v1.md) | |
 | 17 | Conclusion | 🟢 | **PRD §12** | |
@@ -66,7 +66,7 @@ Yuan Jun = coordination/docs · Devanandi = mobile/UI · Foong = backend/DB/API 
 5. **§18 Glossary** (S).
 6. **Reconcile §12 Technical Stack** to Supabase — see the [reconciliation log](doc-reconciliation-log.md) (B1/A4). §16.3 DB design is **resolved** (use the TDM §8 ERD).
 
-The TDM (**v5, 6 Jun — the canonical version**) **covers §16 System Design well**: §4 architecture, §3.3 context DFD, §5 activity diagrams, §7 wireframes, §8 ERD. ⚠️ **Its §6 sequence diagrams are wrong (team-confirmed 12 Jun)** — do **not** copy them; use the **58 rendered per-story diagrams in [sequence-diagrams/](sequence-diagrams/)** (one per US07–US64, simplified BCE style; sources included). Also remember PRD v3 ≡ v2: apply the reconciliation log §B edits (Supabase stack, $9.99, simulated payment) to any PRD-sourced PTD section during assembly.
+The TDM (**v5, 6 Jun — the canonical version**) **covers §16 System Design well**: §4 architecture, §3.3 context DFD, §5 activity diagrams, §7 wireframes, §8 ERD. ⚠️ **Its §6 sequence diagrams are wrong (team-confirmed 12 Jun)** — do **not** copy them; use the **58 rendered per-story diagrams in [sequence-diagrams/](sequence-diagrams/)** (one per US07–US64, simplified BCE style; sources included). Also remember PRD v3 ≡ v2: apply the reconciliation log §B edits (Supabase stack, $9.99, simulated payment, current AI-plan scope) to any PRD-sourced PTD section during assembly.
 
 ---
 
@@ -80,9 +80,9 @@ The TDM (**v5, 6 Jun — the canonical version**) **covers §16 System Design we
 | 3 | Key Features | 🟢 | User-facing phrasing of **SRS §3.2** feature tables / WBS | |
 | 4 | Initial GUIs (screen walkthrough) | 🟢 | **Flow-explorer mock screen renders** + TDM wireframes; one sub-section per screen with a screenshot + step text. Screens: [../reference/screens-v1.md](../reference/screens-v1.md) | |
 
-The PUM is the smaller lift — mostly screenshots from the mock + walkthrough text. With no live app yet, the mock screens are the "preliminary GUIs" (exactly what "preliminary" means here).
+The PUM is the smaller lift — mostly screenshots plus walkthrough text. Use current prototype screenshots for built flows (Train, My Plans, Plan Detail, workout capture, profile/goals) and TDM/mock wireframes for screens not yet polished in Flutter. Since this is still a preliminary submission, either screenshot source is acceptable as long as the caption labels it consistently.
 
-> **Drafts written:** [pum-net-new-sections.md](pum-net-new-sections.md) has drop-in drafts for Document Control, §1 Introduction, §2 Installation Instructions, §3 Key Features, and §4 screen walkthroughs (10 core-journey screens, each keyed to its TDM §7 screenshot).
+> **Drafts written:** [pum-net-new-sections.md](pum-net-new-sections.md) has drop-in drafts for Document Control, §1 Introduction, §2 Installation Instructions, §3 Key Features, and §4 screen walkthroughs (10 core-journey screens, now including My Plans and full-timeline Plan Detail).
 
 ---
 
@@ -92,3 +92,4 @@ The PUM is the smaller lift — mostly screenshots from the mock + walkthrough t
 - **Naming:** `FYP-26-S2-37_PrelimTechDocs` / `FYP-26-S2-37_PrelimUserManual`.
 - **Cover page:** CSIT-26-S2-05, Group FYP-26-S2-37, Supervisor Mr Premrajan, team table from [../project-description.md](../project-description.md), Revision/date footer to match PRD/SRS style.
 - **Consistency check:** the PTD's tech-stack + architecture must match build-plan §2/§10 (Supabase, not the PRD's old Node/Express) — otherwise the PTD will contradict itself.
+- **Prototype evidence to mention where useful:** Flutter Android/iOS prototype, Supabase backend, live `suggest-plan` / `summarise-progress` Edge Functions, 109 automated Flutter tests, and Android emulator verification on Pixel API 35.

@@ -6,9 +6,10 @@ sequenceDiagram
   participant B as «Boundary»<br/>ExpertShell
   participant C as «Control»<br/>Authenticate
   participant E as «Entity»<br/>Profile
-  A->>B: tap log out
+  A->>B: tap LOG OUT
   B->>C: signOut()
-  C->>E: end session, clear cached Profile
-  E-->>C: cleared
-  B-->>A: back to Login
-  note over E: via AuthGateway → Supabase Auth
+  C->>E: signOut()
+  E-->>C: session cleared
+  C-->>B: state = AsyncData (signed out)
+  B-->>A: redirect to Login
+  note over E: signOut via AuthGateway → Supabase Auth (clears local session)

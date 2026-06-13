@@ -9,11 +9,13 @@ sequenceDiagram
   A->>B: open a pending request
   alt accept
     B->>C: accept(requestId)
-    C->>E: status → accepted
+    C->>E: updateServiceRequestStatus(requestId, "accepted")
+    E-->>C: ServiceRequest (status = accepted)
     B-->>A: client notified, work begins
   else reject
     B->>C: reject(requestId)
-    C->>E: status → cancelled
+    C->>E: updateServiceRequestStatus(requestId, "cancelled")
+    E-->>C: ServiceRequest (status = cancelled)
     B-->>A: request closed
   end
-  note over E: persisted via SupabaseGateway
+  note over E: updateServiceRequestStatus via SupabaseGateway → service_requests (RLS)

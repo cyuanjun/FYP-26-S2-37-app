@@ -6,14 +6,16 @@ sequenceDiagram
   participant B as «Boundary»<br/>ServicesScreen
   participant C as «Control»<br/>PublishService
   participant E as «Entity»<br/>ExpertService
-  A->>B: create listing (price, format, response time)
-  B->>C: publish(listing)
-  C->>E: ExpertService (draft → live / archived)
-  alt publish
-    E-->>C: status = live
+  A->>B: enter title, PricingModel, PriceCents, tap PUBLISH
+  alt new listing
+    B->>C: publish(listing)
+    C->>E: insertExpertService(listing)
+    E-->>C: ExpertService (status = live)
     B-->>A: visible in marketplace
-  else archive
-    E-->>C: status = archived
+  else edit / archive
+    B->>C: update(listing)
+    C->>E: updateExpertService(serviceId, changes)
+    E-->>C: ExpertService (status = archived)
     B-->>A: hidden from marketplace
   end
-  note over E: persisted via SupabaseGateway
+  note over E: insertExpertService / updateExpertService via SupabaseGateway → expert_services (RLS).<br/>PriceCents stored only — payment simulated

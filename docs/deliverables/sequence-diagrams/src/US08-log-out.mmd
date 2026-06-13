@@ -8,8 +8,8 @@ sequenceDiagram
   participant E as «Entity»<br/>Profile
   A->>B: tap LOG OUT
   B->>C: signOut()
-  C->>E: end session, clear cached Profile
+  C->>E: signOut()
   E-->>C: session cleared
   C-->>B: auth state = signed out
   B-->>A: redirect to Login
-  note over E: via AuthGateway → Supabase Auth
+  note over E: signOut() via AuthGateway → supabase.auth.signOut() (clears session + cached Profile)

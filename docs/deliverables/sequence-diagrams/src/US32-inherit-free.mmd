@@ -5,11 +5,13 @@ sequenceDiagram
   actor A as Registered Premium User
   participant B as «Boundary»<br/>HomeShell
   participant C as «Control»<br/>Authenticate
-  participant E as «Entity»<br/>Profile
-  A->>B: log in
-  B->>C: load profile
-  C->>E: Profile (role = premium)
-  E-->>C: isPremium = true
-  C-->>B: premium profile
+  participant E as «Entity»<br/>Profile · Subscription
+  A->>B: open the app (signed in)
+  B->>C: loadProfile(userId)
+  C->>E: fetchProfile(userId)
+  E-->>C: Profile (role = premium)
+  C->>E: fetchSubscription(userId)
+  E-->>C: Subscription (isPremium = true)
+  C-->>B: state = AsyncData (premium)
   B-->>A: all Free features + premium surfaces<br/>(no cap banner, no locks)
-  note over E: read via ProfileGateway → Supabase
+  note over E: fetchProfile / fetchSubscription<br/>via ProfileGateway → Supabase (RLS)

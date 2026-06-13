@@ -10,8 +10,9 @@ sequenceDiagram
   B-->>A: status, renews-at, $9.99/mo (simulated)
   A->>B: tap Cancel
   B->>C: cancel()
-  C->>E: status → cancelled
-  E-->>C: updated
-  C-->>B: cancelled (access until period end)
+  C->>E: updateSubscription(status = cancelled)
+  note right of E: payment simulated —<br/>access until period end
+  E-->>C: Subscription (cancelled)
+  C-->>B: state = AsyncData (cancelled)
   B-->>A: status updated
-  note over E: persisted via SupabaseGateway
+  note over E: planned — updateSubscription<br/>via SupabaseGateway (RLS)

@@ -1,8 +1,8 @@
 # PUM — Net-New Sections (drop-in drafts)
 
-Draft content for the **Preliminary User Manual**. The PUM is the smaller deliverable (sample ≈33 pp, 4 sections): mostly **mock/TDM screenshots + walkthrough text**. With no live build yet, the TDM wireframes are the "preliminary GUIs" — that's exactly what *preliminary* means here.
+Draft content for the **Preliminary User Manual**. The PUM is the smaller deliverable (sample ≈33 pp, 4 sections): mostly **prototype/TDM screenshots + walkthrough text**. Use current Flutter screenshots for implemented flows and TDM/mock wireframes for flows that are still preliminary.
 
-Copy into the Word template, drop the matching **TDM §7 screenshot** above each walkthrough, and adjust to team voice. Figures consistent with the [reconciliation log](doc-reconciliation-log.md) (premium = **$9.99/mo**, payment simulated).
+Copy into the Word template, drop the matching **prototype or TDM §7 screenshot** above each walkthrough, and adjust to team voice. Figures consistent with the [reconciliation log](doc-reconciliation-log.md) (premium = **$9.99/mo**, payment simulated).
 
 ---
 
@@ -10,7 +10,7 @@ Copy into the Word template, drop the matching **TDM §7 screenshot** above each
 
 | Version | Date | Modified By | Description |
 |---|---|---|---|
-| 1.0 | <date> | All team members | Initial preliminary user manual |
+| 1.0 | 13 Jun 2026 | All team members | Initial preliminary user manual |
 
 ---
 
@@ -18,7 +18,7 @@ Copy into the Word template, drop the matching **TDM §7 screenshot** above each
 
 **Wise Workout** is a cross-platform mobile fitness application (Android + iOS) that helps users record workouts, track progress, receive AI-assisted summaries and plan suggestions, connect with verified fitness experts, and stay motivated through a social feed and challenges.
 
-This Preliminary User Manual introduces the application's main features and walks through the key screens a user encounters. It is written for **end users** — primarily registered free and premium users — and previews the interface and core flows of the app at its current design stage. Because the system is still in development, the screens shown are **preliminary wireframes** and may change in the final release.
+This Preliminary User Manual introduces the application's main features and walks through the key screens a user encounters. It is written for **end users** — primarily registered free and premium users — and previews the interface and core flows of the app at its current design stage. Because the system is still in development, the screens shown are **prototype screens and preliminary wireframes** and may change in the final release.
 
 The app supports five roles — unregistered visitor, registered free user, registered premium user, verified expert, and system administrator — but this manual focuses on the everyday user journey (free and premium). Expert and admin tools are summarised briefly.
 
@@ -55,8 +55,8 @@ Granting these enables full tracking; they can be changed later in your device s
 |---|---|
 | **Workout tracking** | Record workouts using phone sensors (GPS + step/motion) or enter them manually; start a **suggested** session from a plan or a **freeform** session on the spot. |
 | **Progress & history** | View workout history and basic analytics (day/week/month); Premium adds advanced analytics — HR zones, workload ratio, training load, personal bests. |
-| **AI-assisted support** | Receive AI progress summaries and AI plan suggestions; Premium gets personalised plans and detailed workout breakdowns. |
-| **Fitness profile & goals** | Set body metrics, training experience, preferences, and a primary goal with a target and timeline; track goal progress. |
+| **AI-assisted support** | Receive AI progress summaries and AI plan suggestions. Plans follow the user's selected goal timeline; Premium gets personalised plans and detailed workout breakdowns. |
+| **Fitness profile & goals** | Set body metrics, training experience, preferences, gender, height, weight, and a primary goal with a target and timeline; track goal progress. |
 | **Experts & services** | Browse verified experts and their service listings, view profiles and reviews, request paid services, and receive expert deliverables. |
 | **Social & challenges** | Share posts to a community feed, like/comment, add friends, and join or create challenges with leaderboards; share achievements to Facebook / Instagram / Twitter / TikTok. |
 | **Reminders & notifications** | Workout, missed-session, inactivity, and rest reminders; Premium reminders adapt to your schedule. |
@@ -83,8 +83,10 @@ When you finish, the **Workout Complete** summary shows duration, distance, pace
 ### 4.5 View History *(TDM §7.2.29–7.2.30)*
 Open **History** for your past workouts and basic analytics (day/week/month, with vs-last-week comparison). Tap a workout to see its details — duration, calories, heart-rate graph, and training effect. Premium unlocks full history and advanced analytics.
 
-### 4.6 AI Suggested Plan *(TDM §7.2.20–7.2.21)*
-In **Train**, open **View full plan** to see your AI-suggested plan (both tiers; rule-based fallback) — a weekly schedule of sessions. Tap a session for details. Premium upgrades these to personalised plans with sets, reps, target zones, and coaching cues.
+### 4.6 My Plans and AI Suggested Plan *(prototype Train / My Plans / Plan Detail)*
+In **Train**, tap **View Plans** to open **My Plans**. The active plan appears at the top and saved plans appear below it. Tap any plan to view its full week-by-week schedule in **Plan Detail**. If the selected plan is not active, tap **Use This Plan** to make it the active plan. Generated plans follow the goal timeline selected by the user; for example, a 12-week goal creates a 12-week plan rather than a fixed one-month plan.
+
+Inside **Plan Detail**, choose a week from the horizontal selector and tap a workout row to read its duration, type, descriptor, and start action. Premium plans add richer personalisation from the user's fitness profile, training history, limitations, preferences, gender, height, and weight.
 
 ### 4.7 Experts & Services *(TDM §7.2.15–7.2.18)*
 Open **Experts** to browse verified experts or their **service listings**, filter by category, and sort by rating. Open an expert to see their profile, credentials, specialties, and reviews; open a listing to see what's included and the price, then **Request** the service.
@@ -103,6 +105,6 @@ Open **Profile** from Home. Here you manage **Account settings**, **Fitness prof
 ---
 
 ## Assembly notes
-- **Screenshots:** pull the phone-frame renders from **TDM §7** (or the flow-explorer mock) — they're already iPhone-framed.
+- **Screenshots:** prefer current Flutter screenshots for Train, My Plans, Plan Detail, Profile/Goals, workout capture, History, and Upgrade. Use **TDM §7** or the flow-explorer mock only where a live screenshot is not available.
 - **Length:** the sample PUM is ~33 pp; §4 carries most of it via screenshots, so this is mostly a layout exercise.
 - **Naming / cover:** `FYP-26-S2-37_PrelimUserManual`; cover page matches the PTD (CSIT-26-S2-05, Group FYP-26-S2-37, Supervisor Mr Premrajan).

@@ -4,13 +4,20 @@ title: "US48 — Upload / manage expert content"
 sequenceDiagram
   actor A as Expert User
   participant B as «Boundary»<br/>ServicesScreen
-  participant C as «Control»<br/>PublishService + SendDeliverable
+  participant C as «Control»<br/>PublishContent
   participant E as «Entity»<br/>Deliverable
-  A->>B: upload content file / media
-  B->>C: attach(content)
-  C->>E: Deliverable links the uploaded content
-  E-->>C: available
-  C-->>B: done
-  B-->>A: clients can access it
-  note over B,E: scope under review (reconciliation log)
-  note over E: files via StorageGateway - rows via SupabaseGateway
+  A->>B: pick content file / media, tap UPLOAD
+  B->>C: publishContent(file, meta)
+  C->>E: uploadFile(file)
+  E-->>C: storage path
+  C->>E: insertDeliverable(serviceId, path, meta)
+  alt published
+    E-->>C: Deliverable (available)
+    C-->>B: state = AsyncData (published)
+    B-->>A: clients can access it
+  else upload / insert failed
+    E-->>C: StorageException / PostgrestException
+    C-->>B: state = AsyncError
+    B-->>A: "Could not upload content. Try again."
+  end
+  note over E: uploadFile via StorageGateway → deliverables bucket.<br/>insertDeliverable via SupabaseGateway → deliverables (RLS)

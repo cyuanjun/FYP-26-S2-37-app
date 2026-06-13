@@ -4,12 +4,18 @@ title: "US28 — Browse expert categories"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ExpertsScreen (category chips)
-  participant C as «Control»<br/>BrowseExperts
-  participant E as «Entity»<br/>ExpertCategory
+  participant C as «Control»<br/>LoadExperts
+  participant E as «Entity»<br/>ExpertCategory · ExpertProfile
+  A->>B: open Experts tab
+  B->>C: loadCategories()
+  C->>E: listExpertCategories()
+  E-->>C: List (ExpertCategory)
+  C-->>B: state = AsyncData (category chips)
+  B-->>A: specialty chips
   A->>B: tap a category chip
-  B->>C: filter(categoryId)
-  C->>E: categories + filtered experts
-  E-->>C: filtered set
-  C-->>B: filtered list
+  B->>C: loadExperts(categoryId)
+  C->>E: listExperts(categoryId)
+  E-->>C: List (ExpertProfile)
+  C-->>B: state = AsyncData (filtered)
   B-->>A: experts for that specialty
-  note over E: read via SupabaseGateway
+  note over E: planned — listExpertCategories / listExperts<br/>via SupabaseGateway (RLS)

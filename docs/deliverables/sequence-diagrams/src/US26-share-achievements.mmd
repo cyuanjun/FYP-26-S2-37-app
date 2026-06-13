@@ -6,11 +6,16 @@ sequenceDiagram
   participant B as «Boundary»<br/>WorkoutSummaryScreen
   participant C as «Control»<br/>CreateWorkoutSharePost · ShareWorkoutToSocial
   participant E as «Entity»<br/>Post (workout_share)
-  A->>B: toggle "Share to Social" on, pick platform
-  B->>C: share(caption, platform)
-  C->>E: new Post with public caption only
-  note right of E: private notes are<br/>never shared
-  E-->>C: post created
-  C-->>B: share to Facebook / Instagram / Twitter / TikTok
-  B-->>A: OS share sheet opens with message
-  note over E: post via SocialGateway - platform share via SocialShareGateway
+  A->>B: toggle "Share to Social" on
+  B->>C: call(sessionId, caption)
+  C->>E: createWorkoutSharePost(sessionId, caption)
+  note right of E: public caption only -<br/>private notes are never shared
+  E-->>C: postId (Post created)
+  C-->>B: state = AsyncData (shared to community)
+  A->>B: pick Facebook / Instagram / Twitter / TikTok
+  B->>C: call(platform, text)
+  C->>E: shareTo(platform, text)
+  E-->>C: ok
+  C-->>B: state = AsyncData (handed to platform)
+  B-->>A: native share opens for chosen platform
+  note over E: createWorkoutSharePost via SocialGateway → posts (RLS) - shareTo via SocialShareGateway (Facebook / Instagram / Twitter / TikTok)

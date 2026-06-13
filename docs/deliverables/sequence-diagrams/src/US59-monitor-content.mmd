@@ -1,15 +1,20 @@
 ---
-title: "US59 — Monitor expert content + listings"
+title: "US59 — Monitor content + listings"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>MonitorScreen
-  participant C as «Control»<br/>ModerateServiceListing
-  participant E as «Entity»<br/>ExpertService
-  A->>B: review reported / new listings
-  B->>C: takeDown(listingId)
-  C->>E: status → archived
-  E-->>C: removed from marketplace
-  C-->>B: done
-  B-->>A: listing no longer visible
-  note over E: persisted via SupabaseGateway
+  participant C as «Control»<br/>ModerateContent
+  participant E as «Entity»<br/>Post · ExpertService · Deliverable
+  A->>B: open reported content queue
+  B->>C: loadReports()
+  C->>E: listReportedContent()
+  E-->>C: List of reported Post / ExpertService / Deliverable
+  C-->>B: state = AsyncData (reports)
+  A->>B: tap Remove on an item
+  B->>C: remove(contentId)
+  C->>E: removeContent(contentId)
+  E-->>C: ok (content removed)
+  C-->>B: state = AsyncData (updated)
+  B-->>A: content no longer visible to users
+  note over E: listReportedContent / removeContent via SupabaseGateway (RLS admin-only)

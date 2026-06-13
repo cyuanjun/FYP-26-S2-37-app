@@ -4,12 +4,17 @@ title: "US27 — Browse expert profiles + listings"
 sequenceDiagram
   actor A as Registered Free User
   participant B as «Boundary»<br/>ExpertsScreen
-  participant C as «Control»<br/>BrowseExperts
+  participant C as «Control»<br/>LoadExperts
   participant E as «Entity»<br/>ExpertProfile · ExpertService
   A->>B: open Experts tab, search / filter
-  B->>C: load experts + services
-  C->>E: live listings + profiles
-  E-->>C: domain objects
-  C-->>B: expert + service cards
+  B->>C: loadExperts(filter)
+  C->>E: listExperts(filter)
+  E-->>C: List (ExpertProfile + ExpertService)
+  C-->>B: state = AsyncData (expert cards)
   B-->>A: directory with ratings + prices
-  note over E: read via SupabaseGateway
+  A->>B: tap Follow on an expert
+  B->>C: toggleFollow(expertId)
+  C->>E: toggleFollowExpert(expertId)
+  E-->>C: follow state
+  C-->>B: state = AsyncData (following)
+  note over E: planned — listExperts / toggleFollowExpert<br/>via SupabaseGateway (RLS)

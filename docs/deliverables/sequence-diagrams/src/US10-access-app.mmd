@@ -8,7 +8,8 @@ sequenceDiagram
   participant E as «Entity»<br/>App release (APK / App Store link)
   A->>B: tap "Download mobile app" (logged in)
   B->>C: requestDownload(platform)
-  C->>E: latest app build link
+  C->>E: getLatestBuildLink(platform)
   E-->>C: Android APK / iOS install link
   C-->>B: download starts
   B-->>A: install, then sign in on the app (US07)
+  note over E: website-side flow (not Dart) - the marketing site serves the build link.<br/>In-app auth is a separate flow (US07)

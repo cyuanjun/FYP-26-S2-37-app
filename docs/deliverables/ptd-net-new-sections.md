@@ -2,7 +2,7 @@
 
 Draft content for the PTD sections that aren't already in the PRD/SRS/TDM. Copy these into the Word template under the matching section number, then adjust wording to the team voice. Diagrams (DFD) are given as both a renderable form and a redraw spec so they can be drawn in draw.io to match the TDM's notation.
 
-Sourcing: derived from **PRD v2.0** (market research, value prop, schedule, roles, risk), **SRS v2.0** (use cases, NFRs), and **TDM v5** (architecture, ERD, DFD context diagram). Reconcile any figures against the [reconciliation log](doc-reconciliation-log.md) before final render (e.g. premium price = **$9.99/mo**).
+Sourcing: derived from **PRD v2.0/v3.0** (market research, value prop, schedule, roles, risk), **SRS v2.0** (use cases, NFRs), **TDM v5** (architecture, ERD, DFD context diagram), and the current Flutter/Supabase prototype state. Reconcile any figures against the [reconciliation log](doc-reconciliation-log.md) before final render (e.g. premium price = **$9.99/mo**, payment is simulated, backend stack is Supabase).
 
 ---
 
@@ -18,7 +18,7 @@ Strategic position of Wise Workout as a Final Year Project product concept.
 ### Strengths
 - **Integrated platform** — workout tracking, AI-assisted progress summaries, AI plan suggestions, a verified human-expert marketplace, and a social/challenge layer in **one** cross-platform app, rather than forcing users to stitch together several single-purpose apps.
 - **Three-layer business model** — Free, Premium, and an à-la-carte **expert-services layer** that both Free and Premium users can buy, giving multiple revenue paths without paywalling human expertise behind the Premium tier.
-- **AI used responsibly** — AI scope is deliberately limited to summaries and plan *suggestions*; coaching and custom plans come from verified human experts, and all AI output is labelled AI-assisted (never medical advice), reducing liability and building trust.
+- **AI used responsibly** — AI scope is deliberately limited to summaries and plan *suggestions* generated from the user's profile, goal, timeline, and training preferences; coaching and custom plans come from verified human experts, and all AI output is labelled AI-assisted (never medical advice), reducing liability and building trust.
 - **Modular, extensible architecture** — a managed backend (Supabase) and a clean sensor abstraction mean wearables/HealthKit, BLE heart-rate, and push notifications can be added later as new modules rather than rewrites.
 - **Disciplined engineering design** — a Boundary–Control–Entity architecture with traceable use cases, sequence diagrams, and role-based + row-level access control.
 
@@ -26,7 +26,7 @@ Strategic position of Wise Workout as a Final Year Project product concept.
 - **Resource and time constraints** of an FYP (4-person team, two terms) limit the depth of advanced features; some capabilities (payment, wearable sync) are delivered at a **simulated or conceptual** level.
 - **No existing user base or brand recognition** — the platform starts from zero against established incumbents.
 - **Dependence on third-party services** (OpenAI/Gemini, Supabase) for core functionality, exposing the product to their pricing, availability, and policy changes.
-- **Narrow initial AI capability** by design — users expecting full AI coaching may perceive the summaries/suggestions as limited.
+- **Narrow initial AI capability** by design — users expecting full AI coaching may perceive the summaries/suggestions as limited, especially because expert-level coaching cues remain Premium or expert-service features.
 - **Expert marketplace needs supply** — value depends on attracting verified experts, a two-sided-market cold-start challenge.
 
 ### Opportunities
@@ -72,7 +72,7 @@ Strategic position of Wise Workout as a Final Year Project product concept.
 | **Supervisor** | Mr Premrajan |
 | **Duration** | 4 Apr 2026 – 22 Aug 2026 (two terms) |
 | **Project manager / coordinator** | Chia Yuan Jun |
-| **Purpose** | Deliver a cross-platform mobile fitness application that integrates workout tracking, AI-assisted progress summaries and plan suggestions, a verified-expert services marketplace, and a social/challenge layer, supported by a marketing website and an admin portal. |
+| **Purpose** | Deliver a cross-platform mobile fitness application that integrates workout tracking, AI-assisted progress summaries and timeline-aware plan suggestions, a verified-expert services marketplace, and a social/challenge layer, supported by a marketing website and an admin portal. |
 | **Objectives** | (1) Build the core capture → analyse → AI-summary → share loop. (2) Implement all five user roles. (3) Deliver Free/Premium/Expert-services monetisation (simulated payment). (4) Apply a maintainable BCE architecture with role-based + row-level security. (5) Produce the required FYP deliverables (PRD, SRS, TDM, PTD, PUM, final system + demo). |
 | **In scope** | Mobile app (Android + iOS via Flutter); marketing website; admin portal; phone-sensor + manual workout capture; AI summaries/suggestions via a secure backend function; expert listings, requests, and deliverables; social feed, challenges, friends; subscriptions; admin user/expert/content moderation. |
 | **Out of scope (this project phase)** | Real payment-gateway settlement (simulated only); live wearable/HealthKit/BLE sync (architecturally provisioned, additive later); push/FCM notifications (local notifications only initially); nutrition tracking; non-English localisation. |
@@ -80,7 +80,7 @@ Strategic position of Wise Workout as a Final Year Project product concept.
 | **Stakeholders** | Project team (4), supervisor/assessors (UOW/SIM), prospective end users (free/premium/expert), evaluators. |
 | **Team & roles (PRD §8.4)** | Chia Yuan Jun — coordination & documentation; Devanandi Praveen — mobile / UI; Foong Jun Yan — backend / database / API; Jedidiah Goh — website / expert & admin features. |
 | **Success criteria** | Core vertical slice demonstrable end-to-end; all five roles functional; deliverables submitted on schedule and internally consistent; architecture and security requirements met; positive supervisor/assessor evaluation. |
-| **Top constraints** | Fixed FYP timeline and team size; reliance on third-party services (Supabase, OpenAI/Gemini); iOS build/test requires Mac + device. |
+| **Top constraints** | Fixed FYP timeline and team size; reliance on third-party services (Supabase, OpenAI/Gemini); Android/iOS build/test requires configured SDKs and emulator/simulator devices. |
 | **Top assumptions** | Users have compatible smartphones + connectivity; third-party services remain available within budget; wearables (if used later) support standard data-sharing. |
 
 ---
@@ -125,7 +125,7 @@ The system handles personal and fitness/health-related data and integrates with 
 | **Not medical advice** | AI outputs and app guidance must not be presented as medical, nutritional, or clinical advice. | All AI output is labelled **AI-assisted**; coaching/custom plans come from verified human experts; an explicit "not medical advice" disclaimer; TDM §3.4 records this as a design constraint. |
 | **App-store compliance** | Apple App Store & Google Play health-data, privacy-label, and content policies. | Permissions (location, motion, notifications) requested with rationale; privacy policy published; health-data guidelines followed. |
 | **Social-platform terms** | Sharing to Facebook / Instagram / Twitter / TikTok must follow each platform's API and branding terms. | Use official share mechanisms; respect rate limits and branding; user-initiated sharing only. |
-| **Third-party service terms** | OpenAI/Gemini usage policies; Supabase data-processing terms. | API keys kept server-side (Edge Function) — never shipped in the app; comply with provider acceptable-use policies; no sending of data the user hasn't consented to process. |
+| **Third-party service terms** | OpenAI/Gemini usage policies; Supabase data-processing terms. | API keys kept server-side in Supabase Edge Functions — never shipped in the app; comply with provider acceptable-use policies; no sending of data the user hasn't consented to process. |
 | **Payment** | Real payment handling carries PCI/financial-compliance obligations. | Payment is **simulated** for the FYP — no real card data is collected or stored, avoiding those obligations at this stage. |
 | **Age / eligibility** | Fitness apps commonly restrict to users above a minimum age. | State a minimum-age requirement in the terms; out-of-scope features flagged accordingly. |
 
@@ -144,7 +144,7 @@ Unregistered Visitor · Registered User (Free/Premium) · Verified Expert · Sys
 | 1.0 | Manage Accounts & Authentication | credentials, registration / expert application → auth result, account record |
 | 2.0 | Manage Profile, Fitness Profile & Goals | profile + goal edits → stored profile, goal progress |
 | 3.0 | Capture Workout (sensor / manual) | sensor + manual workout data, wearable sync → workout session |
-| 4.0 | Generate Analytics & AI Outputs | workout history + goals → basic/advanced analytics, AI summary, AI/rule plan suggestion |
+| 4.0 | Generate Analytics & AI Outputs | workout history + profile + goal timeline → basic/advanced analytics, AI summary, AI/rule plan suggestion |
 | 5.0 | Manage Social & Challenges | posts, likes, comments, challenge join/create, share → feed, challenge results |
 | 6.0 | Manage Expert Services | listings, service requests, deliverables, reviews → service status, expert responses |
 | 7.0 | Manage Subscriptions & (Simulated) Payment | tier change, simulated payment → subscription status |
@@ -163,7 +163,7 @@ flowchart LR
   D2 --> P4[4.0 Analytics & AI Outputs]
   U -->|profile & goals| P2[2.0 Profile & Goals] --> D1[(D1 Users & Profiles)]
   D1 --> P4
-  P4 -->|AI summary / suggestion| U
+  P4 -->|AI summary / full-timeline plan suggestion| U
   P4 <-->|prompt / response| AI{{AI Service}}
   U --> P5[5.0 Social & Challenges] --> D4[(D4 Social)]
   U --> P6[6.0 Expert Services] --> D5[(D5 Expert Services)]
@@ -198,6 +198,8 @@ flowchart LR
 | **Three-layer model** | The business model: **Free**, **Premium**, and a separate à-la-carte **Expert-services** layer that both Free and Premium users can purchase. |
 | **AI-assisted summary** | A machine-generated recap of a user's progress — informational, not medical advice. |
 | **AI plan suggestion** | A machine-suggested training plan (Premium = personalised); distinct from human-expert custom plans. |
+| **Full-timeline plan** | A generated plan whose week count follows the user's selected goal timeline, rather than always defaulting to a fixed one-month block. |
+| **My Plans** | The screen listing the user's active and saved generated fitness plans; users can inspect an older plan and activate it again. |
 | **Suggested vs Freeform workout** | A workout started from a plan's prescribed session vs an unstructured one the user starts on the spot. |
 | **Deliverable** | Content an expert produces for a client within a paid engagement (e.g. a form review or custom block). |
 | **Service request** | A user's paid request against an expert's service listing. |

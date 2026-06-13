@@ -7,9 +7,15 @@ sequenceDiagram
   participant C as «Control»<br/>SummariseProgress
   participant E as «Entity»<br/>WorkoutSession · FitnessGoal
   A->>B: tap AI summary
-  B->>C: summarise(range)
-  C->>E: sessions + active goal context
-  E-->>C: personalised inputs
-  C-->>B: tailored summary text
-  B-->>A: summary, AI-assisted label
-  note over E: AI call via AiGateway → Edge Function -<br/>premium = personalised vs basic generic tier
+  B->>C: summarise()
+  C->>E: summariseProgress(range)
+  alt summary returned
+    E-->>C: ProgressSummary (personalised, model tag)
+    C-->>B: state = AsyncData (tailored text)
+    B-->>A: summary, labelled "AI-assisted — not medical advice"
+  else AI unavailable
+    E-->>C: error
+    C-->>B: state = AsyncError
+    B-->>A: friendly error, retry
+  end
+  note over E: summariseProgress via AiGateway → summarise-progress<br/>Edge Function — Premium = personalised vs basic generic (US18a)

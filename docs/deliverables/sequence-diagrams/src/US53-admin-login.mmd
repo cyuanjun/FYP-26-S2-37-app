@@ -2,14 +2,22 @@
 title: "US53 — Admin log in"
 ---
 sequenceDiagram
-  actor A as System Admin
+  actor A as System Administrator
   participant B as «Boundary»<br/>LoginScreen
   participant C as «Control»<br/>Authenticate
   participant E as «Entity»<br/>Profile
-  A->>B: enter credentials
-  B->>C: signIn()
-  C->>E: verify credentials, load Profile
-  E-->>C: session + role = admin
-  C-->>B: signed in
-  B-->>A: route to Admin portal (5-tab shell)
-  note over E: credential check by Supabase Auth via AuthGateway
+  A->>B: enter email + password, tap LOG IN
+  B->>C: signIn(email, password)
+  C->>E: signInWithPassword(email, password)
+  alt valid admin credentials
+    E-->>C: AuthResponse (session)
+    C->>E: fetchProfile(userId)
+    E-->>C: Profile (role = admin)
+    C-->>B: state = AsyncData (signed in)
+    B-->>A: redirect to Admin portal (5-tab shell)
+  else invalid credentials
+    E-->>C: AuthException
+    C-->>B: state = AsyncError
+    B-->>A: "Incorrect email or password."
+  end
+  note over E: signInWithPassword via AuthGateway → Supabase Auth.<br/>fetchProfile via ProfileGateway → profiles (RLS)
