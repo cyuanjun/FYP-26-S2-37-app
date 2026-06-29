@@ -74,34 +74,61 @@ def functional():
 
 # ---------- 13 User Stories (SRS T8-T71: all 64, ID|Name|Description) ----------
 def user_stories():
-    rows=[["ID","Name","Description"]]
+    stories=[]
     for t in SRS.tables:
         cells={r.cells[0].text.strip():r.cells[1].text.strip() for r in t.rows if len(r.cells)>=2}
         sid=cells.get("User Story ID","")
         if sid.startswith("#US"):
-            rows.append([sid.lstrip("#"), cells.get("Name",""), cells.get("Description","")])
-    return [
-        {"t":"p","s":"Normal","x":f"The SRS defines {len(rows)-1} user stories across the five "
-         "user roles. All are listed below with their use-case name and description; the full "
-         "use-case flows are in Section 14."},
-        {"t":"t","rows":rows},
+            stories.append((sid.lstrip("#"), cells.get("Name",""), cells.get("Description","")))
+    # group by user role using the US-number ranges (matches the §15 use-case diagrams)
+    groups=[
+        ("Unregistered User",        1,  6),
+        ("Registered Free User",     7,  31),
+        ("Registered Premium User",  32, 40),
+        ("Verified Expert User",     41, 52),
+        ("System Administrator",     53, 64),
     ]
+    def num(sid): return int(sid[2:])  # 'US07' -> 7
+    blocks=[{"t":"p","s":"Normal","x":f"The SRS defines {len(stories)} user stories across the "
+        "five user roles. They are grouped below by role, each story listed with its use-case "
+        "name and description; the full use-case flows are in Section 14."}]
+    for title,lo,hi in groups:
+        sub=[s for s in stories if lo<=num(s[0])<=hi]
+        if not sub: continue
+        blocks.append({"t":"p","s":"Heading 2","x":title})
+        blocks.append({"t":"t","rows":[["ID","Name","Description"]]+[list(s) for s in sub]})
+    return blocks
 
 # ---------- 14 Use Case Descriptions (SRS T8-T71 full structured) ----------
 def use_cases():
-    blocks=[{"t":"p","s":"Normal","x":
-        "The full structured use-case descriptions (trigger, actors, pre-condition, normal "
-        "flow, alternative flow, sub-flow) for all user stories are given below, consolidated "
-        "from the SRS System Features section."}]
     order=["User Story ID","Name","Description","Trigger","Actor(s)","Pre-condition",
            "Normal Flow","Alternative Flow","Sub-flow"]
+    cases=[]
     for t in SRS.tables:
         cells={r.cells[0].text.strip():r.cells[1].text.strip() for r in t.rows if len(r.cells)>=2}
         sid=cells.get("User Story ID","")
         if not sid.startswith("#US"): continue
-        blocks.append({"t":"p","s":"Heading 3","x":f"{sid.lstrip('#')} {cells.get('Name','')}"})
-        rows=[[k, cells.get(k,"")] for k in order if k in cells]
-        blocks.append({"t":"t","rows":rows})
+        cases.append((sid.lstrip("#"), cells))
+    # group by user role using the US-number ranges (matches Sections 13 and 15)
+    groups=[
+        ("Unregistered User",        1,  6),
+        ("Registered Free User",     7,  31),
+        ("Registered Premium User",  32, 40),
+        ("Verified Expert User",     41, 52),
+        ("System Administrator",     53, 64),
+    ]
+    def num(sid): return int(sid[2:])  # 'US07' -> 7
+    blocks=[{"t":"p","s":"Normal","x":
+        "The full structured use-case descriptions (trigger, actors, pre-condition, normal "
+        "flow, alternative flow, sub-flow) for all user stories are given below, grouped by "
+        "user role and consolidated from the SRS System Features section."}]
+    for title,lo,hi in groups:
+        sub=[(sid,cells) for sid,cells in cases if lo<=num(sid)<=hi]
+        if not sub: continue
+        blocks.append({"t":"p","s":"Heading 2","x":title})
+        for sid,cells in sub:
+            blocks.append({"t":"p","s":"Heading 3","x":f"{sid} {cells.get('Name','')}"})
+            blocks.append({"t":"t","rows":[[k, cells.get(k,"")] for k in order if k in cells]})
     return blocks
 
 # ---------- 1. Introduction: product-overview lead paragraph ----------
@@ -446,7 +473,7 @@ _scrub = {
     "This reduces the need for a separately managed server during the FYP prototype stage.":
         "This reduces the need for a separately managed server.",
     "verified on Android emulator and iOS simulator against a live backend. The repository currently reports 107 passing tests and successful prototype flows including":
-        "verified on Android and iOS against a live backend. The repository currently reports 107 passing tests and successful flows including",
+        "verified on Android and iOS against a live backend. The repository currently reports 109 passing tests and successful flows including",
     "Access Prototype Mobile Application": "Access Mobile Application",
     "the prototype application access or download instructions":
         "the mobile application access or download instructions",
@@ -469,7 +496,7 @@ _scrub = {
     "Mock BLE pairing and simulated wearable heart rate are used for wearable demonstration.":
         "Mock BLE pairing and simulated wearable heart rate are used pending real BLE / HealthKit integration.",
     "Repository reports 107 passing tests and successful verification on Android emulator and iOS simulator.":
-        "Repository reports 107 passing tests and successful verification on Android and iOS.",
+        "Repository reports 109 passing tests and successful verification on Android and iOS.",
 }
 # drop the appendix bullet that cites the sample document
 merged = [b for b in merged if not (
