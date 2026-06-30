@@ -14,6 +14,9 @@ import '../workout/history_detail_screen.dart';
 
 enum _Period { day, week, month }
 
+const _monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
 /// BOUNDARY (#12 History). Basic Workout Analytics (Day/Week/Month) + the
 /// "View Workout History" list grouped by relative week. Matches TDM activity
 /// diagram: History → analytics + history list → completed-workout details.
@@ -98,6 +101,39 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           final typeById = {for (final t in types) t.id: t};
 
           if (sessions.isEmpty) {
+            final hiddenEarlier = ref.watch(earlierHistoryHiddenProvider).value ?? false;
+            if (hiddenEarlier) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('No workouts in ${_monthNames[DateTime.now().month]} yet',
+                          style: AppTypography.title3, textAlign: TextAlign.center),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Free history only covers the current month. Your earlier '
+                        'workouts are still saved.',
+                        style: AppTypography.subheadline,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.premium,
+                          foregroundColor: AppColors.ink,
+                        ),
+                        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Premium upgrade is coming in a later sprint.')),
+                        ),
+                        child: const Text('Upgrade to Premium'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
             return Center(
               child: Text('No workouts yet. Start one from Train.', style: AppTypography.subheadline),
             );
@@ -109,7 +145,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               children: [
                 if (!isPremium) _searchLockedPill(),
-                const SizedBox(height: 12),
+                const Padding(
+                  padding: EdgeInsets.only(top: 16, bottom: 8),
+                  child: Text('BASIC WORKOUT ANALYTICS', style: AppTypography.caption2),
+                ),
                 _analyticsCard(sessions, isPremium),
                 const SizedBox(height: 20),
                 ..._buildGroups(sessions, typeById),
@@ -143,10 +182,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.accent,
+                color: AppColors.premium,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Text('PREMIUM', style: AppTypography.caption2.copyWith(color: AppColors.bg)),
+              child: Text('PREMIUM', style: AppTypography.caption2.copyWith(color: AppColors.ink)),
             ),
           ],
         ),
@@ -162,7 +201,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     final prior = _aggregate(all.where((s) => _inWindow(s, priorWin)));
     final hasPrior = prior.sessions > 0;
 
-    const labels = {_Period.day: 'Today', _Period.week: 'This week', _Period.month: 'This month'};
     const vs = {_Period.day: 'VS YESTERDAY', _Period.week: 'VS LAST WEEK', _Period.month: 'VS LAST MONTH'};
 
     return Container(
@@ -171,8 +209,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('BASIC WORKOUT ANALYTICS', style: AppTypography.caption2),
-          const SizedBox(height: 12),
           // period pills
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -198,14 +234,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               );
             }).toList(),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(labels[_period]!, style: AppTypography.headline),
-              if (hasPrior) Text(vs[_period]!, style: AppTypography.caption2),
-            ],
-          ),
+          if (hasPrior) ...[
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(vs[_period]!, style: AppTypography.caption2),
+            ),
+          ],
           const SizedBox(height: 12),
           Row(children: [
             _statTile('SESSIONS', '${cur.sessions}', hasPrior ? cur.sessions - prior.sessions : null),
@@ -227,12 +262,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.15),
+                  color: AppColors.premium.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.accent),
+                  border: Border.all(color: AppColors.premiumText),
                 ),
                 child: Text('⚡ Unlock with Premium →',
-                    style: AppTypography.footnote.copyWith(color: AppColors.accent)),
+                    style: AppTypography.footnote.copyWith(color: AppColors.premiumText)),
               ),
             ),
           ],
@@ -253,12 +288,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(value, style: AppTypography.title3),
+              Text(value, style: AppTypography.title3.copyWith(color: AppColors.metricColor(label))),
               if (delta != null && delta != 0) ...[
                 const SizedBox(width: 4),
                 Text('${delta > 0 ? '↑' : '↓'}${delta.abs()}',
                     style: AppTypography.caption2.copyWith(
-                        color: delta > 0 ? AppColors.accent : AppColors.danger)),
+                        color: delta > 0 ? AppColors.success : AppColors.danger)),
               ],
             ],
           ),
@@ -307,25 +342,23 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   Widget _capBanner(int visible) {
     final now = DateTime.now();
-    const months = ['', 'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.12),
+        color: AppColors.premium.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.premium.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Free history covers ${months[now.month]} only.',
+          Text('Free history covers ${_monthNames[now.month]} only.',
               style: AppTypography.footnote.copyWith(color: AppColors.ink)),
           const SizedBox(height: 4),
           GestureDetector(
             onTap: () => _soon('Full history'),
             child: Text('⚡ Upgrade for full history →',
-                style: AppTypography.footnote.copyWith(color: AppColors.accent)),
+                style: AppTypography.footnote.copyWith(color: AppColors.premiumText)),
           ),
         ],
       ),
@@ -453,7 +486,7 @@ class _WorkoutListCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(value, style: AppTypography.headline),
+            Text(value, style: AppTypography.headline.copyWith(color: AppColors.metricColor(label))),
             Text(label, style: AppTypography.caption2),
           ],
         ),

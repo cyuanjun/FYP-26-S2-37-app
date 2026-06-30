@@ -272,8 +272,10 @@ class _Stepper extends StatelessWidget {
             child: Column(
               children: [
                 Text('$display $unit',
-                    style: const TextStyle(
-                        fontSize: 34, fontWeight: FontWeight.w900, color: AppColors.ink)),
+                    style: TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.metricColor(unit))),
                 if (subtitle.isNotEmpty)
                   Text(subtitle, style: AppTypography.caption1),
               ],

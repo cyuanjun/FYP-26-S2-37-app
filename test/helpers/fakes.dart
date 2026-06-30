@@ -149,6 +149,10 @@ class FakeWorkoutGateway implements WorkoutGateway {
   final listFroms = <DateTime?>[];
 
   @override
+  Future<bool> hasEndedSessionsBefore(String userId, DateTime before) async =>
+      ended.any((s) => s.startedAt.isBefore(before));
+
+  @override
   Future<void> deleteSession(String sessionId) async => deletedIds.add(sessionId);
 }
 

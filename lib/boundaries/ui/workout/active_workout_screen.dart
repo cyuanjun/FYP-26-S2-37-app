@@ -128,7 +128,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
             final type = s.type ?? _selected;
             final cardio = type?.isCardio ?? false;
             final dim = preStart;
-            final ink = dim ? AppColors.faint : AppColors.ink;
 
             return SafeArea(
               child: Column(
@@ -136,7 +135,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                   const Spacer(),
                   Text('TIME', style: AppTypography.caption2),
                   Text(fmtDuration(s.elapsed),
-                      style: TextStyle(fontSize: 64, fontWeight: FontWeight.w700, color: ink)),
+                      style: TextStyle(
+                          fontSize: 64,
+                          fontWeight: FontWeight.w700,
+                          color: dim ? AppColors.faint : AppColors.metricColor('TIME'))),
                   const SizedBox(height: 32),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -160,7 +162,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                       children: [
                         const Text('♥ ', style: TextStyle(color: AppColors.danger, fontSize: 18)),
                         Text('${s.heartRate} bpm',
-                            style: AppTypography.title3.copyWith(color: AppColors.ink)),
+                            style: AppTypography.title3.copyWith(color: AppColors.metricColor('HR'))),
                         if (s.wearableName != null)
                           Text('  ·  ${s.wearableName}', style: AppTypography.caption2),
                       ],
@@ -180,10 +182,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                               ? OutlinedButton(
                                   onPressed: () => _pickActivity(types),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppColors.ink,
-                                    side: const BorderSide(color: AppColors.faint),
+                                    foregroundColor: AppColors.accent,
+                                    side: const BorderSide(color: AppColors.accent),
                                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                                    textStyle: AppTypography.footnote.copyWith(color: AppColors.ink),
+                                    textStyle: AppTypography.footnote.copyWith(color: AppColors.accent),
                                   ),
                                   child: Text(type?.name ?? '—', overflow: TextOverflow.ellipsis, maxLines: 1),
                                 )
@@ -271,7 +273,7 @@ class _Metric extends StatelessWidget {
           Text(label, style: AppTypography.caption2),
           const SizedBox(height: 4),
           Text(value,
-              style: AppTypography.title2.copyWith(color: dim ? AppColors.faint : AppColors.ink)),
+              style: AppTypography.title2.copyWith(color: dim ? AppColors.faint : AppColors.metricColor(label))),
         ],
       ),
     );

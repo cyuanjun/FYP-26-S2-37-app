@@ -35,7 +35,7 @@ class TrainScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               children: [
                 _SectionHeader(
-                  label: 'AI SUGGESTED PLAN',
+                  label: 'SELECTED PLAN',
                   action: 'VIEW PLANS ›',
                   onAction: () => Navigator.of(context, rootNavigator: true).push(
                     MaterialPageRoute(builder: (_) => const MyPlansScreen()),
@@ -86,8 +86,8 @@ class TrainScreen extends ConsumerWidget {
                       MaterialPageRoute(
                           builder: (_) => const ConnectedDevicesScreen())),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.muted,
-                    side: const BorderSide(color: AppColors.faint),
+                    foregroundColor: AppColors.accent,
+                    side: const BorderSide(color: AppColors.accent),
                     minimumSize: const Size.fromHeight(48),
                   ),
                   child: const Text('+ ADD DEVICE'),
@@ -206,10 +206,10 @@ class _DevicesCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.accent),
+              border: Border.all(color: AppColors.success),
             ),
             child: Text('CONNECTED',
-                style: AppTypography.caption2.copyWith(color: AppColors.accent)),
+                style: AppTypography.caption2.copyWith(color: AppColors.success)),
           ),
         ],
       ),
@@ -235,17 +235,17 @@ class _ActivePlanCard extends StatelessWidget {
             .toInt();
     final thisWeek =
         workouts.where((w) => w.weekNumber == cycleWeek).toList();
+    // The next session this week: first on/after today, else the week's first.
     final next = thisWeek.isEmpty
         ? null
-        : thisWeek.firstWhere((w) => w.dayOfWeek >= today,
-            orElse: () => thisWeek.first);
+        : thisWeek.firstWhere((w) => w.dayOfWeek >= today, orElse: () => thisWeek.first);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
+        border: Border.all(color: AppColors.faint),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,44 +255,59 @@ class _ActivePlanCard extends StatelessWidget {
           Text(
             '${plan.workoutsPerWeek}x per week · ${plan.durationWeeks} weeks · '
             'AI-assisted (${plan.isPersonalised ? 'personalised' : 'basic'})',
-            style: AppTypography.caption2.copyWith(color: AppColors.accent),
+            style: AppTypography.caption2.copyWith(color: AppColors.muted),
           ),
-          if (next != null) ...[
+          if (thisWeek.isNotEmpty) ...[
             const SizedBox(height: 12),
             const Divider(color: AppColors.faint, height: 1),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Text(next.dayOfWeek == today ? 'TODAY' : next.dayName.toUpperCase(),
-                    style: AppTypography.caption2.copyWith(
-                        color: AppColors.accent, fontWeight: FontWeight.w800)),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text('${next.name ?? 'Workout'} · ${next.durationMinutes} min',
-                      style: AppTypography.subheadline.copyWith(color: AppColors.ink)),
-                ),
-                Text('WEEK $cycleWeek/${plan.durationWeeks}', style: AppTypography.caption2),
-              ],
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('THIS WEEK', style: AppTypography.caption2),
+                  Text('WEEK $cycleWeek/${plan.durationWeeks}', style: AppTypography.caption2),
+                ],
+              ),
             ),
+            const SizedBox(height: 8),
+            const Divider(color: AppColors.faint, height: 1),
+            const SizedBox(height: 4),
+            for (final w in thisWeek) _dayRow(w, identical(w, next)),
           ],
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              for (final w in thisWeek)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.bg,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.faint),
-                  ),
-                  child: Text('${w.dayName} · ${w.name ?? ''}',
-                      style: AppTypography.caption2),
-                ),
-            ],
+        ],
+      ),
+    );
+  }
+
+  /// One row of the weekly schedule. The [isNext] session is highlighted with a
+  /// green tint + a NEXT tag so the user can see what's coming up.
+  Widget _dayRow(PlannedWorkout w, bool isNext) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: isNext
+          ? BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            )
+          : null,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 44,
+            child: Text(w.dayName.toUpperCase(),
+                style: AppTypography.caption2
+                    .copyWith(color: AppColors.success, fontWeight: FontWeight.w800)),
           ),
+          Expanded(
+            child: Text(w.name ?? 'Workout',
+                style: AppTypography.subheadline.copyWith(
+                    color: AppColors.ink,
+                    fontWeight: isNext ? FontWeight.w700 : FontWeight.w500)),
+          ),
+          Text('${w.durationMinutes} min', style: AppTypography.caption2),
         ],
       ),
     );

@@ -89,8 +89,8 @@ class AccountSettingsScreen extends ConsumerWidget {
                             : 'Could not send reset link. Try again later.')));
                   },
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.ink,
-              side: const BorderSide(color: AppColors.faint),
+              foregroundColor: AppColors.accent,
+              side: const BorderSide(color: AppColors.accent),
               minimumSize: const Size.fromHeight(52),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),

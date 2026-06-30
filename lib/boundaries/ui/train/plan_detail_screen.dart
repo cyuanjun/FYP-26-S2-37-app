@@ -96,12 +96,12 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.accent),
+                              border: Border.all(color: AppColors.muted),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text('PERSONALISED',
                                 style: AppTypography.caption2
-                                    .copyWith(color: AppColors.accent)),
+                                    .copyWith(color: AppColors.muted)),
                           ),
                       ],
                     ),
@@ -154,7 +154,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                         if (shownWeek == cycleWeek)
                           Text(' · CURRENT',
                               style: AppTypography.caption2
-                                  .copyWith(color: AppColors.accent, letterSpacing: 1.4)),
+                                  .copyWith(color: AppColors.muted, letterSpacing: 1.4)),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -252,7 +252,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
               ),
               Text('${w.durationMinutes}m',
                   style: AppTypography.footnote.copyWith(
-                      color: isToday ? AppColors.accent : AppColors.muted)),
+                      color: AppColors.metricColor('MIN'))),
               const SizedBox(width: 6),
               const Icon(Icons.chevron_right, size: 18, color: AppColors.faint),
             ],
@@ -282,7 +282,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                   if (isToday)
                     Text(' · TODAY',
                         style: AppTypography.caption2
-                            .copyWith(color: AppColors.accent, letterSpacing: 1.4)),
+                            .copyWith(color: AppColors.muted, letterSpacing: 1.4)),
                 ],
               ),
               const SizedBox(height: 8),
@@ -302,12 +302,12 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.1),
+                    color: AppColors.premium.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '⚡ Upgrade to Premium for sets, reps, target zones, and coaching cues.',
-                    style: AppTypography.footnote.copyWith(color: AppColors.accent),
+                    style: AppTypography.footnote.copyWith(color: AppColors.premiumText),
                   ),
                 ),
               ],
@@ -394,7 +394,7 @@ class _RegenerateLink extends ConsumerWidget {
         ),
         if (blocked)
           Text('Upgrade for unlimited regenerations',
-              style: AppTypography.caption2.copyWith(color: AppColors.muted)),
+              style: AppTypography.caption2.copyWith(color: AppColors.premiumText)),
       ],
     );
   }

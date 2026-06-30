@@ -97,11 +97,11 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.15),
+                  color: AppColors.muted.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColors.accent),
+                  border: Border.all(color: AppColors.muted),
                 ),
-                child: Text('EDITING', style: AppTypography.caption2.copyWith(color: AppColors.accent)),
+                child: Text('EDITING', style: AppTypography.caption2.copyWith(color: AppColors.muted)),
               ),
             ],
           ],
@@ -144,7 +144,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
             Text('${relativeDay(when)} · ${(s.durationSeconds / 60).round()} min',
                 style: AppTypography.caption2),
             if (freeform)
-              Text('  · Freeform', style: AppTypography.caption2.copyWith(color: AppColors.accent)),
+              Text('  · Freeform', style: AppTypography.caption2.copyWith(color: AppColors.muted)),
           ],
         ),
         const SizedBox(height: 20),
@@ -166,7 +166,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         const SizedBox(height: 24),
         // Feel
         Text(_editing ? '✏ HOW IT FELT' : 'HOW IT FELT',
-            style: AppTypography.caption2.copyWith(color: _editing ? AppColors.accent : AppColors.muted)),
+            style: AppTypography.caption2.copyWith(color: AppColors.muted)),
         const SizedBox(height: 8),
         if (_editing)
           Wrap(
@@ -188,7 +188,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         const SizedBox(height: 24),
         // Notes (private)
         Text(_editing ? '✏ NOTES (private)' : 'NOTES (private)',
-            style: AppTypography.caption2.copyWith(color: _editing ? AppColors.accent : AppColors.muted)),
+            style: AppTypography.caption2.copyWith(color: AppColors.muted)),
         const SizedBox(height: 8),
         if (_editing)
           TextField(controller: _notes, maxLines: 3, decoration: const InputDecoration(hintText: 'Private notes'))
@@ -213,7 +213,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('✏ $label', style: AppTypography.caption2.copyWith(color: AppColors.accent)),
+        Text('✏ $label', style: AppTypography.caption2.copyWith(color: AppColors.muted)),
         const SizedBox(height: 6),
         TextField(controller: c, decoration: InputDecoration(hintText: hint)),
       ],
@@ -229,7 +229,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
           children: [
             Text(label, style: AppTypography.caption2),
             const SizedBox(height: 4),
-            Text(value, style: AppTypography.title3),
+            Text(value, style: AppTypography.title3.copyWith(color: AppColors.metricColor(label))),
           ],
         ),
       );

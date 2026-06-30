@@ -514,7 +514,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               style: AppTypography.headline,
             ),
           ] else if (_plan != null) ...[
-            const Icon(Icons.check_circle, size: 56, color: AppColors.accent),
+            const Icon(Icons.check_circle, size: 56, color: AppColors.success),
             const SizedBox(height: 16),
             Text('YOUR PLAN IS READY',
                 textAlign: TextAlign.center,
@@ -535,7 +535,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                   Text(
                     '${_plan!.workoutsPerWeek}x per week · ${_plan!.durationWeeks} weeks · '
                     'AI-assisted (${_plan!.isPersonalised ? 'personalised' : 'basic'})',
-                    style: AppTypography.caption2.copyWith(color: AppColors.accent),
+                    style: AppTypography.caption2.copyWith(color: AppColors.muted),
                   ),
                 ],
               ),
