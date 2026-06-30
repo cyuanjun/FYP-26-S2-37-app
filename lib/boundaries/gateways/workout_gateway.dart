@@ -79,6 +79,20 @@ class WorkoutGateway {
     return rows.map(WorkoutSession.fromJson).toList();
   }
 
+  /// Whether the user has any ended session that started before [before].
+  /// Lets History tell "no workouts ever" apart from "earlier workouts exist
+  /// but are hidden by the Free monthly cap". Limited to 1 row (existence only).
+  Future<bool> hasEndedSessionsBefore(String userId, DateTime before) async {
+    final rows = await _client
+        .from('workout_sessions')
+        .select('id')
+        .eq('user_id', userId)
+        .not('ended_at', 'is', null)
+        .lt('started_at', before.toUtc().toIso8601String())
+        .limit(1);
+    return (rows as List).isNotEmpty;
+  }
+
   Future<void> deleteSession(String sessionId) async {
     await _client.from('workout_sessions').delete().eq('id', sessionId);
   }

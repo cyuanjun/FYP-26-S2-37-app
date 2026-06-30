@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
-/// The app's dark Material 3 theme, built from the brand palette + iOS type scale.
+/// The app's light Material 3 theme (white base), built from the brand palette + iOS type scale.
 ThemeData buildAppTheme() {
-  final base = ThemeData.dark(useMaterial3: true);
+  final base = ThemeData.light(useMaterial3: true);
   return base.copyWith(
     scaffoldBackgroundColor: AppColors.bg,
-    colorScheme: const ColorScheme.dark(
+    colorScheme: const ColorScheme.light(
       surface: AppColors.surface,
       onSurface: AppColors.ink,
       primary: AppColors.accent,
-      onPrimary: AppColors.bg, // accent-on-accent text is illegal; CTA text is bg
+      onPrimary: AppColors.bg, // accent-on-accent text is illegal; CTA text is bg (white on violet)
       secondary: AppColors.info,
       onSecondary: AppColors.bg,
       error: AppColors.danger,

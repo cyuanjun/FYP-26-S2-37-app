@@ -155,7 +155,7 @@ class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(Icons.check_circle, size: 64, color: AppColors.accent),
+            const Icon(Icons.check_circle, size: 64, color: AppColors.success),
             const SizedBox(height: 16),
             Text('THANKS FOR YOUR FEEDBACK',
                 textAlign: TextAlign.center,
@@ -174,8 +174,8 @@ class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
                 _category = FeedbackCategory.general;
               }),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.ink,
-                side: const BorderSide(color: AppColors.faint),
+                foregroundColor: AppColors.accent,
+                side: const BorderSide(color: AppColors.accent),
                 minimumSize: const Size.fromHeight(52),
               ),
               child: const Text('SUBMIT ANOTHER'),

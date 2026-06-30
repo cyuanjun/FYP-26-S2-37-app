@@ -47,11 +47,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 // Eyebrow
                 Row(
                   children: [
-                    Container(width: 24, height: 2, color: AppColors.accent),
+                    Container(width: 24, height: 2, color: AppColors.muted),
                     const SizedBox(width: 8),
                     Text('ACCOUNT RECOVERY',
                         style: AppTypography.caption2.copyWith(
-                            color: AppColors.accent, letterSpacing: 2.2)),
+                            color: AppColors.muted, letterSpacing: 2.2)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -101,7 +101,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     child: Row(
                       children: [
                         const Icon(Icons.mark_email_read_outlined,
-                            color: AppColors.accent),
+                            color: AppColors.success),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text('Reset link sent. You can close this screen.',

@@ -194,11 +194,11 @@ class _DeviceRow extends ConsumerWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: device.isActive ? AppColors.accent : AppColors.faint),
+                            color: device.isActive ? AppColors.success : AppColors.faint),
                       ),
                       child: Text(device.isActive ? 'CONNECTED' : 'OFF',
                           style: AppTypography.caption2.copyWith(
-                              color: device.isActive ? AppColors.accent : AppColors.muted)),
+                              color: device.isActive ? AppColors.success : AppColors.muted)),
                     ),
                   ],
                 ),

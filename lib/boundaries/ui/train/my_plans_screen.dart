@@ -97,7 +97,7 @@ class _PlanCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: plan.isActive
-                  ? AppColors.accent.withValues(alpha: 0.6)
+                  ? AppColors.success.withValues(alpha: 0.6)
                   : AppColors.faint,
             ),
           ),
@@ -112,12 +112,12 @@ class _PlanCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.accent.withValues(alpha: 0.12),
+                        color: AppColors.success.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text('ACTIVE',
                           style: AppTypography.caption2.copyWith(
-                              color: AppColors.accent, fontWeight: FontWeight.w800)),
+                              color: AppColors.success, fontWeight: FontWeight.w800)),
                     ),
                 ],
               ),

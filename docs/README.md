@@ -27,6 +27,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 4. [architecture/bce-design.md](architecture/bce-design.md) — BCE architecture + robustness/sequence diagrams + traceability.
 5. [reference/database-v1.md](reference/database-v1.md) — the 26-entity schema and screen→data map.
 6. [reference/screens-v1.md](reference/screens-v1.md) — per-screen UI specs.
+7. [reference/calorie-estimation.md](reference/calorie-estimation.md) — MET calorie method + accuracy caveat (US16).
 
 ## Notes
 

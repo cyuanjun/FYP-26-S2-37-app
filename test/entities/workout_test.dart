@@ -60,8 +60,28 @@ void main() {
       expect(runningType.estimateCalories(durationSeconds: 1800, weightKg: 70), 343);
     });
 
-    test('null weight falls back to the 70 kg default', () {
+    test('null weight + unknown sex falls back to the 70 kg default', () {
       expect(runningType.estimateCalories(durationSeconds: 1800),
+          runningType.estimateCalories(durationSeconds: 1800, weightKg: 70));
+    });
+
+    test('null weight uses a sex-based default (male heavier than female)', () {
+      final male = runningType.estimateCalories(durationSeconds: 1800, sex: Sex.male);
+      final female = runningType.estimateCalories(durationSeconds: 1800, sex: Sex.female);
+      expect(male, runningType.estimateCalories(durationSeconds: 1800, weightKg: 70));
+      expect(female, runningType.estimateCalories(durationSeconds: 1800, weightKg: 55));
+      expect(male, greaterThan(female));
+    });
+
+    test('defaultWeightKg: male 70, female 55, other/null 70', () {
+      expect(WorkoutType.defaultWeightKg(Sex.male), 70);
+      expect(WorkoutType.defaultWeightKg(Sex.female), 55);
+      expect(WorkoutType.defaultWeightKg(Sex.other), 70);
+      expect(WorkoutType.defaultWeightKg(null), 70);
+    });
+
+    test('explicit weight overrides the sex-based default', () {
+      expect(runningType.estimateCalories(durationSeconds: 1800, weightKg: 70, sex: Sex.male),
           runningType.estimateCalories(durationSeconds: 1800, weightKg: 70));
     });
 

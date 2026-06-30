@@ -50,16 +50,16 @@ class ProfileScreen extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.accent,
+                    color: AppColors.premium,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.star, size: 12, color: AppColors.bg),
+                      const Icon(Icons.star, size: 12, color: AppColors.ink),
                       const SizedBox(width: 4),
                       Text('GO PREMIUM',
                           style: AppTypography.caption2.copyWith(
-                              color: AppColors.bg, fontWeight: FontWeight.w900)),
+                              color: AppColors.ink, fontWeight: FontWeight.w900)),
                     ],
                   ),
                 ),
@@ -186,7 +186,8 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           children: [
             Text(value,
-                style: AppTypography.title1.copyWith(fontWeight: FontWeight.w900)),
+                style: AppTypography.title1.copyWith(
+                    fontWeight: FontWeight.w900, color: AppColors.metricColor(label))),
             const SizedBox(height: 2),
             Text(label, style: AppTypography.caption2.copyWith(letterSpacing: 1.2)),
           ],
@@ -211,7 +212,7 @@ class _LevelBar extends StatelessWidget {
           children: [
             Text('LEVEL ${fitness.level}',
                 style: AppTypography.caption2
-                    .copyWith(color: AppColors.accent, fontWeight: FontWeight.w800)),
+                    .copyWith(color: AppColors.muted, fontWeight: FontWeight.w800)),
             Text('${fitness.xpIntoLevel} / ${FitnessProfile.xpPerLevel} XP',
                 style: AppTypography.caption2),
           ],
@@ -223,7 +224,7 @@ class _LevelBar extends StatelessWidget {
             value: progress,
             minHeight: 6,
             backgroundColor: AppColors.surface,
-            valueColor: const AlwaysStoppedAnimation(AppColors.accent),
+            valueColor: const AlwaysStoppedAnimation(AppColors.success),
           ),
         ),
       ],

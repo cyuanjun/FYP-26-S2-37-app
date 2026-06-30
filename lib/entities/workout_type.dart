@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'enums.dart';
+
 part 'workout_type.freezed.dart';
 part 'workout_type.g.dart';
 
@@ -40,9 +42,17 @@ abstract class WorkoutType with _$WorkoutType {
 
   double get met => mets[slug] ?? 4.0;
 
+  /// Population-average fallback weight (kg) used when the fitness profile has
+  /// no weight set, keyed on sex (≈ adult averages); 70 kg when sex is unknown.
+  static double defaultWeightKg(Sex? sex) => switch (sex) {
+        Sex.male => 70,
+        Sex.female => 55,
+        _ => 70, // other / not specified
+      };
+
   /// Estimated kcal = MET × weight(kg) × hours (US16 basic effect estimate).
-  /// [weightKg] falls back to a 70 kg population default when the fitness
-  /// profile has no weight set.
-  int estimateCalories({required int durationSeconds, double? weightKg}) =>
-      (met * (weightKg ?? 70) * (durationSeconds / 3600)).round();
+  /// [weightKg] falls back to a sex-based population default ([defaultWeightKg])
+  /// when the fitness profile has no weight set.
+  int estimateCalories({required int durationSeconds, double? weightKg, Sex? sex}) =>
+      (met * (weightKg ?? defaultWeightKg(sex)) * (durationSeconds / 3600)).round();
 }

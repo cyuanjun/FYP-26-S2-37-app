@@ -6,6 +6,7 @@ import '../boundaries/gateways/workout_data_source.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/connected_device.dart';
+import '../entities/enums.dart';
 import '../entities/workout_type.dart';
 import 'authenticate.dart';
 import 'manage_connected_device.dart';
@@ -146,18 +147,22 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
     final elapsed = _elapsed();
     SeqLog.msg('end-workout', 'ActiveWorkoutScreen', 'ActiveWorkout', 'end($sessionId)');
 
-    // Fetch the calorie weight BEFORE tearing down sensors — keeps the
-    // network round-trip clear of any platform-channel teardown stalls.
+    // Fetch the calorie weight (and sex, for the weight fallback) BEFORE
+    // tearing down sensors — keeps the network round-trip clear of any
+    // platform-channel teardown stalls.
     double? weightKg;
+    Sex? sex;
     try {
-      weightKg = (await ref.read(fitnessProfileProvider.future))?.weightKg;
-    } catch (_) {} // profile unavailable → entity falls back to 70 kg
+      final profile = await ref.read(fitnessProfileProvider.future);
+      weightKg = profile?.weightKg;
+      sex = profile?.sex;
+    } catch (_) {} // profile unavailable → entity falls back to a sex-based default
 
     _timer?.cancel();
     await _metricsSub?.cancel();
     await _source?.stop();
     final calories =
-        type.estimateCalories(durationSeconds: elapsed.inSeconds, weightKg: weightKg);
+        type.estimateCalories(durationSeconds: elapsed.inSeconds, weightKg: weightKg, sex: sex);
 
     final metrics = <String, dynamic>{
       'duration_seconds': elapsed.inSeconds,

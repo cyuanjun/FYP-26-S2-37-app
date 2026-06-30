@@ -85,9 +85,9 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          const Icon(Icons.check_circle, color: AppColors.accent, size: 72),
+          const Icon(Icons.check_circle, color: AppColors.success, size: 72),
           const SizedBox(height: 8),
-          Center(child: Text('+$xp XP', style: AppTypography.title1.copyWith(color: AppColors.accent))),
+          Center(child: Text('+$xp XP', style: AppTypography.title1.copyWith(color: AppColors.success))),
           if (leveledUp)
             Center(child: Text('Level up! You reached level $newLevel 🎉', style: AppTypography.headline)),
           Center(child: Text('🔥 $streak-week streak', style: AppTypography.subheadline)),
@@ -156,8 +156,8 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
                         onPressed: () =>
                             ref.read(shareWorkoutToSocialProvider).call(p, text: _shareText()),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.ink,
-                          side: const BorderSide(color: AppColors.faint),
+                          foregroundColor: AppColors.accent,
+                          side: const BorderSide(color: AppColors.accent),
                         ),
                         child: Text(p.label),
                       ))
@@ -201,7 +201,7 @@ class _Stat extends StatelessWidget {
         children: [
           Text(label, style: AppTypography.caption2),
           const SizedBox(height: 4),
-          Text(value, style: AppTypography.title3),
+          Text(value, style: AppTypography.title3.copyWith(color: AppColors.metricColor(label))),
         ],
       ),
     );
