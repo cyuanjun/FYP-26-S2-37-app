@@ -19,6 +19,17 @@ Pair with [palette.md](palette.md) for colour tokens.
 | Caption 1 | Caption 1 | 12 | `text-xs` | Timestamps, micro-labels |
 | Caption 2 | Caption 2 | 11 | `text-[11px]` | Form field labels, uppercase tags |
 
+## Weights (app)
+
+The Flutter implementation ([`lib/core/theme/app_typography.dart`](../../lib/core/theme/app_typography.dart)) runs the secondary scale a notch heavier than plain regular — small text reads thin on a white background, so weight does the legibility work that the dark theme got from contrast. Sizes are unchanged.
+
+| Token | Weight | Token | Weight |
+|---|---|---|---|
+| Large Title / Title 1 | w700 | Body | **w500** |
+| Title 2 / Title 3 | w600 | Headline | w600 |
+| Subheadline | **w600** | Footnote | **w600** |
+| Caption 1 | **w600** | Caption 2 | **w700** (uppercase labels) |
+
 ## Brand wordmark sizes (Barlow-weight Display)
 
 The `Wordmark` component sizes are display headlines — pick by visual weight, not iOS body parity:
