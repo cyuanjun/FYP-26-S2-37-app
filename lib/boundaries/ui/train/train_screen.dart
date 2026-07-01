@@ -149,6 +149,7 @@ class _NoPlanCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.faint),
+        boxShadow: AppColors.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,6 +188,7 @@ class _DevicesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: AppColors.cardShadow,
       ),
       child: Row(
         children: [
@@ -205,11 +207,12 @@ class _DevicesCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
+              color: AppColors.successBright,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.success),
             ),
             child: Text('CONNECTED',
-                style: AppTypography.caption2.copyWith(color: AppColors.success)),
+                style: AppTypography.caption2
+                    .copyWith(color: AppColors.ink, fontWeight: FontWeight.w800)),
           ),
         ],
       ),
@@ -239,6 +242,9 @@ class _ActivePlanCard extends StatelessWidget {
     final next = thisWeek.isEmpty
         ? null
         : thisWeek.firstWhere((w) => w.dayOfWeek >= today, orElse: () => thisWeek.first);
+    // Today's scheduled workout (if any) — start it straight from the card.
+    final todaysList = thisWeek.where((w) => w.dayOfWeek == today).toList();
+    final todaysWorkout = todaysList.isEmpty ? null : todaysList.first;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -246,6 +252,7 @@ class _ActivePlanCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.faint),
+        boxShadow: AppColors.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,6 +282,24 @@ class _ActivePlanCard extends StatelessWidget {
             const Divider(color: AppColors.faint, height: 1),
             const SizedBox(height: 4),
             for (final w in thisWeek) _dayRow(w, identical(w, next)),
+            const SizedBox(height: 14),
+            if (todaysWorkout != null)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (_) => ActiveWorkoutScreen(
+                          initialTypeId: todaysWorkout.workoutTypeId),
+                    ),
+                  ),
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: const Text('START PLANNED WORKOUT'),
+                ),
+              )
+            else
+              Text('No workout scheduled today.',
+                  textAlign: TextAlign.center, style: AppTypography.footnote),
           ],
         ],
       ),
