@@ -210,6 +210,7 @@ class _GoalCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
+          boxShadow: AppColors.cardShadow,
           border: Border.all(
               color: selected ? AppColors.accent : AppColors.faint,
               width: selected ? 1.5 : 1),
@@ -263,8 +264,10 @@ class _Stepper extends StatelessWidget {
         value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(1);
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration:
-          BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: AppColors.cardShadow),
       child: Row(
         children: [
           _btn(Icons.remove, onMinus),

@@ -17,8 +17,15 @@ abstract final class AppColors {
   static const info = Color(0xFF2563EB); // info / share / recovery (vivid blue)
   static const gold = Color(0xFFFFC400); // #1 leaderboard rank ONLY
 
+  /// Uniform soft elevation for content cards — apply as `boxShadow:` on a card's
+  /// BoxDecoration so every card lifts off the background the same way.
+  static const cardShadow = [
+    BoxShadow(color: Color(0x14000000), blurRadius: 16, offset: Offset(0, 4)),
+  ];
+
   // --- Semantic state (meaning, not decoration) ---
-  static const success = Color(0xFF047857); // positive / up-trend / completed (emerald, ~5.5:1 text)
+  static const success = Color(0xFF047857); // positive / up-trend / completed — TEXT green (emerald, ~5.5:1)
+  static const successBright = Color(0xFF10B981); // vivid green for FILLS/badges (with ink text) — never small text
 
   // --- Premium tier (gold). `premium` = fills/badges (with ink text); `premiumText` = text/borders on white ---
   static const premium = Color(0xFFF59E0B); // premium badge/button FILL (amber) — pair with ink text

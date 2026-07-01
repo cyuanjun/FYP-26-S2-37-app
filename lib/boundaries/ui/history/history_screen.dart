@@ -205,7 +205,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: AppColors.cardShadow),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -262,12 +265,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppColors.premium.withValues(alpha: 0.15),
+                  color: AppColors.premium,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.premiumText),
                 ),
                 child: Text('⚡ Unlock with Premium →',
-                    style: AppTypography.footnote.copyWith(color: AppColors.premiumText)),
+                    style: AppTypography.footnote
+                        .copyWith(color: AppColors.ink, fontWeight: FontWeight.w700)),
               ),
             ),
           ],
@@ -350,15 +353,26 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         border: Border.all(color: AppColors.premium.withValues(alpha: 0.5)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text('Free history covers ${_monthNames[now.month]} only.',
+              textAlign: TextAlign.center,
               style: AppTypography.footnote.copyWith(color: AppColors.ink)),
-          const SizedBox(height: 4),
+          const SizedBox(height: 10),
           GestureDetector(
             onTap: () => _soon('Full history'),
-            child: Text('⚡ Upgrade for full history →',
-                style: AppTypography.footnote.copyWith(color: AppColors.premiumText)),
+            child: Container(
+              width: double.infinity,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.premium,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text('⚡ Upgrade for full history →',
+                  style: AppTypography.footnote
+                      .copyWith(color: AppColors.ink, fontWeight: FontWeight.w700)),
+            ),
           ),
         ],
       ),
@@ -435,16 +449,23 @@ class _WorkoutListCard extends StatelessWidget {
     final when = session.endedAt ?? session.startedAt;
     final mins = (session.durationSeconds / 60).round();
 
-    return Card(
-      color: AppColors.surface,
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.faint),
+        boxShadow: AppColors.cardShadow,
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+      child: Card(
+        color: AppColors.surface,
+        margin: EdgeInsets.zero,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.faint),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -477,6 +498,7 @@ class _WorkoutListCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

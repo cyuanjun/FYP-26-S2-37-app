@@ -429,6 +429,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(14),
+                boxShadow: AppColors.cardShadow,
                 border: Border.all(
                     color: _goal == g ? AppColors.accent : AppColors.faint),
               ),
@@ -523,7 +524,9 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                  color: AppColors.surface, borderRadius: BorderRadius.circular(16)),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: AppColors.cardShadow),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
