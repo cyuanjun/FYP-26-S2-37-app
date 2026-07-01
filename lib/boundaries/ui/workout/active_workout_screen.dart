@@ -15,7 +15,7 @@ import 'workout_summary_screen.dart';
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   const ActiveWorkoutScreen({super.key, this.initialTypeId});
 
-  /// Pre-selects the activity (e.g. "Start today's workout" from Plan Detail).
+  /// Pre-selects the activity (e.g. "Start Planned Workout" from the Train plan card).
   final String? initialTypeId;
 
   @override

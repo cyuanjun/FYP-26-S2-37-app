@@ -10,7 +10,6 @@ import '../../../entities/fitness_plan.dart';
 import '../../../entities/planned_workout.dart';
 import '../../../entities/workout_type.dart';
 import '../../gateways/workout_gateway.dart';
-import '../workout/active_workout_screen.dart';
 
 /// BOUNDARY (#8 Plan Detail). Read-only view of an active or saved plan:
 /// header + meta, week schedule, and active-plan actions.
@@ -64,9 +63,6 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
           final shownWeek = _selectedWeek ?? cycleWeek;
           final weekWorkouts =
               workouts.where((w) => w.weekNumber == shownWeek).toList();
-          final todays = workouts
-              .where((w) => w.weekNumber == cycleWeek && w.dayOfWeek == today)
-              .toList();
 
           return Column(
             children: [
@@ -162,6 +158,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(16),
+                        boxShadow: AppColors.cardShadow,
                       ),
                       child: Column(
                         children: [
@@ -193,23 +190,12 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                 ),
               ),
 
-              // ---- Sticky primary action ----
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                child: plan.isActive
-                    ? ElevatedButton.icon(
-                        onPressed: todays.isEmpty
-                            ? null
-                            : () => Navigator.of(context).push(MaterialPageRoute(
-                                builder: (_) => ActiveWorkoutScreen(
-                                    initialTypeId: todays.first.workoutTypeId))),
-                        icon: const Icon(Icons.play_arrow_rounded),
-                        label: Text(todays.isEmpty
-                            ? 'NO WORKOUT SCHEDULED TODAY'
-                            : "START TODAY'S WORKOUT"),
-                      )
-                    : _UsePlanButton(plan: plan),
-              ),
+              // ---- Sticky action: activate a saved (inactive) plan ----
+              if (!plan.isActive)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                  child: _UsePlanButton(plan: plan),
+                ),
             ],
           );
         },
@@ -230,11 +216,11 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
       Map<String, WorkoutType> byId,
       {required bool isToday, required int currentWeek, required bool isPremium}) {
     final dayStyle = AppTypography.caption2.copyWith(
-        color: isToday ? AppColors.accent : AppColors.muted,
-        fontWeight: FontWeight.w700,
+        color: AppColors.success,
+        fontWeight: FontWeight.w800,
         letterSpacing: 1.2);
     return Material(
-      color: isToday ? AppColors.accent.withValues(alpha: 0.08) : Colors.transparent,
+      color: isToday ? AppColors.success.withValues(alpha: 0.12) : Colors.transparent,
       child: InkWell(
         onTap: () => _showWorkoutModal(context, w, byId[w.workoutTypeId],
             isToday: isToday, currentWeek: currentWeek, isPremium: isPremium),
@@ -251,10 +237,9 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                         .copyWith(color: AppColors.ink, fontWeight: FontWeight.w600)),
               ),
               Text('${w.durationMinutes}m',
-                  style: AppTypography.footnote.copyWith(
-                      color: AppColors.metricColor('MIN'))),
+                  style: AppTypography.footnote.copyWith(color: AppColors.muted)),
               const SizedBox(width: 6),
-              const Icon(Icons.chevron_right, size: 18, color: AppColors.faint),
+              const Icon(Icons.chevron_right, size: 18, color: AppColors.muted),
             ],
           ),
         ),
@@ -302,27 +287,17 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.premium.withValues(alpha: 0.12),
+                    color: AppColors.premium,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '⚡ Upgrade to Premium for sets, reps, target zones, and coaching cues.',
-                    style: AppTypography.footnote.copyWith(color: AppColors.premiumText),
+                    style: AppTypography.footnote
+                        .copyWith(color: AppColors.ink, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
               const SizedBox(height: 20),
-              if (isToday)
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) =>
-                            ActiveWorkoutScreen(initialTypeId: w.workoutTypeId)));
-                  },
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('START WORKOUT'),
-                ),
               Center(
                 child: TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
@@ -347,11 +322,33 @@ class _RegenerateLink extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final generating = ref.watch(generatePlanProvider).isLoading;
-    final blocked = !isPremium && plan.regeneratedCount >= 1;
+    // Free tier: 1 regeneration per calendar month (spec #8). `regeneratedCount`
+    // is cumulative, but the active plan's `startedAt` is when it was last
+    // (re)generated — so a regeneration done in a prior month no longer blocks.
+    final now = DateTime.now();
+    final startedAt = plan.startedAt?.toLocal();
+    final regeneratedThisMonth = plan.regeneratedCount >= 1 &&
+        startedAt != null &&
+        startedAt.year == now.year &&
+        startedAt.month == now.month;
+    final blocked = !isPremium && regeneratedThisMonth;
 
     return Column(
       children: [
-        TextButton(
+        if (!isPremium)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Text('Free plans include 1 plan regeneration per month.',
+                textAlign: TextAlign.center,
+                style: AppTypography.caption2.copyWith(color: AppColors.muted)),
+          ),
+        OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.accent,
+            disabledForegroundColor: AppColors.muted.withValues(alpha: 0.4),
+            side: BorderSide(color: blocked ? AppColors.faint : AppColors.accent),
+            minimumSize: const Size(0, 46),
+          ),
           onPressed: blocked || generating
               ? null
               : () async {
@@ -363,7 +360,7 @@ class _RegenerateLink extends ConsumerWidget {
                       content: Text(isPremium
                           ? 'Your current plan will be replaced. Workout history stays.'
                           : 'Your current plan will be replaced. Workout history stays.\n\n'
-                              '${1 - plan.regeneratedCount} regeneration left this month.'),
+                              'This uses your 1 free regeneration for this month.'),
                       actions: [
                         TextButton(
                             onPressed: () => Navigator.of(ctx).pop(false),
@@ -387,14 +384,27 @@ class _RegenerateLink extends ConsumerWidget {
           child: generating
               ? const SizedBox(
                   height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : Text('Regenerate plan',
-                  style: AppTypography.subheadline.copyWith(
-                      color: blocked ? AppColors.faint : AppColors.info,
-                      fontWeight: FontWeight.w600)),
+              : const Text('Regenerate plan',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
         ),
-        if (blocked)
-          Text('Upgrade for unlimited regenerations',
-              style: AppTypography.caption2.copyWith(color: AppColors.premiumText)),
+        if (blocked) ...[
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Premium upgrade is coming in a later sprint.')),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.premium,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text('⚡ Upgrade for unlimited regenerations',
+                  style: AppTypography.footnote
+                      .copyWith(color: AppColors.ink, fontWeight: FontWeight.w700)),
+            ),
+          ),
+        ],
       ],
     );
   }
