@@ -28,7 +28,8 @@ The app's colour system. This mirrors **[`lib/core/theme/app_colors.dart`](../..
 
 | Token | Hex | Role |
 |---|---|---|
-| `success` | `#047857` | Positive / up-trend / completed / active status (emerald, readable as text). |
+| `success` | `#047857` | Positive / up-trend / completed / active status — **text** green (emerald, readable as text). |
+| `successBright` | `#10B981` | Bright green for status-pill **fills** (with `ink` text) — CONNECTED · ACTIVE · device status. Never small text. |
 | `danger` | `#E11D48` | Negative / destructive / errors (vivid rose, readable as text). |
 | `info` | `#2563EB` | Info / share / recovery (vivid blue). |
 
@@ -53,6 +54,12 @@ Workout stats are colour-coded so the same metric reads the same hue on every sc
 | `mEnergy` | `#C2410C` | calories / energy — orange |
 
 `metricColor()` maps a metric's short label (`'KM'`, `'AVG HR'`, `'CALORIES'`, `'PACE'`, `'ACTIVE MIN'`, …) to its hue, falling back to `ink` for anything unrecognised. `SESSIONS` / `WORKOUTS` / `STEPS` map to `success`.
+
+## Elevation
+
+| Token | Value | Role |
+|---|---|---|
+| `cardShadow` | `BoxShadow(Color(0x14000000), blur 16, offset (0,4))` | The **one** soft shadow every content card uses (`boxShadow:` on its `BoxDecoration`) so all cards lift off `bg` identically. Not for tiles/badges/pills/inputs. |
 
 ## Usage rules
 

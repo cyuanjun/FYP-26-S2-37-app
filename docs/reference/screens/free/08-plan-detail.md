@@ -58,11 +58,12 @@ Tap any row → centred `Modal`:
 - Text-link "Close" to dismiss
 
 
-### Actions row (sticky bottom or inline at bottom of content)
-- **Primary:** "Start today's workout" — full-width `accent` button → opens #9 Active Workout
-- **Secondary text link:** "Regenerate plan" → opens confirmation modal
-  - For Free users with `RegeneratedCount >= 1` this month: button disabled with "Upgrade for unlimited" tooltip/text below
-  - For Premium: always enabled
+### Actions row (bottom of content)
+> **As built:** Plan Detail is **view-only** — *starting* a workout moved to the Train plan card ("Start Planned Workout", today's session pre-selected). This screen keeps only plan-management actions.
+- **Activate (inactive plans only):** "Use This Plan" — full-width `accent` button → sets this plan active
+- **Regenerate plan:** an outlined `accent` button → confirmation modal
+  - Free: **1 regeneration per calendar month** — once used this month the button greys out with a gold "Upgrade for unlimited regenerations" pill; resets next month
+  - Premium: always enabled
 
 ## Regenerate flow
 
@@ -77,8 +78,8 @@ Tapping Regenerate opens a `Modal`:
 - **From:** My Plans (#14) — tapping the active or a saved generated plan
 - **To:**
   - Back (←) → Train (#7) — hard-wired `Link`
-  - Active Workout (#9) — "Start today's workout"
-  - Upgrade to Premium (#16) — via Free-user upgrade banner / disabled-regen tooltip
+  - Upgrade to Premium (#16) — via the disabled-regen "Upgrade for unlimited regenerations" pill (Free)
+  - *(As built: no longer navigates to Active Workout — starting a workout lives on the Train card)*
 
 ## Data touched
 

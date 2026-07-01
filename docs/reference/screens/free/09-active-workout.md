@@ -105,9 +105,9 @@ Tap End → modal:
 ## Edges
 
 - **From:**
-  - Train (#7) — "Start today's workout" (plan-based, with `PlannedWorkoutID` set)
-  - Train (#7) — Quick Start (free-form, `PlannedWorkoutID = null`)
-  - Plan Detail (#8) — "Start today's workout"
+  - Train (#7) plan card — "Start Planned Workout" (plan-based, activity pre-selected)
+  - Train (#7) — "Start Freeform Workout" (free-form, no plan)
+  - *(As built: Plan Detail (#8) is view-only — it no longer starts a workout)*
 - **To:**
   - Workout Summary (#10) — on End → Save & finish
   - Train (#7) — on Discard / Cancel-and-Discard
