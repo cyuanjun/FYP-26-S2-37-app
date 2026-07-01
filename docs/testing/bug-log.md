@@ -3,7 +3,7 @@
 Every defect found while building the prototype — symptom, root cause, fix, and where it landed.
 Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity: **H**igh
 (blocks a core flow / data integrity), **M**edium (feature wrong but workaround exists),
-**L**ow (cosmetic/dev-experience). Last updated **12 Jun 2026** (post consistency pass).
+**L**ow (cosmetic/dev-experience). Last updated **29 Jun 2026** (+ BUG-017, regeneration monthly-reset).
 
 ## Fixed — application code
 
@@ -25,6 +25,7 @@ Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity
 | BUG-014 | 12 Jun | L | Devices UI | Mock-pairing sheet overflowed by 1.7px (debug stripe) | Fixed-height column on small sheet | Wrapped in `SingleChildScrollView` | `7e8ede1` |
 | BUG-015 | 12 Jun | **H** | Capture/stability | **App ANR'd ("isn't responding") while ending a workout**; UI froze, session left un-ended | Geolocator stream cancel wedged on the platform channel when a stale Flutter engine held the location service ("There is still another flutter engine connected"); `end()` blocked behind it | Sensor cancels made non-blocking (`unawaited`); `end()` reordered to do network reads before platform-channel teardown; orphaned session cleaned up | `7e8ede1` |
 | BUG-016 | 12 Jun | L | Plan Detail | Analyzer: regenerate callback shadowed `plan`, referenced before declaration | Variable shadowing | Renamed to `newPlan` (caught pre-commit) | `1ec02d5` |
+| BUG-017 | 29 Jun | M | Plans/tiering | Free plan regeneration never reset monthly — blocked forever after 1 regen; Plan Detail showed a nonsensical "2 of 1 free regenerations used" | `regeneratedCount` is a **cumulative** counter and the gate was `>= 1` (lifetime), but the spec + confirm-dialog copy say **1/month** | Month-aware gate (blocked only when the active plan's `startedAt` falls in the current calendar month, so it resets each month); raw count replaced with a "1 per month" description; disabled button greyed | `73c578c` |
 
 ## Fixed — requirements / documentation defects
 

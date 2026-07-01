@@ -24,7 +24,7 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
 | **Onboarding + plan** | First login → wizard (about you → how you train → goal) → **real AI weekly plan (OpenAI)** → Train shows it | Both tiers: Free basic, Premium personalised; strict JSON schema + server-side validation; Gemini → rule fallback. Gate: `profiles.onboarding_completed_at` |
 | **Devices (#7.1)** | Train → Devices card → paired list (phone sensors pinned) → + ADD DEVICE → mock BLE scan → pair a watch → next workout shows live ♥ HR; avg/max saved, session linked to the device | HR stream is simulated (spec-sanctioned) — real BLE/HealthKit drops in behind the same interface |
-| **Plans + Plan Detail (#8)** | Train → VIEW PLANS → choose a saved plan → header + current-week schedule → tap a row for the workout modal → Use This Plan / Start today's workout (pre-selected activity) · Regenerate | Free: 1 regeneration, then "Upgrade for unlimited"; today's row highlighted |
+| **Plans + Plan Detail (#8)** | Train card → **Start Planned Workout** (today's session, pre-selected activity) · VIEW PLANS → choose a saved plan → header + week schedule (read-only) → tap a row for the workout modal → Use This Plan · Regenerate | Free: **1 regeneration/month** (resets each month), then "Upgrade for unlimited"; today's row highlighted. Planned-workout start lives on the Train card (Plan Detail is view-only) |
 
 **Architecture:** Flutter · Riverpod · go_router · freezed · `supabase_flutter`. Strict **Boundary–Control–Entity**
 (`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`). **Backend:** 26 tables + RLS +
@@ -88,10 +88,11 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ### B. Record a workout *(the core demo)*
 1. Bottom nav → **Train**.
-   - **See:** "TRAIN" header, the **AI Suggested Plan card** (your active plan: name, cadence,
-     TODAY line, weekly chips — or "No active plan · Set a goal" if onboarding was skipped), a
-     **Devices** card, and a sticky **▶ START FREEFORM WORKOUT** button.
-2. Tap **START FREEFORM WORKOUT**.
+   - **See:** "TRAIN" header, the **Selected Plan card** (your active plan: name, cadence, the
+     week schedule with the next session highlighted, and a **▶ START PLANNED WORKOUT** button —
+     or "No active plan · Set a goal" if onboarding was skipped), a **Devices** card, and a sticky
+     **▶ START FREEFORM WORKOUT** button.
+2. Tap **START FREEFORM WORKOUT** (or **START PLANNED WORKOUT** to start today's scheduled session with its activity pre-selected).
    - **See:** the **Active Workout** pre-start screen — dim **00:00** timer, an **activity pill** (defaults
      to *Running*), a big lime **START**, "TAP TO BEGIN". (Tap the pill to switch activity — e.g. Yoga shows
      a STEPS tile instead of DISTANCE/PACE.)
@@ -149,15 +150,18 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
      preferred workouts) → **YOUR GOAL** (goal cards; target/timeline hidden for Maintain Fitness) →
      **GENERATE MY PLAN** → "YOUR PLAN IS READY" card → **START TRAINING** lands on Home.
 2. Open **Train**.
-   - **See:** the **active plan card** — plan name, "3x per week · N weeks · AI-assisted (basic)"
-     (Premium says personalised), a **TODAY** line when a workout is scheduled today, and one chip
-     per weekly slot (e.g. `Mon · Running base`).
+   - **See:** the **Selected Plan card** — plan name, "3x per week · N weeks · AI-assisted (basic)"
+     (Premium says personalised), the week's schedule as a per-day list (day · workout · duration,
+     next session highlighted green), and a **▶ START PLANNED WORKOUT** button (or "No workout
+     scheduled today." on a rest day).
 2b. Tap **VIEW PLANS ›**, then open the active plan.
    - **See:** **Plan Detail (#8)** — big plan name, "12 WEEKS · 3X/WEEK · INTERMEDIATE" meta,
-     the AI description, **WEEK N · CURRENT** schedule card (today's row tinted lime), and
-     **START TODAY'S WORKOUT** pinned at the bottom. Tap a row → workout modal (descriptor,
-     Free upgrade hint, START WORKOUT for today). **Regenerate plan** asks to confirm; for Free
-     it locks after 1 regeneration ("Upgrade for unlimited").
+     the AI description, week selector, and the **WEEK N · CURRENT** schedule card (green day
+     labels, today's row tinted green). It's **view-only** (starting a workout lives on the Train
+     card) — tap a row → workout modal (descriptor, Premium upgrade note, Close). **Regenerate
+     plan** (outlined button) confirms first; for Free it's **1 regeneration per month** — once
+     used this month it greys out with a gold "Upgrade for unlimited regenerations" pill, and
+     resets next month.
 3. **Re-trigger the wizard** for a demo:
    `update profiles set onboarding_completed_at = null where email = 'free@wiseworkout.test';`
 

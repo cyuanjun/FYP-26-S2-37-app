@@ -74,7 +74,7 @@ Below the card: full-width outlined-faint "+ ADD DEVICE" button. Inline shortcut
 - **To:**
   - Profile (#13) via top-right avatar
   - Plan Detail (#8) via "View plan" link
-  - Active Workout (#9) via "Start today's workout" (plan-based) or Quick Start button (free-form)
+  - Active Workout (#9) via "Start Planned Workout" (plan card — today's session pre-selected) or the sticky "Start Freeform Workout"
   - Connected Devices (#7.1) via status row
   - Upgrade to Premium (#16) via banner (Free only)
   - Bottom-nav targets: Home (#5), Experts (#6), Social (#11), History (#12)
