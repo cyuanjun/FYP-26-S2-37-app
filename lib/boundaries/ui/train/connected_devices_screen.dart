@@ -192,13 +192,14 @@ class _DeviceRow extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
+                        color: device.isActive ? AppColors.successBright : null,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                            color: device.isActive ? AppColors.success : AppColors.faint),
+                        border: device.isActive ? null : Border.all(color: AppColors.faint),
                       ),
                       child: Text(device.isActive ? 'CONNECTED' : 'OFF',
                           style: AppTypography.caption2.copyWith(
-                              color: device.isActive ? AppColors.success : AppColors.muted)),
+                              color: device.isActive ? AppColors.ink : AppColors.muted,
+                              fontWeight: device.isActive ? FontWeight.w800 : FontWeight.w600)),
                     ),
                   ],
                 ),

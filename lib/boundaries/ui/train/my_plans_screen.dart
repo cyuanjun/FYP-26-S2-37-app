@@ -83,14 +83,19 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => PlanDetailScreen(planId: plan.id),
-        )),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Material(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => PlanDetailScreen(planId: plan.id),
+          )),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -112,12 +117,12 @@ class _PlanCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.12),
+                        color: AppColors.successBright,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text('ACTIVE',
                           style: AppTypography.caption2.copyWith(
-                              color: AppColors.success, fontWeight: FontWeight.w800)),
+                              color: AppColors.ink, fontWeight: FontWeight.w800)),
                     ),
                 ],
               ),
@@ -133,6 +138,7 @@ class _PlanCard extends StatelessWidget {
                     style: AppTypography.caption2.copyWith(color: AppColors.muted)),
               ],
             ],
+          ),
           ),
         ),
       ),

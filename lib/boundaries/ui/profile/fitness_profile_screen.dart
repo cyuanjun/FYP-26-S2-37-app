@@ -141,7 +141,9 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                      color: AppColors.surface, borderRadius: BorderRadius.circular(16)),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: AppColors.cardShadow),
                   child: Row(
                     children: [
                       Expanded(

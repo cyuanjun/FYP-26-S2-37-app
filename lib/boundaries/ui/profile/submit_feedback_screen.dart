@@ -91,6 +91,7 @@ class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
                           ? AppColors.accent.withValues(alpha: 0.1)
                           : AppColors.surface,
                       borderRadius: BorderRadius.circular(14),
+                      boxShadow: AppColors.cardShadow,
                       border: Border.all(
                           color: _category == cat ? AppColors.accent : AppColors.faint),
                     ),
