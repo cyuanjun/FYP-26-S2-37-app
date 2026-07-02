@@ -146,5 +146,151 @@ where pr.email in ('free@wiseworkout.test','premium@wiseworkout.test')
   and wt.slug = case when pr.email = 'free@wiseworkout.test' then 'cycling' else 'running' end
 order by ws.user_id, ws.started_at desc;
 
+-- ----------------------------------------------------------------------------
+-- 5. Reset social graph so the file stays idempotent on re-run.
+--    (Posts + cascade clears post_likes / post_comments are already done in §2.)
+-- ----------------------------------------------------------------------------
+delete from public.follows
+  where follower_id  in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'))
+     or following_id in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'));
+
+delete from public.challenge_participants
+  where challenge_id in (
+    select id from public.challenges
+    where created_by_user_id in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'))
+  );
+
+delete from public.challenges
+  where created_by_user_id in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'));
+
+-- ----------------------------------------------------------------------------
+-- 6. Mutual friendship — US24 FollowUser / friends modal / feed filter.
+--    The follows table stores directional rows; A→B + B→A = mutual friendship.
+-- ----------------------------------------------------------------------------
+insert into public.follows (follower_id, following_id)
+select a.id, b.id
+from public.profiles a cross join public.profiles b
+where (a.email = 'free@wiseworkout.test'    and b.email = 'premium@wiseworkout.test')
+   or (a.email = 'premium@wiseworkout.test' and b.email = 'free@wiseworkout.test')
+on conflict do nothing;
+
+-- ----------------------------------------------------------------------------
+-- 7. Extra posts — level_up (US22 polymorphic kind) + challenge_result (US25).
+--    The workout_share posts for both users were already inserted in §4.
+-- ----------------------------------------------------------------------------
+-- Mia reached level 2 after her first week of logging workouts.
+insert into public.posts (user_id, kind, level, body)
+select pr.id, 'level_up', 2, null
+from public.profiles pr
+where pr.email = 'free@wiseworkout.test';
+
+-- ----------------------------------------------------------------------------
+-- 8. Challenge — US25 CreateChallenge / JoinChallenge.
+--    Alex creates a June running challenge (accumulator: total_distance).
+--    Both users are auto-joined as participants so the leaderboard has entries.
+--    The qualifying sessions (running, June 2026) are already in the DB from §2.
+-- ----------------------------------------------------------------------------
+with chal as (
+  insert into public.challenges (
+    created_by_user_id, name, short_name, description, icon,
+    visibility, metric_kind, metric, target_value,
+    workout_type_id, started_at, ended_at
+  )
+  select
+    pr.id,
+    'Run 50 km in June',
+    'JUN50K',
+    'Log as many running kilometres as you can across June — every km counts!',
+    '🏃',
+    'public'::challenge_visibility,
+    'accumulator'::challenge_metric_kind,
+    'total_distance'::challenge_metric,
+    50000,
+    wt.id,
+    '2026-06-01 00:00:00+00'::timestamptz,
+    '2026-06-30 23:59:59+00'::timestamptz
+  from public.profiles pr
+  join public.workout_types wt on wt.slug = 'running'
+  where pr.email = 'premium@wiseworkout.test'
+  returning id
+)
+insert into public.challenge_participants (challenge_id, user_id)
+select c.id, pr.id
+from chal c
+cross join public.profiles pr
+where pr.email in ('free@wiseworkout.test', 'premium@wiseworkout.test');
+
+-- Challenge result post: Mia shares her leaderboard entry.
+insert into public.posts (user_id, kind, challenge_id, body)
+select pr.id, 'challenge_result', c.id, 'Made it to the leaderboard! 🏆 16 km logged so far!'
+from public.profiles pr
+join public.challenges c on c.name = 'Run 50 km in June'
+where pr.email = 'free@wiseworkout.test';
+
+-- ----------------------------------------------------------------------------
+-- 9. Likes — US23 TogglePostLike.
+--    Mia likes Alex's workout_share post; Alex likes Mia's workout_share post.
+-- ----------------------------------------------------------------------------
+-- Mia → Alex's workout_share post
+insert into public.post_likes (post_id, user_id)
+select p.id, liker.id
+from public.posts p
+join public.profiles author on author.id = p.user_id
+join public.profiles liker  on liker.email = 'free@wiseworkout.test'
+where author.email = 'premium@wiseworkout.test'
+  and p.kind = 'workout_share'
+on conflict do nothing;
+
+-- Alex → Mia's workout_share post
+insert into public.post_likes (post_id, user_id)
+select p.id, liker.id
+from public.posts p
+join public.profiles author on author.id = p.user_id
+join public.profiles liker  on liker.email = 'premium@wiseworkout.test'
+where author.email = 'free@wiseworkout.test'
+  and p.kind = 'workout_share'
+on conflict do nothing;
+
+-- Alex also likes Mia's challenge_result post
+insert into public.post_likes (post_id, user_id)
+select p.id, liker.id
+from public.posts p
+join public.profiles author on author.id = p.user_id
+join public.profiles liker  on liker.email = 'premium@wiseworkout.test'
+where author.email = 'free@wiseworkout.test'
+  and p.kind = 'challenge_result'
+on conflict do nothing;
+
+-- ----------------------------------------------------------------------------
+-- 10. Comments — US23 AddPostComment.
+--     Alex comments on Mia's cycling post; Mia replies on Alex's running post.
+-- ----------------------------------------------------------------------------
+-- Alex comments on Mia's workout_share (cycling)
+insert into public.post_comments (post_id, user_id, body)
+select p.id, commenter.id, 'Great ride! 🚴 That bay route is beautiful.'
+from public.posts p
+join public.profiles author    on author.id = p.user_id
+join public.profiles commenter on commenter.email = 'premium@wiseworkout.test'
+where author.email = 'free@wiseworkout.test'
+  and p.kind = 'workout_share';
+
+-- Mia comments on Alex's workout_share (running)
+insert into public.post_comments (post_id, user_id, body)
+select p.id, commenter.id, 'Insane pace! 🔥 You''re gonna crush the challenge!'
+from public.posts p
+join public.profiles author    on author.id = p.user_id
+join public.profiles commenter on commenter.email = 'free@wiseworkout.test'
+where author.email = 'premium@wiseworkout.test'
+  and p.kind = 'workout_share';
+
+-- Alex replies on Mia's challenge_result post
+insert into public.post_comments (post_id, user_id, body)
+select p.id, commenter.id, 'Keep those kms coming 💪'
+from public.posts p
+join public.profiles author    on author.id = p.user_id
+join public.profiles commenter on commenter.email = 'premium@wiseworkout.test'
+where author.email = 'free@wiseworkout.test'
+  and p.kind = 'challenge_result';
+
 -- Re-enable the guard.
 alter table public.profiles enable trigger trg_guard_profile_privileged_columns;

@@ -19,6 +19,8 @@ import 'package:wise_workout/entities/fitness_plan.dart';
 import 'package:wise_workout/entities/fitness_profile.dart';
 import 'package:wise_workout/entities/planned_workout.dart';
 import 'package:wise_workout/entities/health_tag.dart';
+import 'package:wise_workout/entities/challenge.dart';
+import 'package:wise_workout/entities/post.dart';
 import 'package:wise_workout/entities/profile.dart';
 import 'package:wise_workout/entities/workout_session.dart';
 import 'package:wise_workout/entities/workout_type.dart';
@@ -210,10 +212,12 @@ class FakeAiGateway implements AiGateway {
   }
 }
 
-/// Fake SocialGateway — records created/deleted posts.
+/// Fake SocialGateway — in-memory stub covering all SocialGateway methods.
 class FakeSocialGateway implements SocialGateway {
+  // ── Posts ────────────────────────────────────────────────────────────────
   final createdPosts = <Map<String, String?>>[];
   final deletedIds = <String>[];
+  final updatedBodies = <(String, String?)>[];
 
   @override
   Future<String> createWorkoutSharePost({
@@ -227,6 +231,253 @@ class FakeSocialGateway implements SocialGateway {
 
   @override
   Future<void> deletePost(String postId) async => deletedIds.add(postId);
+
+  @override
+  Future<void> updatePostBody(String postId, String? body) async =>
+      updatedBodies.add((postId, body));
+
+  // ── Feed ─────────────────────────────────────────────────────────────────
+  List<Map<String, dynamic>> feedPosts = [];
+  Map<String, dynamic>? postById;
+
+  @override
+  Future<List<String>> fetchFriendIds(String userId) async =>
+      friends[userId]?.toList() ?? [];
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchFeedPosts(
+          List<String> feedUserIds) async =>
+      feedPosts;
+
+  @override
+  Future<Map<String, dynamic>> fetchPostById(String postId) async =>
+      postById ?? {'id': postId, 'kind': 'workout_share', 'user_id': 'u1',
+                   'created_at': DateTime.now().toIso8601String()};
+
+  // ── Likes ────────────────────────────────────────────────────────────────
+  final likes = <String, Set<String>>{}; // postId → Set<userId>
+
+  @override
+  Future<void> addLike(String postId, String userId) async =>
+      (likes[postId] ??= {}).add(userId);
+
+  @override
+  Future<void> removeLike(String postId, String userId) async =>
+      likes[postId]?.remove(userId);
+
+  @override
+  Future<Set<String>> fetchMyLikedPostIds(
+          String userId, List<String> postIds) async =>
+      postIds.where((id) => likes[id]?.contains(userId) == true).toSet();
+
+  @override
+  Future<Map<String, int>> fetchLikeCounts(List<String> postIds) async =>
+      {for (final id in postIds) id: likes[id]?.length ?? 0};
+
+  // ── Comments ─────────────────────────────────────────────────────────────
+  final comments = <String, List<Map<String, dynamic>>>{}; // postId → rows
+  final deletedCommentIds = <String>[];
+
+  @override
+  Future<Map<String, int>> fetchCommentCounts(List<String> postIds) async =>
+      {for (final id in postIds) id: comments[id]?.length ?? 0};
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchPostComments(String postId) async =>
+      comments[postId] ?? [];
+
+  @override
+  Future<PostComment> addPostComment({
+    required String postId,
+    required String userId,
+    required String body,
+  }) async {
+    final commentId = 'comment-${DateTime.now().microsecondsSinceEpoch}';
+    final now = DateTime.now();
+    final c = PostComment(
+      id: commentId,
+      postId: postId,
+      userId: userId,
+      body: body,
+      createdAt: now,
+    );
+    (comments[postId] ??= []).add({
+      'id': commentId, 'post_id': postId, 'user_id': userId, 'body': body,
+      'created_at': now.toIso8601String(),
+    });
+    return c;
+  }
+
+  @override
+  Future<void> deletePostComment(String commentId) async {
+    deletedCommentIds.add(commentId);
+    for (final list in comments.values) {
+      list.removeWhere((m) => m['id'] == commentId);
+    }
+  }
+
+  // ── Friends ──────────────────────────────────────────────────────────────
+  // Bidirectional: friends['a'] contains 'b' AND friends['b'] contains 'a'.
+  final friends = <String, Set<String>>{};
+  final followCalls = <(String, String)>[];
+  final unfollowCalls = <(String, String)>[];
+
+  @override
+  Future<void> followUser(String followerId, String followingId) async {
+    followCalls.add((followerId, followingId));
+    (friends[followerId] ??= {}).add(followingId);
+    (friends[followingId] ??= {}).add(followerId);
+  }
+
+  @override
+  Future<void> unfollowUser(String followerId, String followingId) async {
+    unfollowCalls.add((followerId, followingId));
+    friends[followerId]?.remove(followingId);
+    friends[followingId]?.remove(followerId);
+  }
+
+  @override
+  Future<bool> isFriend(String userId, String targetId) async =>
+      friends[userId]?.contains(targetId) == true;
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchFriendProfiles(
+      String userId) async {
+    final ids = friends[userId] ?? {};
+    return ids
+        .map((id) => {'id': id, 'username': id, 'first_name': id,
+                      'last_name': '', 'avatar_url': null})
+        .toList();
+  }
+
+  List<Map<String, dynamic>> searchResults = [];
+
+  @override
+  Future<List<Map<String, dynamic>>> searchUsers(
+          String query, String excludeUserId) async =>
+      searchResults;
+
+  // ── User profile ─────────────────────────────────────────────────────────
+  Map<String, dynamic> userById = {
+    'id': 'u1', 'username': 'test', 'first_name': 'Test',
+    'last_name': 'User', 'avatar_url': null, 'bio': null,
+  };
+  int workoutCount = 0;
+  int activeDays = 0;
+  List<Map<String, dynamic>> userPosts = [];
+
+  @override
+  Future<Map<String, dynamic>> fetchUserById(String userId) async => userById;
+
+  @override
+  Future<int> fetchUserWorkoutCount(String userId) async => workoutCount;
+
+  @override
+  Future<int> fetchUserActiveDays(String userId) async => activeDays;
+
+  @override
+  Future<int> fetchUserFriendCount(String userId) async =>
+      friends[userId]?.length ?? 0;
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchUserPosts(String userId) async =>
+      userPosts;
+
+  // ── Challenges ───────────────────────────────────────────────────────────
+  final challengeStore = <String, Challenge>{};
+  final participantStore = <String, Set<String>>{}; // challengeId → userIds
+  final joinCalls = <(String, String)>[];
+  final leaveCalls = <(String, String)>[];
+  List<WorkoutSession> sessionWindow = [];
+
+  @override
+  Future<List<Challenge>> fetchJoinedChallenges(String userId) async =>
+      challengeStore.entries
+          .where((e) => participantStore[e.key]?.contains(userId) == true)
+          .map((e) => e.value)
+          .toList();
+
+  @override
+  Future<List<Challenge>> fetchActiveChallenges() async =>
+      challengeStore.values.toList(); // all stored challenges count as active in tests
+
+  @override
+  Future<List<Challenge>> fetchPastChallenges(String userId) async =>
+      challengeStore.entries
+          .where((e) => participantStore[e.key]?.contains(userId) == true)
+          .map((e) => e.value)
+          .toList();
+
+  @override
+  Future<Challenge> fetchChallengeById(String challengeId) async =>
+      challengeStore[challengeId]!;
+
+  @override
+  Future<Challenge> createChallenge({
+    required String creatorId,
+    required Map<String, dynamic> data,
+  }) async {
+    final id = 'chal-${challengeStore.length + 1}';
+    final c = Challenge(
+      id: id,
+      createdByUserId: creatorId,
+      name: data['name'] as String,
+      shortName: (data['name'] as String).substring(0, 3).toUpperCase(),
+      description: data['description'] as String?,
+      icon: '🏆',
+      startedAt: DateTime.parse(data['started_at'] as String),
+      endedAt: DateTime.parse(data['ended_at'] as String),
+      metricKind: ChallengeMetricKind.accumulator,
+      metric: ChallengeMetric.totalDistance,
+      visibility: ChallengeVisibility.public,
+    );
+    challengeStore[id] = c;
+    await joinChallenge(id, creatorId);
+    return c;
+  }
+
+  @override
+  Future<void> joinChallenge(String challengeId, String userId) async {
+    joinCalls.add((challengeId, userId));
+    (participantStore[challengeId] ??= {}).add(userId);
+  }
+
+  @override
+  Future<void> leaveChallenge(String challengeId, String userId) async {
+    leaveCalls.add((challengeId, userId));
+    participantStore[challengeId]?.remove(userId);
+  }
+
+  @override
+  Future<Set<String>> fetchParticipantIds(String challengeId) async =>
+      Set.of(participantStore[challengeId] ?? {});
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchParticipantsWithProfiles(
+          String challengeId) async =>
+      (participantStore[challengeId] ?? {})
+          .map((uid) => {
+                'user_id': uid,
+                'profile': {
+                  'id': uid, 'username': uid, 'first_name': uid,
+                  'last_name': '', 'avatar_url': null,
+                },
+              })
+          .toList();
+
+  @override
+  Future<List<WorkoutSession>> fetchSessionsInWindow({
+    required String userId,
+    required DateTime windowStart,
+    required DateTime windowEnd,
+    String? workoutTypeId,
+  }) async =>
+      sessionWindow
+          .where((s) =>
+              s.userId == userId &&
+              !s.startedAt.isBefore(windowStart) &&
+              !s.startedAt.isAfter(windowEnd))
+          .toList();
 }
 
 /// Fake SocialShareGateway — records platform + text passed to the OS share.

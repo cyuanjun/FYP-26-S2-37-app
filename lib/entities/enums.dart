@@ -101,3 +101,49 @@ extension SocialPlatformLabel on SocialPlatform {
         SocialPlatform.tiktok => 'TikTok',
       };
 }
+
+// ── Social ────────────────────────────────────────────────────────────────────
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum PostKind { workoutShare, challengeResult, levelUp }
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum ChallengeVisibility { public, inviteOnly }
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum ChallengeMetricKind { accumulator, bestOf }
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum ChallengeMetric {
+  totalDistance,
+  totalSessions,
+  totalCalories,
+  activeDays,
+  fastestTime,
+  longestDistance,
+  mostCalories,
+}
+
+extension ChallengeMetricLabel on ChallengeMetric {
+  String get label => switch (this) {
+        ChallengeMetric.totalDistance => 'Total distance',
+        ChallengeMetric.totalSessions => 'Total sessions',
+        ChallengeMetric.totalCalories => 'Total calories',
+        ChallengeMetric.activeDays => 'Active days',
+        ChallengeMetric.fastestTime => 'Fastest time',
+        ChallengeMetric.longestDistance => 'Longest distance',
+        ChallengeMetric.mostCalories => 'Most calories',
+      };
+
+  String get unit => switch (this) {
+        ChallengeMetric.totalDistance => 'km',
+        ChallengeMetric.totalSessions => 'sessions',
+        ChallengeMetric.totalCalories => 'kcal',
+        ChallengeMetric.activeDays => 'days',
+        ChallengeMetric.fastestTime => '',
+        ChallengeMetric.longestDistance => 'km',
+        ChallengeMetric.mostCalories => 'kcal',
+      };
+
+  bool get higherIsBetter => this != ChallengeMetric.fastestTime;
+}
