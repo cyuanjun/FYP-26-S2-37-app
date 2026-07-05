@@ -14,6 +14,8 @@ import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/entities/connected_device.dart';
 import 'package:wise_workout/entities/enums.dart';
+import 'package:wise_workout/entities/feed_post.dart';
+import 'package:wise_workout/entities/post_comment.dart';
 import 'package:wise_workout/entities/fitness_goal.dart';
 import 'package:wise_workout/entities/fitness_plan.dart';
 import 'package:wise_workout/entities/fitness_profile.dart';
@@ -214,10 +216,80 @@ class FakeAiGateway implements AiGateway {
   }
 }
 
-/// Fake SocialGateway — records created/deleted posts.
+/// Fake SocialGateway — in-memory posts/likes/comments/friends with recorded
+/// call lists, enough to drive the feed + post-detail controls.
 class FakeSocialGateway implements SocialGateway {
   final createdPosts = <Map<String, String?>>[];
   final deletedIds = <String>[];
+
+  /// Canned feed rows returned by [fetchFeed] / [fetchFeedPost].
+  var feed = <FeedPost>[];
+  var friends = <String>[];
+  var comments = <PostComment>[];
+
+  final likeCalls = <(String, String)>[];
+  final unlikeCalls = <(String, String)>[];
+  final addedComments = <Map<String, String>>[];
+  final deletedCommentIds = <String>[];
+  final bodyUpdates = <(String, String?)>[];
+  int fetchFeedCalls = 0;
+  List<String>? lastFeedScope;
+
+  @override
+  Future<List<FeedPost>> fetchFeed({
+    required String userId,
+    required List<String> friendIds,
+    int limit = 50,
+  }) async {
+    fetchFeedCalls++;
+    lastFeedScope = [userId, ...friendIds];
+    return feed;
+  }
+
+  @override
+  Future<FeedPost?> fetchFeedPost(String postId, {required String me}) async =>
+      feed.where((f) => f.post.id == postId).firstOrNull;
+
+  @override
+  Future<List<PostComment>> listComments(String postId) async =>
+      comments.where((c) => c.postId == postId).toList();
+
+  @override
+  Future<void> likePost(String postId, String userId) async =>
+      likeCalls.add((postId, userId));
+
+  @override
+  Future<void> unlikePost(String postId, String userId) async =>
+      unlikeCalls.add((postId, userId));
+
+  @override
+  Future<PostComment> addComment({
+    required String postId,
+    required String userId,
+    required String body,
+  }) async {
+    addedComments.add({'postId': postId, 'userId': userId, 'body': body});
+    final comment = PostComment(
+      id: 'comment-${addedComments.length}',
+      postId: postId,
+      userId: userId,
+      body: body.trim(),
+      createdAt: DateTime.utc(2026, 7, 6),
+    );
+    comments = [...comments, comment];
+    return comment;
+  }
+
+  @override
+  Future<void> deleteComment(String commentId) async =>
+      deletedCommentIds.add(commentId);
+
+  @override
+  Future<void> updatePostBody(String postId, String? body) async =>
+      bodyUpdates.add((postId, body));
+
+  @override
+  Future<List<String>> friendIds(String userId) async => friends;
 
   @override
   Future<String> createWorkoutSharePost({

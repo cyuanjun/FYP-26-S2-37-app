@@ -50,6 +50,13 @@ void main() {
     test('older shows weekday d mon', () {
       expect(relativeDay(DateTime(2026, 6, 3), now: now), 'Wed 3 Jun');
     });
+    test('UTC timestamps compare by LOCAL date (regression: 01:40 SGT bug)', () {
+      // A DB timestamp early "today" local, expressed in UTC — before the fix
+      // the raw UTC components made this read as the previous day.
+      final localNow = DateTime(2026, 7, 6, 1, 40);
+      final utcStamp = DateTime(2026, 7, 6, 0, 30).toUtc();
+      expect(relativeDay(utcStamp, now: localNow), 'Today');
+    });
   });
 
   group('startOfWeek', () {

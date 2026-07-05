@@ -39,15 +39,19 @@ String iconForSlug(String slug) => switch (slug) {
 const _months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const _weekdays = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-/// "Today" / "Yesterday" / "Wed 13 May" relative to [now].
+/// "Today" / "Yesterday" / "Wed 13 May" relative to [now]. Compares LOCAL
+/// calendar dates — DB timestamps arrive in UTC, and using their raw
+/// components shifts the day near midnight (found 6 Jul, 01:40 SGT: a
+/// just-posted comment read "Yesterday").
 String relativeDay(DateTime d, {DateTime? now}) {
-  final ref = now ?? DateTime.now();
-  final day = DateTime(d.year, d.month, d.day);
+  final ref = (now ?? DateTime.now()).toLocal();
+  final local = d.toLocal();
+  final day = DateTime(local.year, local.month, local.day);
   final today = DateTime(ref.year, ref.month, ref.day);
   final diff = today.difference(day).inDays;
   if (diff == 0) return 'Today';
   if (diff == 1) return 'Yesterday';
-  return '${_weekdays[d.weekday]} ${d.day} ${_months[d.month]}';
+  return '${_weekdays[local.weekday]} ${local.day} ${_months[local.month]}';
 }
 
 /// Monday 00:00 of the week containing [d].

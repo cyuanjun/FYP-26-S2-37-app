@@ -101,3 +101,7 @@ extension SocialPlatformLabel on SocialPlatform {
         SocialPlatform.tiktok => 'TikTok',
       };
 }
+
+/// Post feed kinds (#11 Social) — mirrors the `post_kind` Postgres enum.
+@JsonEnum(fieldRename: FieldRename.snake)
+enum PostKind { workoutShare, challengeResult, levelUp }

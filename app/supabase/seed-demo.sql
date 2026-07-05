@@ -10,7 +10,9 @@
 --
 -- Run against the hosted project (psql / Supabase SQL editor / MCP). Requires the
 -- Supabase Auth schema (auth.users) + this app's schema (migrations applied).
--- "Today" is derived from now(); the dates below assume a demo around 2026-06-10.
+-- All session dates are now()-relative (6 Jul), so re-running this file any time
+-- yields a live-looking demo: recent sessions this/last week, capped sessions in
+-- the previous month, and challenge-window overlap for leaderboards.
 
 -- The role/status guard blocks non-admin role changes; disable it for this seed.
 alter table public.profiles disable trigger trg_guard_profile_privileged_columns;
@@ -78,23 +80,27 @@ insert into public.workout_sessions (
 select pr.id, wt.id, d.start_ts, d.start_ts + (d.dur || ' seconds')::interval, d.dur,
        d.dist, d.cal, d.ahr, d.mhr, d.feel::feel_rating, d.cname
 from (values
-  -- Mia (Free) — this week (8-10 Jun), last week (1-5 Jun), earlier (23-27 May)
-  ('free@wiseworkout.test','running', '2026-06-08 07:10:00+00'::timestamptz, 1920, 5200,  310, 148, 168, 'good',  null),
-  ('free@wiseworkout.test','strength','2026-06-09 18:30:00+00'::timestamptz, 2700, null,  280, 122, 150, 'great', 'Upper body'),
-  ('free@wiseworkout.test','cycling', '2026-06-10 06:40:00+00'::timestamptz, 3000, 18400, 420, 138, 160, 'okay',  null),
-  ('free@wiseworkout.test','running', '2026-06-01 07:00:00+00'::timestamptz, 1680, 4800,  290, 150, 170, 'good',  null),
-  ('free@wiseworkout.test','yoga',    '2026-06-03 19:00:00+00'::timestamptz, 2400, null,  130,  95, 110, 'great', null),
-  ('free@wiseworkout.test','running', '2026-06-05 06:50:00+00'::timestamptz, 2100, 6000,  360, 152, 175, 'tough', null),
-  ('free@wiseworkout.test','hiit',    '2026-05-27 18:00:00+00'::timestamptz, 1500, null,  320, 160, 182, 'tough', null),
-  ('free@wiseworkout.test','hiking',  '2026-05-23 09:00:00+00'::timestamptz, 5400, 8500,  540, 118, 140, 'good',  'Morning trail'),
+  -- Dates are now()-relative so the demo stays evergreen (updated 6 Jul):
+  -- recent days feed THIS WEEK/LAST WEEK groupings + live challenge windows;
+  -- the date_trunc('month')-anchored rows always land in the PREVIOUS month
+  -- to keep demonstrating the Free history cap.
+  -- Mia (Free)
+  ('free@wiseworkout.test','running', date_trunc('day', now()) - interval '2 days' + interval '07:10', 1920, 5200,  310, 148, 168, 'good',  null),
+  ('free@wiseworkout.test','strength',date_trunc('day', now()) - interval '1 day'  + interval '18:30', 2700, null,  280, 122, 150, 'great', 'Upper body'),
+  ('free@wiseworkout.test','cycling', date_trunc('day', now())                     + interval '06:40', 3000, 18400, 420, 138, 160, 'okay',  null),
+  ('free@wiseworkout.test','running', date_trunc('day', now()) - interval '9 days' + interval '07:00', 1680, 4800,  290, 150, 170, 'good',  null),
+  ('free@wiseworkout.test','yoga',    date_trunc('day', now()) - interval '7 days' + interval '19:00', 2400, null,  130,  95, 110, 'great', null),
+  ('free@wiseworkout.test','running', date_trunc('day', now()) - interval '5 days' + interval '06:50', 2100, 6000,  360, 152, 175, 'tough', null),
+  ('free@wiseworkout.test','hiit',    date_trunc('month', now()) - interval '4 days'  + interval '18:00', 1500, null,  320, 160, 182, 'tough', null),
+  ('free@wiseworkout.test','hiking',  date_trunc('month', now()) - interval '8 days'  + interval '09:00', 5400, 8500,  540, 118, 140, 'good',  'Morning trail'),
   -- Alex (Premium) — richer/longer history
-  ('premium@wiseworkout.test','running', '2026-06-08 06:30:00+00'::timestamptz, 2400, 7000,  410, 145, 172, 'good',  '10k tempo'),
-  ('premium@wiseworkout.test','swimming','2026-06-09 12:15:00+00'::timestamptz, 2100, 1500,  300, 130, 150, 'okay',  null),
-  ('premium@wiseworkout.test','strength','2026-06-10 18:00:00+00'::timestamptz, 3300, null,  330, 120, 148, 'great', 'Leg day'),
-  ('premium@wiseworkout.test','cycling', '2026-06-02 06:00:00+00'::timestamptz, 3600, 22000, 520, 140, 165, 'good',  null),
-  ('premium@wiseworkout.test','running', '2026-06-04 06:40:00+00'::timestamptz, 2700, 8000,  470, 150, 178, 'tough', null),
-  ('premium@wiseworkout.test','hiking',  '2026-05-30 08:00:00+00'::timestamptz, 7200, 12000, 720, 115, 138, 'great', 'Mountain loop'),
-  ('premium@wiseworkout.test','hiit',    '2026-05-18 18:30:00+00'::timestamptz, 1800, null,  360, 162, 185, 'tough', null)
+  ('premium@wiseworkout.test','running', date_trunc('day', now()) - interval '2 days' + interval '06:30', 2400, 7000,  410, 145, 172, 'good',  '10k tempo'),
+  ('premium@wiseworkout.test','swimming',date_trunc('day', now()) - interval '1 day'  + interval '12:15', 2100, 1500,  300, 130, 150, 'okay',  null),
+  ('premium@wiseworkout.test','strength',date_trunc('day', now())                     + interval '07:45', 3300, null,  330, 120, 148, 'great', 'Leg day'),
+  ('premium@wiseworkout.test','cycling', date_trunc('day', now()) - interval '8 days' + interval '06:00', 3600, 22000, 520, 140, 165, 'good',  null),
+  ('premium@wiseworkout.test','running', date_trunc('day', now()) - interval '6 days' + interval '06:40', 2700, 8000,  470, 150, 178, 'tough', null),
+  ('premium@wiseworkout.test','hiking',  date_trunc('month', now()) - interval '1 day'  + interval '08:00', 7200, 12000, 720, 115, 138, 'great', 'Mountain loop'),
+  ('premium@wiseworkout.test','hiit',    date_trunc('month', now()) - interval '13 days' + interval '18:30', 1800, null,  360, 162, 185, 'tough', null)
 ) as d(email, slug, start_ts, dur, dist, cal, ahr, mhr, feel, cname)
 join public.profiles pr on pr.email = d.email
 join public.workout_types wt on wt.slug = d.slug;
@@ -145,6 +151,56 @@ join public.workout_types wt on wt.id = ws.workout_type_id
 where pr.email in ('free@wiseworkout.test','premium@wiseworkout.test')
   and wt.slug = case when pr.email = 'free@wiseworkout.test' then 'cycling' else 'running' end
 order by ws.user_id, ws.started_at desc;
+
+-- ----------------------------------------------------------------------------
+-- 5. Mutual friendship Mia ↔ Alex (a pair of rows — add_friend RPC parity).
+-- ----------------------------------------------------------------------------
+delete from public.follows
+ where follower_id  in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'))
+    or following_id in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'));
+insert into public.follows (follower_id, following_id)
+select a.id, b.id
+from public.profiles a
+join public.profiles b on a.id <> b.id
+where a.email in ('free@wiseworkout.test','premium@wiseworkout.test')
+  and b.email in ('free@wiseworkout.test','premium@wiseworkout.test');
+
+-- ----------------------------------------------------------------------------
+-- 6. Each demo user likes + comments the other's shared post.
+--    (Step 2's posts delete cascaded old likes/comments — clean slate.)
+-- ----------------------------------------------------------------------------
+insert into public.post_likes (post_id, user_id)
+select p.id, liker.id
+from public.posts p
+join public.profiles author on author.id = p.user_id
+join public.profiles liker  on liker.email in ('free@wiseworkout.test','premium@wiseworkout.test')
+                           and liker.id <> author.id
+where p.kind = 'workout_share'
+  and author.email in ('free@wiseworkout.test','premium@wiseworkout.test');
+
+insert into public.post_comments (post_id, user_id, body)
+select p.id, commenter.id,
+       case when commenter.email = 'free@wiseworkout.test'
+            then 'Strong pace — nice one! 🔥' else 'Great ride, love that route!' end
+from public.posts p
+join public.profiles author    on author.id = p.user_id
+join public.profiles commenter on commenter.email in ('free@wiseworkout.test','premium@wiseworkout.test')
+                              and commenter.id <> author.id
+where p.kind = 'workout_share'
+  and author.email in ('free@wiseworkout.test','premium@wiseworkout.test');
+
+-- ----------------------------------------------------------------------------
+-- 7. Both demo users join the '20 IN 30' accumulator challenge (seed.sql
+--    catalog id …0002). Their step-2 sessions fall inside the now()-relative
+--    window, so challenge_leaderboards() shows live progress. If the demo
+--    session dates drift out of the window, re-run this file.
+-- ----------------------------------------------------------------------------
+delete from public.challenge_participants
+ where user_id in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'));
+insert into public.challenge_participants (challenge_id, user_id)
+select 'c0000000-0000-4000-8000-000000000002', pr.id
+from public.profiles pr
+where pr.email in ('free@wiseworkout.test','premium@wiseworkout.test');
 
 -- Re-enable the guard.
 alter table public.profiles enable trigger trg_guard_profile_privileged_columns;

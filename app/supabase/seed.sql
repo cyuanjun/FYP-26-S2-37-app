@@ -61,3 +61,36 @@ insert into expert_categories (id, label, description, is_active) values
   ('running',   'Running',   'Run coaching — form, pacing, and race preparation.',               true),
   ('recovery',  'Recovery',  'Rest, mobility work, and return-from-injury protocols.',           true)
 on conflict (id) do nothing;
+
+-- ----------------------------------------------------------------------------
+-- Public challenges catalog (created_by_user_id null = curator-seeded, #11).
+-- Fixed ids => idempotent; windows recomputed relative to now() on each run
+-- (on conflict UPDATE refreshes them so re-seeding keeps challenges live).
+-- ----------------------------------------------------------------------------
+insert into challenges (id, created_by_user_id, name, short_name, description, icon,
+                        visibility, metric_kind, metric, target_value, workout_type_id,
+                        started_at, ended_at) values
+  ('c0000000-0000-4000-8000-000000000001', null, 'Run 100 km this month', 'RUN 100K',
+   'Log 100 km of running before the window closes.', '🏃', 'public', 'accumulator',
+   'total_distance', 100000, (select id from workout_types where slug = 'running'),
+   date_trunc('day', now()) - interval '10 days', date_trunc('day', now()) + interval '20 days'),
+  ('c0000000-0000-4000-8000-000000000002', null, '20 workouts in 30 days', '20 IN 30',
+   'Any workout counts — consistency wins.', '⚡', 'public', 'accumulator',
+   'total_sessions', 20, null,
+   date_trunc('day', now()) - interval '7 days',  date_trunc('day', now()) + interval '23 days'),
+  ('c0000000-0000-4000-8000-000000000003', null, 'Fastest 5K', 'FAST 5K',
+   'Best single running time wins.', '🎯', 'public', 'best_of',
+   'fastest_time', null, (select id from workout_types where slug = 'running'),
+   date_trunc('day', now()) - interval '3 days',  date_trunc('day', now()) + interval '11 days'),
+  ('c0000000-0000-4000-8000-000000000004', null, 'Longest single ride', 'LONG RIDE',
+   'One ride, as far as you can go.', '🚴', 'public', 'best_of',
+   'longest_distance', null, (select id from workout_types where slug = 'cycling'),
+   date_trunc('day', now()) - interval '5 days',  date_trunc('day', now()) + interval '9 days'),
+  ('c0000000-0000-4000-8000-000000000005', null, 'Burn 5,000 kcal', 'BURN 5K',
+   'Any workout type counts toward the burn.', '🔥', 'public', 'accumulator',
+   'total_calories', 5000, null,
+   date_trunc('day', now()) - interval '14 days', date_trunc('day', now()) + interval '16 days')
+on conflict (id) do update set
+  name = excluded.name, short_name = excluded.short_name, description = excluded.description,
+  icon = excluded.icon, target_value = excluded.target_value,
+  started_at = excluded.started_at, ended_at = excluded.ended_at;

@@ -13,6 +13,7 @@ import '../../gateways/workout_gateway.dart';
 import '../common/app_card.dart';
 import '../common/premium_cta.dart';
 import '../common/stat_tile.dart';
+import '../common/workout_list_card.dart';
 import '../common/status_badge.dart';
 import '../workout/history_detail_screen.dart';
 
@@ -286,7 +287,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         child: Text(entry.key, style: AppTypography.caption2),
       ));
       for (final s in entry.value) {
-        widgets.add(_WorkoutListCard(
+        widgets.add(WorkoutListCard(
           session: s,
           type: typeById[s.workoutTypeId],
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -388,77 +389,4 @@ class _Agg {
   const _Agg(this.sessions, this.activeMin, this.calories, this.avgHr, this.maxHr);
   final int sessions, activeMin, calories;
   final int? avgHr, maxHr;
-}
-
-class _WorkoutListCard extends StatelessWidget {
-  const _WorkoutListCard({required this.session, required this.type, required this.onTap});
-
-  final WorkoutSession session;
-  final WorkoutType? type;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final name = session.customName ?? type?.name ?? 'Workout';
-    final cardio = type?.isCardio ?? false;
-    final when = session.endedAt ?? session.startedAt;
-    final mins = (session.durationSeconds / 60).round();
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: AppColors.cardShadow,
-      ),
-      child: Card(
-        color: AppColors.surface,
-        margin: EdgeInsets.zero,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.faint),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(iconForSlug(type?.slug ?? ''), style: const TextStyle(fontSize: 22)),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(name, style: AppTypography.headline, overflow: TextOverflow.ellipsis)),
-                  const Icon(Icons.chevron_right, color: AppColors.faint),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text('${relativeDay(when)} · $mins min', style: AppTypography.caption2),
-              const Divider(color: AppColors.faint, height: 20),
-              Row(
-                children: cardio
-                    ? [
-                        _cell('KM', fmtKm((session.distanceMeters ?? 0).toDouble())),
-                        _cell('/KM', fmtPace((session.distanceMeters ?? 0).toDouble(),
-                            Duration(seconds: session.durationSeconds))),
-                        _cell('AVG HR', session.avgHeartRate?.toString() ?? '—'),
-                      ]
-                    : [
-                        _cell('KCAL', session.caloriesBurned?.toString() ?? '—'),
-                        _cell('AVG HR', session.avgHeartRate?.toString() ?? '—'),
-                        _cell('MAX HR', session.maxHeartRate?.toString() ?? '—'),
-                      ],
-              ),
-            ],
-          ),
-        ),
-        ),
-      ),
-    );
-  }
-
-  Widget _cell(String label, String value) => StatTile(label, value,
-      valueFirst: true, valueStyle: AppTypography.headline, gap: 0);
 }
