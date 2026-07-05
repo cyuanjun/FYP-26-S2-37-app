@@ -24,6 +24,7 @@ abstract class Profile with _$Profile {
     String? bio,
     @Default(<String, dynamic>{}) Map<String, dynamic> notificationPrefs,
     DateTime? onboardingCompletedAt,
+    @Default(<String>[]) List<String> followedExpertIds,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
@@ -39,6 +40,9 @@ abstract class Profile with _$Profile {
 
   /// Free tier — history month-cap and basic-depth AI apply.
   bool get isFree => role == UserRole.free;
+
+  /// Expert role — the Experts tab swaps to the incoming-requests view.
+  bool get isExpert => role == UserRole.expert;
 
   /// First-time users complete the post-login onboarding wizard (#3) before
   /// reaching the main shell.

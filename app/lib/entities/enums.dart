@@ -135,3 +135,44 @@ extension ChallengeMetricLabel on ChallengeMetric {
         ChallengeMetric.mostCalories => 'Most calories',
       };
 }
+
+/// Expert marketplace enums (#6 cluster) — mirror the Postgres types.
+enum ServiceStatus { draft, live, archived }
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum FulfillmentType { workoutPlan, nutrition, review, session, coaching }
+
+extension FulfillmentTypeLabel on FulfillmentType {
+  String get label => switch (this) {
+        FulfillmentType.workoutPlan => 'Workout plan',
+        FulfillmentType.nutrition => 'Nutrition',
+        FulfillmentType.review => 'Review',
+        FulfillmentType.session => 'Session',
+        FulfillmentType.coaching => 'Coaching',
+      };
+}
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum PricingModel { oneTime, recurring }
+
+/// Values aren't valid Dart identifiers — explicit wire values required.
+enum ResponseTime {
+  @JsonValue('24h')
+  h24,
+  @JsonValue('48h')
+  h48,
+  @JsonValue('72h')
+  h72,
+}
+
+extension ResponseTimeLabel on ResponseTime {
+  String get label => switch (this) {
+        ResponseTime.h24 => 'Replies within 24h',
+        ResponseTime.h48 => 'Replies within 48h',
+        ResponseTime.h72 => 'Replies within 72h',
+      };
+}
+
+enum ServiceRequestStatus { pending, accepted, completed, cancelled }
+
+enum VerificationStatus { pending, verified, rejected }

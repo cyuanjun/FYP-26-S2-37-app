@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wise_workout/boundaries/gateways/ai_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/auth_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/device_gateway.dart';
+import 'package:wise_workout/boundaries/gateways/expert_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/feedback_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/fitness_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/plan_gateway.dart';
@@ -14,6 +15,11 @@ import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/entities/connected_device.dart';
 import 'package:wise_workout/entities/challenge.dart';
+import 'package:wise_workout/entities/deliverable.dart';
+import 'package:wise_workout/entities/expert_category.dart';
+import 'package:wise_workout/entities/expert_service.dart';
+import 'package:wise_workout/entities/expert_summary.dart';
+import 'package:wise_workout/entities/service_request_summary.dart';
 import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/feed_post.dart';
 import 'package:wise_workout/entities/post_comment.dart';
@@ -678,3 +684,93 @@ class FakeDeviceGateway implements DeviceGateway {
 /// Common test fixtures.
 const runningType = WorkoutType(id: 'wt-run', name: 'Running', slug: 'running');
 const yogaType = WorkoutType(id: 'wt-yoga', name: 'Yoga', slug: 'yoga');
+
+/// Fake ExpertGateway — canned marketplace data + recorded mutation calls.
+class FakeExpertGateway implements ExpertGateway {
+  var categories = <ExpertCategory>[];
+  var experts = <ExpertSummary>[];
+  var listings = <ServiceListing>[];
+  var myRequests = <ServiceRequestSummary>[];
+  var incomingRequests = <ServiceRequestSummary>[];
+
+  final createRequestCalls = <Map<String, String>>[];
+  final acceptCalls = <String>[];
+  final declineCalls = <String>[];
+  final completeCalls = <String>[];
+  final reviewCalls = <Map<String, dynamic>>[];
+  final deliverableCalls = <Map<String, dynamic>>[];
+  final followUpdates = <List<String>>[];
+
+  @override
+  Future<List<ExpertCategory>> listCategories() async => categories;
+
+  @override
+  Future<List<ExpertSummary>> listExperts() async => experts;
+
+  @override
+  Future<List<ServiceListing>> listServices() async => listings;
+
+  @override
+  Future<List<ServiceRequestSummary>> listMyRequests(String userId) async =>
+      myRequests;
+
+  @override
+  Future<List<ServiceRequestSummary>> listIncomingRequests(
+          String expertId) async =>
+      incomingRequests;
+
+  @override
+  Future<void> createRequest({
+    required String userId,
+    required ExpertService service,
+    required String message,
+  }) async {
+    createRequestCalls.add({
+      'userId': userId,
+      'serviceId': service.id,
+      'expertUserId': service.expertUserId,
+      'price': '${service.priceCents}',
+      'message': message,
+    });
+  }
+
+  @override
+  Future<void> acceptRequest(String requestId) async =>
+      acceptCalls.add(requestId);
+
+  @override
+  Future<void> declineRequest(String requestId) async =>
+      declineCalls.add(requestId);
+
+  @override
+  Future<void> completeRequest(String requestId) async =>
+      completeCalls.add(requestId);
+
+  @override
+  Future<void> submitReview({
+    required String requestId,
+    required int rating,
+    required String body,
+  }) async {
+    reviewCalls.add({'requestId': requestId, 'rating': rating, 'body': body});
+  }
+
+  @override
+  Future<void> sendDeliverable({
+    required String requestId,
+    required String title,
+    String? note,
+    required List<DeliverableSection> sections,
+  }) async {
+    deliverableCalls.add({
+      'requestId': requestId,
+      'title': title,
+      'note': note,
+      'sections': sections,
+    });
+  }
+
+  @override
+  Future<void> setFollowedExperts(String userId, List<String> expertIds) async =>
+      followUpdates.add(expertIds);
+}
