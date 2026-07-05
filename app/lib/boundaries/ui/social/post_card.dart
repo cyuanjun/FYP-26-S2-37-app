@@ -10,6 +10,7 @@ import '../common/app_card.dart';
 import '../common/workout_list_card.dart';
 import 'author_row.dart';
 import 'post_detail_screen.dart';
+import 'user_profile_screen.dart';
 import 'share_post_sheet.dart';
 
 /// BOUNDARY widget — one polymorphic feed card (#11). The whole card is the
@@ -42,7 +43,14 @@ class PostCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AuthorRow(author: feedPost.author, when: post.createdAt),
+            AuthorRow(
+              author: feedPost.author,
+              when: post.createdAt,
+              onTap: () => Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          UserProfileScreen(userId: feedPost.author.id))),
+            ),
             if (post.body != null) ...[
               const SizedBox(height: 10),
               Text(post.body!, style: AppTypography.body),

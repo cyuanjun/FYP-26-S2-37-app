@@ -16,6 +16,7 @@ import 'package:wise_workout/entities/connected_device.dart';
 import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/feed_post.dart';
 import 'package:wise_workout/entities/post_comment.dart';
+import 'package:wise_workout/entities/public_profile.dart';
 import 'package:wise_workout/entities/fitness_goal.dart';
 import 'package:wise_workout/entities/fitness_plan.dart';
 import 'package:wise_workout/entities/fitness_profile.dart';
@@ -290,6 +291,58 @@ class FakeSocialGateway implements SocialGateway {
 
   @override
   Future<List<String>> friendIds(String userId) async => friends;
+
+  /// Canned profiles for search / profile / friends-list reads.
+  var profiles = <PublicProfile>[];
+  var userStatsResult = (workouts: 0, activeDays: 0);
+  final addFriendCalls = <String>[];
+  final removeFriendCalls = <String>[];
+  final searchQueries = <String>[];
+
+  @override
+  Future<void> addFriend(String targetId) async {
+    addFriendCalls.add(targetId);
+    if (!friends.contains(targetId)) friends = [...friends, targetId];
+  }
+
+  @override
+  Future<void> removeFriend(String targetId) async {
+    removeFriendCalls.add(targetId);
+    friends = friends.where((f) => f != targetId).toList();
+  }
+
+  @override
+  Future<bool> isFriend(String me, String other) async =>
+      friends.contains(other);
+
+  @override
+  Future<List<PublicProfile>> listFriends(String userId) async =>
+      profiles.where((p) => friends.contains(p.id)).toList();
+
+  @override
+  Future<List<PublicProfile>> searchUsers(String query,
+      {required String excludeId}) async {
+    searchQueries.add(query);
+    return profiles
+        .where((p) =>
+            p.id != excludeId &&
+            (p.displayName.toLowerCase().contains(query.toLowerCase()) ||
+                (p.username ?? '').toLowerCase().contains(query.toLowerCase())))
+        .toList();
+  }
+
+  @override
+  Future<PublicProfile?> fetchPublicProfile(String userId) async =>
+      profiles.where((p) => p.id == userId).firstOrNull;
+
+  @override
+  Future<({int workouts, int activeDays})> userStats(String userId) async =>
+      userStatsResult;
+
+  @override
+  Future<List<FeedPost>> listUserPosts(String userId,
+          {required String me, int limit = 20}) async =>
+      feed.where((f) => f.post.userId == userId).toList();
 
   @override
   Future<String> createWorkoutSharePost({

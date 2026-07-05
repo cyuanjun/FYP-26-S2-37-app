@@ -13,6 +13,7 @@ import '../common/workout_list_card.dart';
 import '../workout/history_detail_screen.dart';
 import 'author_row.dart';
 import 'share_post_sheet.dart';
+import 'user_profile_screen.dart';
 
 /// BOUNDARY (#11.1 Post Detail). A single polymorphic post in full: wrapped
 /// content, like toggle, flat comment thread (oldest first) and a pinned
@@ -122,6 +123,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           AuthorRow(
             author: feedPost.author,
             when: post.createdAt,
+            onTap: () => Navigator.of(context, rootNavigator: true).push(
+                MaterialPageRoute(
+                    builder: (_) =>
+                        UserProfileScreen(userId: feedPost.author.id))),
             trailing: isOwner && !_editingCaption
                 ? IconButton(
                     icon: const Icon(Icons.edit_outlined,
@@ -210,6 +215,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
               author: c.author!,
               when: c.createdAt,
               size: 32,
+              onTap: () => Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(
+                      builder: (_) => UserProfileScreen(userId: c.userId))),
               trailing: c.userId == me
                   ? IconButton(
                       icon: const Icon(Icons.close, size: 18, color: AppColors.muted),

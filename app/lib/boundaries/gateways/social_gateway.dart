@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/strings.dart';
 import '../../entities/feed_post.dart';
 import '../../entities/post_comment.dart';
+import '../../entities/public_profile.dart';
 
 /// BOUNDARY (gateway) — posts, likes, and comments (#11 Social). Sharing a
 /// workout means a `workout_share` Post exists for the session; the feed is
@@ -106,6 +107,85 @@ class SocialGateway {
         .select('following_id')
         .eq('follower_id', userId);
     return rows.map((r) => r['following_id'] as String).toList();
+  }
+
+  // ---- Friends (#11.2, US24). Mutual pairs are written atomically by the
+  // SECURITY DEFINER RPCs — RLS forbids inserting the reciprocal row. ----
+
+  Future<void> addFriend(String targetId) =>
+      _client.rpc('add_friend', params: {'p_target': targetId});
+
+  Future<void> removeFriend(String targetId) =>
+      _client.rpc('remove_friend', params: {'p_target': targetId});
+
+  Future<bool> isFriend(String me, String other) async {
+    final row = await _client
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', me)
+        .eq('following_id', other)
+        .maybeSingle();
+    return row != null;
+  }
+
+  Future<List<PublicProfile>> listFriends(String userId) async {
+    final rows = await _client
+        .from('follows')
+        .select('friend:public_profiles!follows_following_id_fkey('
+            'id, first_name, last_name, username, avatar_url, level)')
+        .eq('follower_id', userId);
+    return rows
+        .map((r) => PublicProfile.fromJson(r['friend'] as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<PublicProfile>> searchUsers(String query,
+      {required String excludeId}) async {
+    final q = query.trim();
+    if (q.isEmpty) return const [];
+    final rows = await _client
+        .from('public_profiles')
+        .select('id, first_name, last_name, username, avatar_url, level')
+        .or('first_name.ilike.%$q%,last_name.ilike.%$q%,username.ilike.%$q%')
+        .neq('id', excludeId)
+        .limit(20);
+    return rows.map(PublicProfile.fromJson).toList();
+  }
+
+  Future<PublicProfile?> fetchPublicProfile(String userId) async {
+    final row = await _client
+        .from('public_profiles')
+        .select()
+        .eq('id', userId)
+        .maybeSingle();
+    return row == null ? null : PublicProfile.fromJson(row);
+  }
+
+  /// Workouts + active-days for the #11.2 stats row, from the privacy view.
+  Future<({int workouts, int activeDays})> userStats(String userId) async {
+    final rows = await _client
+        .from('public_workout_sessions')
+        .select('ended_at')
+        .eq('user_id', userId)
+        .not('ended_at', 'is', null);
+    final days = <String>{};
+    for (final r in rows) {
+      final d = DateTime.parse(r['ended_at'] as String).toLocal();
+      days.add('${d.year}-${d.month}-${d.day}');
+    }
+    return (workouts: rows.length, activeDays: days.length);
+  }
+
+  /// A user's own posts, newest first (#11.2 Recent Posts).
+  Future<List<FeedPost>> listUserPosts(String userId,
+      {required String me, int limit = 20}) async {
+    final rows = await _client
+        .from('posts')
+        .select(_feedSelect)
+        .eq('user_id', userId)
+        .order('created_at', ascending: false)
+        .limit(limit);
+    return rows.map((r) => FeedPost.fromRow(r, me: me)).toList();
   }
 
   Future<String> createWorkoutSharePost({
