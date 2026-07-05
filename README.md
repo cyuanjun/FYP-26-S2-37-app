@@ -10,10 +10,13 @@ architecture · **Supabase** (Postgres + Auth + RLS + Edge Functions) · **OpenA
 
 ## Current state (6 Jul 2026)
 
-Built, tested (112 tests), and verified on the Android emulator + iOS simulator against a live
+Built, tested (146 tests), and verified on the Android emulator + iOS simulator against a live
 backend: login → first-run onboarding wizard → AI-generated 4-week training plan → Plan Detail →
 phone-GPS workout capture with paired-wearable heart rate → month-capped history + analytics →
-AI progress summary → share to named social platforms → full profile/settings cluster.
+AI progress summary → share to named social platforms → full profile/settings cluster →
+**social cluster** (community feed with likes/comments, mutual friends + user profiles, and
+challenges with live leaderboards). A local Supabase stack (`supabase start`, ports 55321-9)
+mirrors the hosted backend for development.
 
 - 📍 **Where we are / what's next:** [docs/STATUS.md](docs/STATUS.md)
 - 🏃 **Run & demo it** (setup, walkthroughs, test accounts): [docs/prototype-demo-guide.md](docs/prototype-demo-guide.md)
@@ -30,7 +33,7 @@ dart run build_runner build          # freezed / json_serializable codegen
 flutter run -d <device>              # device ids from `flutter devices`
 
 flutter analyze                      # should report "No issues found!"
-flutter test                         # 112 tests, all green
+flutter test                         # 146 tests, all green
 ```
 
 The app connects to the hosted Supabase project out of the box (publishable key in
@@ -47,7 +50,7 @@ app/                         everything needed to run the product
     boundaries/ui/           BOUNDARY — screens (actor-facing); ui/common/ = shared widget
                              library (StatTile · AppCard · StatusBadge · PremiumCta)
     boundaries/gateways/     BOUNDARY — Supabase / sensor / AI / share adapters (system-facing)
-  test/                      112 unit/control tests
+  test/                      146 unit/control tests
   supabase/                  backend: migrations · Edge Functions · seeds   (see app/supabase/README.md)
 docs/                        everything else: requirements · architecture · screen specs · deliverables · QA · scripts
 ```

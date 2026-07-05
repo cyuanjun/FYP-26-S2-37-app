@@ -2,7 +2,7 @@
 screen: 11-social
 role: free
 group: main
-status: spec-only
+status: built
 ---
 
 # 11. Social (tab)

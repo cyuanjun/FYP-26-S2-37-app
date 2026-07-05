@@ -1,6 +1,6 @@
 # Wise Workout — Prototype Demo & Test Guide
 
-How to run, demo, and verify the prototype. Last updated **12 Jun 2026**.
+How to run, demo, and verify the prototype. Last updated **6 Jul 2026**.
 
 The prototype implements the app's demo spine end-to-end:
 
@@ -20,6 +20,7 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **History** | Analytics card (Day/Week/Month + vs-prior deltas), sessions grouped by week, detail with edit/delete | Free tier shows upsell/cap/search-lock; Premium hides them |
 | **AI summary** | "✨" on History → progress summary written by **OpenAI (gpt-4o-mini)** from your real stats | Premium summaries include goal context; Gemini fallback → deterministic stub if keys/AI fail |
 | **Share** | Summary → "Share to Social" toggle → caption + Facebook/Instagram/Twitter/TikTok | Creates a `workout_share` Post; platform buttons open the OS share |
+| **Social (6 Jul)** | Community feed (friends+self; workout_share/level_up posts, likes, comments, caption edit) → Post Detail; find-friends search + Add Friend/Unfriend + User Profile; Challenges (Joined/Active/Past, join/leave/create, live leaderboards) | Friendship = mutual pair via `add_friend` RPC; leaderboards live-computed by `challenge_leaderboards`; demo seed gives Mia↔Alex + likes/comments + a joined challenge |
 | **Profile cluster** | Avatar (top-right) → Profile hub: level/XP bar, lifetime stats, Fitness Profile (#13.1), Fitness Goals (#13.2), Account Settings (#13.3), Notifications (#13.4), Submit Feedback (#13.5), log out | All live writes: fitness_profiles, fitness_goals (active-goal upsert), notification_prefs jsonb, feedback |
 | **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
 | **Onboarding + plan** | First login → wizard (about you → how you train → goal) → **real AI weekly plan (OpenAI)** → Train shows it | Both tiers: Free basic, Premium personalised; strict JSON schema + server-side validation; Gemini → rule fallback. Gate: `profiles.onboarding_completed_at` |
@@ -30,7 +31,8 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 (`lib/entities`, `lib/controls`, `lib/boundaries/{ui,gateways}`). **Backend:** 26 tables + RLS +
 2 privacy views + `end_workout_session` RPC + **two Edge Functions (`summarise-progress`, `suggest-plan`)
 running OpenAI `gpt-4o-mini`** (Gemini → deterministic-stub fallback), all on Supabase project
-`zbeyytgilrqruttvecdc`. **Tests:** 107 unit/control tests (`flutter test`).
+`zbeyytgilrqruttvecdc`. **Tests:** 146 unit/control tests (`flutter test`).
+**Server functions:** `end_workout_session` · `add_friend`/`remove_friend` · `challenge_leaderboards`.
 
 ---
 
@@ -56,6 +58,10 @@ flutter run -d <device>              # pick a device id from `flutter devices`
 
 > The app boots straight to the live Supabase backend (URL + publishable key are baked into
 > `lib/core/config/env.dart`; the key is public and RLS-protected). No local backend needed.
+> **Local backend (optional, 6 Jul):** `cd app && supabase start` (Docker; ports 55321-9), then
+> run with `--dart-define=SUPABASE_URL=http://127.0.0.1:55321 --dart-define=SUPABASE_ANON_KEY=<publishable key printed by supabase start>`.
+> Migrations + `seed.sql` apply automatically; load demo accounts with
+> `docker exec -i supabase_db_app psql -U postgres -d postgres < supabase/seed-demo.sql`.
 
 While `flutter run` is attached: **`r`** = hot reload, **`R`** = hot restart, **`q`** = quit.
 
@@ -82,7 +88,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
    - **See:** brief **WISE / WORKOUT** splash (lime accent), then the **Login** screen.
 2. Enter `free@wiseworkout.test` / `Password123!` → **LOG IN**.
    - **See:** the **Home** dashboard — *"Hi, Mia 👋 · Free member"* — with the 5-tab bottom nav
-     (Home / Experts / Train / Social / History). Experts and Social are styled "later sprint" placeholders.
+     (Home / Experts / Train / Social / History). Experts is a styled "later sprint" placeholder; **Social is live** (feed · friends · challenges, 6 Jul).
 3. **Negative check:** sign out (logout icon, top-right of Home), enter a wrong password → LOG IN.
    - **See:** red **"Incorrect email or password."** and no navigation.
 
@@ -212,7 +218,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ```bash
 flutter analyze     # static analysis — should report "No issues found!"
-flutter test        # 112 tests — should end "All tests passed!"
+flutter test        # 146 tests — should end "All tests passed!"
 ```
 
 Coverage (positive **and** negative cases per flow): entity rules (`Profile`, `WorkoutType` incl. MET
@@ -269,7 +275,7 @@ catalogs: workout types, health tags, expert categories.)
   true per-app deep-linking is a later sprint.
 - **Real GPS needs a physical device** — emulators/simulators show 0 distance unless you mock location.
 - **Payment is simulated** (price fields only — premium = $9.99/mo, no gateway).
-- **Placeholders** (show "later sprint"): the Experts and Social tabs, History search,
+- **Placeholders** (show "later sprint"): the Experts tab, History search,
   Advanced analytics, Upgrade flow, photo upload, per-field name/username/email edits.
   The Dashboard is a minimal greeting. These are scoped out, not broken.
 
@@ -286,11 +292,13 @@ lib/
   controls/        Authenticate, RequestPasswordReset, ActiveWorkout, SaveWorkoutDetails,
                    DeleteWorkoutSession, history, SummariseProgress, CreateWorkoutSharePost,
                    ShareWorkoutToSocial, GeneratePlan + CompleteOnboarding (+ buildPlanSkeleton),
+                   social_feed (feed/likes/comments), manage_friends, challenges,
                    ManageConnectedDevice, ViewProfile, UpdateFitnessProfile, SetFitnessGoal,
                    UpdateAccountSettings, ManageNotificationPrefs, SubmitFeedback
   boundaries/
     ui/            splash · auth (login, forgot pwd) · onboarding (wizard) · home · experts ·
-                   train (+ plan detail, connected devices) · social · history · workout ·
+                   train (+ plan detail, connected devices) · social (feed, post detail,
+                   user profile, challenges, create-challenge) · history · workout ·
                    profile (hub + 5 sub-screens) · common (shared widget library:
                    StatTile · AppCard · StatusBadge · PremiumCta · AvatarButton)
     gateways/      auth, profile, fitness, plan, device, feedback, workout, social,
@@ -302,7 +310,7 @@ supabase/
                    onboarding_completed_at · private custom catalog entries
   functions/       summarise-progress · suggest-plan  (AI Edge Functions, gpt-4o-mini)
   seed.sql         install catalogs       seed-demo.sql  demo accounts + data
-test/              entity · core · control suites (112 tests)
+test/              entity · core · control suites (146 tests)
 ```
 
 Design references: [STATUS.md](STATUS.md) (progress), [architecture/build-plan.md](architecture/build-plan.md),

@@ -4,6 +4,8 @@
 
 Schema built up incrementally as we walk through screens in [screens-v1.md](screens-v1.md). Each entity records which screen first required it, so every column traces back to a UI need.
 
+> **Server-side functions (as-built, 6 Jul 2026)** — beyond the DDL, three Postgres function groups ship with the schema: `end_workout_session(uuid, jsonb)` (SECURITY DEFINER; atomically finalizes a session, computes XP/streak/level and auto-inserts `level_up` Posts), `add_friend(uuid)` / `remove_friend(uuid)` (SECURITY DEFINER; write/delete the mutual Follow pair atomically — `follows` RLS only permits `follower_id = auth.uid()`, so the reciprocal row cannot be a client write), and `challenge_leaderboards(uuid[])` (SECURITY INVOKER, reads `public_workout_sessions`; live-aggregates each participant's qualifying sessions per the challenge metric and ranks them — no stored progress column, per the Challenge design below).
+
 Final output is an ER diagram in the style of the FYP sample (entity boxes with PK/FK markers; relationships labelled with verbs and multiplicities like `1 — *`). This Markdown is the working source; the diagram is generated from it at the end.
 
 ## Conventions

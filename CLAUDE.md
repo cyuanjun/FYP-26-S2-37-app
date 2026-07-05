@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Wise Workout** (FYP-26-S2-37) — a cross-platform (Android + iOS) mobile fitness app, the Final Year Project of a 4-person team at UOW/SIM. Think Strava-style: capture workouts from phone sensors (wearables later), AI-generated training plans, analytics, a social feed with challenges, an expert marketplace, and Free/Premium/Expert/Admin roles.
 
-**Current state: the Flutter app is built and running** (Android emulator + iOS simulator) against a live Supabase backend — vertical slice complete plus onboarding, AI plans (live OpenAI), My Plans + Plan Detail, connected devices, and the full Profile cluster; 112 tests. `docs/` holds the planning/design/reference material; **[docs/STATUS.md](docs/STATUS.md) is the up-to-date state**. The design decisions below are **already made** — implement to them; don't reopen them without being asked.
+**Current state: the Flutter app is built and running** (Android emulator + iOS simulator) against a live Supabase backend — vertical slice complete plus onboarding, AI plans (live OpenAI), My Plans + Plan Detail, connected devices, the full Profile cluster, and the **Social cluster** (feed + likes/comments, mutual friends + user profiles, challenges with live leaderboards); 146 tests. A **local Supabase stack** exists (`cd app && supabase start`, ports 55321-9; target it with `--dart-define`s) — new backend work is tested locally first. `docs/` holds the planning/design/reference material; **[docs/STATUS.md](docs/STATUS.md) is the up-to-date state**. The design decisions below are **already made** — implement to them; don't reopen them without being asked.
 
 ## Where the knowledge lives
 

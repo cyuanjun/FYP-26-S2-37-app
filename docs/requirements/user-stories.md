@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
+Last updated **6 Jul 2026** (after the Social cluster: US22–US25 ✅). Tally: 17 ✅ · 9 🟨 · 38 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -42,10 +42,10 @@ Last updated **12 Jun 2026** (after the Profile cluster + four-way cross-check).
 | US19 | 🟨 | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Preference toggles #13.4 ✅; flutter_local_notifications wired but no scheduling yet |
 | US20 | ⬜ | As a registered free user, I want to receive inactivity alerts so that I am reminded when I have not met my scheduled exercise goals. | Pref toggles exist; rule-based alert engine pending |
 | US21 | ⬜ | As a registered free user, I want to receive rest alerts when I may be exercising too much so that I can avoid overtraining. | Pref toggles exist; rule-based alert engine pending |
-| US22 | ⬜ | As a registered free user, I want to view community posts so that I can stay connected with other fitness users. | Feed UI pending (posts already land in DB) |
-| US23 | 🟨 | As a registered free user, I want to create posts, like posts, and comment on posts so that I can participate in the Wise Workout community. | Workout-share post creation ✅; likes/comments pending |
-| US24 | ⬜ | As a registered free user, I want to follow other users so that I can keep up with their shared fitness progress. | Follow/friends pending |
-| US25 | ⬜ | As a registered free user, I want to join simple fitness challenges and earn badges so that I can stay motivated. | Challenges UI pending; earn mechanics already live (XP/levels + auto level-up posts) |
+| US22 | ✅ | As a registered free user, I want to view community posts so that I can stay connected with other fitness users. | Community feed live (6 Jul): polymorphic posts (workout_share / level_up / challenge_result), friends+self scope |
+| US23 | ✅ | As a registered free user, I want to create posts, like posts, and comment on posts so that I can participate in the Wise Workout community. | Share-post creation, like toggle, flat comments + owner caption edit/delete all live (6 Jul) |
+| US24 | ✅ | As a registered free user, I want to follow other users so that I can keep up with their shared fitness progress. | Mutual friends model (6 Jul): search, Add Friend/Unfriend (atomic pair via add_friend RPC), User Profile #11.2 |
+| US25 | ✅ | As a registered free user, I want to join simple fitness challenges and earn badges so that I can stay motivated. | Challenges live (6 Jul): join/leave/create, live-computed leaderboards (challenge_leaderboards RPC); "badges" = XP/levels per design (SRS lag noted) |
 | US26 | ✅ | As a registered free user, I want to share selected achievements or challenge results so that I can show my progress while controlling what information is shared. | Named FB/IG/Twitter/TikTok buttons + workout_share post ✅; buttons open the OS share sheet (deep links = later sprint) |
 | US27 | ⬜ | As a registered free user, I want to browse expert profiles and service listings so that I can find professional support when needed. | Experts marketplace — placeholder tab |
 | US28 | ⬜ | As a registered free user, I want to browse expert categories so that I can identify what type of expert support may suit my fitness goals. | Experts marketplace — placeholder tab |
