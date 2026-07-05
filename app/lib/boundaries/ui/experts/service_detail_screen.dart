@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/browse_experts.dart';
+import '../../../controls/service_requests.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../entities/deliverable.dart';
 import '../../../entities/enums.dart';
+import '../../../entities/expert_summary.dart';
+import '../../../entities/service_request_summary.dart';
 import '../common/app_card.dart';
 import 'expert_detail_screen.dart';
 
-/// BOUNDARY (#6.2 Service Detail). One service in full: hero, what's
-/// included, who offers it. The pinned request/review footer state machine
-/// arrives with the transact phase.
+/// BOUNDARY (#6.2 Service Detail). One service in full: hero, deliverables
+/// (once the engagement is underway), what's included, who offers it — and
+/// the pinned footer state machine: Request · $X → pending → in progress →
+/// Leave a review → ✓ Reviewed. "Completed" means accepted work finished,
+/// not paid — payment is simulated.
 class ServiceDetailScreen extends ConsumerWidget {
   const ServiceDetailScreen({super.key, required this.serviceId});
 
@@ -19,12 +25,20 @@ class ServiceDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listingAsync = ref.watch(serviceListingProvider(serviceId));
+    final engagement =
+        ref.watch(activeRequestForServiceProvider(serviceId)).value;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
           title: const Text('SERVICE', style: AppTypography.caption2),
           centerTitle: true),
+      bottomNavigationBar: listingAsync.value == null
+          ? null
+          : _Footer(
+              listing: listingAsync.value!,
+              engagement: engagement,
+            ),
       body: listingAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -57,6 +71,16 @@ class ServiceDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 10),
                 Text(service.description!,
                     style: AppTypography.body.copyWith(height: 1.4)),
+              ],
+              if (engagement != null &&
+                  engagement.request.deliverablesVisible &&
+                  engagement.deliverables.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Text(
+                    'FROM ${listing.expertIdentity.firstName?.toUpperCase() ?? 'YOUR EXPERT'}',
+                    style: AppTypography.caption2),
+                const SizedBox(height: 8),
+                for (final d in engagement.deliverables) _DeliverableCard(d),
               ],
               const SizedBox(height: 20),
               Text("WHAT'S INCLUDED", style: AppTypography.caption2),
@@ -119,6 +143,224 @@ class ServiceDetailScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _DeliverableCard extends StatelessWidget {
+  const _DeliverableCard(this.deliverable);
+
+  final Deliverable deliverable;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      margin: const EdgeInsets.only(bottom: 10),
+      borderColor: AppColors.faint,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(deliverable.title, style: AppTypography.headline),
+          if (deliverable.note != null) ...[
+            const SizedBox(height: 4),
+            Text(deliverable.note!, style: AppTypography.footnote),
+          ],
+          for (final section in deliverable.sections) ...[
+            const SizedBox(height: 10),
+            Text(section.heading.toUpperCase(),
+                style: AppTypography.caption2.copyWith(letterSpacing: 1.1)),
+            const SizedBox(height: 4),
+            for (final item in section.items)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Expanded(child: Text(item.label, style: AppTypography.body)),
+                    if (item.detail != null)
+                      Text(item.detail!,
+                          style: AppTypography.headline
+                              .copyWith(color: AppColors.accent)),
+                    if (item.sub != null) ...[
+                      const SizedBox(width: 6),
+                      Text(item.sub!, style: AppTypography.caption2),
+                    ],
+                  ],
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// The #6.2 pinned footer: which action (if any) the engagement state allows.
+class _Footer extends ConsumerWidget {
+  const _Footer({required this.listing, required this.engagement});
+
+  final ServiceListing listing;
+  final ServiceRequestSummary? engagement;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final request = engagement?.request;
+    final Widget child;
+    if (request == null) {
+      child = ElevatedButton(
+        onPressed: () => _openRequestSheet(context, ref),
+        child: Text('Request · ${listing.service.priceLabel}'),
+      );
+    } else if (request.isPending) {
+      child = Text('Request pending — ${listing.expertIdentity.displayName} '
+          'usually replies within ${_replyWindow()}.',
+          textAlign: TextAlign.center,
+          style: AppTypography.footnote.copyWith(color: AppColors.premiumText));
+    } else if (request.isAccepted) {
+      child = Text('In progress — deliverables appear above as they arrive.',
+          textAlign: TextAlign.center, style: AppTypography.footnote);
+    } else if (engagement!.reviewUnlocked) {
+      child = ElevatedButton(
+        onPressed: () => _openReviewSheet(context, ref, request.id),
+        child: const Text('Leave a review'),
+      );
+    } else {
+      child = Text('✓ Reviewed — thanks for the feedback!',
+          textAlign: TextAlign.center,
+          style: AppTypography.footnote.copyWith(color: AppColors.success));
+    }
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+        child: child,
+      ),
+    );
+  }
+
+  String _replyWindow() => switch (listing.service.responseTime) {
+        ResponseTime.h24 => '24 hours',
+        ResponseTime.h48 => '48 hours',
+        ResponseTime.h72 => '72 hours',
+      };
+
+  void _openRequestSheet(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
+        ),
+        child: StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('REQUEST ${listing.service.name.toUpperCase()}',
+                  style: AppTypography.caption2),
+              const SizedBox(height: 4),
+              Text(
+                  '${listing.service.priceLabel} · simulated payment — '
+                  'no card is charged.',
+                  style: AppTypography.footnote),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLines: 4,
+                maxLength: 400,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                    labelText: 'YOUR GOAL',
+                    hintText:
+                        'Tell the expert what you want to achieve (required)'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: controller.text.trim().isEmpty
+                    ? null
+                    : () async {
+                        final ok = await ref.read(requestServiceProvider).call(
+                            service: listing.service,
+                            message: controller.text);
+                        if (ok && sheetContext.mounted) {
+                          Navigator.of(sheetContext).pop();
+                        }
+                      },
+                child: const Text('SEND REQUEST'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openReviewSheet(BuildContext context, WidgetRef ref, String requestId) {
+    final controller = TextEditingController();
+    var rating = 5;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
+        ),
+        child: StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('REVIEW ${listing.expertIdentity.displayName.toUpperCase()}',
+                  style: AppTypography.caption2),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var i = 1; i <= 5; i++)
+                    IconButton(
+                      onPressed: () => setState(() => rating = i),
+                      icon: Icon(i <= rating ? Icons.star : Icons.star_border,
+                          color: AppColors.premium, size: 32),
+                    ),
+                ],
+              ),
+              TextField(
+                controller: controller,
+                maxLines: 3,
+                maxLength: 400,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                    labelText: 'YOUR REVIEW',
+                    hintText: 'How was the engagement? (required)'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: controller.text.trim().isEmpty
+                    ? null
+                    : () async {
+                        final ok = await ref.read(submitReviewProvider).call(
+                            requestId: requestId,
+                            rating: rating,
+                            body: controller.text);
+                        if (ok && sheetContext.mounted) {
+                          Navigator.of(sheetContext).pop();
+                        }
+                      },
+                child: const Text('SUBMIT REVIEW'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -98,20 +98,24 @@ class ExpertGateway {
     return rows.map(_summaryFromRow).toList();
   }
 
-  ServiceRequestSummary _summaryFromRow(Map<String, dynamic> r) =>
-      ServiceRequestSummary(
-        request: ServiceRequest.fromJson(r),
-        service: r['service'] == null
-            ? null
-            : ExpertService.fromJson(r['service'] as Map<String, dynamic>),
-        otherParty: r['other'] == null
-            ? null
-            : PublicProfile.fromJson(r['other'] as Map<String, dynamic>),
-        deliverables: ((r['deliverables'] as List?) ?? const [])
-            .map((d) => Deliverable.fromJson(d as Map<String, dynamic>))
-            .toList(),
-        reviewed: ((r['reviews'] as List?) ?? const []).isNotEmpty,
-      );
+  ServiceRequestSummary _summaryFromRow(Map<String, dynamic> r) {
+    // expert_reviews.service_request_id is UNIQUE, so PostgREST embeds the
+    // review one-to-one: a single object (or null), not a list.
+    final reviews = r['reviews'];
+    return ServiceRequestSummary(
+      request: ServiceRequest.fromJson(r),
+      service: r['service'] == null
+          ? null
+          : ExpertService.fromJson(r['service'] as Map<String, dynamic>),
+      otherParty: r['other'] == null
+          ? null
+          : PublicProfile.fromJson(r['other'] as Map<String, dynamic>),
+      deliverables: ((r['deliverables'] as List?) ?? const [])
+          .map((d) => Deliverable.fromJson(d as Map<String, dynamic>))
+          .toList(),
+      reviewed: reviews is Map || (reviews is List && reviews.isNotEmpty),
+    );
+  }
 
   /// Insert with the price snapshotted from the service (simulated payment).
   Future<void> createRequest({
