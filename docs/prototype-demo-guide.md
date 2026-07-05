@@ -1,6 +1,6 @@
 # Wise Workout — Prototype Demo & Test Guide
 
-How to run, demo, and verify the prototype. Last updated **6 Jul 2026**.
+How to run, demo, and verify the prototype. Last updated **7 Jul 2026**.
 
 The prototype implements the app's demo spine end-to-end:
 
@@ -21,6 +21,7 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **AI summary** | "✨" on History → progress summary written by **OpenAI (gpt-4o-mini)** from your real stats | Premium summaries include goal context; Gemini fallback → deterministic stub if keys/AI fail |
 | **Share** | Summary → "Share to Social" toggle → caption + Facebook/Instagram/Twitter/TikTok | Creates a `workout_share` Post; platform buttons open the OS share |
 | **Social (6 Jul)** | Community feed (friends+self; workout_share/level_up posts, likes, comments, caption edit) → Post Detail; find-friends search + Add Friend/Unfriend + User Profile; Challenges (Joined/Active/Past, join/leave/create, live leaderboards) | Friendship = mutual pair via `add_friend` RPC; leaderboards live-computed by `challenge_leaderboards`; demo seed gives Mia↔Alex + likes/comments + a joined challenge |
+| **Experts (7 Jul)** | Browse experts + service listings (search, category chips, follow-heart) → Expert Detail → Service Detail (Request · \$X modal → pending → deliverables → Leave a review → ✓ Reviewed); Dashboard MY PURCHASES; log in as `expert@` → the Experts tab becomes the request inbox (Accept/Decline · deliverable composer · Mark complete) | Payment simulated (price snapshots, no charge); transitions + reviews via SECURITY DEFINER RPCs; demo: Sam Rivera w/ 3 live services + one engagement in every footer state |
 | **Profile cluster** | Avatar (top-right) → Profile hub: level/XP bar, lifetime stats, Fitness Profile (#13.1), Fitness Goals (#13.2), Account Settings (#13.3), Notifications (#13.4), Submit Feedback (#13.5), log out | All live writes: fitness_profiles, fitness_goals (active-goal upsert), notification_prefs jsonb, feedback |
 | **Forgot password** | Login → "Forgot password?" → reset-link email | Always shows "sent" (anti-enumeration); Change Password in Settings reuses it |
 | **Onboarding + plan** | First login → wizard (about you → how you train → goal) → **real AI weekly plan (OpenAI)** → Train shows it | Both tiers: Free basic, Premium personalised; strict JSON schema + server-side validation; Gemini → rule fallback. Gate: `profiles.onboarding_completed_at` |
@@ -73,8 +74,9 @@ Created/seeded in Supabase Auth (see [§7](#7-reset--reseed-demo-data)). Passwor
 
 | Email | Role | Seeded data |
 |---|---|---|
-| `free@wiseworkout.test` | Free (Mia Patel) | 8 sessions, 719 XP, 4-week streak, 1 shared post |
-| `premium@wiseworkout.test` | Premium (Alex Tan) | 7 sessions, 777 XP, 4-week streak, 1 shared post |
+| `free@wiseworkout.test` | Free (Mia Patel) | 8 sessions, shared post, friends w/ Alex, joined challenge, 3 service requests (pending/completed/reviewed states) |
+| `premium@wiseworkout.test` | Premium (Alex Tan) | 7 sessions, shared post, friends w/ Mia, joined challenge, 1 reviewed engagement |
+| `expert@wiseworkout.test` | Expert (Sam Rivera) | Verified Strength Coach · 3 live services · request inbox with every lifecycle state |
 
 ---
 
@@ -88,7 +90,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
    - **See:** brief **WISE / WORKOUT** splash (lime accent), then the **Login** screen.
 2. Enter `free@wiseworkout.test` / `Password123!` → **LOG IN**.
    - **See:** the **Home** dashboard — *"Hi, Mia 👋 · Free member"* — with the 5-tab bottom nav
-     (Home / Experts / Train / Social / History). Experts is a styled "later sprint" placeholder; **Social is live** (feed · friends · challenges, 6 Jul).
+     (Home / Experts / Train / Social / History). **All five tabs are live** — Experts (marketplace, 7 Jul) · Social (feed · friends · challenges, 6 Jul).
 3. **Negative check:** sign out (logout icon, top-right of Home), enter a wrong password → LOG IN.
    - **See:** red **"Incorrect email or password."** and no navigation.
 
@@ -218,7 +220,7 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 
 ```bash
 flutter analyze     # static analysis — should report "No issues found!"
-flutter test        # 146 tests — should end "All tests passed!"
+flutter test        # 168 tests — should end "All tests passed!"
 ```
 
 Coverage (positive **and** negative cases per flow): entity rules (`Profile`, `WorkoutType` incl. MET
@@ -275,7 +277,7 @@ catalogs: workout types, health tags, expert categories.)
   true per-app deep-linking is a later sprint.
 - **Real GPS needs a physical device** — emulators/simulators show 0 distance unless you mock location.
 - **Payment is simulated** (price fields only — premium = $9.99/mo, no gateway).
-- **Placeholders** (show "later sprint"): the Experts tab, History search,
+- **Placeholders** (show "later sprint"): History search,
   Advanced analytics, Upgrade flow, photo upload, per-field name/username/email edits.
   The Dashboard is a minimal greeting. These are scoped out, not broken.
 
@@ -293,10 +295,13 @@ lib/
                    DeleteWorkoutSession, history, SummariseProgress, CreateWorkoutSharePost,
                    ShareWorkoutToSocial, GeneratePlan + CompleteOnboarding (+ buildPlanSkeleton),
                    social_feed (feed/likes/comments), manage_friends, challenges,
+                   browse_experts, service_requests, expert_requests,
                    ManageConnectedDevice, ViewProfile, UpdateFitnessProfile, SetFitnessGoal,
                    UpdateAccountSettings, ManageNotificationPrefs, SubmitFeedback
   boundaries/
-    ui/            splash · auth (login, forgot pwd) · onboarding (wizard) · home · experts ·
+    ui/            splash · auth (login, forgot pwd) · onboarding (wizard) · home (+ my
+                   purchases) · experts (directory, expert/service detail, request inbox,
+                   deliverable composer) ·
                    train (+ plan detail, connected devices) · social (feed, post detail,
                    user profile, challenges, create-challenge) · history · workout ·
                    profile (hub + 5 sub-screens) · common (shared widget library:
@@ -310,7 +315,7 @@ supabase/
                    onboarding_completed_at · private custom catalog entries
   functions/       summarise-progress · suggest-plan  (AI Edge Functions, gpt-4o-mini)
   seed.sql         install catalogs       seed-demo.sql  demo accounts + data
-test/              entity · core · control suites (146 tests)
+test/              entity · core · control suites (168 tests)
 ```
 
 Design references: [STATUS.md](STATUS.md) (progress), [architecture/build-plan.md](architecture/build-plan.md),

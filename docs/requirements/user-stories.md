@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **6 Jul 2026** (after the Social cluster: US22–US25 ✅). Tally: 17 ✅ · 9 🟨 · 38 ⬜.
+Last updated **7 Jul 2026** (after the Experts cluster: US27–US29 ✅, US49–US51 🟨). Tally: 20 ✅ · 12 🟨 · 32 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -47,9 +47,9 @@ Last updated **6 Jul 2026** (after the Social cluster: US22–US25 ✅). Tally: 
 | US24 | ✅ | As a registered free user, I want to follow other users so that I can keep up with their shared fitness progress. | Mutual friends model (6 Jul): search, Add Friend/Unfriend (atomic pair via add_friend RPC), User Profile #11.2 |
 | US25 | ✅ | As a registered free user, I want to join simple fitness challenges and earn badges so that I can stay motivated. | Challenges live (6 Jul): join/leave/create, live-computed leaderboards (challenge_leaderboards RPC); "badges" = XP/levels per design (SRS lag noted) |
 | US26 | ✅ | As a registered free user, I want to share selected achievements or challenge results so that I can show my progress while controlling what information is shared. | Named FB/IG/Twitter/TikTok buttons + workout_share post ✅; buttons open the OS share sheet (deep links = later sprint) |
-| US27 | ⬜ | As a registered free user, I want to browse expert profiles and service listings so that I can find professional support when needed. | Experts marketplace — placeholder tab |
-| US28 | ⬜ | As a registered free user, I want to browse expert categories so that I can identify what type of expert support may suit my fitness goals. | Experts marketplace — placeholder tab |
-| US29 | ⬜ | As a registered free user, I want to request expert services as a paid add-on so that I can receive professional support when needed. | Experts marketplace — placeholder tab |
+| US27 | ✅ | As a registered free user, I want to browse expert profiles and service listings so that I can find professional support when needed. | #6 live (7 Jul): Experts/Service Listings sub-tabs, search, follow-heart; #6.1 Expert Detail |
+| US28 | ✅ | As a registered free user, I want to browse expert categories so that I can identify what type of expert support may suit my fitness goals. | Category chips from the active expert_categories catalog filter both sub-tabs (7 Jul) |
+| US29 | ✅ | As a registered free user, I want to request expert services as a paid add-on so that I can receive professional support when needed. | #6.2 request modal (simulated payment, price snapshot) → pending → deliverables → review; MY PURCHASES on #5 (7 Jul) |
 | US30 | ⬜ | As a registered free user, I want to browse and purchase expert-created content so that I can access professional fitness guidance when needed. | Experts marketplace — placeholder tab |
 | US31 | ⬜ | As a registered free user, I want to view upgrade options so that I can decide whether to subscribe to premium features. | Go Premium pill is a placeholder; Upgrade #16 pending |
 
@@ -79,9 +79,9 @@ Last updated **6 Jul 2026** (after the Social cluster: US22–US25 ✅). Tally: 
 | US46 | ⬜ | As an expert user, I want to manage my professional information and expertise categories so that my profile accurately represents my services. | Expert portal pending |
 | US47 | ⬜ | As an expert user, I want to create and manage service listings so that users can request the services I offer. | Expert portal pending |
 | US48 | ⬜ | As an expert user, I want to upload or manage expert-related content so that I can provide useful fitness or wellness information to users. | Expert portal pending |
-| US49 | ⬜ | As an expert user, I want to view user service requests so that I can understand what support users are asking for. | Expert portal pending |
-| US50 | ⬜ | As an expert user, I want to accept or reject service requests so that I can manage the services I provide through the platform. | Expert portal pending |
-| US51 | ⬜ | As an expert user, I want to respond with expert advice so that I can provide coaching advice, workout plans, nutrition support, or recovery guidance to users. | Expert portal pending |
+| US49 | 🟨 | As an expert user, I want to view user service requests so that I can understand what support users are asking for. | Minimal expert view live (7 Jul): the Experts tab role-swaps to the request inbox; full portal (#20–24) deferred |
+| US50 | 🟨 | As an expert user, I want to accept or reject service requests so that I can manage the services I provide through the platform. | Accept/Decline live via RPC-guarded transitions (7 Jul); portal-grade management deferred |
+| US51 | 🟨 | As an expert user, I want to respond with expert advice so that I can provide coaching advice, workout plans, nutrition support, or recovery guidance to users. | Deliverable composer (title/note/section) + Mark complete live (7 Jul); rich segment editor deferred |
 | US52 | ⬜ | As an expert user, I want my profile to be verified by an admin so that users can trust the professional services offered on the platform. | Expert portal pending |
 
 ## System Admin (US53–US64)

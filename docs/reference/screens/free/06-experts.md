@@ -2,7 +2,7 @@
 screen: 06-experts
 role: free
 group: main
-status: spec-only
+status: built
 ---
 
 # 6. Experts (tab)
