@@ -13,6 +13,7 @@ import 'package:wise_workout/boundaries/gateways/social_share_gateway.dart';
 import 'package:wise_workout/boundaries/gateways/workout_data_source.dart';
 import 'package:wise_workout/boundaries/gateways/workout_gateway.dart';
 import 'package:wise_workout/entities/connected_device.dart';
+import 'package:wise_workout/entities/challenge.dart';
 import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/feed_post.dart';
 import 'package:wise_workout/entities/post_comment.dart';
@@ -343,6 +344,70 @@ class FakeSocialGateway implements SocialGateway {
   Future<List<FeedPost>> listUserPosts(String userId,
           {required String me, int limit = 20}) async =>
       feed.where((f) => f.post.userId == userId).toList();
+
+  /// Canned challenges: (challenge, participant ids).
+  var challenges = <(Challenge, List<String>)>[];
+  var leaderboardRows = <LeaderboardRow>[];
+  final joinCalls = <(String, String)>[];
+  final leaveCalls = <(String, String)>[];
+  final createdChallenges = <Map<String, dynamic>>[];
+
+  @override
+  Future<List<(Challenge, List<String>)>> listChallenges() async => challenges;
+
+  @override
+  Future<List<LeaderboardRow>> leaderboards(List<String> challengeIds) async =>
+      leaderboardRows
+          .where((r) => challengeIds.contains(r.challengeId))
+          .toList();
+
+  @override
+  Future<List<PublicProfile>> profilesByIds(List<String> ids) async =>
+      profiles.where((p) => ids.contains(p.id)).toList();
+
+  @override
+  Future<void> joinChallenge(String challengeId, String userId) async {
+    joinCalls.add((challengeId, userId));
+    challenges = [
+      for (final (c, ps) in challenges)
+        c.id == challengeId ? (c, [...ps, userId]) : (c, ps),
+    ];
+  }
+
+  @override
+  Future<void> leaveChallenge(String challengeId, String userId) async {
+    leaveCalls.add((challengeId, userId));
+    challenges = [
+      for (final (c, ps) in challenges)
+        c.id == challengeId
+            ? (c, ps.where((p) => p != userId).toList())
+            : (c, ps),
+    ];
+  }
+
+  @override
+  Future<Challenge> createChallenge({
+    required String userId,
+    required Map<String, dynamic> fields,
+  }) async {
+    createdChallenges.add(fields);
+    final challenge = Challenge(
+      id: 'ch-${createdChallenges.length}',
+      createdByUserId: userId,
+      name: fields['name'] as String,
+      shortName: fields['short_name'] as String,
+      icon: fields['icon'] as String? ?? '⚡',
+      metricKind: fields['metric_kind'] == 'best_of'
+          ? ChallengeMetricKind.bestOf
+          : ChallengeMetricKind.accumulator,
+      metric: ChallengeMetric.totalSessions,
+      targetValue: fields['target_value'] as int?,
+      startedAt: DateTime.utc(2026, 7, 1),
+      endedAt: DateTime.utc(2026, 7, 31),
+    );
+    challenges = [...challenges, (challenge, [userId])];
+    return challenge;
+  }
 
   @override
   Future<String> createWorkoutSharePost({

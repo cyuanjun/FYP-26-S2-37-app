@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
-import '../common/app_card.dart';
 import '../common/avatar_button.dart';
+import 'challenges_tab_body.dart';
 import 'community_feed.dart';
 
 /// BOUNDARY (#11 Social). Segmented Community / Challenges tab. Community is
@@ -44,7 +44,7 @@ class _SocialTabState extends State<SocialTab> {
           Expanded(
             child: switch (_tab) {
               _SocialSubTab.community => const CommunityFeed(),
-              _SocialSubTab.challenges => const _ChallengesPlaceholder(),
+              _SocialSubTab.challenges => const ChallengesTabBody(),
             },
           ),
         ],
@@ -66,31 +66,6 @@ class _SocialTabState extends State<SocialTab> {
         child: Text(label,
             style: AppTypography.footnote
                 .copyWith(color: selected ? AppColors.bg : AppColors.muted)),
-      ),
-    );
-  }
-}
-
-class _ChallengesPlaceholder extends StatelessWidget {
-  const _ChallengesPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: AppCard(
-        width: double.infinity,
-        borderColor: AppColors.faint,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Challenges', style: AppTypography.title3),
-            const SizedBox(height: 6),
-            Text('Join community fitness challenges and climb the leaderboard — '
-                'landing in the next phase of this sprint.',
-                style: AppTypography.subheadline),
-          ],
-        ),
       ),
     );
   }

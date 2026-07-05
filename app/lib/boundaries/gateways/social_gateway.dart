@@ -2,9 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/strings.dart';
+import '../../entities/challenge.dart';
 import '../../entities/feed_post.dart';
 import '../../entities/post_comment.dart';
 import '../../entities/public_profile.dart';
+
+/// One `challenge_leaderboards` RPC row.
+typedef LeaderboardRow = ({String challengeId, String userId, num value, int rank});
 
 /// BOUNDARY (gateway) — posts, likes, and comments (#11 Social). Sharing a
 /// workout means a `workout_share` Post exists for the session; the feed is
@@ -186,6 +190,76 @@ class SocialGateway {
         .order('created_at', ascending: false)
         .limit(limit);
     return rows.map((r) => FeedPost.fromRow(r, me: me)).toList();
+  }
+
+  // ---- Challenges (#11/#11.3, US25). Progress is live-computed by the
+  // challenge_leaderboards SQL function — nothing stored. ----
+
+  /// All challenges with their participant ids (count + joined-state in one
+  /// call via the embedded rows).
+  Future<List<(Challenge, List<String>)>> listChallenges() async {
+    final rows = await _client
+        .from('challenges')
+        .select('*, participants:challenge_participants(user_id)')
+        .order('ended_at', ascending: false);
+    return rows.map((r) {
+      final participants = (r['participants'] as List? ?? const [])
+          .map((p) => (p as Map<String, dynamic>)['user_id'] as String)
+          .toList();
+      return (Challenge.fromJson(r), participants);
+    }).toList();
+  }
+
+  /// Batched leaderboards — one RPC for every visible challenge card.
+  Future<List<LeaderboardRow>> leaderboards(List<String> challengeIds) async {
+    if (challengeIds.isEmpty) return const [];
+    final rows = await _client.rpc('challenge_leaderboards',
+        params: {'p_challenge_ids': challengeIds}) as List;
+    return rows
+        .map((r) => (
+              challengeId: (r as Map<String, dynamic>)['challenge_id'] as String,
+              userId: r['user_id'] as String,
+              value: r['value'] as num,
+              rank: (r['rank'] as num).toInt(),
+            ))
+        .toList();
+  }
+
+  Future<List<PublicProfile>> profilesByIds(List<String> ids) async {
+    if (ids.isEmpty) return const [];
+    final rows = await _client
+        .from('public_profiles')
+        .select('id, first_name, last_name, username, avatar_url, level')
+        .inFilter('id', ids);
+    return rows.map(PublicProfile.fromJson).toList();
+  }
+
+  /// Idempotent join (composite key upsert).
+  Future<void> joinChallenge(String challengeId, String userId) =>
+      _client.from('challenge_participants').upsert(
+        {'challenge_id': challengeId, 'user_id': userId},
+        onConflict: 'challenge_id,user_id',
+        ignoreDuplicates: true,
+      );
+
+  Future<void> leaveChallenge(String challengeId, String userId) => _client
+      .from('challenge_participants')
+      .delete()
+      .match({'challenge_id': challengeId, 'user_id': userId});
+
+  /// Insert + creator auto-join (spec-mandated, 11-social.md).
+  Future<Challenge> createChallenge({
+    required String userId,
+    required Map<String, dynamic> fields,
+  }) async {
+    final row = await _client
+        .from('challenges')
+        .insert({'created_by_user_id': userId, ...fields})
+        .select()
+        .single();
+    final challenge = Challenge.fromJson(row);
+    await joinChallenge(challenge.id, userId);
+    return challenge;
   }
 
   Future<String> createWorkoutSharePost({

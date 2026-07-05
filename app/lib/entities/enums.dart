@@ -105,3 +105,33 @@ extension SocialPlatformLabel on SocialPlatform {
 /// Post feed kinds (#11 Social) — mirrors the `post_kind` Postgres enum.
 @JsonEnum(fieldRename: FieldRename.snake)
 enum PostKind { workoutShare, challengeResult, levelUp }
+
+/// Challenge axes (#11 Challenges) — mirror the Postgres enums.
+@JsonEnum(fieldRename: FieldRename.snake)
+enum ChallengeVisibility { public, inviteOnly }
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum ChallengeMetricKind { accumulator, bestOf }
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum ChallengeMetric {
+  totalDistance,
+  totalSessions,
+  totalCalories,
+  activeDays,
+  fastestTime,
+  longestDistance,
+  mostCalories,
+}
+
+extension ChallengeMetricLabel on ChallengeMetric {
+  String get label => switch (this) {
+        ChallengeMetric.totalDistance => 'Total distance',
+        ChallengeMetric.totalSessions => 'Total sessions',
+        ChallengeMetric.totalCalories => 'Total calories',
+        ChallengeMetric.activeDays => 'Active days',
+        ChallengeMetric.fastestTime => 'Fastest time',
+        ChallengeMetric.longestDistance => 'Longest distance',
+        ChallengeMetric.mostCalories => 'Most calories',
+      };
+}
