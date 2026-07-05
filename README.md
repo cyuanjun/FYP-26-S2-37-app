@@ -8,7 +8,7 @@ analytics, social sharing, an expert marketplace, and Free/Premium/Expert/Admin 
 architecture · **Supabase** (Postgres + Auth + RLS + Edge Functions) · **OpenAI** `gpt-4o-mini`
 (Gemini → rule-based fallback) for the two AI surfaces (progress summaries, plan generation).
 
-## Current state (12 Jun 2026)
+## Current state (6 Jul 2026)
 
 Built, tested (112 tests), and verified on the Android emulator + iOS simulator against a live
 backend: login → first-run onboarding wizard → AI-generated 4-week training plan → Plan Detail →
@@ -44,7 +44,8 @@ app/                         everything needed to run the product
   lib/
     entities/                ENTITY   — freezed domain models (TDM §8 ERD) + data-owned rules
     controls/                CONTROL  — one Riverpod control per use case
-    boundaries/ui/           BOUNDARY — screens (actor-facing)
+    boundaries/ui/           BOUNDARY — screens (actor-facing); ui/common/ = shared widget
+                             library (StatTile · AppCard · StatusBadge · PremiumCta)
     boundaries/gateways/     BOUNDARY — Supabase / sensor / AI / share adapters (system-facing)
   test/                      112 unit/control tests
   supabase/                  backend: migrations · Edge Functions · seeds   (see app/supabase/README.md)

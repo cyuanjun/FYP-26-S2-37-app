@@ -37,6 +37,9 @@ abstract class Profile with _$Profile {
 
   bool get isPremium => role == UserRole.premium;
 
+  /// Free tier — history month-cap and basic-depth AI apply.
+  bool get isFree => role == UserRole.free;
+
   /// First-time users complete the post-login onboarding wizard (#3) before
   /// reaching the main shell.
   bool get needsOnboarding => onboardingCompletedAt == null;

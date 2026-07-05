@@ -10,6 +10,10 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/workout_session.dart';
 import '../../../entities/workout_type.dart';
 import '../../gateways/workout_gateway.dart';
+import '../common/app_card.dart';
+import '../common/premium_cta.dart';
+import '../common/stat_tile.dart';
+import '../common/status_badge.dart';
 import '../workout/history_detail_screen.dart';
 
 enum _Period { day, week, month }
@@ -179,14 +183,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             const Text('🔒 ', style: TextStyle(fontSize: 14)),
             Text('Search history', style: AppTypography.subheadline),
             const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.premium,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text('PREMIUM', style: AppTypography.caption2.copyWith(color: AppColors.ink)),
-            ),
+            const StatusBadge('PREMIUM', bg: AppColors.premium, fg: AppColors.ink),
           ],
         ),
       ),
@@ -203,12 +200,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
     const vs = {_Period.day: 'VS YESTERDAY', _Period.week: 'VS LAST WEEK', _Period.month: 'VS LAST MONTH'};
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: AppColors.cardShadow),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -246,60 +238,23 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           ],
           const SizedBox(height: 12),
           Row(children: [
-            _statTile('SESSIONS', '${cur.sessions}', hasPrior ? cur.sessions - prior.sessions : null),
-            _statTile('ACTIVE MIN', '${cur.activeMin}', hasPrior ? cur.activeMin - prior.activeMin : null),
-            _statTile('CALORIES', '${cur.calories}', hasPrior ? cur.calories - prior.calories : null),
+            StatTile('SESSIONS', '${cur.sessions}', delta: hasPrior ? cur.sessions - prior.sessions : null),
+            StatTile('ACTIVE MIN', '${cur.activeMin}', delta: hasPrior ? cur.activeMin - prior.activeMin : null),
+            StatTile('CALORIES', '${cur.calories}', delta: hasPrior ? cur.calories - prior.calories : null),
           ]),
           const SizedBox(height: 10),
           Row(children: [
-            _statTile('AVG HR', cur.avgHr?.toString() ?? '—', null),
-            _statTile('MAX HR', cur.maxHr?.toString() ?? '—', null),
+            StatTile('AVG HR', cur.avgHr?.toString() ?? '—'),
+            StatTile('MAX HR', cur.maxHr?.toString() ?? '—'),
             const Spacer(),
           ]),
           if (!isPremium) ...[
             const SizedBox(height: 16),
-            GestureDetector(
-              onTap: () => _soon('Advanced analytics'),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.premium,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text('⚡ Unlock with Premium →',
-                    style: AppTypography.footnote
-                        .copyWith(color: AppColors.ink, fontWeight: FontWeight.w700)),
-              ),
-            ),
+            PremiumCta('⚡ Unlock with Premium →',
+                onTap: () => _soon('Advanced analytics'),
+                fullWidth: true,
+                padding: const EdgeInsets.symmetric(vertical: 10)),
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _statTile(String label, String value, int? delta) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(label, style: AppTypography.caption2),
-          const SizedBox(height: 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(value, style: AppTypography.title3.copyWith(color: AppColors.metricColor(label))),
-              if (delta != null && delta != 0) ...[
-                const SizedBox(width: 4),
-                Text('${delta > 0 ? '↑' : '↓'}${delta.abs()}',
-                    style: AppTypography.caption2.copyWith(
-                        color: delta > 0 ? AppColors.success : AppColors.danger)),
-              ],
-            ],
-          ),
         ],
       ),
     );
@@ -485,15 +440,15 @@ class _WorkoutListCard extends StatelessWidget {
               Row(
                 children: cardio
                     ? [
-                        _cell(fmtKm((session.distanceMeters ?? 0).toDouble()), 'KM'),
-                        _cell(fmtPace((session.distanceMeters ?? 0).toDouble(),
-                            Duration(seconds: session.durationSeconds)), '/KM'),
-                        _cell(session.avgHeartRate?.toString() ?? '—', 'AVG HR'),
+                        _cell('KM', fmtKm((session.distanceMeters ?? 0).toDouble())),
+                        _cell('/KM', fmtPace((session.distanceMeters ?? 0).toDouble(),
+                            Duration(seconds: session.durationSeconds))),
+                        _cell('AVG HR', session.avgHeartRate?.toString() ?? '—'),
                       ]
                     : [
-                        _cell(session.caloriesBurned?.toString() ?? '—', 'KCAL'),
-                        _cell(session.avgHeartRate?.toString() ?? '—', 'AVG HR'),
-                        _cell(session.maxHeartRate?.toString() ?? '—', 'MAX HR'),
+                        _cell('KCAL', session.caloriesBurned?.toString() ?? '—'),
+                        _cell('AVG HR', session.avgHeartRate?.toString() ?? '—'),
+                        _cell('MAX HR', session.maxHeartRate?.toString() ?? '—'),
                       ],
               ),
             ],
@@ -504,13 +459,6 @@ class _WorkoutListCard extends StatelessWidget {
     );
   }
 
-  Widget _cell(String value, String label) => Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(value, style: AppTypography.headline.copyWith(color: AppColors.metricColor(label))),
-            Text(label, style: AppTypography.caption2),
-          ],
-        ),
-      );
+  Widget _cell(String label, String value) => StatTile(label, value,
+      valueFirst: true, valueStyle: AppTypography.headline, gap: 0);
 }

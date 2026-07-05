@@ -10,6 +10,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/fitness_profile.dart';
 import '../../gateways/workout_gateway.dart';
+import '../common/app_card.dart';
 import 'profile_widgets.dart';
 
 /// BOUNDARY (#13.1 Fitness Profile). Physical baseline + training context.
@@ -98,7 +99,7 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
                 label: 'Date of Birth',
                 value: _dob == null
                     ? 'Not set'
-                    : '${_dob!.day} ${monthName(_dob!.month)} ${_dob!.year} · ${_age()} yrs',
+                    : '${_dob!.day} ${monthName(_dob!.month)} ${_dob!.year} · ${FitnessProfile.ageFrom(_dob!, DateTime.now())} yrs',
                 onTap: _pickDob,
               ),
               const Divider(color: AppColors.faint, height: 1),
@@ -138,12 +139,7 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
               InkWell(
                 onTap: _pickActivity,
                 borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: AppColors.cardShadow),
+                child: AppCard(
                   child: Row(
                     children: [
                       Expanded(
@@ -330,13 +326,6 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     );
   }
 
-  int _age() {
-    final now = DateTime.now();
-    final dob = _dob!;
-    var age = now.year - dob.year;
-    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) age--;
-    return age;
-  }
 
   Future<void> _pickDob() async {
     final picked = await showDatePicker(

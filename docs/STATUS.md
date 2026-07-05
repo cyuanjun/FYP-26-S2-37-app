@@ -1,11 +1,17 @@
 # STATUS — where we are, what's next
 
-**Read this first when resuming.** Single source for current progress. Last updated **13 Jun 2026**.
+**Read this first when resuming.** Single source for current progress. Last updated **6 Jul 2026**.
 
 > 🏃 **Want to run/demo the prototype?** See **[prototype-demo-guide.md](prototype-demo-guide.md)** — how to run, a step-by-step manual-test walkthrough (what to do + what you should see), test accounts, and how to verify the backend.
 
 ## One-line state
 **App well past the vertical slice; AI is live; PTD + PUM assembled.** Backend on Supabase: 26 tables + RLS + `end_workout_session` RPC + **two Edge Functions (`summarise-progress`, `suggest-plan`) running OpenAI gpt-4o-mini** (Gemini → rule fallback). Flutter app (BCE, **112 tests**, Android + iOS verified): vertical slice ▸ 5-tab nav ▸ Profile cluster ▸ first-login onboarding wizard ▸ AI plan generation both tiers (full goal timelines, preference contract) ▸ My Plans + Plan Detail #8 ▸ connected devices #7.1 (mock BLE pairing + simulated wearable HR into sessions) ▸ Free month-cap enforced ▸ MET calories (sex-based weight default) ▸ custom workout types/health tags (creator-private RLS) ▸ **white-base semantic colour theme** (clickable/metric/status/premium colour roles, [reference/palette.md](reference/palette.md)). Trackers: [requirements/user-stories.md](requirements/user-stories.md) (13 ✅ · 10 🟨 · 41 ⬜) · [testing/bug-log.md](testing/bug-log.md). Next: Social cluster (next core build). (Details below.)
+
+## 6 Jul — simplify pass applied (whole [simplify.md](simplify.md) list)
+- **All H1–H8 / M1–M5 / L1–L5 items applied**, one at a time, each verified (analyze + 112 tests + simulator relaunch). Net ≈ **−250 lines** in `lib/` with zero visual/behaviour change.
+- **Shared widget library born:** `boundaries/ui/common/` = `StatTile` · `AppCard` · `StatusBadge` · `PremiumCta` (+ existing `AvatarButton`); plus `core/theme/app_buttons.dart` (outlined accent/danger styles), `core/strings.dart` (`isBlank`), `fmtCompactNum` in `core/format.dart`.
+- **Logic DRY:** `PlanGateway._deactivatePriorPlan`, `FitnessGoal.hasTargetFor`, `Profile.isFree`, `FitnessProfile.ageFrom` (screen's duplicate `_age()` deleted); `intl` dependency removed; dead `providesHeartRate` getter removed.
+- **Analysis corrected where wrong:** H5/H6/H7 partly, L3/L4 fully were false positives — logged in simplify.md Corrections so the presentation cites accurate numbers.
 
 ## 5 Jul — repo restructured: app/ vs docs/
 - **Two-folder split for the presentation:** everything needed to run the product now lives in **`app/`** (the whole Flutter project + `app/supabase/` backend); everything else stays in **`docs/`** (planning/design docs; `scripts/` moved to `docs/scripts/`). Moves done with `git mv` — history preserved. **Run all Flutter commands from `app/`.**

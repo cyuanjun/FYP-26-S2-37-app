@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../common/status_badge.dart';
 
 /// Shared building blocks for the Profile cluster (#13.x): iOS grouped-settings
 /// rows, section labels, chips, and the searchable multi-select picker sheet.
@@ -318,14 +319,10 @@ class _TagPickerSheetState extends State<_TagPickerSheet> {
                           Flexible(child: Text(o.label, style: AppTypography.body)),
                           if (o.isCustom) ...[
                             const SizedBox(width: 8),
-                            Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: AppColors.faint),
-                                  borderRadius: BorderRadius.circular(6)),
-                              child: Text('CUSTOM', style: AppTypography.caption2),
-                            ),
+                            const StatusBadge('CUSTOM',
+                                borderColor: AppColors.faint,
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 6, vertical: 2)),
                           ],
                         ],
                       ),

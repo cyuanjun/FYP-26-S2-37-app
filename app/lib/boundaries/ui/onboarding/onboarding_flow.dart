@@ -14,7 +14,9 @@ import '../../../entities/enums.dart';
 import '../../../entities/fitness_goal.dart';
 import '../../../entities/fitness_plan.dart';
 import '../../gateways/workout_gateway.dart';
+import '../common/app_card.dart';
 import '../profile/profile_widgets.dart';
+import '../../../core/strings.dart';
 
 /// BOUNDARY (#3 Onboarding, post-login). First-time wizard: profile basics →
 /// training context → goal → AI/rule plan generation. The plan needs the
@@ -77,7 +79,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       _sex != null &&
       _heightCm != null &&
       _weightKg != null &&
-      (!_needsName || _firstName.text.trim().isNotEmpty);
+      (!_needsName || _firstName.text.isNotBlank);
   bool get _step2Valid => _activity != null && _experience != null;
 
   Future<void> _generate() async {
@@ -149,10 +151,10 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         ],
       ),
     );
-    if (name == null || name.trim().isEmpty) return;
+    if (name.isBlank) return;
     final type = await ref
         .read(updateFitnessProfileProvider.notifier)
-        .addCustomWorkoutType(userId: userId, name: name);
+        .addCustomWorkoutType(userId: userId, name: name!);
     if (type != null && mounted) {
       setState(() => _workoutTypeIds.add(type.id)); // appears selected in the chips
     }
@@ -423,16 +425,11 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               _target = FitnessGoal.defaultTargetFor(g, currentWeightKg: _weightKg);
             }),
             borderRadius: BorderRadius.circular(14),
-            child: Container(
+            child: AppCard(
               padding: const EdgeInsets.all(14),
               margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: AppColors.cardShadow,
-                border: Border.all(
-                    color: _goal == g ? AppColors.accent : AppColors.faint),
-              ),
+              radius: 14,
+              borderColor: _goal == g ? AppColors.accent : AppColors.faint,
               child: Row(
                 children: [
                   Expanded(
@@ -521,12 +518,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                 textAlign: TextAlign.center,
                 style: AppTypography.title2.copyWith(fontWeight: FontWeight.w900)),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: AppColors.cardShadow),
+            AppCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -619,8 +611,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     required VoidCallback onMinus,
     required VoidCallback onPlus,
   }) {
-    final display =
-        value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(1);
+    final display = fmtCompactNum(value);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration:

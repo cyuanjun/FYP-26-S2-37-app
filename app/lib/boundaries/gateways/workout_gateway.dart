@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../entities/enums.dart';
 import '../../entities/workout_session.dart';
 import '../../entities/workout_type.dart';
+import '../../core/strings.dart';
 
 /// BOUNDARY (gateway) — `workout_types` + `workout_sessions` CRUD and the
 /// `end_workout_session` RPC. Controls call this; the UI never queries Supabase.
@@ -105,9 +106,9 @@ class WorkoutGateway {
     String? notes,
   }) async {
     final patch = <String, dynamic>{};
-    if (customName != null && customName.trim().isNotEmpty) patch['custom_name'] = customName.trim();
+    if (customName.isNotBlank) patch['custom_name'] = customName!.trim();
     if (feelRating != null) patch['feel_rating'] = feelRating.name;
-    if (notes != null && notes.trim().isNotEmpty) patch['notes'] = notes.trim();
+    if (notes.isNotBlank) patch['notes'] = notes!.trim();
     if (patch.isEmpty) return;
     await _client.from('workout_sessions').update(patch).eq('id', sessionId);
   }

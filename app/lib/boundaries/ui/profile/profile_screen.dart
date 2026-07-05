@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/authenticate.dart';
 import '../../../controls/view_profile.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/fitness_profile.dart';
+import '../common/stat_tile.dart';
+import '../common/premium_cta.dart';
 import 'account_settings_screen.dart';
 import 'fitness_goals_screen.dart';
 import 'fitness_profile_screen.dart';
@@ -45,25 +48,13 @@ class ProfileScreen extends ConsumerWidget {
           if (!(profile?.isPremium ?? false))
             Padding(
               padding: const EdgeInsets.only(right: 16),
-              child: GestureDetector(
-                onTap: () => _soon(context, 'Upgrade'),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.premium,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.star, size: 12, color: AppColors.ink),
-                      const SizedBox(width: 4),
-                      Text('GO PREMIUM',
-                          style: AppTypography.caption2.copyWith(
-                              color: AppColors.ink, fontWeight: FontWeight.w900)),
-                    ],
-                  ),
-                ),
-              ),
+              child: PremiumCta('GO PREMIUM',
+                  onTap: () => _soon(context, 'Upgrade'),
+                  icon: Icons.star,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  style: AppTypography.caption2.copyWith(
+                      color: AppColors.ink, fontWeight: FontWeight.w900)),
             ),
         ],
       ),
@@ -168,12 +159,7 @@ class ProfileScreen extends ConsumerWidget {
               await ref.read(authenticateProvider.notifier).signOut();
               if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
             },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.danger,
-              side: const BorderSide(color: AppColors.danger),
-              minimumSize: const Size.fromHeight(52),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ),
+            style: AppButtonStyles.outlinedDanger(height: 52, radius: 16),
             child: const Text('LOG OUT',
                 style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2)),
           ),
@@ -182,17 +168,10 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _stat(String value, String label) => Expanded(
-        child: Column(
-          children: [
-            Text(value,
-                style: AppTypography.title1.copyWith(
-                    fontWeight: FontWeight.w900, color: AppColors.metricColor(label))),
-            const SizedBox(height: 2),
-            Text(label, style: AppTypography.caption2.copyWith(letterSpacing: 1.2)),
-          ],
-        ),
-      );
+  Widget _stat(String value, String label) => StatTile(label, value,
+      valueFirst: true,
+      valueStyle: AppTypography.title1.copyWith(fontWeight: FontWeight.w900),
+      labelStyle: AppTypography.caption2.copyWith(letterSpacing: 1.2));
 
   Widget _divider() => Container(width: 1, height: 40, color: AppColors.faint);
 }

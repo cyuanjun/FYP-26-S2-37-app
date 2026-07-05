@@ -8,6 +8,10 @@ String fmtDuration(Duration d) {
 
 String fmtKm(double meters) => (meters / 1000).toStringAsFixed(2);
 
+/// Whole numbers without a decimal point, otherwise one decimal ("5", "62.5").
+String fmtCompactNum(double v) =>
+    v == v.roundToDouble() ? v.toInt().toString() : v.toStringAsFixed(1);
+
 /// Average pace as mm:ss per km over the elapsed time.
 String fmtPace(double meters, Duration elapsed) {
   if (meters < 5 || elapsed.inSeconds == 0) return '--:--';

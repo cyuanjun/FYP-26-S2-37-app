@@ -291,10 +291,11 @@ lib/
   boundaries/
     ui/            splash · auth (login, forgot pwd) · onboarding (wizard) · home · experts ·
                    train (+ plan detail, connected devices) · social · history · workout ·
-                   profile (hub + 5 sub-screens) · common
+                   profile (hub + 5 sub-screens) · common (shared widget library:
+                   StatTile · AppCard · StatusBadge · PremiumCta · AvatarButton)
     gateways/      auth, profile, fitness, plan, device, feedback, workout, social,
                    social_share, ai, workout_data_source (phone + simulated wearable HR)
-  core/            theme (palette + iOS type scale), format, seq_log, config/env
+  core/            theme (palette + iOS type scale + button styles), format, strings, seq_log, config/env
   router/          go_router (auth redirect)
 supabase/
   migrations/      schema · RLS · end_workout_session RPC · signup-trigger fix ·

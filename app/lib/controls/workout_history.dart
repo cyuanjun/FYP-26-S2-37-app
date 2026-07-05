@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/format.dart';
 import '../core/seq_log.dart';
-import '../entities/enums.dart';
 import '../entities/workout_session.dart';
 import 'authenticate.dart';
 
@@ -16,7 +15,7 @@ final historyProvider = FutureProvider<List<WorkoutSession>>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return const <WorkoutSession>[];
   final profile = await ref.watch(currentProfileProvider.future);
-  final capped = profile?.role == UserRole.free;
+  final capped = profile?.isFree ?? false;
   final from = capped ? startOfMonth(DateTime.now()) : null;
   SeqLog.msg('view-history', 'ViewWorkoutHistory', 'WorkoutGateway',
       'listEndedSessions(from: ${from?.toIso8601String() ?? 'lifetime'})');
@@ -31,7 +30,7 @@ final earlierHistoryHiddenProvider = FutureProvider<bool>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return false;
   final profile = await ref.watch(currentProfileProvider.future);
-  if (profile?.role != UserRole.free) return false;
+  if (!(profile?.isFree ?? false)) return false;
   return ref
       .watch(workoutGatewayProvider)
       .hasEndedSessionsBefore(userId, startOfMonth(DateTime.now()));

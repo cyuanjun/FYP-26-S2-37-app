@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../entities/enums.dart';
 import '../../entities/profile.dart';
+import '../../core/strings.dart';
 
 /// BOUNDARY (gateway) — reads/writes the `profiles` table. Controls call this;
 /// the UI never queries Supabase directly.
@@ -31,7 +32,7 @@ class ProfileGateway {
   Future<void> updateName(String id, {required String firstName, String? lastName}) async {
     await _client.from('profiles').update({
       'first_name': firstName.trim(),
-      if (lastName != null && lastName.trim().isNotEmpty) 'last_name': lastName.trim(),
+      if (lastName.isNotBlank) 'last_name': lastName!.trim(),
     }).eq('id', id);
   }
 

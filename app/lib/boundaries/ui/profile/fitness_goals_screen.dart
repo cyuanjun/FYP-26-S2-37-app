@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/authenticate.dart';
 import '../../../controls/set_fitness_goal.dart';
 import '../../../controls/view_profile.dart';
+import '../../../core/format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/fitness_goal.dart';
+import '../common/app_card.dart';
 import 'profile_widgets.dart';
 
 /// BOUNDARY (#13.2 Fitness Goals). Primary goal cards + target/commitment
@@ -205,16 +207,9 @@ class _GoalCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: AppColors.cardShadow,
-          border: Border.all(
-              color: selected ? AppColors.accent : AppColors.faint,
-              width: selected ? 1.5 : 1),
-        ),
+      child: AppCard(
+        borderColor: selected ? AppColors.accent : AppColors.faint,
+        borderWidth: selected ? 1.5 : 1,
         child: Row(
           children: [
             Expanded(
@@ -260,14 +255,8 @@ class _Stepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final display =
-        value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(1);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: AppColors.cardShadow),
+    final display = fmtCompactNum(value);
+    return AppCard(
       child: Row(
         children: [
           _btn(Icons.remove, onMinus),

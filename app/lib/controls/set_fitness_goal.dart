@@ -27,7 +27,7 @@ class SetFitnessGoal extends AsyncNotifier<void> {
       state = AsyncError(ArgumentError('weeklyCommitmentDays must be 1–7'), StackTrace.current);
       return false;
     }
-    final hasTarget = primaryGoal != PrimaryGoal.maintainFitness;
+    final hasTarget = FitnessGoal.hasTargetFor(primaryGoal);
     final unit = FitnessGoal.unitFor(primaryGoal);
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -46,6 +46,9 @@ class SetFitnessGoal extends AsyncNotifier<void> {
   }
 }
 
+// Explicit enum→column adapters (kept deliberately, simplify M4): the
+// json_serializable enum maps are library-private to the entities' .g.dart
+// files, so a control building a raw values map spells the mapping out.
 extension PrimaryGoalDb on PrimaryGoal {
   String get toDb => switch (this) {
         PrimaryGoal.loseWeight => 'lose_weight',

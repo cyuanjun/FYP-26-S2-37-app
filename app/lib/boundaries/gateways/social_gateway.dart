@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/strings.dart';
 
 /// BOUNDARY (gateway) — the `posts` table. Sharing a workout means a
 /// `workout_share` Post exists for the session (database-v1.md).
@@ -18,7 +19,7 @@ class SocialGateway {
       'kind': 'workout_share',
       'workout_session_id': workoutSessionId,
     };
-    if (body != null && body.trim().isNotEmpty) payload['body'] = body.trim();
+    if (body.isNotBlank) payload['body'] = body!.trim();
     final row = await _client.from('posts').insert(payload).select('id').single();
     return row['id'] as String;
   }

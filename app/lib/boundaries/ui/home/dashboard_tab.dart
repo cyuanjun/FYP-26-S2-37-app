@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/authenticate.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../common/app_card.dart';
 import '../common/avatar_button.dart';
 
 /// BOUNDARY (#5 Dashboard — minimal slice version). Greets the signed-in user
@@ -33,14 +33,9 @@ class DashboardTab extends ConsumerWidget {
               Text(p?.isPremium ?? false ? 'Premium member' : 'Free member',
                   style: AppTypography.subheadline),
               const SizedBox(height: 24),
-              Container(
+              AppCard(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: AppColors.cardShadow,
-                ),
+                radius: 14,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

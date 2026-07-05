@@ -52,6 +52,13 @@ class PlanGateway {
     return rows.map(PlannedWorkout.fromJson).toList();
   }
 
+  /// One active plan per user (unique partial index) — clear the old one.
+  Future<void> _deactivatePriorPlan(String userId) => _client
+      .from('fitness_plans')
+      .update({'is_active': false})
+      .eq('user_id', userId)
+      .eq('is_active', true);
+
   /// Inserts a plan + its weekly template. Deactivates any prior active plan
   /// first (unique partial index allows one active plan per user).
   Future<FitnessPlan> insertPlan({
@@ -60,11 +67,7 @@ class PlanGateway {
     required Map<String, dynamic> plan,
     required List<Map<String, dynamic>> workouts,
   }) async {
-    await _client
-        .from('fitness_plans')
-        .update({'is_active': false})
-        .eq('user_id', userId)
-        .eq('is_active', true);
+    await _deactivatePriorPlan(userId);
 
     final row = await _client.from('fitness_plans').insert({
       'user_id': userId,
@@ -86,11 +89,7 @@ class PlanGateway {
     required String userId,
     required String planId,
   }) async {
-    await _client
-        .from('fitness_plans')
-        .update({'is_active': false})
-        .eq('user_id', userId)
-        .eq('is_active', true);
+    await _deactivatePriorPlan(userId);
 
     await _client.from('fitness_plans').update({
       'is_active': true,

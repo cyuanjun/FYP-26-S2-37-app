@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/save_workout_details.dart';
 import '../../../controls/workout_history.dart';
 import '../../../core/format.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/workout_session.dart';
 import '../../gateways/workout_gateway.dart';
+import '../common/stat_tile.dart';
+import '../common/status_badge.dart';
 
 /// BOUNDARY (#12.1 History Detail). Read-only recap of a completed session with
 /// an edit mode (name / feel / notes) and a delete action. Matches the activity
@@ -94,15 +97,9 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
             const Text('WORKOUT', style: AppTypography.caption2),
             if (_editing) ...[
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.muted.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColors.muted),
-                ),
-                child: Text('EDITING', style: AppTypography.caption2.copyWith(color: AppColors.muted)),
-              ),
+              StatusBadge('EDITING',
+                  bg: AppColors.muted.withValues(alpha: 0.15),
+                  borderColor: AppColors.muted),
             ],
           ],
         ),
@@ -198,11 +195,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
         if (_editing)
           OutlinedButton(
             onPressed: _busy ? null : _delete,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.danger,
-              side: const BorderSide(color: AppColors.danger),
-              minimumSize: const Size.fromHeight(52),
-            ),
+            style: AppButtonStyles.outlinedDanger(height: 52),
             child: const Text('DELETE SESSION'),
           ),
       ],
@@ -220,19 +213,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     );
   }
 
-  Widget _stat(String label, String value) => Container(
-        width: 150,
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: AppTypography.caption2),
-            const SizedBox(height: 4),
-            Text(value, style: AppTypography.title3.copyWith(color: AppColors.metricColor(label))),
-          ],
-        ),
-      );
+  Widget _stat(String label, String value) => StatTile(label, value, boxed: true);
 
   String _feelLabel(FeelRating f) => switch (f) {
         FeelRating.great => '🔥 Great',

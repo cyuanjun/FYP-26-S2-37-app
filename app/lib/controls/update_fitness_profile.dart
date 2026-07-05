@@ -7,6 +7,7 @@ import '../entities/enums.dart';
 import '../entities/health_tag.dart';
 import '../entities/workout_type.dart';
 import 'view_profile.dart';
+import '../core/strings.dart';
 
 /// CONTROL — Update Fitness Profile (#13.1 Save Profile). Batches every edited
 /// field + chip selection into one update; the screen edits locally and commits
@@ -34,7 +35,7 @@ class UpdateFitnessProfile extends AsyncNotifier<void> {
     required String userId,
     required String name,
   }) async {
-    if (name.trim().isEmpty) return null;
+    if (name.isBlank) return null;
     SeqLog.msg('update-fitness-profile', 'UpdateFitnessProfile', 'WorkoutGateway',
         'addCustomWorkoutType($name)');
     final type = await ref
@@ -50,7 +51,7 @@ class UpdateFitnessProfile extends AsyncNotifier<void> {
     required HealthTagKind kind,
     required String name,
   }) async {
-    if (name.trim().isEmpty) return null;
+    if (name.isBlank) return null;
     SeqLog.msg('update-fitness-profile', 'UpdateFitnessProfile', 'FitnessGateway',
         'addCustomHealthTag(${kind.name}, $name)');
     final tag = await ref

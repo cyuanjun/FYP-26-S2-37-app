@@ -10,6 +10,9 @@ import '../../../entities/fitness_plan.dart';
 import '../../../entities/planned_workout.dart';
 import '../../../entities/workout_type.dart';
 import '../../gateways/workout_gateway.dart';
+import '../common/app_card.dart';
+import '../common/premium_cta.dart';
+import '../common/status_badge.dart';
 
 /// BOUNDARY (#8 Plan Detail). Read-only view of an active or saved plan:
 /// header + meta, week schedule, and active-plan actions.
@@ -88,17 +91,11 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                           ),
                         ),
                         if (plan.isPersonalised)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.muted),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text('PERSONALISED',
-                                style: AppTypography.caption2
-                                    .copyWith(color: AppColors.muted)),
-                          ),
+                          const StatusBadge('PERSONALISED',
+                              borderColor: AppColors.muted,
+                              radius: 12,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4)),
                       ],
                     ),
                     if (plan.description != null) ...[
@@ -154,12 +151,8 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: AppColors.cardShadow,
-                      ),
+                    AppCard(
+                      padding: EdgeInsets.zero,
                       child: Column(
                         children: [
                           for (var i = 0; i < weekWorkouts.length; i++) ...[
@@ -284,17 +277,12 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
               ],
               if (!isPremium) ...[
                 const SizedBox(height: 16),
-                Container(
+                PremiumCta(
+                  '⚡ Upgrade to Premium for sets, reps, target zones, and coaching cues.',
+                  radius: 12,
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.premium,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '⚡ Upgrade to Premium for sets, reps, target zones, and coaching cues.',
-                    style: AppTypography.footnote
-                        .copyWith(color: AppColors.ink, fontWeight: FontWeight.w600),
-                  ),
+                  style: AppTypography.footnote
+                      .copyWith(color: AppColors.ink, fontWeight: FontWeight.w600),
                 ),
               ],
               const SizedBox(height: 20),
@@ -389,21 +377,12 @@ class _RegenerateLink extends ConsumerWidget {
         ),
         if (blocked) ...[
           const SizedBox(height: 6),
-          GestureDetector(
-            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Premium upgrade is coming in a later sprint.')),
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.premium,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text('⚡ Upgrade for unlimited regenerations',
-                  style: AppTypography.footnote
-                      .copyWith(color: AppColors.ink, fontWeight: FontWeight.w700)),
-            ),
-          ),
+          PremiumCta('⚡ Upgrade for unlimited regenerations',
+              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text(
+                            'Premium upgrade is coming in a later sprint.')),
+                  )),
         ],
       ],
     );

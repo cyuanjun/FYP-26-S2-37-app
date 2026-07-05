@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/generate_plan.dart';
 import '../../../controls/manage_connected_device.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/fitness_plan.dart';
 import '../../../entities/planned_workout.dart';
+import '../common/app_card.dart';
 import '../common/avatar_button.dart';
+import '../common/status_badge.dart';
 import '../profile/fitness_goals_screen.dart';
 import '../workout/active_workout_screen.dart';
 import 'connected_devices_screen.dart';
@@ -85,11 +88,7 @@ class TrainScreen extends ConsumerWidget {
                   onPressed: () => Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
                           builder: (_) => const ConnectedDevicesScreen())),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.accent,
-                    side: const BorderSide(color: AppColors.accent),
-                    minimumSize: const Size.fromHeight(48),
-                  ),
+                  style: AppButtonStyles.outlinedAccent(height: 48),
                   child: const Text('+ ADD DEVICE'),
                 ),
               ],
@@ -142,15 +141,10 @@ class _NoPlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCard(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.faint),
-        boxShadow: AppColors.cardShadow,
-      ),
+      borderColor: AppColors.faint,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -160,10 +154,7 @@ class _NoPlanCard extends StatelessWidget {
           const SizedBox(height: 16),
           OutlinedButton(
             onPressed: onSetGoal,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.accent,
-              side: const BorderSide(color: AppColors.accent),
-            ),
+            style: AppButtonStyles.outlinedAccent(),
             child: const Text('Set a goal'),
           ),
         ],
@@ -183,13 +174,7 @@ class _DevicesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: AppColors.cardShadow,
-      ),
+    return AppCard(
       child: Row(
         children: [
           Text(emoji, style: const TextStyle(fontSize: 28)),
@@ -204,16 +189,12 @@ class _DevicesCard extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.successBright,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text('CONNECTED',
-                style: AppTypography.caption2
-                    .copyWith(color: AppColors.ink, fontWeight: FontWeight.w800)),
-          ),
+          const StatusBadge('CONNECTED',
+              bg: AppColors.successBright,
+              fg: AppColors.ink,
+              weight: FontWeight.w800,
+              radius: 20,
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
         ],
       ),
     );
@@ -246,14 +227,8 @@ class _ActivePlanCard extends StatelessWidget {
     final todaysList = thisWeek.where((w) => w.dayOfWeek == today).toList();
     final todaysWorkout = todaysList.isEmpty ? null : todaysList.first;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.faint),
-        boxShadow: AppColors.cardShadow,
-      ),
+    return AppCard(
+      borderColor: AppColors.faint,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

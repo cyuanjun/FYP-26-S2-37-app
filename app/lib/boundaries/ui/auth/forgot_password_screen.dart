@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/request_password_reset.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/strings.dart';
+import '../common/app_card.dart';
 
 /// BOUNDARY (#4 Forgot Password). Sends a reset link; always shows the
 /// "sent" card regardless of whether the email matched (anti-enumeration).
@@ -25,7 +27,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _submit() async {
-    if (_email.text.trim().isEmpty) return;
+    if (_email.text.isBlank) return;
     await ref.read(requestPasswordResetProvider.notifier).send(_email.text);
     if (mounted) setState(() => _sent = true);
   }
@@ -91,13 +93,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         : const Text('SEND RESET LINK'),
                   ),
                 ] else
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.faint),
-                    ),
+                  AppCard(
+                    borderColor: AppColors.faint,
+                    shadow: false,
                     child: Row(
                       children: [
                         const Icon(Icons.mark_email_read_outlined,

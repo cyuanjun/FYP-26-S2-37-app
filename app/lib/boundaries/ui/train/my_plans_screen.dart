@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/generate_plan.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/fitness_plan.dart';
+import '../common/status_badge.dart';
 import '../profile/fitness_goals_screen.dart';
 import 'plan_detail_screen.dart';
 
@@ -46,13 +48,13 @@ class MyPlansScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             children: [
               if (active.isNotEmpty) ...[
-                const _SectionLabel('ACTIVE'),
+                const Text('ACTIVE', style: AppTypography.caption2),
                 const SizedBox(height: 8),
                 for (final plan in active) _PlanCard(plan: plan),
                 const SizedBox(height: 22),
               ],
               if (inactive.isNotEmpty) ...[
-                const _SectionLabel('SAVED'),
+                const Text('SAVED', style: AppTypography.caption2),
                 const SizedBox(height: 8),
                 for (final plan in inactive) ...[
                   _PlanCard(plan: plan),
@@ -65,15 +67,6 @@ class MyPlansScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Text(text, style: AppTypography.caption2);
 }
 
 class _PlanCard extends StatelessWidget {
@@ -114,16 +107,12 @@ class _PlanCard extends StatelessWidget {
                 children: [
                   Expanded(child: Text(plan.name, style: AppTypography.headline)),
                   if (plan.isActive)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.successBright,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text('ACTIVE',
-                          style: AppTypography.caption2.copyWith(
-                              color: AppColors.ink, fontWeight: FontWeight.w800)),
-                    ),
+                    const StatusBadge('ACTIVE',
+                        bg: AppColors.successBright,
+                        fg: AppColors.ink,
+                        weight: FontWeight.w800,
+                        radius: 12,
+                        padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4)),
                 ],
               ),
               const SizedBox(height: 6),
@@ -174,10 +163,7 @@ class _EmptyPlans extends StatelessWidget {
             const SizedBox(height: 18),
             OutlinedButton(
               onPressed: onSetGoal,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.accent,
-                side: const BorderSide(color: AppColors.accent),
-              ),
+              style: AppButtonStyles.outlinedAccent(),
               child: const Text('Set a goal'),
             ),
           ],

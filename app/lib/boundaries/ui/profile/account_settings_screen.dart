@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/authenticate.dart';
 import '../../../controls/update_account_settings.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
+import '../common/app_card.dart';
 import 'profile_widgets.dart';
 
 /// BOUNDARY (#13.3 Account Settings). Account-level data only — fitness data
@@ -88,12 +90,7 @@ class AccountSettingsScreen extends ConsumerWidget {
                             ? 'Password-reset link sent to ${profile.email}.'
                             : 'Could not send reset link. Try again later.')));
                   },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.accent,
-              side: const BorderSide(color: AppColors.accent),
-              minimumSize: const Size.fromHeight(52),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ),
+            style: AppButtonStyles.outlinedAccent(height: 52, radius: 16),
             child: const Text('CHANGE PASSWORD',
                 style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2)),
           ),
@@ -113,12 +110,11 @@ class _Segmented extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.faint),
-      ),
+    return AppCard(
+      padding: EdgeInsets.zero,
+      radius: 10,
+      borderColor: AppColors.faint,
+      shadow: false,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

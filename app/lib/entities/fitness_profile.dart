@@ -37,9 +37,11 @@ abstract class FitnessProfile with _$FitnessProfile {
   int get xpIntoLevel => totalXp % xpPerLevel;
 
   /// Age in whole years at [now], or null when DOB is unset.
-  int? ageAt(DateTime now) {
-    final dob = dateOfBirth;
-    if (dob == null) return null;
+  int? ageAt(DateTime now) =>
+      dateOfBirth == null ? null : ageFrom(dateOfBirth!, now);
+
+  /// Age rule for a bare DOB (screens with a draft DOB share the same math).
+  static int ageFrom(DateTime dob, DateTime now) {
     var age = now.year - dob.year;
     if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) age--;
     return age;

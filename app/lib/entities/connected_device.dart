@@ -27,5 +27,4 @@ abstract class ConnectedDevice with _$ConnectedDevice {
   bool get isPhoneSensors => deviceType == DeviceType.phoneSensors;
 
   /// Wearables can stream heart rate; the phone alone cannot.
-  bool get providesHeartRate => !isPhoneSensors;
 }

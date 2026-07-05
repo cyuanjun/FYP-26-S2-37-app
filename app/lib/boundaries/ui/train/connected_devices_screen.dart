@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/manage_connected_device.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/connected_device.dart';
 import '../../../entities/enums.dart';
+import '../common/status_badge.dart';
 
 /// BOUNDARY (#7.1 Connected Devices). Manage paired wearables/sensors.
 /// Phone sensors are the pinned system device; pairing uses the spec's mock
@@ -42,11 +44,7 @@ class ConnectedDevicesScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
               child: OutlinedButton(
                 onPressed: () => _openScanModal(context, ref),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.accent,
-                  side: const BorderSide(color: AppColors.accent),
-                  minimumSize: const Size.fromHeight(52),
-                ),
+                style: AppButtonStyles.outlinedAccent(height: 52),
                 child: const Text('+ ADD DEVICE'),
               ),
             ),
@@ -189,18 +187,13 @@ class _DeviceRow extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.headline)),
                     const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: device.isActive ? AppColors.successBright : null,
-                        borderRadius: BorderRadius.circular(10),
-                        border: device.isActive ? null : Border.all(color: AppColors.faint),
-                      ),
-                      child: Text(device.isActive ? 'CONNECTED' : 'OFF',
-                          style: AppTypography.caption2.copyWith(
-                              color: device.isActive ? AppColors.ink : AppColors.muted,
-                              fontWeight: device.isActive ? FontWeight.w800 : FontWeight.w600)),
-                    ),
+                    StatusBadge(device.isActive ? 'CONNECTED' : 'OFF',
+                        bg: device.isActive ? AppColors.successBright : null,
+                        fg: device.isActive ? AppColors.ink : AppColors.muted,
+                        weight:
+                            device.isActive ? FontWeight.w800 : FontWeight.w600,
+                        borderColor: device.isActive ? null : AppColors.faint,
+                        radius: 10),
                   ],
                 ),
                 const SizedBox(height: 2),

@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/save_workout_details.dart';
 import '../../../controls/share_workout.dart';
 import '../../../core/format.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/workout_type.dart';
+import '../common/stat_tile.dart';
 
 /// BOUNDARY (#10 Workout Summary). Post-session recap: stats + XP, name / feel /
 /// notes, and Share to Social (creates a workout_share Post + named-platform share).
@@ -96,12 +98,12 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
             spacing: 12,
             runSpacing: 12,
             children: [
-              _Stat(label: 'DURATION', value: fmtDuration(widget.elapsed)),
+              StatTile('DURATION', fmtDuration(widget.elapsed), boxed: true),
               if (widget.type.isCardio) ...[
-                _Stat(label: 'DISTANCE', value: '${fmtKm(widget.distanceMeters)} km'),
-                _Stat(label: 'AVG PACE', value: '${fmtPace(widget.distanceMeters, widget.elapsed)} /km'),
+                StatTile('DISTANCE', '${fmtKm(widget.distanceMeters)} km', boxed: true),
+                StatTile('AVG PACE', '${fmtPace(widget.distanceMeters, widget.elapsed)} /km', boxed: true),
               ],
-              _Stat(label: 'TYPE', value: widget.type.name),
+              StatTile('TYPE', widget.type.name, boxed: true),
             ],
           ),
           const SizedBox(height: 24),
@@ -155,10 +157,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
                   .map((p) => OutlinedButton(
                         onPressed: () =>
                             ref.read(shareWorkoutToSocialProvider).call(p, text: _shareText()),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.accent,
-                          side: const BorderSide(color: AppColors.accent),
-                        ),
+                        style: AppButtonStyles.outlinedAccent(),
                         child: Text(p.label),
                       ))
                   .toList(),
@@ -182,28 +181,4 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
         FeelRating.okay => '😐 Okay',
         FeelRating.tough => '😣 Tough',
       };
-}
-
-class _Stat extends StatelessWidget {
-  const _Stat({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 150,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppTypography.caption2),
-          const SizedBox(height: 4),
-          Text(value, style: AppTypography.title3.copyWith(color: AppColors.metricColor(label))),
-        ],
-      ),
-    );
-  }
 }

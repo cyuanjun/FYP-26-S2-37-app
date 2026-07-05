@@ -29,7 +29,10 @@ abstract class FitnessGoal with _$FitnessGoal {
   bool get isActive => achievedAt == null;
 
   /// maintain_fitness is an ongoing routine: no target, no timeline.
-  bool get hasTarget => primaryGoal != PrimaryGoal.maintainFitness;
+  bool get hasTarget => hasTargetFor(primaryGoal);
+
+  static bool hasTargetFor(PrimaryGoal goal) =>
+      goal != PrimaryGoal.maintainFitness;
 
   /// The unit each goal's target is expressed in (app-owned mapping; the DB
   /// doesn't enforce the goal↔unit link).

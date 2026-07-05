@@ -5,6 +5,7 @@ import '../boundaries/gateways/profile_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/enums.dart';
 import 'authenticate.dart';
+import '../core/strings.dart';
 
 /// CONTROL — Update Account Settings (#13.3). Inline commits, no save button:
 /// the units toggle persists instantly; Change Password reuses the reset-link
@@ -26,7 +27,7 @@ class UpdateAccountSettings extends AsyncNotifier<void> {
   /// metadata was missing; later also #13.3 per-field editing).
   Future<bool> saveName({required String firstName, String? lastName}) async {
     final userId = ref.read(currentUserIdProvider);
-    if (userId == null || firstName.trim().isEmpty) return false;
+    if (userId == null || firstName.isBlank) return false;
     SeqLog.msg('account-settings', 'UpdateAccountSettings', 'ProfileGateway',
         'updateName($firstName)');
     await ref

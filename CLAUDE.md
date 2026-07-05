@@ -19,7 +19,7 @@ Start at [docs/README.md](docs/README.md) for the index. The load-bearing docs i
 - [docs/STATUS.md](docs/STATUS.md) — **current progress + next steps** (read this first when resuming).
 - [docs/prototype-demo-guide.md](docs/prototype-demo-guide.md) — **how to run/demo the app**: setup, step-by-step manual-test walkthrough (what to do + what you should see), test accounts, backend verification.
 - [docs/testing/bug-log.md](docs/testing/bug-log.md) — every defect with root cause + fix commit; check it before re-diagnosing a familiar symptom.
-- [docs/simplify.md](docs/simplify.md) — plain-English **code map** (how the layers wire together, data flow, data-owned rules) + a verified redundancy/simplification list. Good orientation before touching `lib/`.
+- [docs/simplify.md](docs/simplify.md) — plain-English **code map** (how the layers wire together, data flow, data-owned rules) + the redundancy/simplification list — **fully applied 6 Jul 2026** (incl. corrected false positives). Good orientation before touching `lib/`.
 - [docs/architecture/build-plan.md](docs/architecture/build-plan.md) — the **engineering plan**: scope/three-layer model, tech stack, AI scope, schedule pointers, rubric map, and the doc-reconciliation pointer (§10).
 - [docs/architecture/bce-design.md](docs/architecture/bce-design.md) — BCE architecture, Boundary/Control/Entity inventory, traceability matrix, robustness + Mermaid sequence diagrams, runtime logging convention. (AI: one `GeneratePlan` control — both tiers AI via the suggest-plan Edge Function, `BuildPlanSkeleton` rule fallback — plus `SummariseProgress`.)
 - [docs/reference/database-v1.md](docs/reference/database-v1.md) — the **working data model** (from the React mock). The **TDM §8 ERD is now the schema of record**; align this file to it before generating DDL (reconciliation log §D — `ExpertReview` kept, expert layer = `ExpertService → ServiceRequest → Deliverable`, payment simulated). Companions: [database.dbml](docs/reference/database.dbml) (machine-readable, paste into dbdiagram.io) and [erd-relationships.md](docs/reference/erd-relationships.md) (the cardinality / crow's-foot checklist).
@@ -48,9 +48,9 @@ The app follows **Boundary–Control–Entity** (Jacobson). This is an FYP desig
 ```
 app/lib/entities/              ENTITY   — freezed models of the ~26 TDM §8 entities + data-owned rules (XP/level/streak)
 app/lib/controls/              CONTROL  — one class per use case (= the mock's store actions, e.g. EndWorkoutSession)
-app/lib/boundaries/ui/         BOUNDARY — actor-facing screens/widgets
+app/lib/boundaries/ui/         BOUNDARY — actor-facing screens/widgets; ui/common/ = the shared widget library (StatTile, AppCard, StatusBadge, PremiumCta, AvatarButton) — use these instead of hand-rolling stat rows / surface cards / status pills / gold CTAs
 app/lib/boundaries/gateways/   BOUNDARY — system-facing adapters (Auth/Profile/Fitness/Plan/Workout/Social/Feedback/Device gateways + AiGateway, WorkoutDataSource, SocialShareGateway; Notification/Storage gateways pending)
-app/lib/core/                  cross-cutting helpers — seq_log.dart (the SEQ logging convention below), format.dart, config/env.dart, theme/ (palette + typography)
+app/lib/core/                  cross-cutting helpers — seq_log.dart (the SEQ logging convention below), format.dart, strings.dart (isBlank), config/env.dart, theme/ (palette + typography + app_buttons.dart outlined styles)
 app/lib/router/                app_router.dart — the go_router config with role-based redirects
 ```
 

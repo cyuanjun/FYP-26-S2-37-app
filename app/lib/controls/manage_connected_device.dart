@@ -5,6 +5,7 @@ import '../core/seq_log.dart';
 import '../entities/connected_device.dart';
 import '../entities/enums.dart';
 import 'authenticate.dart';
+import '../core/strings.dart';
 
 /// The user's devices, with the phone-sensors virtual device guaranteed to
 /// exist (system-managed, pinned first, never removable — #7.1 spec).
@@ -49,7 +50,7 @@ class ManageConnectedDevice {
 
   Future<ConnectedDevice?> pair({required DeviceType type, required String name}) async {
     final userId = _ref.read(currentUserIdProvider);
-    if (userId == null || name.trim().isEmpty) return null;
+    if (userId == null || name.isBlank) return null;
     SeqLog.msg('manage-device', 'ConnectedDevicesScreen', 'ManageConnectedDevice',
         'pair(${type.name}, $name)');
     final device = await _ref

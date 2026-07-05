@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Fill the genuine content gaps in the PTD-filled doc, on a copy, preserving everything else."""
+"""Fill the genuine content gaps in the PTD-filled doc, on a copy, preserving everything else.
+
+MANUAL-ONLY utility (simplify L5): not part of the PTD build pipeline
+(expand_ptd.py -> build_ptd_v1format.py). Run by hand for ad-hoc gap fills."""
 import shutil, docx
 
 SRC = "/Users/cyj/Downloads/FYP-26-S2-37-PTD-filled.docx"

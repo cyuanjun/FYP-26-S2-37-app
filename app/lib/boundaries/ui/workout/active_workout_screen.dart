@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/workout_type.dart';
 import '../../gateways/workout_gateway.dart';
+import '../common/stat_tile.dart';
 import 'workout_summary_screen.dart';
 
 /// BOUNDARY (#9 Active Workout). Free-form capture with a pre-start phase:
@@ -145,12 +146,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                     child: Row(
                       children: cardio
                           ? [
-                              _Metric(label: 'DISTANCE', value: '${fmtKm(s.distanceMeters)} km', dim: dim),
-                              _Metric(label: 'PACE', value: '${fmtPace(s.distanceMeters, s.elapsed)} /km', dim: dim),
+                              StatTile('DISTANCE', '${fmtKm(s.distanceMeters)} km', valueStyle: AppTypography.title2, gap: 4, dim: dim),
+                              StatTile('PACE', '${fmtPace(s.distanceMeters, s.elapsed)} /km', valueStyle: AppTypography.title2, gap: 4, dim: dim),
                             ]
                           : [
-                              _Metric(label: 'TIME', value: fmtDuration(s.elapsed), dim: dim),
-                              _Metric(label: 'STEPS', value: '${s.steps}', dim: dim),
+                              StatTile('TIME', fmtDuration(s.elapsed), valueStyle: AppTypography.title2, gap: 4, dim: dim),
+                              StatTile('STEPS', '${s.steps}', valueStyle: AppTypography.title2, gap: 4, dim: dim),
                             ],
                     ),
                   ),
@@ -253,28 +254,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _Metric extends StatelessWidget {
-  const _Metric({required this.label, required this.value, this.dim = false});
-
-  final String label;
-  final String value;
-  final bool dim;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(label, style: AppTypography.caption2),
-          const SizedBox(height: 4),
-          Text(value,
-              style: AppTypography.title2.copyWith(color: dim ? AppColors.faint : AppColors.metricColor(label))),
-        ],
       ),
     );
   }

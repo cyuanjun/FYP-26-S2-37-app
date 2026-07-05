@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/submit_feedback.dart';
+import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
@@ -174,11 +175,7 @@ class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
                 _body.clear();
                 _category = FeedbackCategory.general;
               }),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.accent,
-                side: const BorderSide(color: AppColors.accent),
-                minimumSize: const Size.fromHeight(52),
-              ),
+              style: AppButtonStyles.outlinedAccent(height: 52),
               child: const Text('SUBMIT ANOTHER'),
             ),
             const SizedBox(height: 10),
