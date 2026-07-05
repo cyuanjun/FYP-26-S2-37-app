@@ -29,8 +29,9 @@ declare
 begin
   for rec in
     select * from (values
-      ('free@wiseworkout.test',    'Mia',  'Patel', 'free'),
-      ('premium@wiseworkout.test', 'Alex', 'Tan',   'premium')
+      ('free@wiseworkout.test',    'Mia',  'Patel',  'free'),
+      ('premium@wiseworkout.test', 'Alex', 'Tan',    'premium'),
+      ('expert@wiseworkout.test',  'Sam',  'Rivera', 'expert')
     ) as t(email, first_name, last_name, role)
   loop
     select id into uid from auth.users where email = rec.email;
@@ -201,6 +202,107 @@ insert into public.challenge_participants (challenge_id, user_id)
 select 'c0000000-0000-4000-8000-000000000002', pr.id
 from public.profiles pr
 where pr.email in ('free@wiseworkout.test','premium@wiseworkout.test');
+
+-- ----------------------------------------------------------------------------
+-- 8. Expert marketplace demo (6-7 Jul): Sam Rivera, verified expert, with
+--    3 live services and engagements exercising every #6.2 footer state.
+--    Stored aggregates intentionally exceed the physical review rows (mock
+--    convention per 06.1); the submit_expert_review RPC keeps them consistent
+--    going forward.
+-- ----------------------------------------------------------------------------
+insert into public.expert_profiles (id, title, years_coaching, about, credentials,
+                                    specialties, rating_avg, review_count, client_count,
+                                    verification_status)
+select id, 'Strength Coach', 9,
+       'I help everyday athletes build strength that lasts — no fads, just progressive overload, honest feedback, and programming that fits your life.',
+       array['NASM CPT', 'Precision Nutrition L1', 'BSc Exercise Science'],
+       array['strength', 'mobility'], 4.8, 23, 41, 'verified'
+from public.profiles where email = 'expert@wiseworkout.test'
+on conflict (id) do update set
+  title = excluded.title, years_coaching = excluded.years_coaching,
+  about = excluded.about, credentials = excluded.credentials,
+  specialties = excluded.specialties, rating_avg = excluded.rating_avg,
+  review_count = excluded.review_count, client_count = excluded.client_count,
+  verification_status = excluded.verification_status;
+
+delete from public.expert_services
+ where expert_user_id in (select id from public.profiles where email = 'expert@wiseworkout.test');
+insert into public.expert_services (id, expert_user_id, status, name, description,
+                                    detail_bullets, category, fulfillment, pricing_model,
+                                    price_cents, duration_weeks, response_time)
+select v.id::uuid, pr.id, 'live', v.name, v.description, v.bullets, v.category,
+       v.fulfillment::fulfillment_type, v.pricing::pricing_model, v.price, v.weeks,
+       v.rt::response_time
+from (values
+  ('e0000000-0000-4000-8000-000000000001', '12-Week Strength Block',
+   'A fully periodised strength programme built around your schedule and equipment.',
+   array['Personalised 12-week plan', 'Weekly check-in notes', 'Video form review each block'],
+   'strength', 'workout_plan', 'one_time', 12000, 12, '48h'),
+  ('e0000000-0000-4000-8000-000000000002', 'Form Check & Program Review',
+   'Send your lifts and current programme — get a detailed written review.',
+   array['Up to 5 lift videos reviewed', 'Written technique notes', 'Programme adjustments'],
+   'strength', 'review', 'one_time', 4500, null, '24h'),
+  ('e0000000-0000-4000-8000-000000000003', 'Mobility Reset Coaching',
+   'Four weeks of guided mobility work to unlock stiff hips and shoulders.',
+   array['Daily 15-min routines', 'Weekly progression', 'Direct message support'],
+   'mobility', 'coaching', 'recurring', 8000, 4, '72h')
+) as v(id, name, description, bullets, category, fulfillment, pricing, price, weeks, rt)
+join public.profiles pr on pr.email = 'expert@wiseworkout.test';
+
+delete from public.service_requests
+ where expert_user_id in (select id from public.profiles where email = 'expert@wiseworkout.test');
+-- Mia -> Strength Block: COMPLETED, has a deliverable, NOT yet reviewed
+insert into public.service_requests (id, user_id, expert_service_id, expert_user_id,
+                                     quoted_price_cents, status, request_message,
+                                     requested_at, completed_at)
+select 'a0000000-0000-4000-8000-000000000001', mia.id,
+       'e0000000-0000-4000-8000-000000000001', sam.id, 12000, 'completed',
+       'I want to squat 100 kg by the end of the year — three gym days a week.',
+       now() - interval '20 days', now() - interval '3 days'
+from public.profiles mia, public.profiles sam
+where mia.email = 'free@wiseworkout.test' and sam.email = 'expert@wiseworkout.test';
+-- Mia -> Mobility Reset: PENDING (demos the pending footer + Sam's inbox)
+insert into public.service_requests (id, user_id, expert_service_id, expert_user_id,
+                                     quoted_price_cents, status, request_message, requested_at)
+select 'a0000000-0000-4000-8000-000000000002', mia.id,
+       'e0000000-0000-4000-8000-000000000003', sam.id, 8000, 'pending',
+       'Desk job has wrecked my hips — I want to move freely again.',
+       now() - interval '1 day'
+from public.profiles mia, public.profiles sam
+where mia.email = 'free@wiseworkout.test' and sam.email = 'expert@wiseworkout.test';
+-- Alex -> Form Check: COMPLETED + REVIEWED (demos the ✓ Reviewed footer)
+insert into public.service_requests (id, user_id, expert_service_id, expert_user_id,
+                                     quoted_price_cents, status, request_message,
+                                     requested_at, completed_at)
+select 'a0000000-0000-4000-8000-000000000003', alex.id,
+       'e0000000-0000-4000-8000-000000000002', sam.id, 4500, 'completed',
+       'Deadlift form check before I push heavier this block, please.',
+       now() - interval '12 days', now() - interval '8 days'
+from public.profiles alex, public.profiles sam
+where alex.email = 'premium@wiseworkout.test' and sam.email = 'expert@wiseworkout.test';
+
+insert into public.deliverables (service_request_id, title, note, sections)
+values ('a0000000-0000-4000-8000-000000000001', 'Weeks 1-4 Training Block',
+        'Start conservative — RPE 7 means two clean reps left in the tank.',
+        '[{"heading":"Day A — Lower","items":[
+            {"label":"Back squat","detail":"4x6","sub":"RPE 7"},
+            {"label":"Romanian deadlift","detail":"3x8","sub":"slow eccentric"},
+            {"label":"Walking lunges","detail":"3x12/leg"}]},
+          {"heading":"Day B — Upper","items":[
+            {"label":"Bench press","detail":"4x6","sub":"RPE 7"},
+            {"label":"One-arm row","detail":"3x10/side"},
+            {"label":"Face pulls","detail":"3x15"}]}]'::jsonb);
+
+insert into public.expert_reviews (expert_user_id, user_id, service_request_id, rating, body)
+select sam.id, alex.id, 'a0000000-0000-4000-8000-000000000003', 5,
+       'Sharp, actionable feedback within a day. My deadlift lockout finally clicked.'
+from public.profiles alex, public.profiles sam
+where alex.email = 'premium@wiseworkout.test' and sam.email = 'expert@wiseworkout.test';
+
+-- Mia already follows Sam (pre-filled heart on #6).
+update public.profiles
+   set followed_expert_ids = array[(select id from public.profiles where email = 'expert@wiseworkout.test')]
+ where email = 'free@wiseworkout.test';
 
 -- Re-enable the guard.
 alter table public.profiles enable trigger trg_guard_profile_privileged_columns;
