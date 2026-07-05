@@ -10,7 +10,7 @@ The estimate is a **MET (Metabolic Equivalent of Task) formula**, computed at se
 kcal = MET × weight(kg) × duration(hours)
 ```
 
-- **Code:** `WorkoutType.estimateCalories(...)` in [`lib/entities/workout_type.dart`](../../lib/entities/workout_type.dart) — an entity-owned rule. Called from the `ActiveWorkout` control's `end()` in [`lib/controls/active_workout.dart`](../../lib/controls/active_workout.dart).
+- **Code:** `WorkoutType.estimateCalories(...)` in [`lib/entities/workout_type.dart`](../../app/lib/entities/workout_type.dart) — an entity-owned rule. Called from the `ActiveWorkout` control's `end()` in [`lib/controls/active_workout.dart`](../../app/lib/controls/active_workout.dart).
 - **MET** — a per-activity intensity constant from the Compendium of Physical Activities (running 9.8, hiit 10.0, swimming 8.0, cycling 7.5, rowing 7.0, hiking 6.0, strength 5.0, walking 3.5, pilates 3.0, yoga 2.5). Unknown/custom types fall back to a moderate **4.0**.
 - **Weight** — from the user's `FitnessProfile.weightKg`. When unset, a **sex-based population default** is used (`WorkoutType.defaultWeightKg`): **male 70 kg · female 55 kg · other/unset 70 kg**.
 - **Duration** — the recorded session length, in hours.

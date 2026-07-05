@@ -1,6 +1,6 @@
 # Wise Workout — Database (v1)
 
-> ⚠️ **The schema of record is the TDM v5 §8 ERD** (team-approved, 5 Jun 2026). This file is the **working source** that predates it (built from the React mock). **Aligned to the TDM §8 ERD on 10 Jun 2026** — the rosters match at **26 entities** ([reconciliation log](../deliverables/doc-reconciliation-log.md) §D); the TDM settled the open questions (`ExpertReview` kept; expert layer = `ExpertService → ServiceRequest → Deliverable`; payment simulated via price fields). The generated Postgres DDL + RLS + seed now live in [`/supabase/`](../../supabase/) (`supabase/migrations/` + `supabase/seed.sql`) — regenerate those from this file, not by hand.
+> ⚠️ **The schema of record is the TDM v5 §8 ERD** (team-approved, 5 Jun 2026). This file is the **working source** that predates it (built from the React mock). **Aligned to the TDM §8 ERD on 10 Jun 2026** — the rosters match at **26 entities** ([reconciliation log](../deliverables/doc-reconciliation-log.md) §D); the TDM settled the open questions (`ExpertReview` kept; expert layer = `ExpertService → ServiceRequest → Deliverable`; payment simulated via price fields). The generated Postgres DDL + RLS + seed now live in [`/supabase/`](../../app/supabase/) (`supabase/migrations/` + `supabase/seed.sql`) — regenerate those from this file, not by hand.
 
 Schema built up incrementally as we walk through screens in [screens-v1.md](screens-v1.md). Each entity records which screen first required it, so every column traces back to a UI need.
 

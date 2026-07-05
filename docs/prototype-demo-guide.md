@@ -39,7 +39,7 @@ running OpenAI `gpt-4o-mini`** (Gemini → deterministic-stub fallback), all on 
 Requires **Flutter 3.44+** (stable). First-time setup:
 
 ```bash
-cd FYP-26-S2-37-app
+cd FYP-26-S2-37-app/app
 flutter pub get
 dart run build_runner build          # generate freezed / json models (*.g.dart, *.freezed.dart)
 flutter run -d <device>              # pick a device id from `flutter devices`
@@ -250,7 +250,7 @@ You should see XP/streak change after recording a workout, and a `workout_share`
 ## 7. Reset / reseed demo data
 
 To restore both demo accounts + their varied sessions to a known state, run
-[`supabase/seed-demo.sql`](../supabase/seed-demo.sql) against the project (SQL editor / `psql` / MCP).
+[`supabase/seed-demo.sql`](../app/supabase/seed-demo.sql) against the project (SQL editor / `psql` / MCP).
 It's **idempotent** — re-run anytime. (Separate from `supabase/seed.sql`, which seeds the install-time
 catalogs: workout types, health tags, expert categories.)
 
@@ -276,6 +276,8 @@ catalogs: workout types, health tags, expert categories.)
 ---
 
 ## 9. Where things live
+
+All paths below are inside **`app/`** (the repo root also holds `docs/` — planning/design material not needed to run the app).
 
 ```
 lib/

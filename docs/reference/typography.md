@@ -21,7 +21,7 @@ Pair with [palette.md](palette.md) for colour tokens.
 
 ## Weights (app)
 
-The Flutter implementation ([`lib/core/theme/app_typography.dart`](../../lib/core/theme/app_typography.dart)) runs the secondary scale a notch heavier than plain regular — small text reads thin on a white background, so weight does the legibility work that the dark theme got from contrast. Sizes are unchanged.
+The Flutter implementation ([`lib/core/theme/app_typography.dart`](../../app/lib/core/theme/app_typography.dart)) runs the secondary scale a notch heavier than plain regular — small text reads thin on a white background, so weight does the legibility work that the dark theme got from contrast. Sizes are unchanged.
 
 | Token | Weight | Token | Weight |
 |---|---|---|---|

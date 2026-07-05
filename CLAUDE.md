@@ -17,11 +17,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Start at [docs/README.md](docs/README.md) for the index. The load-bearing docs in this repo:
 
 - [docs/STATUS.md](docs/STATUS.md) — **current progress + next steps** (read this first when resuming).
+- [docs/prototype-demo-guide.md](docs/prototype-demo-guide.md) — **how to run/demo the app**: setup, step-by-step manual-test walkthrough (what to do + what you should see), test accounts, backend verification.
+- [docs/testing/bug-log.md](docs/testing/bug-log.md) — every defect with root cause + fix commit; check it before re-diagnosing a familiar symptom.
+- [docs/simplify.md](docs/simplify.md) — plain-English **code map** (how the layers wire together, data flow, data-owned rules) + a verified redundancy/simplification list. Good orientation before touching `lib/`.
 - [docs/architecture/build-plan.md](docs/architecture/build-plan.md) — the **engineering plan**: scope/three-layer model, tech stack, AI scope, schedule pointers, rubric map, and the doc-reconciliation pointer (§10).
 - [docs/architecture/bce-design.md](docs/architecture/bce-design.md) — BCE architecture, Boundary/Control/Entity inventory, traceability matrix, robustness + Mermaid sequence diagrams, runtime logging convention. (AI: one `GeneratePlan` control — both tiers AI via the suggest-plan Edge Function, `BuildPlanSkeleton` rule fallback — plus `SummariseProgress`.)
 - [docs/reference/database-v1.md](docs/reference/database-v1.md) — the **working data model** (from the React mock). The **TDM §8 ERD is now the schema of record**; align this file to it before generating DDL (reconciliation log §D — `ExpertReview` kept, expert layer = `ExpertService → ServiceRequest → Deliverable`, payment simulated). Companions: [database.dbml](docs/reference/database.dbml) (machine-readable, paste into dbdiagram.io) and [erd-relationships.md](docs/reference/erd-relationships.md) (the cardinality / crow's-foot checklist).
-- [docs/reference/screens/](docs/reference/screens/) — **per-screen UI blueprints** (~28 files, indexed by [screens-v1.md](docs/reference/screens-v1.md)): purpose, UI elements, states, and incoming/outgoing edges per screen, citing [palette.md](docs/reference/palette.md) + [typography.md](docs/reference/typography.md). This is the spec to build each Flutter screen against — read the relevant file before implementing a Boundary. Frontmatter `status:` (e.g. `spec-only` = design locked, code not built).
-- [docs/deliverables/](docs/deliverables/) — FYP deliverable prep: [doc-reconciliation-log.md](docs/deliverables/doc-reconciliation-log.md) (cross-doc edits), [ptd-pum-assembly.md](docs/deliverables/ptd-pum-assembly.md) (PTD/PUM mapping), and the net-new drafts [ptd-net-new-sections.md](docs/deliverables/ptd-net-new-sections.md) / [pum-net-new-sections.md](docs/deliverables/pum-net-new-sections.md).
+- [docs/reference/screens/](docs/reference/screens/) — **per-screen UI blueprints** (~28 files, indexed by [screens-v1.md](docs/reference/screens-v1.md)): purpose, UI elements, states, and incoming/outgoing edges per screen, citing [palette.md](docs/reference/palette.md) + [typography.md](docs/reference/typography.md). This is the spec to build each Flutter screen against — read the relevant file before implementing a Boundary. Frontmatter `status:` (e.g. `spec-only` = design locked, code not built). ⚠️ Several *built* screens are deliberately simpler than their specs (Dashboard, Fitness Goals, Account Settings, Login, Train card — found 13 Jun, STATUS.md): treat the spec as design intent; where code exists, the build is canonical.
+- [docs/deliverables/](docs/deliverables/) — FYP deliverable prep: [doc-reconciliation-log.md](docs/deliverables/doc-reconciliation-log.md) (cross-doc edits), [ptd-pum-assembly.md](docs/deliverables/ptd-pum-assembly.md) (PTD/PUM mapping), and the net-new drafts [ptd-net-new-sections.md](docs/deliverables/ptd-net-new-sections.md) / [pum-net-new-sections.md](docs/deliverables/pum-net-new-sections.md). The submitted PTD/PUM Word docs are *generated* by the Python scripts in [docs/scripts/](docs/scripts/) (`expand_ptd.py`, `build_pum.py`, …) from content sources in `../FYP_docs/Submissions/` — edit the sources/scripts and regenerate; don't hand-edit the FILLED docx.
 - [docs/requirements/urs.md](docs/requirements/urs.md) — **deprecated**, superseded by the SRS.
 
 **Settled figures:** premium = **$9.99/mo**; payment is **simulated** (price fields only, no gateway/ledger).
@@ -31,22 +34,24 @@ The React flow-explorer mock these docs derive from is a **separate** repo (`../
 ## Locked architecture (do not re-litigate)
 
 - **App:** Flutter (stable channel). **State:** Riverpod. **Routing:** go_router (role-based redirects). **Models:** freezed + json_serializable for the ~26 entities in the TDM §8 ERD.
-- **Backend: Supabase** — Postgres + Auth + Storage + Realtime + Edge Functions. The schema in `database-v1.md` maps ~1:1 to Postgres; `User` becomes a `profiles` table keyed on `auth.users.id`; the shared-key specialization tables (`FitnessProfile`, `ExpertProfile`, `Subscription`) are 1:1 off the user id. Row-level security enforces the documented invariants (e.g. `WorkoutSession.Notes` is always private). **The actual backend lives in `supabase/`** — migrations (DDL, RLS policies, SECURITY DEFINER RPCs like `end_workout_session`), `seed.sql` (install catalogs) / `seed-demo.sql` (demo accounts: `free@`/`premium@wiseworkout.test`, pw `Password123!`), and the two `functions/` edge functions (`summarise-progress`, `suggest-plan`). **[supabase/README.md](supabase/README.md) is the backend reference** — read it for the entity→Postgres mapping, the RLS model, and which RPCs exist. DDL is *generated from the docs*: change the schema in `database-v1.md` first, then regenerate — don't hand-edit migrations in isolation. The hosted project is reached via the Supabase MCP (`project_ref` in `.mcp.json`).
+- **Backend: Supabase** — Postgres + Auth + Storage + Realtime + Edge Functions. The schema in `database-v1.md` maps ~1:1 to Postgres; `User` becomes a `profiles` table keyed on `auth.users.id`; the shared-key specialization tables (`FitnessProfile`, `ExpertProfile`, `Subscription`) are 1:1 off the user id. Row-level security enforces the documented invariants (e.g. `WorkoutSession.Notes` is always private). **The actual backend lives in `app/supabase/`** — migrations (DDL, RLS policies, SECURITY DEFINER RPCs like `end_workout_session`), `seed.sql` (install catalogs) / `seed-demo.sql` (demo accounts: `free@`/`premium@wiseworkout.test`, pw `Password123!`), and the two `functions/` edge functions (`summarise-progress`, `suggest-plan`). **[app/supabase/README.md](app/supabase/README.md) is the backend reference** — read it for the entity→Postgres mapping, the RLS model, and which RPCs exist. DDL is *generated from the docs*: change the schema in `database-v1.md` first, then regenerate — don't hand-edit migrations in isolation. The hosted project is reached via the Supabase MCP (`project_ref` in `.mcp.json`).
 - **AI: OpenAI** (Gemini fallback; not Anthropic/Claude) via a Supabase **Edge Function** so the key never ships in the app. **AI scope is exactly two functions: progress *summaries* + plan *suggestions*** (build-plan §5, SRS §3.9). Reminders/inactivity/**rest** alerts are **rule-based**, not AI (plans: both tiers call `suggestPlan` — Free basic depth, Premium personalised; the rule-based skeleton is the offline fallback — decided 12 Jun); coaching/custom plans are **human-expert**. Wrap as `summariseProgress(...)` / `suggestPlan(...)`. Free = basic, Premium = personalised. Label AI output as AI-assisted; never imply medical advice.
 - **Sensors:** one `WorkoutDataSource` interface. Built: `PhoneSensorSource` (geolocator + pedometer) + `WearableHrSource` (simulated BLE HR behind mock pairing, #7.1) merged via `CompositeWorkoutDataSource`; sessions record their source device (null `ConnectedDeviceID` = manual; manual-entry UI itself still pending, US13). Real `BleHeartRateSource` (flutter_blue_plus) / `HealthSource` (HealthKit/Health Connect) are **additive later** — class swaps, not refactors.
 - **Notifications:** preference toggles built (#13.4, jsonb on profiles); `flutter_local_notifications` is a dependency but scheduling is not wired yet (US19–21 pending); FCM/push later.
 
 ## BCE — the architectural rule that governs all app code
 
-The app follows **Boundary–Control–Entity** (Jacobson). This is an FYP design requirement, not a stylistic preference. Layout:
+The app follows **Boundary–Control–Entity** (Jacobson). This is an FYP design requirement, not a stylistic preference.
+
+**Repo split (13 Jun):** everything needed to run the product lives in **`app/`** (the Flutter project *and* `app/supabase/`); everything else — planning/design docs, deliverable tooling (`docs/scripts/`) — lives in **`docs/`**. Run all Flutter/Dart commands from `app/`. Layout inside `app/`:
 
 ```
-lib/entities/              ENTITY   — freezed models of the ~26 TDM §8 entities + data-owned rules (XP/level/streak)
-lib/controls/              CONTROL  — one class per use case (= the mock's store actions, e.g. EndWorkoutSession)
-lib/boundaries/ui/         BOUNDARY — actor-facing screens/widgets
-lib/boundaries/gateways/   BOUNDARY — system-facing adapters (Auth/Profile/Fitness/Plan/Workout/Social/Feedback/Device gateways + AiGateway, WorkoutDataSource, SocialShareGateway; Notification/Storage gateways pending)
-lib/core/                  cross-cutting helpers — seq_log.dart (the SEQ logging convention below), format.dart, config/env.dart, theme/ (palette + typography)
-lib/router/                app_router.dart — the go_router config with role-based redirects
+app/lib/entities/              ENTITY   — freezed models of the ~26 TDM §8 entities + data-owned rules (XP/level/streak)
+app/lib/controls/              CONTROL  — one class per use case (= the mock's store actions, e.g. EndWorkoutSession)
+app/lib/boundaries/ui/         BOUNDARY — actor-facing screens/widgets
+app/lib/boundaries/gateways/   BOUNDARY — system-facing adapters (Auth/Profile/Fitness/Plan/Workout/Social/Feedback/Device gateways + AiGateway, WorkoutDataSource, SocialShareGateway; Notification/Storage gateways pending)
+app/lib/core/                  cross-cutting helpers — seq_log.dart (the SEQ logging convention below), format.dart, config/env.dart, theme/ (palette + typography)
+app/lib/router/                app_router.dart — the go_router config with role-based redirects
 ```
 
 **The rule:** `Actor ─ Boundary ─ Control ─ Entity`. A screen NEVER touches an entity or the database directly — a Control always mediates. No Boundary↔Boundary or Boundary↔Entity calls. Riverpod implements a Control as a Notifier the UI watches, so idiomatic Flutter and BCE coincide. The mock's store actions (`endWorkoutSession`, `generatePlan`, `joinChallenge`, `requestService`, `startPremium`, …) each become exactly one Control — they are the use-case inventory, enumerated in `bce-design.md` §2.4.
@@ -68,9 +73,10 @@ Optimise for **rubric coverage**, build **core-first** (PRD §10.3 sprints + ris
 
 ## Commands
 
-Standard Flutter project:
+Standard Flutter project — **run everything from `app/`**:
 
 ```bash
+cd app
 flutter pub get                          # install dependencies
 dart run build_runner build --delete-conflicting-outputs   # codegen for freezed / json_serializable
 flutter run                              # run on a connected device/emulator

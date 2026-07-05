@@ -1,7 +1,7 @@
 # Supabase backend — Wise Workout (FYP-26-S2-37)
 
 Postgres schema, RLS, and seed for the Wise Workout app. **Generated from
-[docs/reference/database-v1.md](../docs/reference/database-v1.md)**, which is aligned to the **TDM v5 §8
+[docs/reference/database-v1.md](../../docs/reference/database-v1.md)**, which is aligned to the **TDM v5 §8
 ERD** (the schema of record — 26 entities). Treat the docs as the source of truth: change the schema there
 first, then regenerate these files — don't hand-edit DDL in isolation.
 

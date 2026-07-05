@@ -10,7 +10,7 @@ architecture · **Supabase** (Postgres + Auth + RLS + Edge Functions) · **OpenA
 
 ## Current state (12 Jun 2026)
 
-Built, tested (109 tests), and verified on the Android emulator + iOS simulator against a live
+Built, tested (112 tests), and verified on the Android emulator + iOS simulator against a live
 backend: login → first-run onboarding wizard → AI-generated 4-week training plan → Plan Detail →
 phone-GPS workout capture with paired-wearable heart rate → month-capped history + analytics →
 AI progress summary → share to named social platforms → full profile/settings cluster.
@@ -24,28 +24,31 @@ AI progress summary → share to named social platforms → full profile/setting
 ## Quick start
 
 ```bash
+cd app                               # the Flutter project lives in app/
 flutter pub get
 dart run build_runner build          # freezed / json_serializable codegen
 flutter run -d <device>              # device ids from `flutter devices`
 
 flutter analyze                      # should report "No issues found!"
-flutter test                         # 109 tests, all green
+flutter test                         # 112 tests, all green
 ```
 
 The app connects to the hosted Supabase project out of the box (publishable key in
-`lib/core/config/env.dart`; safe in the client — everything is RLS-enforced). Demo accounts and
+`app/lib/core/config/env.dart`; safe in the client — everything is RLS-enforced). Demo accounts and
 seeding: see the demo guide §3/§7.
 
 ## Layout
 
 ```
-lib/
-  entities/                freezed domain models (TDM §8 ERD) + data-owned rules
-  controls/                one Riverpod control per use case
-  boundaries/ui/           screens (actor-facing boundaries)
-  boundaries/gateways/     Supabase / sensor / AI / share adapters (system-facing boundaries)
-supabase/                  migrations · Edge Functions · seeds   (see supabase/README.md)
-docs/                      requirements · architecture · screen specs · deliverables · QA
+app/                         everything needed to run the product
+  lib/
+    entities/                ENTITY   — freezed domain models (TDM §8 ERD) + data-owned rules
+    controls/                CONTROL  — one Riverpod control per use case
+    boundaries/ui/           BOUNDARY — screens (actor-facing)
+    boundaries/gateways/     BOUNDARY — Supabase / sensor / AI / share adapters (system-facing)
+  test/                      112 unit/control tests
+  supabase/                  backend: migrations · Edge Functions · seeds   (see app/supabase/README.md)
+docs/                        everything else: requirements · architecture · screen specs · deliverables · QA · scripts
 ```
 
 The architectural rule, graded as part of the FYP: `Actor ─ Boundary ─ Control ─ Entity` —

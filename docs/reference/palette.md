@@ -1,6 +1,6 @@
 # Wise Workout — Colour Palette
 
-The app's colour system. This mirrors **[`lib/core/theme/app_colors.dart`](../../lib/core/theme/app_colors.dart)** (the single source of truth in code) and is the reference for any colour cited in the per-screen files under [screens/](screens/) (indexed by [screens-v1.md](screens-v1.md)). Pair with [typography.md](typography.md) for the type scale.
+The app's colour system. This mirrors **[`lib/core/theme/app_colors.dart`](../../app/lib/core/theme/app_colors.dart)** (the single source of truth in code) and is the reference for any colour cited in the per-screen files under [screens/](screens/) (indexed by [screens-v1.md](screens-v1.md)). Pair with [typography.md](typography.md) for the type scale.
 
 > **History:** the app originally shipped a dark, lime-accent theme (from the brand-kit extract). It was reworked into the **light, white-base, semantic** system below — bright energetic accents on white, with every colour assigned a *meaning* (see Usage rules). When this doc and `app_colors.dart` ever drift, the code wins.
 
