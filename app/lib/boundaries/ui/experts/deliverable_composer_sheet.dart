@@ -57,6 +57,11 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
     if (ok) Navigator.of(context).pop();
   }
 
+  Widget _label(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text(text, style: AppTypography.caption2),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -70,30 +75,33 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('SEND DELIVERABLE', style: AppTypography.caption2),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          _label('TITLE (REQUIRED)'),
           TextField(
             controller: _title,
             onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(labelText: 'TITLE (REQUIRED)'),
+            decoration:
+                const InputDecoration(hintText: 'e.g. Weeks 1–4 Training Block'),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
+          _label('NOTE (OPTIONAL)'),
           TextField(
             controller: _note,
-            decoration: const InputDecoration(labelText: 'NOTE (OPTIONAL)'),
+            decoration:
+                const InputDecoration(hintText: 'A short note for your client'),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
+          _label('SECTION HEADING (OPTIONAL)'),
           TextField(
             controller: _heading,
-            decoration: const InputDecoration(
-                labelText: 'SECTION HEADING (OPTIONAL)',
-                hintText: 'e.g. Day A — Lower'),
+            decoration: const InputDecoration(hintText: 'e.g. Day A — Lower'),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
+          _label('SECTION ITEMS'),
           TextField(
             controller: _lines,
             maxLines: 4,
             decoration: const InputDecoration(
-                labelText: 'SECTION ITEMS',
                 hintText: 'One item per line, e.g.\nBack squat 4x6'),
           ),
           const SizedBox(height: 12),

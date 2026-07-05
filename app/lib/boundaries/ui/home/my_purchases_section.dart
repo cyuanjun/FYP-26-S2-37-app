@@ -37,38 +37,48 @@ class MyPurchasesSection extends ConsumerWidget {
               padding: const EdgeInsets.all(12),
               shadow: false,
               borderColor: AppColors.faint,
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(summary.service?.name ?? 'Service',
-                            style: AppTypography.headline,
-                            overflow: TextOverflow.ellipsis),
-                        Text(
+                  // Row 1: full-width service name (never truncated) + chevron.
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(summary.service?.name ?? 'Service',
+                            style: AppTypography.headline),
+                      ),
+                      const Icon(Icons.chevron_right,
+                          color: AppColors.faint, size: 18),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Row 2: expert + when on the left, price + status on the right.
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
                             '${summary.otherParty?.displayName ?? 'Expert'} · '
                             '${relativeDay(summary.request.requestedAt)}',
                             style: AppTypography.caption2),
-                      ],
-                    ),
+                      ),
+                      Text(summary.request.quotedPriceLabel,
+                          style: AppTypography.headline),
+                      const SizedBox(width: 8),
+                      if (summary.request.isPending)
+                        const StatusBadge('PENDING',
+                            bg: AppColors.premium, fg: AppColors.ink)
+                      else if (summary.request.isCancelled)
+                        const StatusBadge('DECLINED',
+                            borderColor: AppColors.faint)
+                      else if (summary.request.isCompleted)
+                        const StatusBadge('DONE',
+                            bg: AppColors.successBright, fg: AppColors.ink)
+                      else
+                        const StatusBadge('ACTIVE',
+                            borderColor: AppColors.faint),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Text(summary.request.quotedPriceLabel,
-                      style: AppTypography.headline),
-                  const SizedBox(width: 8),
-                  if (summary.request.isPending)
-                    const StatusBadge('PENDING',
-                        bg: AppColors.premium, fg: AppColors.ink)
-                  else if (summary.request.isCancelled)
-                    const StatusBadge('DECLINED', borderColor: AppColors.faint)
-                  else if (summary.request.isCompleted)
-                    const StatusBadge('DONE',
-                        bg: AppColors.successBright, fg: AppColors.ink)
-                  else
-                    const StatusBadge('ACTIVE', borderColor: AppColors.faint),
-                  const Icon(Icons.chevron_right,
-                      color: AppColors.faint, size: 18),
                 ],
               ),
             ),

@@ -270,13 +270,14 @@ class _Footer extends ConsumerWidget {
                   'no card is charged.',
                   style: AppTypography.footnote),
               const SizedBox(height: 12),
+              Text('YOUR GOAL', style: AppTypography.caption2),
+              const SizedBox(height: 6),
               TextField(
                 controller: controller,
                 maxLines: 4,
                 maxLength: 400,
                 onChanged: (_) => setState(() {}),
                 decoration: const InputDecoration(
-                    labelText: 'YOUR GOAL',
                     hintText:
                         'Tell the expert what you want to achieve (required)'),
               ),
@@ -334,13 +335,14 @@ class _Footer extends ConsumerWidget {
                     ),
                 ],
               ),
+              Text('YOUR REVIEW', style: AppTypography.caption2),
+              const SizedBox(height: 6),
               TextField(
                 controller: controller,
                 maxLines: 3,
                 maxLength: 400,
                 onChanged: (_) => setState(() {}),
                 decoration: const InputDecoration(
-                    labelText: 'YOUR REVIEW',
                     hintText: 'How was the engagement? (required)'),
               ),
               const SizedBox(height: 8),

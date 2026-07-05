@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../controls/authenticate.dart';
 import '../../../controls/browse_experts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../common/avatar_button.dart';
 import 'expert_card.dart';
-import 'expert_requests_view.dart';
 import 'service_card.dart';
 
-/// BOUNDARY (#6 Experts). For clients: the marketplace directory — Experts /
-/// Service Listings sub-tabs over a shared search + category filter. For a
-/// role=expert account the tab swaps to their incoming-requests view (the
-/// deliberate minimal realization of the #20-24 portal).
+/// BOUNDARY (#6 Experts). The client marketplace directory — Experts /
+/// Service Listings sub-tabs over a shared search + category filter.
+/// (Expert accounts never see this tab — they get their own shell, #20–#24.)
 class ExpertsTab extends ConsumerStatefulWidget {
   const ExpertsTab({super.key});
 
@@ -30,9 +27,6 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final isExpert =
-        ref.watch(currentProfileProvider).value?.isExpert ?? false;
-
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
@@ -40,7 +34,7 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
         title: const Text('EXPERTS', style: AppTypography.title1),
         actions: const [AvatarButton()],
       ),
-      body: isExpert ? const ExpertRequestsView() : _browse(),
+      body: _browse(),
     );
   }
 

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/expert_requests.dart';
 import '../../../core/format.dart';
-import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/service_request_summary.dart';
@@ -69,6 +68,24 @@ class ExpertRequestsView extends ConsumerWidget {
   }
 }
 
+/// Matched 44px single-line action pair — same height/radius/type for the
+/// filled and outlined halves so the card actions read as one control set.
+final ButtonStyle _compactFilled = ElevatedButton.styleFrom(
+  minimumSize: const Size(0, 44),
+  padding: const EdgeInsets.symmetric(horizontal: 12),
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  textStyle: AppTypography.footnote.copyWith(fontWeight: FontWeight.w700),
+);
+
+ButtonStyle _compactOutlined(Color color) => OutlinedButton.styleFrom(
+      foregroundColor: color,
+      side: BorderSide(color: color),
+      minimumSize: const Size(0, 44),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      textStyle: AppTypography.footnote.copyWith(fontWeight: FontWeight.w700),
+    );
+
 class _RequestCard extends ConsumerWidget {
   const _RequestCard({required this.summary, this.muted = false});
 
@@ -120,6 +137,7 @@ class _RequestCard extends ConsumerWidget {
                     onPressed: () => ref
                         .read(acceptServiceRequestProvider)
                         .call(request.id),
+                    style: _compactFilled,
                     child: const Text('Accept'),
                   ),
                 ),
@@ -129,7 +147,7 @@ class _RequestCard extends ConsumerWidget {
                     onPressed: () => ref
                         .read(declineServiceRequestProvider)
                         .call(request.id),
-                    style: AppButtonStyles.outlinedDanger(),
+                    style: _compactOutlined(AppColors.danger),
                     child: const Text('Decline'),
                   ),
                 ),
@@ -147,7 +165,7 @@ class _RequestCard extends ConsumerWidget {
                   child: OutlinedButton(
                     onPressed: () =>
                         showDeliverableComposer(context, request.id),
-                    style: AppButtonStyles.outlinedAccent(),
+                    style: _compactOutlined(AppColors.accent),
                     child: const Text('Send deliverable'),
                   ),
                 ),
@@ -155,6 +173,7 @@ class _RequestCard extends ConsumerWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => _confirmComplete(context, ref),
+                    style: _compactFilled,
                     child: const Text('Mark complete'),
                   ),
                 ),
