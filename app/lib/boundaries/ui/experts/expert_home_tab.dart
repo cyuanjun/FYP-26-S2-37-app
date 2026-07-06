@@ -80,6 +80,17 @@ class ExpertHomeTab extends ConsumerWidget {
                       style: AppTypography.footnote
                           .copyWith(color: AppColors.premiumText)),
                 ],
+                const Divider(color: AppColors.faint, height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text('Earned to date (simulated)',
+                            style: AppTypography.footnote)),
+                    Text(summary?.profile.earnedLabel ?? r'$0',
+                        style: AppTypography.title3
+                            .copyWith(color: AppColors.success)),
+                  ],
+                ),
               ],
             ),
           ),

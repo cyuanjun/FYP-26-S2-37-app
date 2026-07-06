@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'enums.dart';
+import 'expert_service.dart';
 
 part 'expert_profile.freezed.dart';
 part 'expert_profile.g.dart';
@@ -22,6 +23,7 @@ abstract class ExpertProfile with _$ExpertProfile {
     @Default(0) double ratingAvg,
     @Default(0) int reviewCount,
     @Default(0) int clientCount,
+    @Default(0) int totalEarnedCents,
     @Default(VerificationStatus.pending) VerificationStatus verificationStatus,
   }) = _ExpertProfile;
 
@@ -29,4 +31,7 @@ abstract class ExpertProfile with _$ExpertProfile {
       _$ExpertProfileFromJson(json);
 
   bool get isVerified => verificationStatus == VerificationStatus.verified;
+
+  /// "\$3720" — lifetime simulated earnings.
+  String get earnedLabel => ExpertService.formatCents(totalEarnedCents);
 }

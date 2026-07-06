@@ -78,6 +78,8 @@ class ExpertProfileTab extends ConsumerWidget {
                     valueFirst: true),
                 StatTile('CLIENTS', '${profile?.clientCount ?? '—'}',
                     valueFirst: true),
+                StatTile('EARNED', profile?.earnedLabel ?? '—',
+                    valueFirst: true),
               ],
             ),
           ),

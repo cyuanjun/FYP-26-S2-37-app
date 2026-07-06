@@ -212,17 +212,18 @@ where pr.email in ('free@wiseworkout.test','premium@wiseworkout.test');
 -- ----------------------------------------------------------------------------
 insert into public.expert_profiles (id, title, years_coaching, about, credentials,
                                     specialties, rating_avg, review_count, client_count,
-                                    verification_status)
+                                    total_earned_cents, verification_status)
 select id, 'Strength Coach', 9,
        'I help everyday athletes build strength that lasts — no fads, just progressive overload, honest feedback, and programming that fits your life.',
        array['NASM CPT', 'Precision Nutrition L1', 'BSc Exercise Science'],
-       array['strength', 'mobility'], 4.8, 23, 41, 'verified'
+       array['strength', 'mobility'], 4.8, 23, 41, 372000, 'verified'
 from public.profiles where email = 'expert@wiseworkout.test'
 on conflict (id) do update set
   title = excluded.title, years_coaching = excluded.years_coaching,
   about = excluded.about, credentials = excluded.credentials,
   specialties = excluded.specialties, rating_avg = excluded.rating_avg,
   review_count = excluded.review_count, client_count = excluded.client_count,
+  total_earned_cents = excluded.total_earned_cents,
   verification_status = excluded.verification_status;
 
 delete from public.expert_services
