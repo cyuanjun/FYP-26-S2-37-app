@@ -8,12 +8,12 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/service_request_summary.dart';
 import '../common/app_card.dart';
 import '../common/status_badge.dart';
-import 'deliverable_composer_sheet.dart';
+import 'expert_buttons.dart';
+import 'expert_client_detail_screen.dart';
 
-/// BOUNDARY — the expert's incoming-requests view: the Experts tab for a
-/// role=expert account (the deliberate minimal realization of the #20–#24
-/// portal). NEW → Accept/Decline · ACTIVE → deliverables + Mark complete ·
-/// COMPLETED → muted history.
+/// BOUNDARY (#22 Requests) — triage: accept or decline incoming requests.
+/// Once accepted, the engagement is managed under Clients → #23.1 (per the
+/// fulfillment model); active rows here link straight there.
 class ExpertRequestsView extends ConsumerWidget {
   const ExpertRequestsView({super.key});
 
@@ -68,24 +68,6 @@ class ExpertRequestsView extends ConsumerWidget {
   }
 }
 
-/// Matched 44px single-line action pair — same height/radius/type for the
-/// filled and outlined halves so the card actions read as one control set.
-final ButtonStyle _compactFilled = ElevatedButton.styleFrom(
-  minimumSize: const Size(0, 44),
-  padding: const EdgeInsets.symmetric(horizontal: 12),
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  textStyle: AppTypography.footnote.copyWith(fontWeight: FontWeight.w700),
-);
-
-ButtonStyle _compactOutlined(Color color) => OutlinedButton.styleFrom(
-      foregroundColor: color,
-      side: BorderSide(color: color),
-      minimumSize: const Size(0, 44),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: AppTypography.footnote.copyWith(fontWeight: FontWeight.w700),
-    );
-
 class _RequestCard extends ConsumerWidget {
   const _RequestCard({required this.summary, this.muted = false});
 
@@ -137,7 +119,7 @@ class _RequestCard extends ConsumerWidget {
                     onPressed: () => ref
                         .read(acceptServiceRequestProvider)
                         .call(request.id),
-                    style: _compactFilled,
+                    style: expertCompactFilled,
                     child: const Text('Accept'),
                   ),
                 ),
@@ -147,39 +129,24 @@ class _RequestCard extends ConsumerWidget {
                     onPressed: () => ref
                         .read(declineServiceRequestProvider)
                         .call(request.id),
-                    style: _compactOutlined(AppColors.danger),
+                    style: expertCompactOutlined(AppColors.danger),
                     child: const Text('Decline'),
                   ),
                 ),
               ],
             )
-          else if (request.isAccepted) ...[
-            Text(
-                '${summary.deliverables.length} deliverable'
-                '${summary.deliverables.length == 1 ? '' : 's'} sent',
-                style: AppTypography.caption2),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () =>
-                        showDeliverableComposer(context, request.id),
-                    style: _compactOutlined(AppColors.accent),
-                    child: const Text('Send deliverable'),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _confirmComplete(context, ref),
-                    style: _compactFilled,
-                    child: const Text('Mark complete'),
-                  ),
-                ),
-              ],
-            ),
-          ] else if (request.isCompleted)
+          else if (request.isAccepted)
+            OutlinedButton(
+              onPressed: summary.otherParty == null
+                  ? null
+                  : () => Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                          builder: (_) => ExpertClientDetailScreen(
+                              clientId: summary.otherParty!.id))),
+              style: expertCompactOutlined(AppColors.accent),
+              child: const Text('In progress — manage under Clients'),
+            )
+          else if (request.isCompleted)
             const StatusBadge('COMPLETED',
                 bg: AppColors.successBright, fg: AppColors.ink)
           else
@@ -189,29 +156,4 @@ class _RequestCard extends ConsumerWidget {
     );
   }
 
-  void _confirmComplete(BuildContext context, WidgetRef ref) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: const Text('Mark engagement complete?'),
-        content: const Text(
-            'The client will be able to leave a review. This can\'t be undone.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              ref
-                  .read(completeServiceRequestProvider)
-                  .call(summary.request.id);
-            },
-            child: const Text('Complete'),
-          ),
-        ],
-      ),
-    );
-  }
 }

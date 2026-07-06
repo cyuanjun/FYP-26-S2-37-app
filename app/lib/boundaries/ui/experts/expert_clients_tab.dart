@@ -8,10 +8,12 @@ import '../../../entities/public_profile.dart';
 import '../../../entities/service_request_summary.dart';
 import '../common/app_card.dart';
 import '../common/status_badge.dart';
+import 'expert_client_detail_screen.dart';
 
 /// BOUNDARY (#23 Expert Clients). Everyone who has engaged this expert,
-/// grouped from the request inbox: engagement counts + current state.
-/// Deliverable composition happens on Requests (#22) in this realization.
+/// split Active/Past per the fulfillment model. Tapping a client opens
+/// #23.1 Client Detail, where deliverables are sent and engagements
+/// marked complete.
 class ExpertClientsTab extends ConsumerWidget {
   const ExpertClientsTab({super.key});
 
@@ -39,22 +41,48 @@ class ExpertClientsTab extends ConsumerWidget {
           ? Center(
               child: Text('No clients yet — accepted requests appear here.',
                   style: AppTypography.subheadline))
-          : ListView(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-              children: [
-                for (final entry in byClient.entries)
-                  _clientCard(identities[entry.key]!, entry.value),
-              ],
-            ),
+          : Builder(builder: (context) {
+              final activeIds = byClient.entries
+                  .where((e) => e.value.any((r) =>
+                      r.request.isAccepted || r.request.isPending))
+                  .map((e) => e.key)
+                  .toList();
+              final pastIds = byClient.keys
+                  .where((id) => !activeIds.contains(id))
+                  .toList();
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                children: [
+                  if (activeIds.isNotEmpty) ...[
+                    Text('ACTIVE', style: AppTypography.caption2),
+                    const SizedBox(height: 8),
+                    for (final id in activeIds)
+                      _clientCard(context, identities[id]!, byClient[id]!),
+                  ],
+                  if (pastIds.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text('PAST', style: AppTypography.caption2),
+                    const SizedBox(height: 8),
+                    for (final id in pastIds)
+                      _clientCard(context, identities[id]!, byClient[id]!),
+                  ],
+                ],
+              );
+            }),
     );
   }
 
-  Widget _clientCard(
-      PublicProfile client, List<ServiceRequestSummary> engagements) {
+  Widget _clientCard(BuildContext context, PublicProfile client,
+      List<ServiceRequestSummary> engagements) {
     final active = engagements.where((e) => e.request.isAccepted).length;
     final completed = engagements.where((e) => e.request.isCompleted).length;
 
-    return AppCard(
+    return GestureDetector(
+      onTap: () => Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+              builder: (_) =>
+                  ExpertClientDetailScreen(clientId: client.id))),
+      child: AppCard(
       margin: const EdgeInsets.only(bottom: 12),
       borderColor: AppColors.faint,
       child: Row(
@@ -88,7 +116,9 @@ class ExpertClientsTab extends ConsumerWidget {
           if (active > 0)
             const StatusBadge('ACTIVE',
                 bg: AppColors.successBright, fg: AppColors.ink),
+          const Icon(Icons.chevron_right, color: AppColors.faint, size: 18),
         ],
+      ),
       ),
     );
   }
