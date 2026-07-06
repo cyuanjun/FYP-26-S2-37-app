@@ -5,6 +5,8 @@ import '../../../controls/authenticate.dart';
 import '../../../core/theme/app_typography.dart';
 import '../common/app_card.dart';
 import '../common/avatar_button.dart';
+import '../common/premium_cta.dart';
+import '../premium/upgrade_screen.dart';
 import 'my_purchases_section.dart';
 
 /// BOUNDARY (#5 Dashboard — minimal slice version). Greets the signed-in user
@@ -41,6 +43,16 @@ class DashboardTab extends ConsumerWidget {
               p?.isPremium ?? false ? 'Premium member' : 'Free member',
               style: AppTypography.subheadline,
             ),
+            if (p?.isFree ?? false) ...[
+              const SizedBox(height: 12),
+              PremiumCta('⚡ Go Premium — personalised AI plans & more',
+                  fullWidth: true,
+                  radius: 12,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  onTap: () => Navigator.of(context, rootNavigator: true)
+                      .push(MaterialPageRoute(
+                          builder: (_) => const UpgradeScreen()))),
+            ],
             const SizedBox(height: 24),
             AppCard(
               width: double.infinity,

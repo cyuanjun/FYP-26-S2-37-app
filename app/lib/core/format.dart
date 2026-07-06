@@ -54,6 +54,12 @@ String relativeDay(DateTime d, {DateTime? now}) {
   return '${_weekdays[local.weekday]} ${local.day} ${_months[local.month]}';
 }
 
+/// "8 Aug 2026" — absolute date for renewal / billing rows (#13.6).
+String fmtDate(DateTime d) {
+  final l = d.toLocal();
+  return '${l.day} ${_months[l.month]} ${l.year}';
+}
+
 /// Monday 00:00 of the week containing [d].
 DateTime startOfWeek(DateTime d) {
   final day = DateTime(d.year, d.month, d.day);

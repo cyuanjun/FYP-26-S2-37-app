@@ -214,6 +214,28 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
    - **See:** **no** "Unlock with Premium" pill, **no** monthly-cap banner, **no** search-lock — those Free-only
      surfaces are hidden for Premium. Same rich analytics + session history (7 seeded sessions).
 
+### H. Upgrade to Premium *(the live tier flip — great demo moment)*
+1. Log in as `free@wiseworkout.test` (Mia).
+   - **See:** the gold **"⚡ Go Premium — personalised AI plans & more"** banner on the Dashboard
+     (also reachable from the Profile **GO PREMIUM** pill, History's unlock pill / cap banner,
+     and the Plan Detail upgrade CTAs).
+2. Tap the banner.
+   - **See:** **#16 Upgrade** — "TRAIN SMARTER." hero, the six **PREMIUM UNLOCKS**, the gold-ringed
+     **$9.99 / mo** pricing card, **START PREMIUM**, and "Payment is simulated — no real charge."
+3. Tap **START PREMIUM** → the **SIMULATED PAYMENT** sheet (plan summary + mock Visa •••• 4242) →
+   **CONFIRM PAYMENT**.
+   - **See:** "Welcome to Premium 🎉" — back on the Dashboard the banner is **gone** and the subtitle
+     reads **Premium member**. No re-login: the `start_premium` RPC flipped the role live.
+4. Open **Profile**.
+   - **See:** the GO PREMIUM pill is gone; a **⭐ Manage Subscription** row appeared. Tap it.
+   - **See:** **#13.6 Subscription** — PREMIUM MONTHLY plan card (ACTIVE badge, renewal date),
+     mock payment method, synthesised **billing history**, **CANCEL SUBSCRIPTION**.
+5. Optional: **Cancel** (confirm dialog) → badge flips to CANCELLED with "access until {date}" →
+   **RESUME SUBSCRIPTION** flips it back.
+6. **Reset for the next demo** (Mia should stay Free) — in SQL editor / psql:
+   `select set_config('app.role_change_authorized','on',true); update profiles set role='free' where email='free@wiseworkout.test'; delete from subscriptions where id=(select id from profiles where email='free@wiseworkout.test');`
+   (one transaction), then log out in the app.
+
 ---
 
 ## 5. Run the automated tests

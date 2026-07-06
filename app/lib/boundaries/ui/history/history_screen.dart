@@ -15,6 +15,7 @@ import '../common/premium_cta.dart';
 import '../common/stat_tile.dart';
 import '../common/workout_list_card.dart';
 import '../common/status_badge.dart';
+import '../premium/upgrade_screen.dart';
 import '../workout/history_detail_screen.dart';
 
 enum _Period { day, week, month }
@@ -37,6 +38,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   void _soon(String what) => ScaffoldMessenger.of(context)
       .showSnackBar(SnackBar(content: Text('$what is a Premium feature (later sprint).')));
+
+  void _goUpgrade() => Navigator.of(context, rootNavigator: true)
+      .push(MaterialPageRoute(builder: (_) => const UpgradeScreen()));
 
   void _showAiSummary() {
     showModalBottomSheet<void>(
@@ -129,9 +133,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                           backgroundColor: AppColors.premium,
                           foregroundColor: AppColors.ink,
                         ),
-                        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Premium upgrade is coming in a later sprint.')),
-                        ),
+                        onPressed: _goUpgrade,
                         child: const Text('Upgrade to Premium'),
                       ),
                     ],
@@ -172,7 +174,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   // ---- Search (Free = locked pill) ----
   Widget _searchLockedPill() {
     return GestureDetector(
-      onTap: () => _soon('History search'),
+      onTap: () => _soon('History search'),  // search stays a later-sprint item
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
@@ -252,7 +254,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           if (!isPremium) ...[
             const SizedBox(height: 16),
             PremiumCta('⚡ Unlock with Premium →',
-                onTap: () => _soon('Advanced analytics'),
+                onTap: _goUpgrade,
                 fullWidth: true,
                 padding: const EdgeInsets.symmetric(vertical: 10)),
           ],
@@ -316,7 +318,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               style: AppTypography.footnote.copyWith(color: AppColors.ink)),
           const SizedBox(height: 10),
           GestureDetector(
-            onTap: () => _soon('Full history'),
+            onTap: _goUpgrade,
             child: Container(
               width: double.infinity,
               alignment: Alignment.center,

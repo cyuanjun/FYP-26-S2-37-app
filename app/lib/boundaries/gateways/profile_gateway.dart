@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../entities/enums.dart';
 import '../../entities/profile.dart';
+import '../../entities/subscription.dart';
 import '../../core/strings.dart';
 
 /// BOUNDARY (gateway) — reads/writes the `profiles` table. Controls call this;
@@ -34,6 +35,26 @@ class ProfileGateway {
       'first_name': firstName.trim(),
       if (lastName.isNotBlank) 'last_name': lastName!.trim(),
     }).eq('id', id);
+  }
+
+  /// Simulated Free→Premium upgrade (#16) — the SECURITY DEFINER RPC flips the
+  /// role and upserts the subscriptions row; direct role writes stay blocked.
+  Future<void> startPremium() async {
+    await _client.rpc<void>('start_premium');
+  }
+
+  /// The caller's subscription row, or null while Free (#13.6).
+  Future<Subscription?> fetchSubscription(String id) async {
+    final row =
+        await _client.from('subscriptions').select().eq('id', id).maybeSingle();
+    return row == null ? null : Subscription.fromJson(row);
+  }
+
+  /// Cancel / resume (#13.6) — owner-scoped status write, RLS-covered.
+  Future<void> setSubscriptionStatus(String id, SubscriptionStatus status) async {
+    await _client
+        .from('subscriptions')
+        .update({'status': status.dbValue}).eq('id', id);
   }
 
   /// Marks first-time onboarding done — Splash/Login stop routing to the wizard.

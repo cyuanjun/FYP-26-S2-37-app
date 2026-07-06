@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **7 Jul 2026** (after the Experts cluster: US27–US29 ✅, US49–US51 🟨). Tally: 20 ✅ · 12 🟨 · 32 ⬜.
+Last updated **8 Jul 2026** (after the premium upgrade flow: US31 + US40 ✅). Tally: 22 ✅ · 12 🟨 · 30 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -51,7 +51,7 @@ Last updated **7 Jul 2026** (after the Experts cluster: US27–US29 ✅, US49–
 | US28 | ✅ | As a registered free user, I want to browse expert categories so that I can identify what type of expert support may suit my fitness goals. | Category chips from the active expert_categories catalog filter both sub-tabs (7 Jul) |
 | US29 | ✅ | As a registered free user, I want to request expert services as a paid add-on so that I can receive professional support when needed. | #6.2 request modal (simulated payment, price snapshot) → pending → deliverables → review; MY PURCHASES on #5 (7 Jul) |
 | US30 | ⬜ | As a registered free user, I want to browse and purchase expert-created content so that I can access professional fitness guidance when needed. | Experts marketplace — placeholder tab |
-| US31 | ⬜ | As a registered free user, I want to view upgrade options so that I can decide whether to subscribe to premium features. | Go Premium pill is a placeholder; Upgrade #16 pending |
+| US31 | ✅ | As a registered free user, I want to view upgrade options so that I can decide whether to subscribe to premium features. | #16 Upgrade built: hero + 6 honest unlocks + $9.99 pricing card; reached from every Free upsell hook (Dashboard banner, Profile pill, History cap/analytics, Plan Detail) |
 
 ## Registered Premium user (US32–US40)
 
@@ -65,7 +65,7 @@ Last updated **7 Jul 2026** (after the Experts cluster: US27–US29 ✅, US49–
 | US37 | ✅ | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | Live AI plans (gpt-4o-mini, strict schema + validation); My Plans + Plan Detail #8 with regenerate (Free capped at 1) |
 | US38 | ⬜ | As a registered premium user, I want to customise plan duration, workout frequency, preferred workout categories, target calories, daily or weekly weight loss goals, and preferred rest days so that the fitness plan fits my schedule and needs. | Personalised plans / reminders / subscription mgmt pending |
 | US39 | ⬜ | As a registered premium user, I want to receive personalised workout reminders, inactivity alerts, and rest alerts so that I can maintain a balanced routine. | Personalised plans / reminders / subscription mgmt pending |
-| US40 | ⬜ | As a registered premium user, I want to view or manage my subscription status so that I can understand and control my paid access. | Personalised plans / reminders / subscription mgmt pending |
+| US40 | ✅ | As a registered premium user, I want to view or manage my subscription status so that I can understand and control my paid access. | #13.6 Subscription Management built: plan/status/renewal, mock payment method, synthesised billing history, cancel/resume (simulated payment; `start_premium` RPC does the live Free→Premium flip) |
 
 ## Expert user (US41–US52)
 

@@ -2,7 +2,7 @@
 screen: 16-upgrade
 role: free
 group: settings
-status: spec-only
+status: built
 ---
 
 # 16. Upgrade to Premium

@@ -12,6 +12,7 @@ import '../../../entities/workout_type.dart';
 import '../../gateways/workout_gateway.dart';
 import '../common/app_card.dart';
 import '../common/premium_cta.dart';
+import '../premium/upgrade_screen.dart';
 import '../common/status_badge.dart';
 
 /// BOUNDARY (#8 Plan Detail). Read-only view of an active or saved plan:
@@ -283,6 +284,8 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
                   padding: const EdgeInsets.all(12),
                   style: AppTypography.footnote
                       .copyWith(color: AppColors.ink, fontWeight: FontWeight.w600),
+                  onTap: () => Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(builder: (_) => const UpgradeScreen())),
                 ),
               ],
               const SizedBox(height: 20),
@@ -378,11 +381,8 @@ class _RegenerateLink extends ConsumerWidget {
         if (blocked) ...[
           const SizedBox(height: 6),
           PremiumCta('⚡ Upgrade for unlimited regenerations',
-              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text(
-                            'Premium upgrade is coming in a later sprint.')),
-                  )),
+              onTap: () => Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (_) => const UpgradeScreen()))),
         ],
       ],
     );

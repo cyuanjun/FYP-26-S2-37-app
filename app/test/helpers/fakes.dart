@@ -18,6 +18,7 @@ import 'package:wise_workout/entities/challenge.dart';
 import 'package:wise_workout/entities/deliverable.dart';
 import 'package:wise_workout/entities/expert_category.dart';
 import 'package:wise_workout/entities/expert_service.dart';
+import 'package:wise_workout/entities/subscription.dart';
 import 'package:wise_workout/entities/expert_summary.dart';
 import 'package:wise_workout/entities/service_request_summary.dart';
 import 'package:wise_workout/entities/enums.dart';
@@ -525,6 +526,35 @@ class FakeProfileGateway implements ProfileGateway {
   @override
   Future<void> updateName(String id, {required String firstName, String? lastName}) async =>
       nameWrites.add((firstName, lastName));
+
+  // ---- Premium (grows with the interface) ----
+  Subscription? subscription;
+  int startPremiumCalls = 0;
+  final subscriptionStatusWrites = <SubscriptionStatus>[];
+
+  @override
+  Future<void> startPremium() async {
+    startPremiumCalls++;
+    final p = profile;
+    if (p != null && !p.isFree) {
+      throw Exception('Only free accounts can upgrade');
+    }
+    profile = p?.copyWith(role: UserRole.premium);
+    subscription = Subscription(
+      id: p?.id ?? 'u1',
+      startedAt: DateTime(2026, 7, 8),
+      renewsAt: DateTime(2026, 8, 8),
+    );
+  }
+
+  @override
+  Future<Subscription?> fetchSubscription(String id) async => subscription;
+
+  @override
+  Future<void> setSubscriptionStatus(String id, SubscriptionStatus status) async {
+    subscriptionStatusWrites.add(status);
+    subscription = subscription?.copyWith(status: status);
+  }
 }
 
 /// Fake FeedbackGateway — records submissions, optionally throws.

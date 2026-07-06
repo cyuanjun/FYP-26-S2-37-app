@@ -75,9 +75,15 @@ These are the deliberate translations from the PascalCase ERD to the physical sc
 ### SECURITY DEFINER RPCs
 
 Multi-step atomic mutations live in **SECURITY DEFINER RPCs**, added as their controls land (build-plan §3).
-- ✅ **`end_workout_session`** (finalize session + bump XP + recompute streak + maybe emit a `level_up` post) — built.
-- ⏳ Still deferred: `startPremium` (role flip + `subscriptions` upsert) and the `ServiceRequest`
-  status-transition rules (client cancels / expert accepts+completes).
+- ✅ **`end_workout_session`** (finalize session + bump XP + recompute streak + maybe emit a `level_up` post).
+- ✅ **`add_friend` / `remove_friend`** (mutual Follow pair, atomic both directions).
+- ✅ **`accept_service_request` / `decline_service_request` / `complete_service_request` / `submit_expert_review`**
+  (the ServiceRequest status-lifecycle + review rules; complete bumps `client_count` and `total_earned_cents`,
+  review recomputes `rating_avg`/`review_count`; direct writes revoked — RPCs are the only path).
+- ✅ **`start_premium`** (the simulated Free→Premium upgrade: role flip + `subscriptions` upsert; the
+  role-guard trigger admits it via a transaction-local flag, so client role writes stay blocked).
+  Cancel/resume on #13.6 are deliberately NOT RPCs — owner-scoped status writes under `subscriptions_owner`.
+- ⏳ Still deferred: client `cancel` of a pending ServiceRequest (no UI surface).
 
 The RLS here gates *row access*; these RPCs enforce the *column-level transition* logic.
 

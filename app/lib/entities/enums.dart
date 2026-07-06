@@ -176,3 +176,20 @@ extension ResponseTimeLabel on ResponseTime {
 enum ServiceRequestStatus { pending, accepted, completed, cancelled }
 
 enum VerificationStatus { pending, verified, rejected }
+
+@JsonEnum(fieldRename: FieldRename.snake)
+enum SubscriptionStatus { active, cancelled, pastDue }
+
+extension SubscriptionStatusLabel on SubscriptionStatus {
+  String get label => switch (this) {
+        SubscriptionStatus.active => 'Active',
+        SubscriptionStatus.cancelled => 'Cancelled',
+        SubscriptionStatus.pastDue => 'Past due',
+      };
+
+  /// Postgres enum value (snake) — for direct column writes.
+  String get dbValue => switch (this) {
+        SubscriptionStatus.pastDue => 'past_due',
+        _ => name,
+      };
+}

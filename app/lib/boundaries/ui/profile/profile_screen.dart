@@ -9,6 +9,8 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/fitness_profile.dart';
 import '../common/stat_tile.dart';
 import '../common/premium_cta.dart';
+import '../premium/subscription_management_screen.dart';
+import '../premium/upgrade_screen.dart';
 import 'account_settings_screen.dart';
 import 'fitness_goals_screen.dart';
 import 'fitness_profile_screen.dart';
@@ -49,7 +51,7 @@ class ProfileScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: PremiumCta('GO PREMIUM',
-                  onTap: () => _soon(context, 'Upgrade'),
+                  onTap: () => _push(context, const UpgradeScreen()),
                   icon: Icons.star,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -146,6 +148,14 @@ class ProfileScreen extends ConsumerWidget {
               emoji: '🔔',
               label: 'Notifications',
               onTap: () => _push(context, const NotificationsScreen())),
+          if (profile?.isPremium ?? false) ...[
+            const Divider(color: AppColors.faint, height: 1),
+            MenuRow(
+                emoji: '⭐',
+                label: 'Manage Subscription',
+                onTap: () =>
+                    _push(context, const SubscriptionManagementScreen())),
+          ],
           const Divider(color: AppColors.faint, height: 1),
           MenuRow(
               emoji: '💬',
