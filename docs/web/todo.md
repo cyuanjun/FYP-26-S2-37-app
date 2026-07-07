@@ -1,5 +1,7 @@
 # TODO
 
+> **Updated 11 Jul 2026:** the site now shares the app's Supabase database — live reads (metrics, pricing, testimonials, experts), real Supabase Auth (register / login / expert application), and real `contact_messages` inserts, with the bundled seed as offline fallback. Statements below about placeholder/seed-only gateways are historical; see [limitations.md](./limitations.md) for the current truth.
+
 ## Future Auth Work
 
 ### Supabase Login Sessions
@@ -44,7 +46,7 @@ Current UI behavior:
 - At least one certification document is required.
 - Accepted file types: PDF, JPG, PNG, WebP.
 - Max file size: 5 MB each.
-- File metadata is currently passed through the placeholder gateway.
+- File metadata is recorded in `expert_verification_documents` by the signup trigger; the file blobs themselves are still not uploaded.
 
 Future implementation:
 

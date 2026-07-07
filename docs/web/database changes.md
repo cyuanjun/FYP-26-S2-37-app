@@ -1,5 +1,7 @@
 # Database Changes
 
+> **Updated 11 Jul 2026:** the site now shares the app's Supabase database — live reads (metrics, pricing, testimonials, experts), real Supabase Auth (register / login / expert application), and real `contact_messages` inserts, with the bundled seed as offline fallback. Statements below about placeholder/seed-only gateways are historical; see [limitations.md](./limitations.md) for the current truth.
+
 This file logs changes needed for the landing page when compared against the `../FYP-26-S2-37-app` Supabase schema.
 
 The app schema is the source of truth. If the old `../fyp` prototype differs from the app schema, adapt the landing page to the app schema and record the difference here.
@@ -75,7 +77,7 @@ Draft SQL files for these additions are stored in:
 database/migrations/
 ```
 
-These are planning drafts. Final migrations should live in `../FYP-26-S2-37-app` before real database integration.
+These began as planning drafts and were finalised on 11 Jul 2026 as `app/supabase/migrations/20260711090000_landing_site.sql` (applied to the local stack and the hosted project). This document remains the design rationale.
 
 ### 1. Public Testimonials
 

@@ -1,6 +1,8 @@
 # Test Plan
 
-This project currently includes a landing-page slice plus user/expert registration UI. Data access is seed-backed or placeholder-backed. The most important tests now are architecture checks, build checks, and simple UI behavior checks.
+> **Updated 11 Jul 2026:** the site now shares the app's Supabase database — live reads (metrics, pricing, testimonials, experts), real Supabase Auth (register / login / expert application), and real `contact_messages` inserts, with the bundled seed as offline fallback. Statements below about placeholder/seed-only gateways are historical; see [limitations.md](./limitations.md) for the current truth.
+
+This project includes a landing-page slice plus user/expert registration UI. Data access is live against the shared Supabase database with bundled-seed fallback. The most important automated tests are architecture checks, build checks, and simple UI behavior checks; DB-backed flows were verified manually end-to-end on 11 Jul 2026 (headless-browser runs with row-level checks, local + hosted).
 
 ## Automated Checks
 
@@ -121,7 +123,7 @@ Expected:
 
 Note:
 
-The gateway is currently a no-op seed placeholder. Real DB insert is later.
+The gateway inserts into the shared `contact_messages` table (anon insert by design).
 
 ### 8. Login Positive Flow
 
@@ -138,7 +140,7 @@ Expected:
 
 Note:
 
-The gateway is currently a placeholder. Real Supabase Auth sign-in is later.
+The gateway signs in via Supabase Auth and reads the caller's own `profiles` row.
 
 ### 9. User Registration Positive Flow
 
@@ -155,7 +157,7 @@ Expected:
 
 Note:
 
-The gateway is currently a placeholder. Supabase Auth sign-up is later.
+The gateway signs up via Supabase Auth; the DB trigger mirrors profiles (and expert applications).
 
 ### 10. Expert Registration Positive Flow
 
@@ -296,7 +298,7 @@ Manual steps:
 Expected:
 
 - Error message appears.
-- Registration placeholder gateway is not called.
+- The registration gateway is not called (validation fails first).
 
 ### 8. Login Missing Password
 
@@ -321,7 +323,7 @@ Manual steps:
 Expected:
 
 - Error message appears.
-- Expert application placeholder gateway is not called.
+- The expert-application gateway is not called (validation fails first).
 
 ### 10. Expert Application Missing Documents
 
@@ -334,7 +336,7 @@ Manual steps:
 Expected:
 
 - Error message appears.
-- Expert application placeholder gateway is not called.
+- The expert-application gateway is not called (validation fails first).
 
 ## Deferred Integration Tests
 

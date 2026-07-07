@@ -1,5 +1,7 @@
 # Demo Checklist
 
+> **Updated 11 Jul 2026:** the site now shares the app's Supabase database — live reads (metrics, pricing, testimonials, experts), real Supabase Auth (register / login / expert application), and real `contact_messages` inserts, with the bundled seed as offline fallback. Statements below about placeholder/seed-only gateways are historical; see [limitations.md](./limitations.md) for the current truth.
+
 ## Before The Demo
 
 Run:
@@ -99,7 +101,7 @@ src/boundary/gateways/landingGateway.ts
 
 Say:
 
-> The controller calls a gateway boundary. Right now that gateway reads hardcoded seed data. Later, this is where the Supabase/Postgres query will go.
+> The controller calls a gateway boundary. The gateway now queries the shared Supabase database live — the same Postgres the mobile app writes to — and falls back to bundled seed data if the network is down.
 
 ### 5. Show Seed Data Is Explicit
 
@@ -208,7 +210,7 @@ Current limitations are documented in docs/limitations.md.
 
 Answer:
 
-> Admin editing, real media uploads, live Supabase reads, real login sessions, and logout are not implemented yet. Login, user registration, and expert application forms are present, but they submit to placeholder gateways until Supabase Auth and the shared database are connected. Expert document files are collected and validated, but real storage is not connected yet.
+> Admin editing, real media uploads, persistent site sessions, and logout are not implemented yet. Login, registration, and expert application use real Supabase Auth against the shared database — a website registration can immediately log into the mobile app, and an expert application creates the pending profile the admin portal will approve. Expert document files are validated and their metadata recorded, but the file blobs are not uploaded.
 
 ## Quick Recovery
 

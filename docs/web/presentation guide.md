@@ -1,5 +1,7 @@
 # Presentation Guide
 
+> **Updated 11 Jul 2026:** the site now shares the app's Supabase database — live reads (metrics, pricing, testimonials, experts), real Supabase Auth (register / login / expert application), and real `contact_messages` inserts, with the bundled seed as offline fallback. Statements below about placeholder/seed-only gateways are historical; see [limitations.md](./limitations.md) for the current truth.
+
 ## One-Sentence Summary
 
 This project recreates the existing Wise Workout landing page frontend while reorganizing the code using BCE: users interact only with boundary UI, boundary UI calls controllers, and controllers coordinate entities/gateways.
@@ -45,7 +47,7 @@ Important:
 - UI components do not query the database directly.
 - UI components do not import entities directly.
 - Controllers coordinate the use case.
-- Gateways are the only place that should later talk to Postgres/Supabase.
+- Gateways are the only place that talks to Postgres/Supabase.
 
 ## Example Flow: Contact Form
 
@@ -53,7 +55,7 @@ Important:
 Visitor fills contact form
 -> ContactSection.vue handles the submit event
 -> submitContactMessage.ts validates/coordinatess the action
--> contactGateway.ts will insert into contact_messages later
+-> contactGateway.ts inserts into the shared contact_messages table
 ```
 
 Current file path:
@@ -98,7 +100,7 @@ src/boundary/gateways/seed/expert-categories.seed.json
 
 Presentation wording:
 
-> These seed files stand in for the database boundary. Because the UI talks to controllers and controllers talk to gateways, replacing seed reads with Supabase reads later should not require rewriting the UI.
+> These seed files are now the offline fallback behind the live Supabase reads. Because the UI talks to controllers and controllers talk to gateways, swapping seed reads for Supabase reads required no UI changes — which is exactly the BCE payoff.
 
 ## Example Flow: Expert Specialties
 
@@ -142,9 +144,9 @@ docs/limitations.md
 
 Short version:
 
-- Login UI exists, but real Supabase Auth sessions are not connected yet.
-- Registration forms exist, but real Supabase Auth writes are not connected yet.
-- Expert application collects and validates verification documents, but real storage writes are not connected yet.
+- Login, registration, and expert application run against real Supabase Auth on the shared database.
+- The site keeps no persistent session (accounts are for the app); logout UI is not implemented.
+- Expert verification documents are metadata-only — the file blobs are not uploaded to Storage.
 - Gateway data is currently seed-backed.
 - Admin editing pages are not implemented yet.
 - Real media upload/storage is not connected yet.

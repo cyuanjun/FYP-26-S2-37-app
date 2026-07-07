@@ -1,5 +1,7 @@
 # Landing Page BCE Plan
 
+> **Updated 11 Jul 2026:** the site now shares the app's Supabase database — live reads (metrics, pricing, testimonials, experts), real Supabase Auth (register / login / expert application), and real `contact_messages` inserts, with the bundled seed as offline fallback. Statements below about placeholder/seed-only gateways are historical; see [limitations.md](./limitations.md) for the current truth.
+
 ## Current Objective
 
 Build a Wise Workout landing page that visually follows the existing `../fyp` frontend while using a BCE-oriented architecture compatible with the shared `../FYP-26-S2-37-app` database direction.
@@ -65,7 +67,7 @@ Rules:
 - Boundary UI must not import entities directly.
 - Controllers coordinate validation and use-case flow.
 - Controllers call gateway boundaries for data access.
-- Gateway boundaries represent external systems such as seed data now and Postgres/Supabase later.
+- Gateway boundaries represent external systems — now live Supabase reads/writes with bundled seed as the offline fallback.
 - Entities must not import boundary or controller code.
 
 The rule is enforced by:
@@ -83,7 +85,7 @@ npm run check:bce
 /expert-application  expert application UI
 ```
 
-`/login` currently submits to a placeholder gateway because Supabase Auth is not connected yet.
+`/login` signs in against the shared project's Supabase Auth and shows the role-based destination.
 
 ## Current Data Flow
 
@@ -139,7 +141,7 @@ ExpertApplicationPage.vue
 -> authGateway.ts
 ```
 
-The expert application currently validates document file type/size and passes document metadata through the placeholder gateway. Actual storage writes are listed in [limitations.md](./limitations.md).
+The expert application validates document file type/size and records document metadata in `expert_verification_documents` via the signup trigger (files themselves are not uploaded — see [limitations.md](./limitations.md)).
 
 Login:
 
@@ -208,7 +210,7 @@ client_count desc
 
 ## Pricing
 
-Pricing should be database-backed later through `landing_pricing_plans`.
+Pricing is database-backed through `landing_pricing_plans`.
 
 For now:
 
