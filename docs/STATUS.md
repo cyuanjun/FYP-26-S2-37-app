@@ -12,6 +12,9 @@
 - **RPC change** (migration `20260709090000`, local + hosted): `end_workout_session` honours an optional backdated `started_at` in the metrics (ended_at = start + duration, capped at now; future starts raise). Live sessions unchanged.
 - **190 tests** (+2: manual payload incl. backdate + no-device, non-cardio drops distance).
 
+## 10 Jul (later) — MODULE TEST REPORT (for the 11 Jul milestone)
+- **[testing/module-test-report.md](testing/module-test-report.md)** generated from a fresh run: 9 modules · **221/221 automated cases pass** (each enumerated by name from the live suite) · 13 manual procedures indexed to their dated STATUS evidence · requirements traceability per module · declared limitations (sim can't exercise notification delivery / real-BLE hardware; payment simulated by scope) · sign-off block. The 11 Jul milestone becomes review-and-sign.
+
 ## 10 Jul — FINISHING PASS: TRAINING EFFECT + AVATAR UPLOAD + REAL BLE
 - **Per-session TRAINING EFFECT (US35 short-term ✅):** shared card on #10 Summary + #12.1 Detail per the spec — band (Low/Moderate/High/Very High, coloured) + 1–10 score + canned recovery line; Premium adds the **aerobic/anaerobic split + indicative recovery window**; Free gets the upsell link; no-HR sessions get the honest unavailable state. Pure rules in `entities/training_effect.dart` (spec formula; 7 tests). Verified: Alex's Leg day = High · 8/10, aerobic 4.0/5, ~24 h.
 - **Avatar upload (StorageGateway lands):** public `avatars` bucket (owner-folder write policies, migration `20260709100000`), `StorageGateway.uploadAvatar` (upsert + cache-busted public URL), `UpdateAvatar` control, gallery picker on #13 (image_picker, 512px), photo renders on the profile circle + AvatarButton. Verified end-to-end on the simulator (storage object + profiles.avatar_url + rendering).
@@ -102,7 +105,7 @@
 ## Calendar
 - **~13 Jun** — PTD + PUM due (basic-prototype milestone, PRD §8.2).
 - **20 Jun** — End-of-Term-1 review.
-- 11 Jul module testing · 1 Aug integration · 13–22 Aug final demo.
+- 11 Jul module testing (report ready — [testing/module-test-report.md](testing/module-test-report.md)) · 1 Aug integration · 13–22 Aug final demo.
 
 ---
 

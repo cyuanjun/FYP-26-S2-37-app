@@ -14,6 +14,7 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 | **[reference/](reference/)** | The spec carried over from the design phase — data model, design system, screen-by-screen specs | [database-v1.md](reference/database-v1.md), [screens-v1.md](reference/screens-v1.md) |
 | **[testing/](testing/)** | QA evidence — the running **[bug-log.md](testing/bug-log.md)** (symptom → root cause → fix → commit), feeds PTD testing + module testing | [bug-log.md](testing/bug-log.md) |
 | **[archive/](archive/)** | Legacy docs for the React flow-explorer mock (kept for provenance; not the build target) | — |
+| [testing/module-test-report.md](testing/module-test-report.md) | **Module test report (11 Jul milestone)** — 221 automated cases by module + manual-procedure evidence + traceability | review & sign |
 | [demo-script.md](demo-script.md) | **The Aug final-demo run-of-show** — acts, taps, talking points, timings, fallbacks | rehearse from this |
 | [prototype-demo-guide.md](prototype-demo-guide.md) | **Run & demo the prototype** — setup, walkthroughs, test accounts, backend verification | start here to demo |
 | [project-description.md](project-description.md) | The FYP project brief | — |
