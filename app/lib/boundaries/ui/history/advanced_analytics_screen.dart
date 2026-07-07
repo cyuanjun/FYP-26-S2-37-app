@@ -9,6 +9,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/advanced_analytics.dart';
 import '../../../entities/workout_session.dart';
 import '../common/app_card.dart';
+import '../common/selector_pills.dart';
 import '../common/status_badge.dart';
 
 /// BOUNDARY (#12.2 Advanced Workout Analytics, Premium). Trends over time
@@ -74,7 +75,12 @@ class _AdvancedAnalyticsScreenState
         children: [
           _acwrTile(acwr),
           const SizedBox(height: 20),
-          _rangePills(),
+          SelectorPills<_Range>(
+            values: _Range.values,
+            selected: _range,
+            labelOf: (r) => r.label,
+            onTap: (r) => setState(() => _range = r),
+          ),
           const SizedBox(height: 16),
           _card('WEEKLY VOLUME', [
             _metricToggle(),
@@ -212,32 +218,7 @@ class _AdvancedAnalyticsScreenState
 
   // ---- Range + metric selectors ----
 
-  Widget _rangePills() {
-    return Row(
-      children: [
-        for (final r in _Range.values) ...[
-          GestureDetector(
-            onTap: () => setState(() => _range = r),
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: _range == r ? AppColors.accent : AppColors.surface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                    color: _range == r ? AppColors.accent : AppColors.faint),
-              ),
-              child: Text(r.label,
-                  style: AppTypography.footnote.copyWith(
-                      color: _range == r ? AppColors.bg : AppColors.ink,
-                      fontWeight: FontWeight.w700)),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ],
-    );
-  }
+
 
   Widget _metricToggle() {
     const labels = {

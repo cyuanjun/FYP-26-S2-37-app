@@ -9,6 +9,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/expert_service.dart';
+import '../common/field_label.dart';
+import '../common/selector_pills.dart';
 
 /// BOUNDARY (#21.2 Create / Edit Service). The expert's listing editor —
 /// create when [existing] is null, edit otherwise. Status (draft / live /
@@ -118,7 +120,7 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         children: [
-          _label('SERVICE NAME'),
+          const FieldLabel('SERVICE NAME'),
           TextField(
             controller: _name,
             onChanged: (_) => setState(() {}),
@@ -126,7 +128,7 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
                 const InputDecoration(hintText: 'e.g. 12-Week Strength Block'),
           ),
           const SizedBox(height: 16),
-          _label('DESCRIPTION'),
+          const FieldLabel('DESCRIPTION'),
           TextField(
             controller: _description,
             maxLines: 3,
@@ -134,7 +136,7 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
                 hintText: 'One or two sentences clients see on the listing'),
           ),
           const SizedBox(height: 16),
-          _label('CATEGORY'),
+          const FieldLabel('CATEGORY'),
           DropdownButtonFormField<String>(
             initialValue: _category,
             hint: const Text('Choose a category'),
@@ -149,7 +151,7 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
             onChanged: (v) => setState(() => _category = v),
           ),
           const SizedBox(height: 16),
-          _label('WHAT THE CLIENT GETS (FULFILLMENT)'),
+          const FieldLabel('WHAT THE CLIENT GETS (FULFILLMENT)'),
           DropdownButtonFormField<FulfillmentType>(
             initialValue: _fulfillment,
             style: AppTypography.body,
@@ -170,7 +172,7 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _label('PRICE (USD)'),
+                    const FieldLabel('PRICE (USD)'),
                     TextField(
                       controller: _price,
                       keyboardType: const TextInputType.numberWithOptions(
@@ -186,7 +188,7 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _label('DURATION (WEEKS)'),
+                    const FieldLabel('DURATION (WEEKS)'),
                     TextField(
                       controller: _durationWeeks,
                       keyboardType: TextInputType.number,
@@ -199,23 +201,23 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _label('BILLING'),
-          _pills<PricingModel>(
+          const FieldLabel('BILLING'),
+          SelectorPills<PricingModel>(
             values: PricingModel.values,
             selected: _pricingModel,
             labelOf: (m) => m == PricingModel.oneTime ? 'One-time' : 'Monthly',
             onTap: (m) => setState(() => _pricingModel = m),
           ),
           const SizedBox(height: 16),
-          _label('RESPONSE TIME'),
-          _pills<ResponseTime>(
+          const FieldLabel('RESPONSE TIME'),
+          SelectorPills<ResponseTime>(
             values: ResponseTime.values,
             selected: _responseTime,
             labelOf: (r) => r.dbValue,
             onTap: (r) => setState(() => _responseTime = r),
           ),
           const SizedBox(height: 16),
-          _label("WHAT'S INCLUDED (ONE PER LINE)"),
+          const FieldLabel("WHAT'S INCLUDED (ONE PER LINE)"),
           TextField(
             controller: _bullets,
             maxLines: 4,
@@ -238,8 +240,8 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _label('LISTING STATUS'),
-          _pills<ServiceStatus>(
+          const FieldLabel('LISTING STATUS'),
+          SelectorPills<ServiceStatus>(
             values: widget.existing == null
                 ? const [ServiceStatus.draft, ServiceStatus.live]
                 : ServiceStatus.values,
@@ -273,41 +275,6 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
     );
   }
 
-  Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text, style: AppTypography.caption2),
-      );
 
-  Widget _pills<T>({
-    required List<T> values,
-    required T selected,
-    required String Function(T) labelOf,
-    required void Function(T) onTap,
-  }) {
-    return Row(
-      children: [
-        for (final v in values) ...[
-          GestureDetector(
-            onTap: () => onTap(v),
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: v == selected ? AppColors.accent : AppColors.surface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                    color:
-                        v == selected ? AppColors.accent : AppColors.faint),
-              ),
-              child: Text(labelOf(v),
-                  style: AppTypography.footnote.copyWith(
-                      color: v == selected ? AppColors.bg : AppColors.ink,
-                      fontWeight: FontWeight.w700)),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ],
-    );
-  }
+
 }

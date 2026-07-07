@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/log_manual_workout.dart';
 import '../../gateways/workout_gateway.dart';
+import '../common/field_label.dart';
+import '../common/selector_pills.dart';
 import '../../../core/format.dart';
 import '../../../core/strings.dart';
 import '../../../core/theme/app_colors.dart';
@@ -103,36 +105,12 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         children: [
-          _label('WORKOUT TYPE'),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final t in types)
-                GestureDetector(
-                  onTap: () => setState(() => _type = t),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: _type?.id == t.id
-                          ? AppColors.accent
-                          : AppColors.surface,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                          color: _type?.id == t.id
-                              ? AppColors.accent
-                              : AppColors.faint),
-                    ),
-                    child: Text('${iconForSlug(t.slug)} ${t.name}',
-                        style: AppTypography.footnote.copyWith(
-                            color: _type?.id == t.id
-                                ? AppColors.bg
-                                : AppColors.ink,
-                            fontWeight: FontWeight.w700)),
-                  ),
-                ),
-            ],
+          const FieldLabel('WORKOUT TYPE'),
+          SelectorPills<WorkoutType>(
+            values: types,
+            selected: _type,
+            labelOf: (t) => '${iconForSlug(t.slug)} ${t.name}',
+            onTap: (t) => setState(() => _type = t),
           ),
           const SizedBox(height: 16),
           Row(
@@ -142,7 +120,7 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _label('DATE'),
+                    const FieldLabel('DATE'),
                     OutlinedButton(
                       onPressed: _pickDate,
                       style: OutlinedButton.styleFrom(
@@ -164,7 +142,7 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _label('START TIME'),
+                    const FieldLabel('START TIME'),
                     OutlinedButton(
                       onPressed: _pickTime,
                       style: OutlinedButton.styleFrom(
@@ -197,7 +175,7 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _label('DURATION (MIN)'),
+                    const FieldLabel('DURATION (MIN)'),
                     TextField(
                       controller: _duration,
                       keyboardType: TextInputType.number,
@@ -213,7 +191,7 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _label('DISTANCE (KM)'),
+                          const FieldLabel('DISTANCE (KM)'),
                           TextField(
                             controller: _distance,
                             keyboardType:
@@ -229,35 +207,15 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _label('HOW DID IT FEEL?'),
-          Wrap(
-            spacing: 8,
-            children: [
-              for (final f in FeelRating.values)
-                GestureDetector(
-                  onTap: () =>
-                      setState(() => _feel = _feel == f ? null : f),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color:
-                          _feel == f ? AppColors.accent : AppColors.surface,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                          color:
-                              _feel == f ? AppColors.accent : AppColors.faint),
-                    ),
-                    child: Text(_feelLabel(f),
-                        style: AppTypography.footnote.copyWith(
-                            color: _feel == f ? AppColors.bg : AppColors.ink,
-                            fontWeight: FontWeight.w700)),
-                  ),
-                ),
-            ],
+          const FieldLabel('HOW DID IT FEEL?'),
+          SelectorPills<FeelRating>(
+            values: FeelRating.values,
+            selected: _feel,
+            labelOf: _feelLabel,
+            onTap: (f) => setState(() => _feel = _feel == f ? null : f),
           ),
           const SizedBox(height: 16),
-          _label('NOTES (PRIVATE)'),
+          const FieldLabel('NOTES (PRIVATE)'),
           TextField(
             controller: _notes,
             maxLines: 3,
@@ -286,10 +244,6 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
     );
   }
 
-  Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text, style: AppTypography.caption2),
-      );
 
   String _feelLabel(FeelRating f) => switch (f) {
         FeelRating.great => '🔥 Great',

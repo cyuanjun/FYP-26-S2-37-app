@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../controls/expert_requests.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../common/field_label.dart';
 
 /// Deliverable composer (expert view) — deliberately simple: title, note,
 /// and one optional section where each line becomes an item. Not the full
@@ -57,10 +58,6 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
     if (ok) Navigator.of(context).pop();
   }
 
-  Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text, style: AppTypography.caption2),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +73,7 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
         children: [
           Text('SEND DELIVERABLE', style: AppTypography.caption2),
           const SizedBox(height: 14),
-          _label('TITLE (REQUIRED)'),
+          const FieldLabel('TITLE (REQUIRED)'),
           TextField(
             controller: _title,
             onChanged: (_) => setState(() {}),
@@ -84,20 +81,20 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
                 const InputDecoration(hintText: 'e.g. Weeks 1–4 Training Block'),
           ),
           const SizedBox(height: 12),
-          _label('NOTE (OPTIONAL)'),
+          const FieldLabel('NOTE (OPTIONAL)'),
           TextField(
             controller: _note,
             decoration:
                 const InputDecoration(hintText: 'A short note for your client'),
           ),
           const SizedBox(height: 12),
-          _label('SECTION HEADING (OPTIONAL)'),
+          const FieldLabel('SECTION HEADING (OPTIONAL)'),
           TextField(
             controller: _heading,
             decoration: const InputDecoration(hintText: 'e.g. Day A — Lower'),
           ),
           const SizedBox(height: 12),
-          _label('SECTION ITEMS'),
+          const FieldLabel('SECTION ITEMS'),
           TextField(
             controller: _lines,
             maxLines: 4,

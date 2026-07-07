@@ -83,3 +83,22 @@ The automated pass flagged these; grep/`analyze` disproved them. Listed so they 
 ~~1. **H1 + H2 + H3** … 4. **L1/L2** …~~ — **✅ all applied 6 Jul 2026** in exactly this order (H1→H8, then M1→M5, then L1→L5), one item at a time, each verified with `flutter analyze` + the 112-test suite + an on-simulator relaunch before moving on.
 
 The codebase is otherwise clean: no orphan files, no commented-out blocks, no TODO/FIXME markers, no redundant migrations/policies/tests.
+
+---
+
+## Addendum — 10 Jul 2026 cleanup pass
+
+The July feature sprints (premium, expert portal, notifications, manual entry,
+#12.2, Training Effect) each grew private copies of two UI patterns; this pass
+extracted them into `ui/common/` and refactored all call sites (221 tests green):
+
+- **`FieldLabel`** — the caption-outside-the-box form label (was four private
+  `_label(...)` copies: manual entry, service editor, professional info,
+  deliverable composer).
+- **`SelectorPills<T>`** — the accent single-select pill row (was four
+  hand-rolled versions: service editor billing/response/status pills, #12.2
+  range pills, manual-entry workout-type + feel chips). Callers own the
+  toggle/deselect semantics via `onTap`.
+
+Also reconciled stale claims: CLAUDE.md current-state paragraph (was pre-expert
+"168 tests"), demo-guide test counts, and the shared-widget inventory.

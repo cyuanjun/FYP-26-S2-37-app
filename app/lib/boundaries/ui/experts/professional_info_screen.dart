@@ -6,6 +6,7 @@ import '../../../core/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/expert_profile.dart';
+import '../common/field_label.dart';
 
 /// BOUNDARY (#24.1 Manage Professional Info). Edits the expert's
 /// self-descriptive columns — title, years coaching, about, credentials,
@@ -87,7 +88,7 @@ class _ProfessionalInfoScreenState
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         children: [
-          _label('PROFESSIONAL TITLE'),
+          const FieldLabel('PROFESSIONAL TITLE'),
           TextField(
             controller: _title,
             onChanged: (_) => setState(() {}),
@@ -95,7 +96,7 @@ class _ProfessionalInfoScreenState
                 const InputDecoration(hintText: 'e.g. Strength Coach'),
           ),
           const SizedBox(height: 16),
-          _label('YEARS COACHING'),
+          const FieldLabel('YEARS COACHING'),
           TextField(
             controller: _years,
             keyboardType: TextInputType.number,
@@ -103,7 +104,7 @@ class _ProfessionalInfoScreenState
             decoration: const InputDecoration(hintText: '9'),
           ),
           const SizedBox(height: 16),
-          _label('ABOUT'),
+          const FieldLabel('ABOUT'),
           TextField(
             controller: _about,
             maxLines: 5,
@@ -111,7 +112,7 @@ class _ProfessionalInfoScreenState
                 hintText: 'What clients should know about how you coach'),
           ),
           const SizedBox(height: 16),
-          _label('CREDENTIALS (ONE PER LINE)'),
+          const FieldLabel('CREDENTIALS (ONE PER LINE)'),
           TextField(
             controller: _credentials,
             maxLines: 4,
@@ -119,7 +120,7 @@ class _ProfessionalInfoScreenState
                 hintText: 'NASM CPT\nBSc Exercise Science'),
           ),
           const SizedBox(height: 16),
-          _label('SPECIALTIES (COMMA-SEPARATED)'),
+          const FieldLabel('SPECIALTIES (COMMA-SEPARATED)'),
           TextField(
             controller: _specialties,
             decoration:
@@ -147,8 +148,4 @@ class _ProfessionalInfoScreenState
     );
   }
 
-  Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text, style: AppTypography.caption2),
-      );
 }
