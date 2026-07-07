@@ -1,0 +1,245 @@
+{
+  "site": {
+    "site_name": "Wise Workout",
+    "brand_first_word": "Wise",
+    "brand_second_word": "Workout",
+    "logo_url": "Logo",
+    "navigation": [
+      { "label": "Home", "url": "#top" },
+      { "label": "Features", "url": "#features" },
+      { "label": "Statistics", "url": "#statistics" },
+      { "label": "Experts", "url": "#experts" },
+      { "label": "Pricing", "url": "#pricing" },
+      { "label": "Testimonials", "url": "#testimonials" },
+      { "label": "FAQ", "url": "#faq" },
+      { "label": "Contact", "url": "#contact" }
+    ],
+    "auth_actions": [
+      { "label": "Login", "url": "/login" },
+      { "label": "Register", "url": "/register" }
+    ],
+    "footer": {
+      "site_name": "Wise Workout",
+      "copyright_text": "Copyright 2026 Wise Workout",
+      "links": [
+        { "label": "Privacy", "url": "/privacy" },
+        { "label": "Terms", "url": "/terms" },
+        { "label": "Contact", "url": "#contact" }
+      ]
+    }
+  },
+  "sections": [
+    {
+      "type": "intro",
+      "eyebrow": "AI fitness platform",
+      "headline_primary": "Train smarter.",
+      "headline_accent": "Track sharper.",
+      "hero_media_url": "hero_video_url",
+      "hero_title": "Fitness tracking, AI-assisted progress summaries, and expert services in one platform.",
+      "hero_description": "Designed for users who want to record workouts, monitor progress, and receive guided support. Supports free users, premium users, expert users, and administrators.",
+      "primary_cta_text": "Start tracking",
+      "primary_cta_url": "./register.html",
+      "secondary_cta_text": "Explore features",
+      "secondary_cta_url": "#features"
+    },
+    {
+      "type": "features",
+      "eyebrow": "Product features",
+      "title": "App features",
+      "section_description": "Highlights the main platform capabilities that can be edited by administrators.",
+      "items": [
+        { "icon_url": "Feature image", "title": "Workout activity recording", "description": "Record workout activities and maintain workout history." },
+        { "icon_url": "Feature image", "title": "AI progress summaries and plan suggestions", "description": "Receive AI-assisted summaries and fitness plan suggestions." },
+        { "icon_url": "Feature image", "title": "Expert discovery and service requests", "description": "Browse expert profiles and request paid expert services." }
+      ]
+    },
+    {
+      "type": "statistics",
+      "eyebrow": "Proof",
+      "title": "Platform statistics",
+      "section_description": "Builds visitor trust by showing audience growth, platform activity, AI usage, and expert availability.",
+      "overview_chart_image_url": "",
+      "user_base": [
+        {
+          "segment_name": "Free users",
+          "segment_description": "Users who track workouts and access basic progress summaries.",
+          "data_source": "free_users",
+          "segment_count": "",
+          "growth_percentage": ""
+        },
+        {
+          "segment_name": "Premium users",
+          "segment_description": "Users who access advanced AI summaries and premium tracking features.",
+          "data_source": "premium_users",
+          "segment_count": "",
+          "growth_percentage": ""
+        },
+        {
+          "segment_name": "Verified experts",
+          "segment_description": "Verified experts who provide specialised coaching and support services.",
+          "data_source": "verified_experts",
+          "segment_count": "",
+          "growth_percentage": ""
+        }
+      ],
+      "items": [
+        {
+          "metric_label": "Approved reviews",
+          "line_color": "#b8ff00",
+          "chart_data_summary": "Approved user testimonials currently surfaced on the landing page",
+          "data_source": "approved_reviews",
+          "metric_value": "",
+          "growth_percentage": ""
+        },
+        {
+          "metric_label": "Active categories",
+          "line_color": "#00b4ff",
+          "chart_data_summary": "Expert categories curated by the admin team and currently visible in expert browsing",
+          "data_source": "active_categories",
+          "metric_value": "",
+          "growth_percentage": ""
+        },
+        {
+          "metric_label": "Verified experts",
+          "line_color": "#ff5c8a",
+          "chart_data_summary": "Verified experts grouped by coaching, strength, running, nutrition, and recovery categories",
+          "data_source": "verified_experts",
+          "metric_value": "",
+          "growth_percentage": ""
+        }
+      ]
+    },
+    {
+      "type": "featuredExperts",
+      "eyebrow": "Specialists",
+      "title": "Featured experts",
+      "section_description": "Shows selected expert profiles that are marked as featured by administrators.",
+      "featured_user_ids": []
+    },
+    {
+      "type": "pricing",
+      "eyebrow": "Access",
+      "title": "Pricing plans",
+      "section_description": "Explains the available subscription tiers and expert service pricing options.",
+      "items": [
+        {
+          "plan_name": "Free tier",
+          "price": "$0/mth",
+          "description": "Basic tracking and summaries",
+          "button_text": "Choose plan",
+          "button_url": "./register.html",
+          "features": [
+            "Workout activity logging",
+            "Basic workout history",
+            "Limited AI progress summaries",
+            "Browse verified experts",
+            "Access FAQ and contact support"
+          ]
+        },
+        {
+          "plan_name": "Premium tier",
+          "price": "$9.90/mth",
+          "description": "Advanced analytics and personalised AI",
+          "button_text": "Choose plan",
+          "button_url": "./register.html",
+          "features": [
+            "Everything in Free",
+            "Unlimited AI progress summaries",
+            "Personalised plan suggestions",
+            "Advanced progress statistics",
+            "Priority reminder and goal tools",
+            "Premium support"
+          ]
+        },
+        {
+          "plan_name": "Expert services",
+          "price": "Add-on",
+          "description": "Separate paid expert services",
+          "button_text": "Add-on",
+          "button_url": "./register.html",
+          "features": [
+            "Everything in Premium",
+            "Request verified experts by category",
+            "Custom coaching or nutrition plans",
+            "Direct expert feedback",
+            "Service add-ons for events or specialist goals"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "testimonials",
+      "eyebrow": "Social proof",
+      "title": "Testimonials",
+      "section_description": "Displays approved feedback records from users and expert-service customers.",
+      "overall_rating_label": "Overall Rating",
+      "review_count_template": "Based on {count} reviews",
+      "rating_distribution": [
+        { "label": "Excellent" },
+        { "label": "Good" },
+        { "label": "Average" },
+        { "label": "Below Average" },
+        { "label": "Poor" }
+      ],
+      "featured_ids": []
+    },
+    {
+      "type": "ctaRow",
+      "items": [
+        {
+          "eyebrow": "For members",
+          "panel_variant": "member",
+          "title": "Start tracking your training",
+          "description": "Create an account to record workouts, receive AI summaries, monitor progress, and browse expert support.",
+          "button_text": "Register",
+          "button_url": "/register"
+        },
+        {
+          "eyebrow": "For experts",
+          "panel_variant": "expert",
+          "title": "Apply as a verified expert",
+          "description": "Offer coaching, training, nutrition, or recovery services to users who need specialised guidance.",
+          "button_text": "Apply",
+          "button_url": "/expert-application"
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "eyebrow": "Questions",
+      "title": "FAQ",
+      "section_description": "Answers common questions visitors may have before registering, subscribing, or requesting expert support.",
+      "items": [
+        {
+          "question": "Can I use Wise Workout for free?",
+          "answer": "Yes. Free users can log workouts, view basic workout history, browse verified experts, and access limited AI progress summaries."
+        },
+        {
+          "question": "What does the premium plan add?",
+          "answer": "Premium adds unlimited AI progress summaries, personalised plan suggestions, advanced progress statistics, priority reminders, and premium support."
+        },
+        {
+          "question": "How do expert services work?",
+          "answer": "Users can browse featured experts by category and request paid coaching, nutrition, recovery, or specialist event support as separate add-ons."
+        },
+        {
+          "question": "Can administrators update this landing page?",
+          "answer": "Yes. Section text, feature records, statistics, expert profiles, pricing details, testimonials, FAQs, and contact content can be managed from database records."
+        }
+      ]
+    },
+    {
+      "type": "contactSection",
+      "eyebrow": "Contact",
+      "contact_heading": "Get in touch",
+      "contact_subheading": "Need help before joining Wise Workout?",
+      "contact_description": "Send a message to the team for support, partnership enquiries, or questions about expert services.",
+      "name_placeholder": "Enter your name",
+      "email_placeholder": "Enter a valid email address",
+      "message_placeholder": "Enter your message",
+      "terms_label": "I accept the Terms of Service",
+      "button_text": "Submit",
+      "social_links": ["Facebook", "Instagram", "YouTube", "LinkedIn"]
+    }
+  ]
+}

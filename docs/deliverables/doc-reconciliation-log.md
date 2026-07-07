@@ -4,7 +4,7 @@ Tracks where the three **submitted deliverables** — **PRD v2/v3**, **SRS v2.0*
 
 > **Version decisions (12 Jun 2026):** **TDM v5 is canonical** — *except* its **§6 sequence diagrams, which the team confirmed are wrong** (replace from bce-design §5; see A3). **PRD v3 is textually identical to v2** — the §B edits were never folded in; the team will fix the PRD **after** the 13 Jun submission, since only the **PTD + PUM** are submitted. Anything the PTD copies from the PRD must apply §B during assembly.
 
-> Driver: engineering decisions lead, documents follow ("requirements change as we continue"). The build-plan ([../architecture/build-plan.md](../architecture/build-plan.md)) and BCE design ([../architecture/bce-design.md](../architecture/bce-design.md)) are the technical source of truth; this log is the to-do list for the Word deliverables.
+> Driver: engineering decisions lead, documents follow ("requirements change as we continue"). The build-plan ([../architecture/build-plan.md](../app/architecture/build-plan.md)) and BCE design ([../architecture/bce-design.md](../app/architecture/bce-design.md)) are the technical source of truth; this log is the to-do list for the Word deliverables.
 
 ## Submitted-document versions
 | Doc | Version | Date | Canonical for |
@@ -54,7 +54,7 @@ The TDM is newest and supersedes earlier design material. Where the TDM and PRD/
 
 | # | Was | Now resolved by |
 |---|---|---|
-| D1 | **`database-v1.md` reconciliation** — open question on expert reviews + whether paid services / custom plans / simulated payment were modelled. | **TDM §8 ERD settles it:** `ExpertReview` is **kept**; the expert layer = `ExpertService` (listings, `PricingModel`/`PriceCents`) → `ServiceRequest` (`QuotedPriceCents`, status) → `Deliverable` (expert-created content/plans to the client); subscriptions via `Subscription` (`PriceCents`, `RenewsAt`); payment **simulated** (price fields only, no transaction ledger). **Action: align [../reference/database-v1.md](../reference/database-v1.md) to TDM §8, then generate DDL from the TDM ERD** — not the other way round. |
+| D1 | **`database-v1.md` reconciliation** — open question on expert reviews + whether paid services / custom plans / simulated payment were modelled. | **TDM §8 ERD settles it:** `ExpertReview` is **kept**; the expert layer = `ExpertService` (listings, `PricingModel`/`PriceCents`) → `ServiceRequest` (`QuotedPriceCents`, status) → `Deliverable` (expert-created content/plans to the client); subscriptions via `Subscription` (`PriceCents`, `RenewsAt`); payment **simulated** (price fields only, no transaction ledger). **Action: align [../reference/database-v1.md](../app/reference/database-v1.md) to TDM §8, then generate DDL from the TDM ERD** — not the other way round. |
 | D2 | AI scope uncertainty. | TDM §3.4 confirms summaries + suggestions only (see C2). |
 
 ### TDM §8 ERD — entity roster (the schema of record, ~26 entities)

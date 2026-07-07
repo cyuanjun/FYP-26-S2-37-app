@@ -6,7 +6,7 @@
 **Group:** FYP-26-S2-37
 **Supervisor:** Mr Premrajan P
 
-> Structured to the FYP URS template. The **feature breakdown mirrors the team's functional-decomposition diagram** (the authoritative scope), with three deliberate retentions and one fold (see *Scope decisions* below). Requirements trace to the design artifacts: screens in [../reference/screens-v1.md](../reference/screens-v1.md), data model in [../reference/database-v1.md](../reference/database-v1.md), and use-case ↔ control mapping in [../architecture/bce-design.md](../architecture/bce-design.md).
+> Structured to the FYP URS template. The **feature breakdown mirrors the team's functional-decomposition diagram** (the authoritative scope), with three deliberate retentions and one fold (see *Scope decisions* below). Requirements trace to the design artifacts: screens in [../reference/screens-v1.md](../app/reference/screens-v1.md), data model in [../reference/database-v1.md](../app/reference/database-v1.md), and use-case ↔ control mapping in [../architecture/bce-design.md](../app/architecture/bce-design.md).
 
 ### Scope decisions (vs the feature diagram)
 
@@ -31,7 +31,7 @@ The audience is everyone involved in the project: the four team members, the sup
 
 Wise Workout is a SaaS mobile product that lets users **collect exercise data** from phone sensors (and, in a later phase, wearables/BLE sensors), **analyse exercise effects** over any period, receive **AI-generated, customisable fitness plans**, get **reminders** to exercise or rest, and **interact socially** — sharing workouts to Facebook / Instagram / Twitter / TikTok and competing in challenges. It offers **profile-based, data-driven** services across four in-app roles (Free, Premium, Expert, Admin) under a freemium model.
 
-Account **registration** and **expert application** are performed on the external marketing website; the app handles login and everything thereafter. **In scope:** phone-sensor + manual capture; AI plans (basic/personalised); analytics incl. one predictive projection; social feed, challenges, and platform sharing; expert marketplace incl. reviews; admin back-office (users, expert approval, moderation, categories, monitoring); mock subscription. **Deferred:** real wearable/BLE integration, real payment processing, OAuth/2FA. (MVP boundary and cut order: [../architecture/build-plan.md](../architecture/build-plan.md) §1.)
+Account **registration** and **expert application** are performed on the external marketing website; the app handles login and everything thereafter. **In scope:** phone-sensor + manual capture; AI plans (basic/personalised); analytics incl. one predictive projection; social feed, challenges, and platform sharing; expert marketplace incl. reviews; admin back-office (users, expert approval, moderation, categories, monitoring); mock subscription. **Deferred:** real wearable/BLE integration, real payment processing, OAuth/2FA. (MVP boundary and cut order: [../architecture/build-plan.md](../app/architecture/build-plan.md) §1.)
 
 ---
 
@@ -39,7 +39,7 @@ Account **registration** and **expert application** are performed on the externa
 
 ### 2.1 Product Perspective
 
-A new, self-contained mobile application backed by a managed cloud backend (Supabase: Postgres, Auth, Storage, Realtime, Edge Functions) with an AI plan-generation service (OpenAI, called server-side). A separate marketing website (already live) drives registration, expert applications, and hosts a public contact form. The app captures workout data on-device, persists it to the backend, derives analytics, and powers a social and marketplace layer. It is designed to the Boundary–Control–Entity architecture (see [../architecture/bce-design.md](../architecture/bce-design.md)).
+A new, self-contained mobile application backed by a managed cloud backend (Supabase: Postgres, Auth, Storage, Realtime, Edge Functions) with an AI plan-generation service (OpenAI, called server-side). A separate marketing website (already live) drives registration, expert applications, and hosts a public contact form. The app captures workout data on-device, persists it to the backend, derives analytics, and powers a social and marketplace layer. It is designed to the Boundary–Control–Entity architecture (see [../architecture/bce-design.md](../app/architecture/bce-design.md)).
 
 ### 2.2 Product Features
 
@@ -113,7 +113,7 @@ Features mirror the functional-decomposition diagram (marketing-website items ex
 
 ### 2.6 User Documentation
 
-A preliminary user manual / in-app onboarding, and the marketing website's feature pages. Per-screen behaviour is specified in [../reference/screens-v1.md](../reference/screens-v1.md).
+A preliminary user manual / in-app onboarding, and the marketing website's feature pages. Per-screen behaviour is specified in [../reference/screens-v1.md](../app/reference/screens-v1.md).
 
 ### 2.7 Assumptions and Dependencies
 
@@ -127,7 +127,7 @@ A preliminary user manual / in-app onboarding, and the marketing website's featu
 
 ## 3. System Features
 
-For each role: a **use-case diagram** (PlantUML — render at plantuml.com or the PlantUML IDE extension), the **user stories**, and **use-case descriptions** for the core flows. Remaining use cases follow the same template and trace to the features in §2.2 and the matrix in [../architecture/bce-design.md](../architecture/bce-design.md) §3.
+For each role: a **use-case diagram** (PlantUML — render at plantuml.com or the PlantUML IDE extension), the **user stories**, and **use-case descriptions** for the core flows. Remaining use cases follow the same template and trace to the features in §2.2 and the matrix in [../architecture/bce-design.md](../app/architecture/bce-design.md) §3.
 
 ### 3.1 Use Case Diagram — Free User
 
@@ -485,4 +485,4 @@ A --> A6
 
 ## 5. Traceability summary
 
-Every functional requirement maps to a **Screen** ([../reference/screens-v1.md](../reference/screens-v1.md)), a **Control** use case and **Entities** ([../architecture/bce-design.md](../architecture/bce-design.md) §2–§3), and a project-brief feature (rubric map in [../architecture/build-plan.md](../architecture/build-plan.md) §6). This forward/backward traceability is the basis for design verification and the demo/test plan.
+Every functional requirement maps to a **Screen** ([../reference/screens-v1.md](../app/reference/screens-v1.md)), a **Control** use case and **Entities** ([../architecture/bce-design.md](../app/architecture/bce-design.md) §2–§3), and a project-brief feature (rubric map in [../architecture/build-plan.md](../app/architecture/build-plan.md) §6). This forward/backward traceability is the basis for design verification and the demo/test plan.

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "strength",
+    "label": "Strength",
+    "description": "Strength training, lifting technique, and muscle-building programmes.",
+    "is_active": true
+  },
+  {
+    "id": "endurance",
+    "label": "Endurance",
+    "description": "Cardio conditioning, stamina, and long-duration training.",
+    "is_active": true
+  },
+  {
+    "id": "mobility",
+    "label": "Mobility",
+    "description": "Movement quality, flexibility, and joint range of motion.",
+    "is_active": true
+  },
+  {
+    "id": "nutrition",
+    "label": "Nutrition",
+    "description": "Eating habits, meal structure, and sport nutrition support.",
+    "is_active": true
+  },
+  {
+    "id": "running",
+    "label": "Running",
+    "description": "Running plans, pacing, race preparation, and running form.",
+    "is_active": true
+  },
+  {
+    "id": "recovery",
+    "label": "Recovery",
+    "description": "Rest, injury prevention, fatigue management, and recovery planning.",
+    "is_active": true
+  }
+]

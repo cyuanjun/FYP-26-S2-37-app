@@ -1,0 +1,62 @@
+[
+  {
+    "user_id": "7f1a9f8e-1a35-4e0f-a36c-49aa2f8e0f01",
+    "display_name": "Amelia Tan",
+    "email": "amelia.tan@example.com",
+    "avatar_url": null,
+    "title": "Strength and mobility coach",
+    "years_coaching": 9,
+    "about": "Helps busy members build sustainable strength routines with practical mobility work and recovery habits.",
+    "credentials": ["Certified Strength Coach", "Mobility Specialist", "Former national team trainer"],
+    "specialties": ["strength", "mobility", "recovery"],
+    "rating_avg": 4.9,
+    "review_count": 86,
+    "client_count": 240,
+    "verification_status": "verified"
+  },
+  {
+    "user_id": "89941fe0-1d48-4e3a-99ff-d9f8f7db0a02",
+    "display_name": "Marcus Lim",
+    "email": "marcus.lim@example.com",
+    "avatar_url": null,
+    "title": "Endurance performance specialist",
+    "years_coaching": 11,
+    "about": "Designs running and cycling plans for users who want better pacing, safer progression, and clearer race prep.",
+    "credentials": ["Endurance Coach", "Sports Science MSc", "Marathon programme lead"],
+    "specialties": ["endurance", "running", "recovery"],
+    "rating_avg": 4.8,
+    "review_count": 112,
+    "client_count": 310,
+    "verification_status": "verified"
+  },
+  {
+    "user_id": "3d9c3531-b116-4648-a797-d2dd96a7a503",
+    "display_name": "Priya Nair",
+    "email": "priya.nair@example.com",
+    "avatar_url": null,
+    "title": "Nutrition and habit coach",
+    "years_coaching": 7,
+    "about": "Supports members with nutrition planning, habit change, and realistic routines that match their training goals.",
+    "credentials": ["Sports Nutrition Specialist", "Precision Nutrition Certified", "Behaviour change coach"],
+    "specialties": ["nutrition", "recovery", "strength"],
+    "rating_avg": 4.7,
+    "review_count": 94,
+    "client_count": 198,
+    "verification_status": "verified"
+  },
+  {
+    "user_id": "dc86a9f2-907b-435b-8d37-bf9b5f274004",
+    "display_name": "Daniel Koh",
+    "email": "daniel.koh@example.com",
+    "avatar_url": null,
+    "title": "Hypertrophy programme coach",
+    "years_coaching": 8,
+    "about": "Builds progressive gym plans for members focused on muscle gain, form quality, and measurable weekly progress.",
+    "credentials": ["Personal Trainer", "Corrective Exercise Specialist", "Body recomposition coach"],
+    "specialties": ["strength", "mobility"],
+    "rating_avg": 4.9,
+    "review_count": 43,
+    "client_count": 122,
+    "verification_status": "verified"
+  }
+]

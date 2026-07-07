@@ -25,7 +25,7 @@ Three must-add items in total: a Notifications Inbox, an Invite Picker, and the 
 | Layer | What exists |
 |---|---|
 | Schema | [`ConnectedDevice`](../app/src/state/types.ts) with `deviceType` (apple_watch / fitbit / garmin / polar / oura / phone_sensors / other), `bluetoothAddress`, `lastSyncedAt`, `isActive`. `WorkoutSession.trackPoints` (GPX-style HR / cadence / elev / pace) + `trackSource` + `dataSource: wearable \| phone_sensors \| manual`. |
-| UI | [#7.1 Connected Devices](../reference/screens/free/07.1-connected-devices.md) with pair / unpair / set-primary; [#9 Active Workout](../reference/screens/free/09-active-workout.md) auto-picks the active non-phone-sensors device on session start; [#12.1 History Detail](../reference/screens/free/12.1-history-detail.md) renders LineChart from `trackPoints`. |
+| UI | [#7.1 Connected Devices](../app/reference/screens/free/07.1-connected-devices.md) with pair / unpair / set-primary; [#9 Active Workout](../app/reference/screens/free/09-active-workout.md) auto-picks the active non-phone-sensors device on session start; [#12.1 History Detail](../app/reference/screens/free/12.1-history-detail.md) renders LineChart from `trackPoints`. |
 
 **No UI or schema gap.** What's missing is implementation only (real BLE pairing in Flutter; live `trackPoints` append in `endWorkoutSession`; `lastSyncedAt` writeback) — none of those need new screens or columns.
 
@@ -39,7 +39,7 @@ Three must-add items in total: a Notifications Inbox, an Invite Picker, and the 
 |---|---|
 | Per-session | [`lib/effectEstimate.ts`](../app/src/lib/effectEstimate.ts) — Karvonen HR-reserve × duration multiplier → Training Effect 1–10 score, band, advice line. Aerobic / anaerobic split + recovery hours for Premium drill-down. Surfaced via `TrainingEffectCard` on #10 Workout Summary + #12.1 History Detail. |
 | Day / Week / Month / All | [`lib/periodAnalysis.ts`](../app/src/lib/periodAnalysis.ts) + `PeriodAnalysisCard` on #12 History. Free gets 3 pills (Day / Week / Month); Premium gets `All` too. Tiles: sessions, active min, calories, avg HR, max HR. Prior-period deltas per tile. |
-| Long-term | [`lib/advancedAnalytics.ts`](../app/src/lib/advancedAnalytics.ts) + [#12.2 Advanced Effect Estimates](../reference/screens/premium/12.2-advanced-analytics.md) (Premium-only). Weekly bars over 8w / 6mo / 1yr / all for volume, HR efficiency, training load. 4-tile personal bests. |
+| Long-term | [`lib/advancedAnalytics.ts`](../app/src/lib/advancedAnalytics.ts) + [#12.2 Advanced Effect Estimates](../app/reference/screens/premium/12.2-advanced-analytics.md) (Premium-only). Weekly bars over 8w / 6mo / 1yr / all for volume, HR efficiency, training load. 4-tile personal bests. |
 
 **No UI or schema gap.** All four pacing windows in the brief (per activity / day / week / month / any period) are covered. Calories burned, avg HR, max HR are the headline tiles.
 
@@ -55,9 +55,9 @@ Three must-add items in total: a Notifications Inbox, an Invite Picker, and the 
 
 | Layer | What exists |
 |---|---|
-| Goal capture | [#13.2 Fitness Goals](../reference/screens/free/13.2-fitness-goals.md) with `primaryGoal`, `targetValue` + `targetUnit`, `timelineWeeks` (4–24), `weeklyCommitmentDays` (1–7). All four customization knobs the brief names. |
-| Health info | [#13.1 Fitness Profile](../reference/screens/free/13.1-fitness-profile.md) with DOB / sex / height / weight / activity level / training experience, plus `healthTagIds[]` (diet / allergy / injury) and `preferredWorkoutTypeIds[]`. |
-| Plan generation | [`FitnessPlan`](../app/src/state/types.ts) + `PlannedWorkout` schema, `regenerateFitnessPlan` action, [#8 Plan Detail](../reference/screens/free/08-plan-detail.md) with Regenerate CTA (Free: 1/month cap, Premium: unlimited). [#7 Train](../reference/screens/free/07-train.md) surfaces today's planned workout. |
+| Goal capture | [#13.2 Fitness Goals](../app/reference/screens/free/13.2-fitness-goals.md) with `primaryGoal`, `targetValue` + `targetUnit`, `timelineWeeks` (4–24), `weeklyCommitmentDays` (1–7). All four customization knobs the brief names. |
+| Health info | [#13.1 Fitness Profile](../app/reference/screens/free/13.1-fitness-profile.md) with DOB / sex / height / weight / activity level / training experience, plus `healthTagIds[]` (diet / allergy / injury) and `preferredWorkoutTypeIds[]`. |
+| Plan generation | [`FitnessPlan`](../app/src/state/types.ts) + `PlannedWorkout` schema, `regenerateFitnessPlan` action, [#8 Plan Detail](../app/reference/screens/free/08-plan-detail.md) with Regenerate CTA (Free: 1/month cap, Premium: unlimited). [#7 Train](../app/reference/screens/free/07-train.md) surfaces today's planned workout. |
 
 ### UI gap — no standalone "advice" surface
 
@@ -83,7 +83,7 @@ If we want stored advice copy rather than derived: add an `AdviceTemplate` entit
 | Layer | What exists |
 |---|---|
 | Schema | [`NotificationTypeKey`](../app/src/state/types.ts) enum: `workout_reminder \| missed_workout \| inactivity_reminder \| rest_alert` covers both halves of the brief. `NOTIFICATION_TYPES` metadata with category / audience / name / description. `User.notificationPrefs` map. |
-| UI | [#13.4 Notifications](../reference/screens/free/13.4-notifications.md) — full toggle UI. Free sees `rest_alert` as locked-Premium; Premium gets an "Adaptive" badge on workout-reminder types. |
+| UI | [#13.4 Notifications](../app/reference/screens/free/13.4-notifications.md) — full toggle UI. Free sees `rest_alert` as locked-Premium; Premium gets an "Adaptive" badge on workout-reminder types. |
 
 ### UI gap — no notification inbox
 
@@ -131,7 +131,7 @@ A user has nowhere to view fired reminders. This is a critical gap — "send rem
 |---|---|
 | External sharing | [`SharePostModal`](../app/src/components/SharePostModal.tsx) with exactly the four FYP-named platforms (Facebook / Instagram / Twitter) + TikTok + Copy. [`lib/sharePost.ts`](../app/src/lib/sharePost.ts) opens real Twitter intent + Facebook sharer; Instagram + TikTok fall back to clipboard with a paste hint (web has no share API for them). |
 | Competitions schema | Unified [`Challenge`](../app/src/state/types.ts) entity polymorphic by `visibility: public \| invite_only` × `metricKind: accumulator \| best_of`. `ChallengeParticipant` junction. Seven metrics (total_distance / total_sessions / total_calories / active_days / fastest_time / longest_distance / most_calories). |
-| Competitions UI | [#11 Social](../reference/screens/free/11-social.md) Challenges tab with Joined / Active / Past sub-tabs + search + Create button. [#11.3 Challenge Detail](../reference/screens/free/11.3-challenge-detail.md) with leaderboard + progress + Join/Leave. [`CreateChallengeModal`](../app/src/components/CreateChallengeModal.tsx) for any combo. |
+| Competitions UI | [#11 Social](../app/reference/screens/free/11-social.md) Challenges tab with Joined / Active / Past sub-tabs + search + Create button. [#11.3 Challenge Detail](../app/reference/screens/free/11.3-challenge-detail.md) with leaderboard + progress + Join/Leave. [`CreateChallengeModal`](../app/src/components/CreateChallengeModal.tsx) for any combo. |
 | Result sharing | `best_of` challenges auto-emit a `challenge_result` Post on deadline. The Post is shareable to FB/IG/TW/TikTok via the same SharePostModal. |
 
 ### UI gap — invite picker + invitations strip

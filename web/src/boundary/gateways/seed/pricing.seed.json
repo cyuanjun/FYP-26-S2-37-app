@@ -1,0 +1,44 @@
+[
+  {
+    "plan_name": "Free tier",
+    "price": "$0/mth",
+    "description": "Basic tracking and summaries",
+    "button_text": "Choose plan",
+    "button_url": "/register",
+    "features": [
+      "Workout activity logging",
+      "Basic workout history",
+      "Limited AI progress summaries",
+      "Browse verified experts",
+      "Access FAQ and contact support"
+    ]
+  },
+  {
+    "plan_name": "Premium tier",
+    "price": "$9.90/mth",
+    "description": "Advanced analytics and personalised AI",
+    "button_text": "Choose plan",
+    "button_url": "/register",
+    "features": [
+      "Everything in Free",
+      "Unlimited AI progress summaries",
+      "Personalised plan suggestions",
+      "Advanced progress statistics",
+      "Priority reminder and goal tools",
+      "Premium support"
+    ]
+  },
+  {
+    "plan_name": "Expert services",
+    "price": "Add-on",
+    "description": "Separate paid expert services",
+    "button_text": "Explore",
+    "button_url": "/register",
+    "features": [
+      "Request verified experts by category",
+      "Custom coaching or nutrition plans",
+      "Direct expert feedback",
+      "Service add-ons for events or specialist goals"
+    ]
+  }
+]

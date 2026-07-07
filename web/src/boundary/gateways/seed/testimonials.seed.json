@@ -1,0 +1,50 @@
+[
+  {
+    "id": "3f7c73de-8a09-4f89-a267-21d4f9900011",
+    "rating": 5,
+    "created_at": "2026-05-18T09:00:00.000Z",
+    "feedback_text": "Wise Workout helped me keep my training consistent. The progress summaries make it much easier to understand what changed week by week.",
+    "user_display_name": "Jamie L.",
+    "user_category": "Premium runner",
+    "status": "approved",
+    "submitted_at": "2026-05-18T09:00:00.000Z",
+    "admin_reply": null,
+    "reviewed_at": "2026-05-19T10:30:00.000Z"
+  },
+  {
+    "id": "e8050466-6335-4379-a38c-5f6f7e900012",
+    "rating": 5,
+    "created_at": "2026-05-24T13:20:00.000Z",
+    "feedback_text": "The expert discovery flow is the part I use most. I found a coach who understood my schedule and helped me plan around work.",
+    "user_display_name": "Nadia S.",
+    "user_category": "Strength training",
+    "status": "approved",
+    "submitted_at": "2026-05-24T13:20:00.000Z",
+    "admin_reply": null,
+    "reviewed_at": "2026-05-25T08:15:00.000Z"
+  },
+  {
+    "id": "02215f76-676a-4c37-aa67-2f7f33e00013",
+    "rating": 4,
+    "created_at": "2026-06-02T07:45:00.000Z",
+    "feedback_text": "The workout history is clean and easy to scan. I like seeing my routine and AI notes together instead of across separate apps.",
+    "user_display_name": "Ethan P.",
+    "user_category": "Free member",
+    "status": "approved",
+    "submitted_at": "2026-06-02T07:45:00.000Z",
+    "admin_reply": null,
+    "reviewed_at": "2026-06-02T12:00:00.000Z"
+  },
+  {
+    "id": "abc28574-6ef0-4da6-844a-1bb49ad00014",
+    "rating": 5,
+    "created_at": "2026-06-09T16:30:00.000Z",
+    "feedback_text": "The plan suggestions gave me a practical starting point without feeling overwhelming. It feels built for real people.",
+    "user_display_name": "Mei C.",
+    "user_category": "Premium member",
+    "status": "approved",
+    "submitted_at": "2026-06-09T16:30:00.000Z",
+    "admin_reply": null,
+    "reviewed_at": "2026-06-10T09:10:00.000Z"
+  }
+]

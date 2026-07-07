@@ -37,7 +37,7 @@ This is a **design / flow exploration tool**, not the actual mobile app. The mob
 | Styling | **Tailwind CSS** | Quick to mock phone UIs |
 | Language | **TypeScript** | Catches screen-id typos in flow definitions |
 | Icons | **lucide-react** | Clean, used inside phone mocks |
-| Design tokens | [palette.md](../reference/palette.md) (colours) + [typography.md](../reference/typography.md) (iOS type scale) | Single source of truth for any colour or font-size choice in a screen mock. Tailwind config imports the palette directly. |
+| Design tokens | [palette.md](../app/reference/palette.md) (colours) + [typography.md](../app/reference/typography.md) (iOS type scale) | Single source of truth for any colour or font-size choice in a screen mock. Tailwind config imports the palette directly. |
 
 No backend. Flow definitions and screen mocks live in source files.
 
@@ -195,7 +195,7 @@ Concrete v1 screens to mock. **Each role's canvas must render and connect at lea
 **Auth & onboarding (4 screens):** Splash → Login → {Forgot password | Onboarding (post-login, temporary)}
 **Main — 5 bottom-nav tabs (8 screens):** Dashboard, Workouts → Workout detail → Active workout → Workout summary, Activity, Social, Profile
 **Settings & upsell (3 screens):** Settings → Notifications, Upgrade to Premium
-**Total: 15 screens.** Live inventory + status: [screens-v1.md](../reference/screens-v1.md). Signup is **external** — there is no in-app signup screen; users register on the marketing website (`fyp-26-s2-37-website.vercel.app`) linked from Login's footer.
+**Total: 15 screens.** Live inventory + status: [screens-v1.md](../app/reference/screens-v1.md). Signup is **external** — there is no in-app signup screen; users register on the marketing website (`fyp-26-s2-37-website.vercel.app`) linked from Login's footer.
 
 ### Premium user (`/premium`)
 All Free screens **plus:** Premium Dashboard (extra analytics widgets), Advanced Analytics, Custom Plan Builder, Ad-free badge on Profile, Subscription Management under Settings.

@@ -8,7 +8,7 @@ analytics, social sharing, an expert marketplace, and Free/Premium/Expert/Admin 
 architecture · **Supabase** (Postgres + Auth + RLS + Edge Functions) · **OpenAI** `gpt-4o-mini`
 (Gemini → rule-based fallback) for the two AI surfaces (progress summaries, plan generation).
 
-## Current state (10 Jul 2026) — feature-complete
+## Current state (11 Jul 2026) — app feature-complete
 
 Built, tested (221 tests), and verified on the Android emulator + iOS simulator against a live
 backend: login → onboarding wizard → AI-generated training plan → phone-GPS capture with
@@ -20,13 +20,16 @@ deliverable → review, simulated payment) **plus the complete expert portal** (
 request triage, client engagements, professional info) → **premium upgrade** (simulated checkout,
 live role flip, subscription management) → rule-based **notification reminders** → profile-photo
 upload. A local Supabase stack (`supabase start`, ports 55321-9) mirrors hosted for development.
-Remaining work is outside the app: the admin **web** portal, submitted-doc reconciliation edits,
-and one physical-device pass (notifications firing + real-BLE pairing).
+The **marketing website lives in `web/`** (Vue 3 + Vite + TS, same BCE discipline; landing
+sections + register/expert-application/login UIs, seed-backed — Supabase wiring + deploy pending).
+Remaining work is outside the app: the website's backend wiring, the admin **web** portal,
+submitted-doc reconciliation edits, and one physical-device pass (notifications firing +
+real-BLE pairing).
 
 - 📍 **Where we are / what's next:** [docs/STATUS.md](docs/STATUS.md)
-- 🏃 **Run & demo it** (setup, walkthroughs, test accounts): [docs/prototype-demo-guide.md](docs/prototype-demo-guide.md)
+- 🏃 **Run & demo it** (setup, walkthroughs, test accounts): [docs/prototype-demo-guide.md](docs/app/prototype-demo-guide.md)
 - 📋 **Requirements coverage** (all 64 user stories + build status): [docs/requirements/user-stories.md](docs/requirements/user-stories.md)
-- 🐛 **Bug log:** [docs/testing/bug-log.md](docs/testing/bug-log.md)
+- 🐛 **Bug log:** [docs/testing/bug-log.md](docs/app/testing/bug-log.md)
 - 🧭 **Docs index:** [docs/README.md](docs/README.md) · agent guidance: [CLAUDE.md](CLAUDE.md)
 
 ## Quick start
@@ -57,8 +60,13 @@ app/                         everything needed to run the product
     boundaries/gateways/     BOUNDARY — Supabase / sensor / AI / share adapters (system-facing)
   test/                      221 entity/control/gateway tests
   supabase/                  backend: migrations · Edge Functions · seeds   (see app/supabase/README.md)
-docs/                        everything else: requirements · architecture · screen specs · deliverables · QA · scripts
+web/                         marketing website (Vue 3 + Vite + TS, BCE: src/boundary|controller|entity)
+  database/migrations/       draft shared-DB add-ons (not applied)
+docs/                        everything else — split by product:
+  app/                       mobile-app docs: architecture · reference/screens · testing · demo guides
+  web/                       website docs: plan · limitations · test plan · demo checklist
+  (root)                     project-wide: STATUS.md · requirements/ · deliverables/ · scripts/ · archive/
 ```
 
 The architectural rule, graded as part of the FYP: `Actor ─ Boundary ─ Control ─ Entity` —
-screens never touch entities or the database directly. Details: [docs/architecture/bce-design.md](docs/architecture/bce-design.md).
+screens never touch entities or the database directly. Details: [docs/architecture/bce-design.md](docs/app/architecture/bce-design.md).

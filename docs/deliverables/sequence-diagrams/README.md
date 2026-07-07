@@ -16,7 +16,7 @@ Mirrors the **sample PTD convention**: the story's actor + exactly three lifelin
 normal/alternate flow. The gateway/Supabase persistence path appears as a small note under
 the Entity (gateways are system-facing Boundaries in BCE; the note keeps the diagrams
 faithful to the as-built architecture without breaking the sample's three-box format). Names are the **as-built/as-designed** classes
-from [bce-design.md](../../architecture/bce-design.md) §2 (built stories use shipped
+from [bce-design.md](../../app/architecture/bce-design.md) §2 (built stories use shipped
 class names; unbuilt stories use the §2.4 design inventory).
 
 - `USnn-<slug>.png` — drop straight into Word (2× scale, white background)
@@ -36,4 +36,4 @@ npx -y @mermaid-js/mermaid-cli -i src/US07-log-in.mmd -o US07-log-in.png -b whit
 - **US21** carries a note: rest-alert tier is unresolved (SRS says Free, WBS says Premium).
 - **US30 / US48** carry a note: expert-content scope may narrow to services-only.
 - The seven detailed (non-simplified) diagrams for the built vertical slice remain in
-  [bce-design.md](../../architecture/bce-design.md) §5.
+  [bce-design.md](../../app/architecture/bce-design.md) §5.

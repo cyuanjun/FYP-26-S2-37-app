@@ -1,0 +1,8 @@
+{
+  "free_users": { "value": "1,284", "growth_percentage": "12" },
+  "premium_users": { "value": "436", "growth_percentage": "18" },
+  "verified_experts": { "value": "32", "growth_percentage": "9" },
+  "approved_reviews": { "value": "148", "growth_percentage": "15" },
+  "active_categories": { "value": "6", "growth_percentage": "0" },
+  "contact_resolved": { "value": "91%", "growth_percentage": "6" }
+}

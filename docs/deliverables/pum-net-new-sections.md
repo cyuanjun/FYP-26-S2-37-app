@@ -72,7 +72,7 @@ Granting these enables full tracking; they can be changed later in your device s
 
 ## §4 Initial GUIs — Screen Walkthrough
 
-One sub-section per screen: **insert the TDM §7 screenshot**, then the step text below. Covered here are the core user journey screens; the full screen inventory is in the TDM §7 and [../reference/screens-v1.md](../reference/screens-v1.md).
+One sub-section per screen: **insert the TDM §7 screenshot**, then the step text below. Covered here are the core user journey screens; the full screen inventory is in the TDM §7 and [../reference/screens-v1.md](../app/reference/screens-v1.md).
 
 ### 4.1 Sign in / Register *(TDM §7.2.3)*
 The app opens to the sign-in screen. Enter your email and password and tap **Log in**, or tap the sign-up link to register on the website. Use **Remember me** to stay signed in, or **Forgot password?** to receive a reset link.

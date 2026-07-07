@@ -58,9 +58,9 @@ Yuan Jun = coordination/docs · Devanandi = mobile/UI · Foong = backend/DB/API 
 | 14 | Use Case Descriptions | 🟢 | **SRS §4.x.2** — full descriptions already written for the major use cases | |
 | 15 | Use Case Diagrams | 🟢 | **SRS §4.x / PRD §7.2** (5 PlantUML diagrams) | |
 | 16.1 | Data Flow Diagram | 🟡 | **TDM §3.3** already has the **context-level DFD** (the Wise Workout Platform Process figure, p8) — reuse it; only the **level-1 DFD** is net-new | |
-| 16.2 | System Architecture Design | 🟢 | **TDM §4** (client-server architecture diagram, p10) + [../architecture/bce-design.md](../architecture/bce-design.md) — name the concrete stack (Flutter + Supabase Postgres/Auth/Storage/Realtime + Edge Functions + OpenAI/Gemini fallback) per reconciliation A4 | |
-| 16.3 | Database Design | 🟢 | **TDM §8 ERD is the schema of record** (reconciliation **D1 — resolved**); render it directly. [../reference/database-v1.md](../reference/database-v1.md) is the working copy to align to it | |
-| 16.4 | Wireframe Design | 🟢 | **TDM** wireframes + flow-explorer mock renders + [../reference/screens-v1.md](../reference/screens-v1.md) | |
+| 16.2 | System Architecture Design | 🟢 | **TDM §4** (client-server architecture diagram, p10) + [../architecture/bce-design.md](../app/architecture/bce-design.md) — name the concrete stack (Flutter + Supabase Postgres/Auth/Storage/Realtime + Edge Functions + OpenAI/Gemini fallback) per reconciliation A4 | |
+| 16.3 | Database Design | 🟢 | **TDM §8 ERD is the schema of record** (reconciliation **D1 — resolved**); render it directly. [../reference/database-v1.md](../app/reference/database-v1.md) is the working copy to align to it | |
+| 16.4 | Wireframe Design | 🟢 | **TDM** wireframes + flow-explorer mock renders + [../reference/screens-v1.md](../app/reference/screens-v1.md) | |
 | 17 | Conclusion | 🟢 | **PRD §12** | |
 | 18 | Glossary | 🔴 | Net-new (½ pg) — BCE, RLS, Edge Function, HR zones, AI-summary vs expert, etc. | |
 | 19 | References | 🟢 | **PRD §13** (23 refs) | |

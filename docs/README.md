@@ -1,6 +1,6 @@
 # Wise Workout — Docs
 
-Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code lives in this repo's root; this folder holds the planning, design, and reference material.
+Documentation for the **Wise Workout** platform (FYP-26-S2-37). The Flutter app lives in `../app/`, the marketing website in `../web/`; this folder holds the planning, design, and reference material — split into **[app/](app/)** (mobile-app docs), **[web/](web/)** (website docs), and project-wide files at this root.
 
 ## Layout
 
@@ -10,29 +10,30 @@ Documentation for the **Wise Workout** mobile app (FYP-26-S2-37). The app code l
 |---|---|---|
 | **Requirements** | **The official SRS v2.0 is canonical** (64 use cases + FR/NFR). [requirements/user-stories.md](requirements/user-stories.md) mirrors all 64 user stories with **build status** (the engineering tracker). [requirements/urs.md](requirements/urs.md) is **deprecated** — superseded by the SRS. | [user-stories.md](requirements/user-stories.md) + SRS v2.0 (team docs) |
 | **[deliverables/](deliverables/)** | FYP submission-document prep — assembly checklists, cross-doc change log, and the PTD/PUM net-new drafts | [ptd-pum-assembly.md](deliverables/ptd-pum-assembly.md), [doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md), [ptd-net-new-sections.md](deliverables/ptd-net-new-sections.md), [pum-net-new-sections.md](deliverables/pum-net-new-sections.md) |
-| **[architecture/](architecture/)** | How the real Flutter app is built | [build-plan.md](architecture/build-plan.md), [bce-design.md](architecture/bce-design.md) |
-| **[reference/](reference/)** | The spec carried over from the design phase — data model, design system, screen-by-screen specs | [database-v1.md](reference/database-v1.md), [screens-v1.md](reference/screens-v1.md) |
-| **[testing/](testing/)** | QA evidence — the running **[bug-log.md](testing/bug-log.md)** (symptom → root cause → fix → commit), feeds PTD testing + module testing | [bug-log.md](testing/bug-log.md) |
+| **[app/architecture/](app/architecture/)** | How the real Flutter app is built | [build-plan.md](app/architecture/build-plan.md), [bce-design.md](app/architecture/bce-design.md) |
+| **[app/reference/](app/reference/)** | The spec carried over from the design phase — data model, design system, screen-by-screen specs | [database-v1.md](app/reference/database-v1.md), [screens-v1.md](app/reference/screens-v1.md) |
+| **[app/testing/](app/testing/)** | QA evidence — the running **[bug-log.md](app/testing/bug-log.md)** (symptom → root cause → fix → commit), feeds PTD testing + module testing | [bug-log.md](app/testing/bug-log.md) |
 | **[archive/](archive/)** | Legacy docs for the React flow-explorer mock (kept for provenance; not the build target) | — |
-| [testing/module-test-report.md](testing/module-test-report.md) | **Module test report (11 Jul milestone)** — 221 automated cases by module + manual-procedure evidence + traceability | review & sign |
-| [demo-script.md](demo-script.md) | **The Aug final-demo run-of-show** — acts, taps, talking points, timings, fallbacks | rehearse from this |
-| [prototype-demo-guide.md](prototype-demo-guide.md) | **Run & demo the prototype** — setup, walkthroughs, test accounts, backend verification | start here to demo |
+| **[web/](web/)** | Marketing-website docs (imported 11 Jul with the site itself, now in `../web/`) — plan, limitations, test plan, demo checklist, presentation guide, DB-change drafts | [web/README.md](web/README.md), [web/plan.md](web/plan.md) |
+| [app/testing/module-test-report.md](app/testing/module-test-report.md) | **Module test report (11 Jul milestone)** — 221 automated cases by module + manual-procedure evidence + traceability | review & sign |
+| [app/demo-script.md](app/demo-script.md) | **The Aug final-demo run-of-show** — acts, taps, talking points, timings, fallbacks | rehearse from this |
+| [app/prototype-demo-guide.md](app/prototype-demo-guide.md) | **Run & demo the prototype** — setup, walkthroughs, test accounts, backend verification | start here to demo |
 | [project-description.md](project-description.md) | The FYP project brief | — |
 
 ## Reading order for someone new
 
 0. [STATUS.md](STATUS.md) — current progress + what's next (if you're resuming).
-0b. [prototype-demo-guide.md](prototype-demo-guide.md) — **run & demo the prototype**: setup, manual-test walkthrough (do this → see this), test accounts, backend verification.
+0b. [prototype-demo-guide.md](app/prototype-demo-guide.md) — **run & demo the prototype**: setup, manual-test walkthrough (do this → see this), test accounts, backend verification.
 1. [project-description.md](project-description.md) — what we're required to build.
 2. **PRD v2/v3 + SRS v2.0 + TDM v5** (the team's submitted docs; TDM §6 superseded by our sequence-diagram set) — canonical requirements (PRD/SRS) and system design: architecture, ERD (§8), wireframes (TDM). Divergences between them and engineering decisions are tracked in [deliverables/doc-reconciliation-log.md](deliverables/doc-reconciliation-log.md). ([requirements/urs.md](requirements/urs.md) is deprecated.)
-3. [architecture/build-plan.md](architecture/build-plan.md) — scope, stack, roadmap, team split.
-4. [architecture/bce-design.md](architecture/bce-design.md) — BCE architecture + robustness/sequence diagrams + traceability.
-5. [reference/database-v1.md](reference/database-v1.md) — the 26-entity schema and screen→data map.
-6. [reference/screens-v1.md](reference/screens-v1.md) — per-screen UI specs.
-7. [reference/calorie-estimation.md](reference/calorie-estimation.md) — MET calorie method + accuracy caveat (US16).
-8. [simplify.md](simplify.md) — code-structure map (for presentations) + redundancy/simplification candidates.
+3. [architecture/build-plan.md](app/architecture/build-plan.md) — scope, stack, roadmap, team split.
+4. [architecture/bce-design.md](app/architecture/bce-design.md) — BCE architecture + robustness/sequence diagrams + traceability.
+5. [reference/database-v1.md](app/reference/database-v1.md) — the 26-entity schema and screen→data map.
+6. [reference/screens-v1.md](app/reference/screens-v1.md) — per-screen UI specs.
+7. [reference/calorie-estimation.md](app/reference/calorie-estimation.md) — MET calorie method + accuracy caveat (US16).
+8. [simplify.md](app/simplify.md) — code-structure map (for presentations) + redundancy/simplification candidates.
 
 ## Notes
 
-- **`reference/` is now canonical.** It's a copy of the design-phase docs; treat it as the source of truth for the build and let the original flow-explorer copies go stale.
+- **`app/reference/` is now canonical.** It's a copy of the design-phase docs; treat it as the source of truth for the build and let the original flow-explorer copies go stale.
 - Some `archive/` docs cite mock source paths (`../app/src/...`, `../CLAUDE.md`) that don't exist in this repo — they're provenance references to the React mock, intentionally left as-is.
