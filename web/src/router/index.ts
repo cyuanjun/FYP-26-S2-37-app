@@ -33,6 +33,7 @@ const router = createRouter({
         { path: "listings", name: "admin-listings", component: () => import("@/boundary/ui/admin/ListingsPage.vue") },
         { path: "categories", name: "admin-categories", component: () => import("@/boundary/ui/admin/CategoriesPage.vue") },
         { path: "pricing", name: "admin-pricing", component: () => import("@/boundary/ui/admin/PricingPage.vue") },
+        { path: "faq", name: "admin-faq", component: () => import("@/boundary/ui/admin/FaqPage.vue") },
         { path: "testimonials", name: "admin-testimonials", component: () => import("@/boundary/ui/admin/TestimonialsPage.vue") },
         { path: "feedback", name: "admin-feedback", component: () => import("@/boundary/ui/admin/FeedbackPage.vue") },
         { path: "contact", name: "admin-contact", component: () => import("@/boundary/ui/admin/ContactPage.vue") },

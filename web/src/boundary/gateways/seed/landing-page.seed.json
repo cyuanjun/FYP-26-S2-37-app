@@ -5,26 +5,65 @@
     "brand_second_word": "Workout",
     "logo_url": "Logo",
     "navigation": [
-      { "label": "Home", "url": "#top" },
-      { "label": "Features", "url": "#features" },
-      { "label": "Statistics", "url": "#statistics" },
-      { "label": "Experts", "url": "#experts" },
-      { "label": "Pricing", "url": "#pricing" },
-      { "label": "Testimonials", "url": "#testimonials" },
-      { "label": "FAQ", "url": "#faq" },
-      { "label": "Contact", "url": "#contact" }
+      {
+        "label": "Home",
+        "url": "#top"
+      },
+      {
+        "label": "Features",
+        "url": "#features"
+      },
+      {
+        "label": "Statistics",
+        "url": "#statistics"
+      },
+      {
+        "label": "Experts",
+        "url": "#experts"
+      },
+      {
+        "label": "Pricing",
+        "url": "#pricing"
+      },
+      {
+        "label": "Testimonials",
+        "url": "#testimonials"
+      },
+      {
+        "label": "FAQ",
+        "url": "#faq"
+      },
+      {
+        "label": "Contact",
+        "url": "#contact"
+      }
     ],
     "auth_actions": [
-      { "label": "Login", "url": "/login" },
-      { "label": "Register", "url": "/register" }
+      {
+        "label": "Login",
+        "url": "/login"
+      },
+      {
+        "label": "Register",
+        "url": "/register"
+      }
     ],
     "footer": {
       "site_name": "Wise Workout",
       "copyright_text": "Copyright 2026 Wise Workout",
       "links": [
-        { "label": "Privacy", "url": "/privacy" },
-        { "label": "Terms", "url": "/terms" },
-        { "label": "Contact", "url": "#contact" }
+        {
+          "label": "Privacy",
+          "url": "/privacy"
+        },
+        {
+          "label": "Terms",
+          "url": "/terms"
+        },
+        {
+          "label": "Contact",
+          "url": "#contact"
+        }
       ]
     }
   },
@@ -34,7 +73,7 @@
       "eyebrow": "AI fitness platform",
       "headline_primary": "Train smarter.",
       "headline_accent": "Track sharper.",
-      "hero_media_url": "hero_video_url",
+      "hero_media_url": "/uploads/hero-app-preview.mp4",
       "hero_title": "Fitness tracking, AI-assisted progress summaries, and expert services in one platform.",
       "hero_description": "Designed for users who want to record workouts, monitor progress, and receive guided support. Supports free users, premium users, expert users, and administrators.",
       "primary_cta_text": "Start tracking",
@@ -46,11 +85,38 @@
       "type": "features",
       "eyebrow": "Product features",
       "title": "App features",
-      "section_description": "Highlights the main platform capabilities that can be edited by administrators.",
+      "section_description": "What the Wise Workout app does — captured live from the running product.",
       "items": [
-        { "icon_url": "Feature image", "title": "Workout activity recording", "description": "Record workout activities and maintain workout history." },
-        { "icon_url": "Feature image", "title": "AI progress summaries and plan suggestions", "description": "Receive AI-assisted summaries and fitness plan suggestions." },
-        { "icon_url": "Feature image", "title": "Expert discovery and service requests", "description": "Browse expert profiles and request paid expert services." }
+        {
+          "icon_url": "/uploads/feature-tracking.png",
+          "title": "Live workout tracking",
+          "description": "Record runs, rides, and gym sessions with phone GPS and Bluetooth heart-rate devices — or log a workout manually."
+        },
+        {
+          "icon_url": "/uploads/feature-history.png",
+          "title": "History & Training Effect",
+          "description": "Searchable workout history with weekly analytics, calories, heart-rate stats, and a per-session Training Effect score."
+        },
+        {
+          "icon_url": "/uploads/feature-analytics.png",
+          "title": "Advanced analytics (Premium)",
+          "description": "Workload ratio (ACWR), weekly volume, HR efficiency and zones, plus all-time personal bests."
+        },
+        {
+          "icon_url": "/uploads/feature-dashboard.png",
+          "title": "AI plans & progress summaries",
+          "description": "AI-generated training plans and progress summaries, with a personal dashboard that nudges the next workout."
+        },
+        {
+          "icon_url": "/uploads/feature-social.png",
+          "title": "Social feed & challenges",
+          "description": "Share sessions, react and comment, add friends, and climb live challenge leaderboards."
+        },
+        {
+          "icon_url": "/uploads/feature-experts.png",
+          "title": "Expert marketplace",
+          "description": "Browse verified coaches by specialty and request paid plans, form checks, and coaching add-ons."
+        }
       ]
     },
     {
@@ -175,11 +241,21 @@
       "overall_rating_label": "Overall Rating",
       "review_count_template": "Based on {count} reviews",
       "rating_distribution": [
-        { "label": "Excellent" },
-        { "label": "Good" },
-        { "label": "Average" },
-        { "label": "Below Average" },
-        { "label": "Poor" }
+        {
+          "label": "Excellent"
+        },
+        {
+          "label": "Good"
+        },
+        {
+          "label": "Average"
+        },
+        {
+          "label": "Below Average"
+        },
+        {
+          "label": "Poor"
+        }
       ],
       "featured_ids": []
     },
@@ -239,7 +315,12 @@
       "message_placeholder": "Enter your message",
       "terms_label": "I accept the Terms of Service",
       "button_text": "Submit",
-      "social_links": ["Facebook", "Instagram", "YouTube", "LinkedIn"]
+      "social_links": [
+        "Facebook",
+        "Instagram",
+        "YouTube",
+        "LinkedIn"
+      ]
     }
   ]
 }

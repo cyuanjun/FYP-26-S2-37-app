@@ -72,6 +72,12 @@ export interface StatisticItem {
   growth_percentage: string;
 }
 
+export interface ActivityWeek {
+  week_start: string;
+  session_count: number;
+  active_minutes: number;
+}
+
 export interface StatisticsSection {
   type: "statistics";
   eyebrow: string;
@@ -80,6 +86,7 @@ export interface StatisticsSection {
   overview_chart_image_url: string;
   user_base: UserBaseSegment[];
   items: StatisticItem[];
+  activity_series?: ActivityWeek[];
 }
 
 export interface ExpertProfile {

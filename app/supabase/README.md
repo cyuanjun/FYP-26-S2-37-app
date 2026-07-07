@@ -27,6 +27,9 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | `migrations/20260709100000_avatars_bucket.sql` | Public `avatars` storage bucket + owner-folder write policies. |
 | `migrations/20260709110000_ble_remote_id.sql` | `connected_devices.ble_remote_id` for real-BLE pairings. |
 | `migrations/20260711090000_landing_site.sql` | Marketing-site integration: `public_testimonials` / `landing_pricing_plans` / `landing_media_assets` tables, anon read policy on `expert_categories`, the anon-callable `landing_metric_summary()` / `landing_featured_experts()` SECURITY DEFINER functions, and signup-trigger v3 (last_name mirroring + expert-application metadata → pending `expert_profiles` + document metadata). |
+| `migrations/20260712090000_admin_portal.sql` | Admin portal surface: `review_expert_application` RPC (approve → verified + expert role) + admin read/write policy on `expert_services`. |
+| `migrations/20260712100000_landing_faqs.sql` | `landing_faqs` (admin-editable FAQ; public reads active rows). |
+| `migrations/20260712110000_landing_activity_and_ranking.sql` | `landing_activity_series()` (weekly sessions/minutes for the public chart) + `landing_featured_experts()` v2 — Bayesian weighted-rating ranking (IMDb WR, m=10) returned with a `score` column. |
 | `seed.sql` | The three install-time catalogs: `workout_types`, `health_tags`, `expert_categories`. |
 | `seed-demo.sql` | **Demo data** (not install data): two login accounts (`free@`/`premium@wiseworkout.test`, pw `Password123!`) + varied workout sessions, XP/streak, and share posts. Idempotent — re-run to reset the demo. |
 

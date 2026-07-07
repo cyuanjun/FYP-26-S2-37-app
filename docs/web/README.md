@@ -7,6 +7,7 @@ Use this folder to understand the repo status, architecture, database plan, test
 - [../../web/README.md](../../web/README.md): project overview, run commands, BCE summary.
 - [plan.md](./plan.md): current implementation and next work.
 - [limitations.md](./limitations.md): known limitations and deferred integrations.
+- [algorithms.md](./algorithms.md): the landing-page ranking algorithms (featured experts, testimonials) and the live activity chart.
 
 ## Presentation
 

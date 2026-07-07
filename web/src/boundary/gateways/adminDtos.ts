@@ -103,3 +103,12 @@ export interface PricingPlanRow {
   display_order: number;
   is_active: boolean;
 }
+
+export interface FaqRow {
+  id: string;
+  faq_key: string;
+  question: string;
+  answer: string;
+  display_order: number;
+  is_active: boolean;
+}

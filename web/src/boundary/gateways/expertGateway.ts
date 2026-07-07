@@ -15,15 +15,25 @@ interface FeaturedExpertRow {
   rating_avg: number;
   review_count: number;
   client_count: number;
+  score: number;
 }
 
 export async function readTopRankedExperts(): Promise<GatewayExpertProfile[]> {
   try {
-    // SECURITY DEFINER function: verified, non-suspended experts only,
-    // ranked by rating weighted with log review volume. No email exposed.
+    // SECURITY DEFINER function: verified, non-suspended experts only.
+    // Ranking = IMDb-style Bayesian weighted rating, computed in the database
+    // (single source of truth): WR = (v/(v+m))·R + (m/(v+m))·C with m = 10 and
+    // C = mean rating across verified experts; ties broken by review_count,
+    // then client_count. No email exposed.
     const { data, error } = await supabase.rpc("landing_featured_experts", { p_limit: 3 });
     if (error) throw error;
-    return (data as FeaturedExpertRow[]).map((row) => ({
+    const rows = data as FeaturedExpertRow[];
+    console.info(
+      "[landing] FEATURED EXPERTS ranked by Bayesian weighted rating " +
+        "WR = (v/(v+m))·R + (m/(v+m))·C (m=10, C=mean verified rating; ties: reviews, clients):",
+      rows.map((r) => `${r.display_name} R=${r.rating_avg} v=${r.review_count} → WR=${r.score}`),
+    );
+    return rows.map((row) => ({
       user_id: row.user_id,
       display_name: row.display_name,
       email: "",

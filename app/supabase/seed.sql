@@ -119,3 +119,17 @@ on conflict (plan_key) do update set
   button_url = excluded.button_url, features = excluded.features,
   display_order = excluded.display_order, is_active = excluded.is_active,
   updated_at = now();
+
+insert into landing_faqs (faq_key, question, answer, display_order, is_active) values
+  ('free-tier', 'Can I use Wise Workout for free?',
+   'Yes. Free users can log workouts, view basic workout history, browse verified experts, and access limited AI progress summaries.', 1, true),
+  ('premium-adds', 'What does the premium plan add?',
+   'Premium adds unlimited AI progress summaries, personalised plan suggestions, advanced progress statistics, priority reminders, and premium support.', 2, true),
+  ('expert-services', 'How do expert services work?',
+   'Users can browse featured experts by category and request paid coaching, nutrition, recovery, or specialist event support as separate add-ons.', 3, true),
+  ('admin-managed', 'Can administrators update this landing page?',
+   'Yes. Pricing details, testimonials, FAQs, and expert information are managed live from the admin portal against the shared database.', 4, true)
+on conflict (faq_key) do update set
+  question = excluded.question, answer = excluded.answer,
+  display_order = excluded.display_order, is_active = excluded.is_active,
+  updated_at = now();

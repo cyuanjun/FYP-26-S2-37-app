@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient";
 import type {
   AdminIdentity,
+  FaqRow,
   AdminUser,
   ContactMessageRow,
   ExpertApplication,
@@ -189,5 +190,20 @@ export async function updatePricingPlan(
     .from("landing_pricing_plans")
     .update({ ...fields, updated_at: new Date().toISOString() })
     .eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+// ---- FAQs (US63) ----
+
+export async function listAllFaqs(): Promise<FaqRow[]> {
+  const { data, error } = await supabase.from("landing_faqs").select("*").order("display_order");
+  if (error) throw new Error(error.message);
+  return data as FaqRow[];
+}
+
+export async function upsertFaq(faq: Omit<FaqRow, "id"> & { id?: string }): Promise<void> {
+  const row = { ...faq, updated_at: new Date().toISOString() };
+  if (!row.id) delete row.id;
+  const { error } = await supabase.from("landing_faqs").upsert(row, { onConflict: "faq_key" });
   if (error) throw new Error(error.message);
 }

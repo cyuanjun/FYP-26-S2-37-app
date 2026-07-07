@@ -30,7 +30,9 @@ This page lists the current limitations of the landing-page repo. These are know
 
 - Admin login, logout, and role-guarded routes work against shared Supabase Auth (`profiles.role = 'admin'`, enforced by `is_admin()` RLS policies — the same identification the draft policies assumed).
 - Built: overview, user management (suspend / tier switch), expert-application review, service-listing archive/restore, categories, pricing display copy, testimonial moderation, feedback triage, contact inbox.
-- Not built: editing landing feature copy / media sections; password-reset page inside the portal (the shared pre-auth reset flow serves admins); contact responses are recorded, not emailed.
+- Not built: editing landing hero/feature copy from the portal (FAQ, pricing, testimonials, categories ARE editable; hero/feature media are real app captures swapped via `web/public/uploads/`); password-reset page inside the portal (the shared pre-auth reset flow serves admins).
+- Contact replies open the admin's own mail client pre-filled (`Reply via email`) and the response is recorded on the message — there is no outbound mailer.
+- Featured experts and testimonials are ranked by documented algorithms (see [algorithms.md](./algorithms.md)), logged to the console at runtime — not manually selected.
 
 ## Database Limitations
 

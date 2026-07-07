@@ -41,6 +41,7 @@ async function onSignOut() {
         <RouterLink to="/admin/listings">Service listings</RouterLink>
         <RouterLink to="/admin/categories">Categories</RouterLink>
         <RouterLink to="/admin/pricing">Pricing</RouterLink>
+        <RouterLink to="/admin/faq">FAQ</RouterLink>
         <RouterLink to="/admin/testimonials">Testimonials</RouterLink>
         <RouterLink to="/admin/feedback">Feedback</RouterLink>
         <RouterLink to="/admin/contact">Contact inbox</RouterLink>

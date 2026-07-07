@@ -45,5 +45,6 @@ function isImagePath(url: string): boolean {
   max-height: 190px;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  object-position: top;
 }
 </style>

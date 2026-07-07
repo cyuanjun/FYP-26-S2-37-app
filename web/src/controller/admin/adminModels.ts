@@ -6,6 +6,7 @@ export type {
   ContactMessageRow,
   ExpertApplication,
   ExpertCategoryRow,
+  FaqRow,
   FeedbackRow,
   PricingPlanRow,
   ServiceListingRow,

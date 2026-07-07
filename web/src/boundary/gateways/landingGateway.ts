@@ -22,6 +22,7 @@ interface GatewaySection {
   type: string;
   user_base?: MetricBoundItem[];
   items?: unknown[];
+  activity_series?: ActivityWeek[];
 }
 
 interface GatewayLandingPage {
@@ -48,14 +49,32 @@ interface PricingRow {
   features: string[];
 }
 
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+interface ActivityWeek {
+  week_start: string;
+  session_count: number;
+  active_minutes: number;
+}
+
 const seedMetricValues = metricSeed as MetricSeed;
 
 export async function readLandingSeed() {
   // Page structure (copy, section order, media placeholders) stays bundled;
-  // metric values and pricing plans come live from the shared database.
-  const [metrics, pricing] = await Promise.all([readLiveMetrics(), readPricingPlans()]);
+  // metric values, pricing plans, and FAQs come live from the shared database.
+  const [metrics, pricing, faqs, activity] = await Promise.all([
+    readLiveMetrics(),
+    readPricingPlans(),
+    readFaqs(),
+    readActivitySeries(),
+  ]);
   const page = structuredClone(seedData) as GatewayLandingPage;
-  page.sections = page.sections.map((section) => hydrateSection(section, metrics, pricing));
+  page.sections = page.sections.map((section) =>
+    hydrateSection(section, metrics, pricing, faqs, activity),
+  );
   return page;
 }
 
@@ -103,14 +122,48 @@ async function readPricingPlans(): Promise<PricingItem[]> {
   }
 }
 
+/// FAQ entries live in landing_faqs; the seed section's items are the
+/// offline fallback (null = fall back to whatever the seed carries).
+async function readFaqs(): Promise<FaqItem[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from("landing_faqs")
+      .select("question, answer")
+      .eq("is_active", true)
+      .order("display_order");
+    if (error) throw error;
+    if (!data.length) throw new Error("no faq rows");
+    return data as FaqItem[];
+  } catch {
+    return null;
+  }
+}
+
+/// Weekly platform activity (sessions + active minutes) straight from
+/// workout_sessions via landing_activity_series() — null = chart placeholder.
+async function readActivitySeries(): Promise<ActivityWeek[] | null> {
+  try {
+    const { data, error } = await supabase.rpc("landing_activity_series", { p_weeks: 12 });
+    if (error) throw error;
+    const series = data as ActivityWeek[];
+    if (!series.some((w) => w.session_count > 0)) return null;
+    return series;
+  } catch {
+    return null;
+  }
+}
+
 function hydrateSection(
   section: GatewaySection,
   metrics: MetricSeed,
   pricing: PricingItem[],
+  faqs: FaqItem[] | null,
+  activity: ActivityWeek[] | null,
 ): GatewaySection {
   if (section.type === "statistics") {
     return {
       ...section,
+      activity_series: activity ?? undefined,
       user_base: section.user_base?.map((item) => ({
         ...item,
         segment_count: metrics[item.data_source]?.value ?? "0",
@@ -128,6 +181,13 @@ function hydrateSection(
     return {
       ...section,
       items: pricing,
+    };
+  }
+
+  if (section.type === "faq" && faqs) {
+    return {
+      ...section,
+      items: faqs,
     };
   }
 

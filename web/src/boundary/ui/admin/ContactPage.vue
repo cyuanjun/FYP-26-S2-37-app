@@ -33,6 +33,18 @@ async function resolve(row: ContactMessageRow) {
     busyId.value = null;
   }
 }
+
+/// Opens the admin's own mail client with the reply drafted — the site has no
+/// outbound mailer, so the actual send stays with the human.
+function mailtoHref(row: ContactMessageRow) {
+  const subject = encodeURIComponent("Re: your message to Wise Workout");
+  const drafted = responses.value[row.id] ?? "";
+  const body = encodeURIComponent(
+    `Hi ${row.submitter_name},\n\n${drafted}\n\n— Wise Workout team\n\n` +
+      `> ${row.message.replace(/\n/g, "\n> ")}`,
+  );
+  return `mailto:${row.submitter_email}?subject=${subject}&body=${body}`;
+}
 </script>
 
 <template>
@@ -55,9 +67,10 @@ async function resolve(row: ContactMessageRow) {
       </div>
       <p style="margin: 0">{{ row.message }}</p>
       <div class="admin-actions">
-        <input v-model="responses[row.id]" class="admin-field" style="flex: 1" placeholder="Response (recorded with the message)" />
+        <input v-model="responses[row.id]" class="admin-field" style="flex: 1" placeholder="Write the reply here…" />
+        <a class="admin-btn" :href="mailtoHref(row)">Reply via email</a>
         <button class="admin-btn primary" :disabled="busyId === row.id" @click="resolve(row)">
-          Resolve
+          Record &amp; resolve
         </button>
       </div>
     </div>

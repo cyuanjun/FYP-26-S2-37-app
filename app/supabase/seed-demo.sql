@@ -39,7 +39,10 @@ begin
       ('jordan@wiseworkout.test',  'Jordan','Lee',   'free'),
       ('priya@wiseworkout.test',   'Priya', 'Nair',  'free'),
       ('leo@wiseworkout.test',     'Leo',   'Chen',  'free'),
-      ('admin@wiseworkout.test',   'Ava',   'Admin',  'admin')
+      ('admin@wiseworkout.test',   'Ava',   'Admin',  'admin'),
+      ('amelia@wiseworkout.test',  'Amelia','Tan',    'expert'),
+      ('marcus@wiseworkout.test',  'Marcus','Lim',    'expert'),
+      ('elena@wiseworkout.test',   'Elena', 'Ortiz',  'expert')
     ) as t(email, first_name, last_name, role)
   loop
     select id into uid from auth.users where email = rec.email;
@@ -455,6 +458,65 @@ from (values
   ('c0000000-0000-4000-8000-000000000004', 'leo@wiseworkout.test')     -- LONG RIDE
 ) as v(cid, email)
 join public.profiles pr on pr.email = v.email;
+
+-- ============================================================================
+-- §11 MORE VERIFIED EXPERTS — gives the marketplace + the landing FEATURED
+-- EXPERTS ranking real depth. Aggregates (rating/review/client counts) are
+-- seeded directly per the mock convention (RPCs keep them consistent forward).
+-- ============================================================================
+
+insert into public.expert_profiles
+  (id, title, years_coaching, about, credentials, specialties,
+   rating_avg, review_count, client_count, verification_status)
+select pr.id, v.title, v.years, v.about, v.credentials, v.specialties,
+       v.rating, v.reviews, v.clients, 'verified'::verification_status
+from (values
+  ('amelia@wiseworkout.test', 'Strength & Mobility Coach', 9,
+   'Helps busy members build sustainable strength routines with practical mobility work and recovery habits.',
+   array['Certified Strength Coach', 'Mobility Specialist', 'Former national team trainer'],
+   array['strength', 'mobility', 'recovery'], 4.9, 86, 240),
+  ('marcus@wiseworkout.test', 'Endurance Performance Specialist', 11,
+   'Designs running and cycling plans for users who want better pacing, safer progression, and clearer race prep.',
+   array['Endurance Coach', 'Sports Science MSc', 'Marathon programme lead'],
+   array['endurance', 'running', 'recovery'], 4.8, 112, 310),
+  ('elena@wiseworkout.test', 'Yoga & Recovery Coach', 7,
+   'Blends yoga, breathwork, and structured recovery weeks so hard training keeps paying off.',
+   array['RYT-500', 'Recovery & Sleep Coach'],
+   array['yoga', 'mobility', 'recovery'], 4.7, 54, 150)
+) as v(email, title, years, about, credentials, specialties, rating, reviews, clients)
+join public.profiles pr on pr.email = v.email
+on conflict (id) do update set
+  title = excluded.title, years_coaching = excluded.years_coaching,
+  about = excluded.about, credentials = excluded.credentials,
+  specialties = excluded.specialties, rating_avg = excluded.rating_avg,
+  review_count = excluded.review_count, client_count = excluded.client_count,
+  verification_status = excluded.verification_status;
+
+insert into public.expert_services
+  (id, expert_user_id, status, name, description, detail_bullets, category,
+   fulfillment, pricing_model, price_cents, duration_weeks, response_time)
+select v.id::uuid, pr.id, 'live'::service_status, v.name, v.description,
+       v.bullets, v.category, v.fulfillment::fulfillment_type,
+       v.pricing::pricing_model, v.price, v.weeks, v.rt::response_time
+from (values
+  ('e0000000-0000-4000-8000-000000000101', 'amelia@wiseworkout.test',
+   '8-Week Strength Foundation', 'Progressive full-body block with weekly check-ins.',
+   array['3 sessions/week programming', 'Form review on request', 'Weekly adjustments'],
+   'strength', 'coaching', 'one_time', 9500, 8, '24h'),
+  ('e0000000-0000-4000-8000-000000000102', 'marcus@wiseworkout.test',
+   'Race-Ready Run Plan', 'Personalised 10K/half build with pacing targets.',
+   array['Weekly mileage plan', 'Pace zones from your history', 'Race-week taper'],
+   'endurance', 'coaching', 'one_time', 11000, 10, '48h'),
+  ('e0000000-0000-4000-8000-000000000103', 'elena@wiseworkout.test',
+   'Recovery Reset', 'Four weeks of mobility + breathwork to absorb hard training.',
+   array['2 guided sessions/week', 'Sleep & recovery checklist', 'Deload planning'],
+   'mobility', 'coaching', 'recurring', 6000, 4, '48h')
+) as v(id, email, name, description, bullets, category, fulfillment, pricing, price, weeks, rt)
+join public.profiles pr on pr.email = v.email
+on conflict (id) do update set
+  status = excluded.status, name = excluded.name, description = excluded.description,
+  detail_bullets = excluded.detail_bullets, category = excluded.category,
+  price_cents = excluded.price_cents, duration_weeks = excluded.duration_weeks;
 
 -- ============================================================================
 -- §10 LANDING SITE — approved public testimonials from the demo athletes

@@ -1,13 +1,16 @@
 import {
   listAllCategories,
+  listAllFaqs,
   listAllPricingPlans,
   listServiceListings,
   updatePricingPlan,
   updateServiceStatus,
   upsertCategory,
+  upsertFaq,
 } from "@/boundary/gateways/adminGateway";
 import type {
   ExpertCategoryRow,
+  FaqRow,
   PricingPlanRow,
   ServiceListingRow,
 } from "@/boundary/gateways/adminDtos";
@@ -61,5 +64,26 @@ export async function savePricingPlan(plan: PricingPlanRow): Promise<void> {
     price_label: plan.price_label.trim(),
     description: plan.description.trim(),
     is_active: plan.is_active,
+  });
+}
+
+// ---- FAQs (US63) ----
+
+export async function getFaqs(): Promise<FaqRow[]> {
+  return listAllFaqs();
+}
+
+export async function saveFaq(faq: Omit<FaqRow, "id"> & { id?: string }): Promise<void> {
+  const key = faq.faq_key.trim().toLowerCase();
+  if (!SLUG_REGEX.test(key)) {
+    throw new Error("FAQ key must be a 2-30 char slug (a-z, 0-9, dashes).");
+  }
+  if (!faq.question.trim()) throw new Error("Question is required.");
+  if (!faq.answer.trim()) throw new Error("Answer is required.");
+  await upsertFaq({
+    ...faq,
+    faq_key: key,
+    question: faq.question.trim(),
+    answer: faq.answer.trim(),
   });
 }

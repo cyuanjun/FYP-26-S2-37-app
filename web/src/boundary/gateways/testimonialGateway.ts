@@ -22,9 +22,23 @@ export async function readApprovedTestimonials(): Promise<GatewayTestimonialSubm
       .from("public_testimonials")
       .select("*")
       .eq("status", "approved")
-      .order("rating", { ascending: false });
+      .order("submitted_at", { ascending: false });
     if (error) throw error;
-    return (data as TestimonialRow[]).map((row) => ({
+    // Displayed testimonials are ORDERED BY ALGORITHM, not hand-picked:
+    // score = rating + e^(−age_days / 45)   (rating dominates; among equal
+    // ratings, fresher testimonials float up — the bonus halves ~every month).
+    const now = Date.now();
+    const scored = (data as TestimonialRow[]).map((row) => {
+      const ageDays = Math.max(0, (now - Date.parse(row.submitted_at)) / 86_400_000);
+      return { row, score: row.rating + Math.exp(-ageDays / 45) };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    console.info(
+      "[landing] TESTIMONIALS ranked by rating + recency decay " +
+        "(score = rating + e^(−age_days/45)):",
+      scored.map((s) => `${s.row.display_name} ★${s.row.rating} → ${s.score.toFixed(3)}`),
+    );
+    return scored.map(({ row }) => ({
       id: row.id,
       rating: row.rating,
       created_at: row.created_at,
