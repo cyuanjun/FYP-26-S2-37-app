@@ -12,6 +12,9 @@
 - **RPC change** (migration `20260709090000`, local + hosted): `end_workout_session` honours an optional backdated `started_at` in the metrics (ended_at = start + duration, capped at now; future starts raise). Live sessions unchanged.
 - **190 tests** (+2: manual payload incl. backdate + no-device, non-cardio drops distance).
 
+## 9 Jul (late) — DEMO POLISH: BACKGROUND ATHLETES
+- **seed-demo.sql §9**: three background athletes — Jordan Lee (runner), Priya Nair (yoga/trails), Leo Chen (cyclist) — with now()-relative sessions, XP/streak via the canonical formula, one shared post each, mutual friendships with Mia + Alex, likes/comments both ways, and challenge entries (20 IN 30 ×3, RUN 100K, BURN 5K ×2, LONG RIDE). The #11 feed now has five voices and the 20 IN 30 leaderboard **5 participants** (verified live as Alex: Jordan's + Leo's posts w/ likes+comments; podium Mia 6 · You 6 · Leo 4). Applied to **local AND hosted**. Remaining demo-polish item: the written demo script.
+
 ## 9 Jul (evening) — HISTORY→SOCIAL LINK (the last app-tail item)
 - A shared session's #12.1 detail now shows **VIEW SHARED POST** → #11.1 Post Detail (likes + comments) — closing the capture → analyse → share → engage loop in one flow. `SocialGateway.findSharePostId` + `sessionSharePostProvider` (family, null when unshared/signed-out; 3 tests). Verified live as Alex: 10k tempo detail → post with 1 like + Mia's comment. **210 tests.** The app tail is done — next: demo polish (seed athletes, demo script).
 

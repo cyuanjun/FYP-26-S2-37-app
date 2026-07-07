@@ -4,9 +4,13 @@
 -- History / analytics / AI-summary / share surfaces look realistic in a demo.
 -- Idempotent: re-running resets the two accounts' workout data to this exact set.
 --
---   Accounts (password for both: Password123!):
+--   Accounts (password for all: Password123!):
 --     free@wiseworkout.test     — Mia Patel (Free)
 --     premium@wiseworkout.test  — Alex Tan  (Premium)
+--     expert@wiseworkout.test   — Sam Rivera (Expert)
+--   Background athletes (§9, so the feed/leaderboards look alive):
+--     jordan@ / priya@ / leo@wiseworkout.test — Free athletes w/ sessions,
+--     posts, likes/comments, friendships with Mia+Alex, challenge entries.
 --
 -- Run against the hosted project (psql / Supabase SQL editor / MCP). Requires the
 -- Supabase Auth schema (auth.users) + this app's schema (migrations applied).
@@ -31,7 +35,10 @@ begin
     select * from (values
       ('free@wiseworkout.test',    'Mia',  'Patel',  'free'),
       ('premium@wiseworkout.test', 'Alex', 'Tan',    'premium'),
-      ('expert@wiseworkout.test',  'Sam',  'Rivera', 'expert')
+      ('expert@wiseworkout.test',  'Sam',  'Rivera', 'expert'),
+      ('jordan@wiseworkout.test',  'Jordan','Lee',   'free'),
+      ('priya@wiseworkout.test',   'Priya', 'Nair',  'free'),
+      ('leo@wiseworkout.test',     'Leo',   'Chen',  'free')
     ) as t(email, first_name, last_name, role)
   loop
     select id into uid from auth.users where email = rec.email;
@@ -304,6 +311,149 @@ where alex.email = 'premium@wiseworkout.test' and sam.email = 'expert@wiseworkou
 update public.profiles
    set followed_expert_ids = array[(select id from public.profiles where email = 'expert@wiseworkout.test')]
  where email = 'free@wiseworkout.test';
+
+-- ----------------------------------------------------------------------------
+-- 9. Background athletes (demo polish): Jordan, Priya, Leo. Sessions, one
+--    shared post each, mutual friendships with Mia + Alex, likes/comments
+--    both ways, and challenge entries so the #11 feed and #11.3 leaderboards
+--    look alive with more than two people.
+-- ----------------------------------------------------------------------------
+update public.profiles set bio = v.bio
+from (values
+  ('jordan@wiseworkout.test', 'Chasing a sub-50 10k. Coffee first, always.'),
+  ('priya@wiseworkout.test',  'Yoga mornings, trail weekends.'),
+  ('leo@wiseworkout.test',    'Ride far, lift heavy, sleep well.')
+) as v(email, bio)
+where profiles.email = v.email;
+
+delete from public.posts
+  where user_id in (select id from public.profiles where email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test'));
+delete from public.workout_sessions
+  where user_id in (select id from public.profiles where email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test'));
+
+insert into public.workout_sessions (
+  user_id, workout_type_id, started_at, ended_at, duration_seconds,
+  distance_meters, calories_burned, avg_heart_rate, max_heart_rate, feel_rating, custom_name
+)
+select pr.id, wt.id, d.start_ts, d.start_ts + (d.dur || ' seconds')::interval, d.dur,
+       d.dist, d.cal, d.ahr, d.mhr, d.feel::feel_rating, d.cname
+from (values
+  -- Jordan — runner (feeds RUN 100K + 20 IN 30)
+  ('jordan@wiseworkout.test','running', date_trunc('day', now()) - interval '3 days' + interval '06:45', 2520, 7500,  430, 149, 173, 'good',  'Progression run'),
+  ('jordan@wiseworkout.test','running', date_trunc('day', now()) - interval '1 day'  + interval '06:50', 1800, 5000,  300, 146, 168, 'okay',  null),
+  ('jordan@wiseworkout.test','strength',date_trunc('day', now()) - interval '6 days' + interval '18:20', 2400, null,  250, 118, 142, 'good',  null),
+  ('jordan@wiseworkout.test','running', date_trunc('day', now()) - interval '8 days' + interval '07:05', 3300, 10000, 560, 151, 176, 'tough', 'Long run Sunday'),
+  -- Priya — yoga + trails (feeds 20 IN 30 + BURN 5K)
+  ('priya@wiseworkout.test','yoga',    date_trunc('day', now()) - interval '2 days' + interval '07:00', 2700, null,  140,  92, 108, 'great', 'Sunrise flow'),
+  ('priya@wiseworkout.test','hiking',  date_trunc('day', now()) - interval '4 days' + interval '08:30', 6300, 9800,  610, 121, 145, 'great', 'Ridge trail'),
+  ('priya@wiseworkout.test','yoga',    date_trunc('day', now())                     + interval '06:30', 2400, null,  120,  90, 104, 'good',  null),
+  ('priya@wiseworkout.test','running', date_trunc('day', now()) - interval '7 days' + interval '17:40', 1620, 4200,  260, 143, 165, 'okay',  null),
+  -- Leo — cyclist (feeds LONG RIDE + BURN 5K)
+  ('leo@wiseworkout.test','cycling',  date_trunc('day', now()) - interval '2 days' + interval '06:15', 5400, 32000, 780, 141, 166, 'tough', 'Century prep'),
+  ('leo@wiseworkout.test','strength', date_trunc('day', now()) - interval '5 days' + interval '19:00', 2700, null,  290, 116, 140, 'good',  null),
+  ('leo@wiseworkout.test','cycling',  date_trunc('day', now()) - interval '9 days' + interval '06:30', 4200, 26000, 640, 138, 162, 'good',  null),
+  ('leo@wiseworkout.test','rowing',   date_trunc('day', now()) - interval '1 day'  + interval '07:20', 1800, 4000,  270, 132, 154, 'okay',  null)
+) as d(email, slug, start_ts, dur, dist, cal, ahr, mhr, feel, cname)
+join public.profiles pr on pr.email = d.email
+join public.workout_types wt on wt.slug = d.slug;
+
+-- XP + streak for the athletes (same canonical formula as §3).
+update public.fitness_profiles fp
+set total_xp = sub.total, current_streak = sub.streak
+from (
+  select ws.user_id,
+    sum(
+      20 + floor(ws.duration_seconds / 60.0)
+      + case when wt.slug in ('running','cycling','swimming','walking','hiit','rowing','hiking')
+             then floor(coalesce(ws.distance_meters, 0) / 1000.0 * 5) else 0 end
+    )::int as total,
+    (
+      select count(*) from (
+        select wk, row_number() over (order by wk desc) as rn
+        from (
+          select distinct date_trunc('week', w2.ended_at)::date as wk
+          from public.workout_sessions w2
+          where w2.user_id = ws.user_id and w2.ended_at is not null
+        ) z
+      ) r
+      where r.wk = (date_trunc('week', now())::date - ((r.rn - 1) * 7)::int)
+    )::int as streak
+  from public.workout_sessions ws
+  join public.workout_types wt on wt.id = ws.workout_type_id
+  where ws.ended_at is not null
+    and ws.user_id in (select id from public.profiles where email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test'))
+  group by ws.user_id
+) sub
+where fp.id = sub.user_id;
+
+-- One shared post each (their most on-brand session).
+insert into public.posts (user_id, kind, workout_session_id, body)
+select ws.user_id, 'workout_share', ws.id, v.body
+from (values
+  ('jordan@wiseworkout.test', 'Long run Sunday', 'Longest run of the block done 🙌'),
+  ('priya@wiseworkout.test',  'Ridge trail',     'Trail therapy with a view ⛰️'),
+  ('leo@wiseworkout.test',    'Century prep',    '32k before breakfast. Legs = jelly 🚴')
+) as v(email, cname, body)
+join public.profiles pr on pr.email = v.email
+join public.workout_sessions ws on ws.user_id = pr.id and ws.custom_name = v.cname;
+
+-- Friendships: each athlete ↔ Mia and ↔ Alex (mutual pairs; athletes are not
+-- friends with each other so friend counts differ believably).
+insert into public.follows (follower_id, following_id)
+select a.id, b.id
+from public.profiles a
+join public.profiles b on a.id <> b.id
+where (a.email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test')
+       and b.email in ('free@wiseworkout.test','premium@wiseworkout.test'))
+   or (b.email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test')
+       and a.email in ('free@wiseworkout.test','premium@wiseworkout.test'))
+on conflict do nothing;
+
+-- Likes: Mia + Alex like every athlete post; athletes like Mia's and Alex's posts.
+insert into public.post_likes (post_id, user_id)
+select p.id, liker.id
+from public.posts p
+join public.profiles author on author.id = p.user_id
+join public.profiles liker on liker.id <> author.id
+where p.kind = 'workout_share'
+  and (
+    (author.email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test')
+     and liker.email in ('free@wiseworkout.test','premium@wiseworkout.test'))
+    or
+    (author.email in ('free@wiseworkout.test','premium@wiseworkout.test')
+     and liker.email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test'))
+  )
+on conflict do nothing;
+
+-- A few comments so threads have depth.
+insert into public.post_comments (post_id, user_id, body)
+select p.id, commenter.id, v.body
+from (values
+  ('jordan@wiseworkout.test', 'free@wiseworkout.test',    'That pace over 10k?! Teach me 😅'),
+  ('priya@wiseworkout.test',  'premium@wiseworkout.test', 'Adding this trail to my list.'),
+  ('leo@wiseworkout.test',    'free@wiseworkout.test',    'Century soon then? 👀'),
+  ('free@wiseworkout.test',   'jordan@wiseworkout.test',  'Bay loop is the best evening ride.'),
+  ('premium@wiseworkout.test','priya@wiseworkout.test',   'Solid tempo, Alex!')
+) as v(author_email, commenter_email, body)
+join public.profiles author on author.email = v.author_email
+join public.profiles commenter on commenter.email = v.commenter_email
+join public.posts p on p.user_id = author.id and p.kind = 'workout_share';
+
+-- Challenge entries: fill the leaderboards around Mia + Alex.
+delete from public.challenge_participants
+ where user_id in (select id from public.profiles where email in ('jordan@wiseworkout.test','priya@wiseworkout.test','leo@wiseworkout.test'));
+insert into public.challenge_participants (challenge_id, user_id)
+select v.cid::uuid, pr.id
+from (values
+  ('c0000000-0000-4000-8000-000000000002', 'jordan@wiseworkout.test'), -- 20 IN 30
+  ('c0000000-0000-4000-8000-000000000002', 'priya@wiseworkout.test'),
+  ('c0000000-0000-4000-8000-000000000002', 'leo@wiseworkout.test'),
+  ('c0000000-0000-4000-8000-000000000001', 'jordan@wiseworkout.test'), -- RUN 100K
+  ('c0000000-0000-4000-8000-000000000005', 'priya@wiseworkout.test'),  -- BURN 5K
+  ('c0000000-0000-4000-8000-000000000005', 'leo@wiseworkout.test'),
+  ('c0000000-0000-4000-8000-000000000004', 'leo@wiseworkout.test')     -- LONG RIDE
+) as v(cid, email)
+join public.profiles pr on pr.email = v.email;
 
 -- Re-enable the guard.
 alter table public.profiles enable trigger trg_guard_profile_privileged_columns;

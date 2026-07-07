@@ -79,6 +79,7 @@ Created/seeded in Supabase Auth (see [§7](#7-reset--reseed-demo-data)). Passwor
 | `free@wiseworkout.test` | Free (Mia Patel) | 8 sessions, shared post, friends w/ Alex, joined challenge, 3 service requests (pending/completed/reviewed states) |
 | `premium@wiseworkout.test` | Premium (Alex Tan) | 7 sessions, shared post, friends w/ Mia, joined challenge, 1 reviewed engagement |
 | `expert@wiseworkout.test` | Expert (Sam Rivera) | Verified Strength Coach · 3 live services · request inbox with every lifecycle state |
+| `jordan@` / `priya@` / `leo@wiseworkout.test` | Free (background athletes) | Sessions + a shared post each, friendships with Mia + Alex, likes/comments both ways, challenge entries — they make the feed and leaderboards look alive; no need to log in as them |
 
 ---
 
