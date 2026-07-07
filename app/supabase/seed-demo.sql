@@ -42,7 +42,8 @@ begin
       ('admin@wiseworkout.test',   'Ava',   'Admin',  'admin'),
       ('amelia@wiseworkout.test',  'Amelia','Tan',    'expert'),
       ('marcus@wiseworkout.test',  'Marcus','Lim',    'expert'),
-      ('elena@wiseworkout.test',   'Elena', 'Ortiz',  'expert')
+      ('elena@wiseworkout.test',   'Elena', 'Ortiz',  'expert'),
+      ('noah@wiseworkout.test',    'Noah',  'Reyes',  'free')
     ) as t(email, first_name, last_name, role)
   loop
     select id into uid from auth.users where email = rec.email;
@@ -544,6 +545,67 @@ on conflict (user_id) do update set
   display_name = excluded.display_name, user_category = excluded.user_category,
   rating = excluded.rating, body = excluded.body, status = excluded.status,
   submitted_at = excluded.submitted_at, reviewed_at = excluded.reviewed_at;
+
+-- ============================================================================
+-- §12 ADMIN PORTAL DEMO STATE — every portal page has live rows to triage:
+-- a PENDING expert application (Noah), a PENDING testimonial (Leo), open +
+-- resolved contact messages, and feedback in both states. Fixed UUIDs keep
+-- re-runs idempotent.
+-- ============================================================================
+
+-- Noah's pending expert application (role stays 'free' until approval)
+insert into public.expert_profiles
+  (id, title, years_coaching, about, credentials, specialties,
+   rating_avg, review_count, client_count, verification_status)
+select id, 'Running Coach', 5,
+       'Track-and-field background; I coach 10K and half-marathon blocks around full-time work schedules.',
+       array['UESCA Certified Running Coach'], array['endurance', 'running'],
+       0, 0, 0, 'pending'::verification_status
+from public.profiles where email = 'noah@wiseworkout.test'
+on conflict (id) do update set verification_status = 'pending';
+
+insert into public.expert_verification_documents (id, user_id, doc_type, title, file_name)
+select v.id::uuid, pr.id, v.doc_type::expert_doc_type, v.title, v.file_name
+from (values
+  ('d0000000-0000-4000-8000-000000000201', 'identity',      'NRIC (front)',      'nric-front.jpg'),
+  ('d0000000-0000-4000-8000-000000000202', 'certification', 'UESCA certificate', 'uesca-cert.pdf')
+) as v(id, doc_type, title, file_name)
+cross join (select id from public.profiles where email = 'noah@wiseworkout.test') pr
+on conflict (id) do nothing;
+
+-- Pending testimonial from Leo (his first — Mia/Alex/Jordan/Priya are approved)
+insert into public.public_testimonials (user_id, display_name, user_category, rating, body, status)
+select id, 'Leo C.', 'Cyclist', 5,
+       'Century prep was way easier with the ride history and calorie numbers in one place. The challenges got my whole group on it.'
+       , 'pending'
+from public.profiles where email = 'leo@wiseworkout.test'
+on conflict (user_id) do update set status = 'pending', body = excluded.body,
+  display_name = excluded.display_name, user_category = excluded.user_category, rating = excluded.rating;
+
+-- Contact inbox: two open, one already resolved
+insert into public.contact_messages (id, submitter_name, submitter_email, message, status, response, created_at) values
+  ('d0000000-0000-4000-8000-000000000301', 'Taylor Ng', 'taylor.ng@example.com',
+   'Do you support corporate wellness plans for teams of 20-50 people?', 'open', null, now() - interval '2 days'),
+  ('d0000000-0000-4000-8000-000000000302', 'Wei Lin', 'wei.lin@example.com',
+   'Does the app work with a Polar H10 chest strap?', 'open', null, now() - interval '10 hours'),
+  ('d0000000-0000-4000-8000-000000000303', 'Sofia Mendes', 'sofia.m@example.com',
+   'Is my workout data private? Who can see my notes?', 'resolved',
+   'Yes — workout notes are always private (enforced at the database level), and you choose what to share to the feed.', now() - interval '6 days')
+on conflict (id) do update set status = excluded.status, response = excluded.response;
+
+-- Feedback: one new bug, one new feature request, one already reviewed
+insert into public.feedback (id, user_id, category, body, status, created_at)
+select v.id::uuid, pr.id, v.category::feedback_category, v.body, v.status::feedback_status, now() - v.age
+from (values
+  ('d0000000-0000-4000-8000-000000000401', 'free@wiseworkout.test', 'feature_request',
+   'Would love interval timers during freeform workouts.', 'new', interval '1 day'),
+  ('d0000000-0000-4000-8000-000000000402', 'premium@wiseworkout.test', 'bug',
+   'The pace chart flickers when I rotate the phone mid-session.', 'new', interval '3 days'),
+  ('d0000000-0000-4000-8000-000000000403', 'jordan@wiseworkout.test', 'general',
+   'Loving the challenges — leaderboard updates feel instant.', 'reviewed', interval '8 days')
+) as v(id, email, category, body, status, age)
+join public.profiles pr on pr.email = v.email
+on conflict (id) do update set status = excluded.status, body = excluded.body;
 
 -- Re-enable the guard.
 alter table public.profiles enable trigger trg_guard_profile_privileged_columns;

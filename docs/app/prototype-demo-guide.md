@@ -77,7 +77,7 @@ While `flutter run` is attached: **`r`** = hot reload, **`R`** = hot restart, **
 
 ## 3. Test accounts
 
-Created/seeded in Supabase Auth (see [§7](#7-reset--reseed-demo-data)). Password for both: **`Password123!`**
+Created/seeded in Supabase Auth (see [§7](#7-reset--reseed-demo-data)). Password for all: **`Password123!`**
 
 | Email | Role | Seeded data |
 |---|---|---|
@@ -85,6 +85,9 @@ Created/seeded in Supabase Auth (see [§7](#7-reset--reseed-demo-data)). Passwor
 | `premium@wiseworkout.test` | Premium (Alex Tan) | 7 sessions, shared post, friends w/ Mia, joined challenge, 1 reviewed engagement |
 | `expert@wiseworkout.test` | Expert (Sam Rivera) | Verified Strength Coach · 3 live services · request inbox with every lifecycle state |
 | `jordan@` / `priya@` / `leo@wiseworkout.test` | Free (background athletes) | Sessions + a shared post each, friendships with Mia + Alex, likes/comments both ways, challenge entries — they make the feed and leaderboards look alive; no need to log in as them |
+| `admin@wiseworkout.test` | Admin (Ava Admin) | Logs into the **web portal** (`web/` → `/login` → `/admin`), not the app — the app role-redirects admins away |
+| `amelia@` / `marcus@` / `elena@wiseworkout.test` | Experts (verified) | Marketplace depth: live services + stored rating aggregates; they drive the landing FEATURED EXPERTS ranking — no need to log in as them |
+| `noah@wiseworkout.test` | Free (pending expert applicant) | PENDING expert application + document metadata — the demo card on `/admin/applications`; approving him live flips his role to expert |
 
 ---
 
