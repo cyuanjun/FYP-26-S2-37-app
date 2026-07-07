@@ -60,7 +60,7 @@ When adding a feature, instrument its Control with the `SEQ <useCase> <from> -> 
 
 ## Scope discipline (this is graded as much as the code)
 
-**Three-layer model** (build-plan §1, PRD §4): **Free** (basic tracking/analytics/AI + social + expert browsing) · **Premium** (advanced analytics + personalised AI + reports) · **Expert-services paid layer** (à-la-carte add-ons both Free *and* Premium buy; simulated payment; *not* bundled into Premium). All five roles (Unregistered/Free/Premium/Expert/Admin) are in scope — the SRS specs all 64 use cases.
+**Three-layer model** (build-plan §1, PRD §4): **Free** (basic tracking/analytics/AI + social + expert browsing) · **Premium** (advanced analytics + personalised AI + reports) · **Expert-services paid layer** (à-la-carte add-ons both Free *and* Premium buy; simulated payment; *not* bundled into Premium). All five roles (Unregistered/Free/Premium/Expert/Admin) are in scope — the SRS specs all 64 use cases. **Admin is a WEB portal (decided 8 Jul 2026), not a mobile-app track** — the app only role-redirects admin accounts; US53–64 live outside `app/lib`.
 
 Optimise for **rubric coverage**, build **core-first** (PRD §10.3 sprints + risk plan "prioritise core features"). If a term runs short, expert-content/admin-monitoring depth yields before the core **capture → analyse → AI-summary → share** loop — that's the spine and the demo. Build the vertical slice (log in → record a phone-GPS workout → history → AI summary → share) before going deep anywhere.
 

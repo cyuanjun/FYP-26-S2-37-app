@@ -91,7 +91,9 @@ Fulfillment model: an `ExpertService` is a marketplace *listing* tagged by `Fulf
 
 ## Admin (role: admin)
 
-The admin portal has a **5-tab bottom nav**: Home (#25) · Users (#26) · Experts (#27) · Monitor (#28) · Categories (#29), plus the shared auth/account screens (Login #2, Forgot Password #4/#4.1, Account Settings #13.3 = change password, Notifications #13.4). Log Out + account links live on **#25.1 Profile** (reached via the dashboard avatar, like the trainee #13). Built incrementally cluster by cluster; per-screen specs aren't written yet.
+> **Realization decision (8 Jul 2026): the admin portal ships as a WEB app**, not in the Flutter mobile app. The mock's mobile wireframes below remain the design reference for the web screens' content/flows; layout adapts to desktop web.
+
+The admin portal (in the mock) has a **5-tab bottom nav**: Home (#25) · Users (#26) · Experts (#27) · Monitor (#28) · Categories (#29), plus the shared auth/account screens (Login #2, Forgot Password #4/#4.1, Account Settings #13.3 = change password, Notifications #13.4). Log Out + account links live on **#25.1 Profile** (reached via the dashboard avatar, like the trainee #13). Built incrementally cluster by cluster; per-screen specs aren't written yet.
 
 **#27.1 Expert Review** shows the expert's profile (about / credentials / specialties) alongside the **verification documents** they submitted at signup — an identity doc + certifications (`ExpertVerificationDocument`) — so the admin can verify identity / achievements before Approve / Reject.
 

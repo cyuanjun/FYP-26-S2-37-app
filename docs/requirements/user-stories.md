@@ -86,6 +86,8 @@ Last updated **8 Jul 2026** (premium upgrade US31+US40; expert portal US42–US4
 
 ## System Admin (US53–US64)
 
+> **Realization decision (8 Jul 2026): the Admin portal will be a WEB app, not part of the Flutter mobile app.** US53–US64 (and the admin sides of US52/US57) move out of the mobile-app backlog; the mobile app keeps the role-based redirect that denies admin accounts the athlete/expert shells. Statuses below now track the web portal.
+
 | ID | Status | User story | Build note |
 |---|---|---|---|
 | US53 | 🟨 | As a system admin, I want to log in securely so that I can access administrative functions. | Shared auth works; admin portal pending |
