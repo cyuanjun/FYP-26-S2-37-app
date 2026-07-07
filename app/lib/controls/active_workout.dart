@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../boundaries/gateways/ble_heart_rate_source.dart';
 import '../boundaries/gateways/workout_data_source.dart';
 import '../boundaries/gateways/workout_gateway.dart';
 import '../core/seq_log.dart';
@@ -99,12 +100,33 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
         );
 
     final phoneSource = ref.read(workoutDataSourceFactoryProvider)();
-    _source = wearable != null
-        ? CompositeWorkoutDataSource(phoneSource, WearableHrSource())
+    // Real BLE pairing → live GATT heart rate; mock pairing → simulated
+    // stream. Same HrSource interface either way (class swap, no refactor).
+    final hrSource = wearable == null
+        ? null
+        : wearable.isRealBle
+            ? BleHeartRateSource(wearable.bleRemoteId!)
+            : WearableHrSource();
+    _source = hrSource != null
+        ? CompositeWorkoutDataSource(phoneSource, hrSource)
         : phoneSource;
     SeqLog.msg('start-workout', 'ActiveWorkout', 'WorkoutDataSource',
-        'start(${wearable != null ? 'phone+${wearable.deviceName}' : 'phone'})');
-    await _source!.start();
+        'start(${wearable != null ? 'phone+${wearable.deviceName}${hrSource is BleHeartRateSource ? ' (BLE)' : ' (sim)'}' : 'phone'})');
+    try {
+      await _source!.start();
+    } catch (e) {
+      // A real device out of range shouldn't cost the session — fall back
+      // to the simulated HR stream and keep recording.
+      if (hrSource is BleHeartRateSource) {
+        SeqLog.msg('start-workout', 'ActiveWorkout', 'WorkoutDataSource',
+            'BLE connect failed ($e) — falling back to simulated HR');
+        _source = CompositeWorkoutDataSource(
+            ref.read(workoutDataSourceFactoryProvider)(), WearableHrSource());
+        await _source!.start();
+      } else {
+        rethrow;
+      }
+    }
     _metricsSub = _source!.metrics.listen((m) {
       state = state.copyWith(
           distanceMeters: m.distanceMeters, steps: m.steps, heartRate: m.heartRate);

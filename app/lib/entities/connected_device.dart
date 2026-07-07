@@ -19,6 +19,10 @@ abstract class ConnectedDevice with _$ConnectedDevice {
     required String deviceName,
     DateTime? lastSyncedAt,
     @Default(true) bool isActive,
+
+    /// Bluetooth remote id captured by a real BLE scan; null = mock pairing
+    /// (the simulated HR stream).
+    String? bleRemoteId,
   }) = _ConnectedDevice;
 
   factory ConnectedDevice.fromJson(Map<String, dynamic> json) =>
@@ -26,5 +30,7 @@ abstract class ConnectedDevice with _$ConnectedDevice {
 
   bool get isPhoneSensors => deviceType == DeviceType.phoneSensors;
 
-  /// Wearables can stream heart rate; the phone alone cannot.
+  /// True when this pairing came from a real Bluetooth scan — sessions then
+  /// stream HR via BleHeartRateSource instead of the simulated wearable.
+  bool get isRealBle => bleRemoteId != null && bleRemoteId!.isNotEmpty;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../boundaries/gateways/ble_heart_rate_source.dart';
 import '../../../controls/manage_connected_device.dart';
 import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
@@ -54,8 +55,10 @@ class ConnectedDevicesScreen extends ConsumerWidget {
     );
   }
 
-  /// Mock Bluetooth scan (#7.1 spec) — brief "scanning", then discoverable
-  /// devices to pick from.
+  /// Pairing sheet (#7.1): a REAL BLE scan for heart-rate devices runs
+  /// alongside the spec's demo list — real finds show first; wherever
+  /// Bluetooth is unavailable (simulator) the scan yields nothing and the
+  /// demo list remains the pairing path.
   Future<void> _openScanModal(BuildContext context, WidgetRef ref) async {
     const discoverable = <(DeviceType, String)>[
       (DeviceType.appleWatch, 'Apple Watch Series 9'),
@@ -66,7 +69,7 @@ class ConnectedDevicesScreen extends ConsumerWidget {
       (DeviceType.other, 'Other device'),
     ];
 
-    final picked = await showModalBottomSheet<(DeviceType, String)>(
+    final picked = await showModalBottomSheet<(DeviceType, String, String?)>(
       context: context,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
@@ -77,9 +80,8 @@ class ConnectedDevicesScreen extends ConsumerWidget {
     );
     if (picked == null) return;
 
-    final device = await ref
-        .read(manageConnectedDeviceProvider)
-        .pair(type: picked.$1, name: picked.$2);
+    final device = await ref.read(manageConnectedDeviceProvider).pair(
+        type: picked.$1, name: picked.$2, bleRemoteId: picked.$3);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(device == null
@@ -100,10 +102,15 @@ class _ScanSheet extends StatefulWidget {
 
 class _ScanSheetState extends State<_ScanSheet> {
   bool _scanning = true;
+  List<ScannedBleDevice> _nearby = const [];
 
   @override
   void initState() {
     super.initState();
+    // Real scan (returns [] without Bluetooth); the spinner covers it.
+    scanForHeartRateDevices().then((found) {
+      if (mounted) setState(() => _nearby = found);
+    });
     Future.delayed(const Duration(milliseconds: 1400), () {
       if (mounted) setState(() => _scanning = false);
     });
@@ -135,6 +142,26 @@ class _ScanSheetState extends State<_ScanSheet> {
               ])),
             ),
           ] else ...[
+            if (_nearby.isNotEmpty) ...[
+              Text('NEARBY (BLUETOOTH)',
+                  style: AppTypography.caption2.copyWith(letterSpacing: 1.5)),
+              for (final d in _nearby)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading:
+                      const Text('📡', style: TextStyle(fontSize: 24)),
+                  title: Text(d.name, style: AppTypography.body),
+                  subtitle: Text('Live heart rate · real device',
+                      style: AppTypography.caption1),
+                  trailing: const Icon(Icons.add_circle_outline,
+                      color: AppColors.accent),
+                  onTap: () => Navigator.of(context)
+                      .pop((DeviceType.other, d.name, d.remoteId)),
+                ),
+              const SizedBox(height: 8),
+              Text('DEMO DEVICES',
+                  style: AppTypography.caption2.copyWith(letterSpacing: 1.5)),
+            ],
             for (final (type, name) in widget.discoverable)
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -142,7 +169,7 @@ class _ScanSheetState extends State<_ScanSheet> {
                 title: Text(name, style: AppTypography.body),
                 subtitle: Text(type.label, style: AppTypography.caption1),
                 trailing: const Icon(Icons.add_circle_outline, color: AppColors.accent),
-                onTap: () => Navigator.of(context).pop((type, name)),
+                onTap: () => Navigator.of(context).pop((type, name, null)),
               ),
           ],
         ],

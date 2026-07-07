@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../controls/authenticate.dart';
+import '../../../controls/update_avatar.dart';
 import '../../../controls/view_profile.dart';
 import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
@@ -24,13 +26,31 @@ import 'submit_feedback_screen.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  void _soon(BuildContext context, String what) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('$what arrives in a later sprint.')));
-  }
-
   void _push(BuildContext context, Widget screen) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+  }
+
+  /// Gallery pick → UpdateAvatar control (resize keeps uploads small).
+  Future<void> _pickAvatar(BuildContext context, WidgetRef ref) async {
+    final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 85);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    try {
+      await ref.read(updateAvatarProvider).call(bytes);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Profile photo updated.')));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+      }
+    }
   }
 
   @override
@@ -70,18 +90,29 @@ class ProfileScreen extends ConsumerWidget {
                 Container(
                   width: 96,
                   height: 96,
-                  decoration:
-                      const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    shape: BoxShape.circle,
+                    image: profile?.avatarUrl == null
+                        ? null
+                        : DecorationImage(
+                            image: NetworkImage(profile!.avatarUrl!),
+                            fit: BoxFit.cover),
+                  ),
                   alignment: Alignment.center,
-                  child: Text(initial,
-                      style: const TextStyle(
-                          fontSize: 40, fontWeight: FontWeight.w900, color: AppColors.accent)),
+                  child: profile?.avatarUrl != null
+                      ? null
+                      : Text(initial,
+                          style: const TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.accent)),
                 ),
                 Positioned(
                   right: 0,
                   bottom: 0,
                   child: GestureDetector(
-                    onTap: () => _soon(context, 'Photo upload'),
+                    onTap: () => _pickAvatar(context, ref),
                     child: Container(
                       width: 28,
                       height: 28,

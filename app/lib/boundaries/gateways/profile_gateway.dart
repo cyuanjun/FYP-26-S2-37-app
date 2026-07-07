@@ -57,6 +57,11 @@ class ProfileGateway {
         .update({'status': status.dbValue}).eq('id', id);
   }
 
+  /// Points the profile at a freshly uploaded avatar (public URL).
+  Future<void> updateAvatarUrl(String id, String url) async {
+    await _client.from('profiles').update({'avatar_url': url}).eq('id', id);
+  }
+
   /// Marks first-time onboarding done — Splash/Login stop routing to the wizard.
   Future<void> completeOnboarding(String id) async {
     await _client

@@ -42,6 +42,7 @@ class DeviceGateway {
     required String userId,
     required DeviceType type,
     required String name,
+    String? bleRemoteId,
   }) async {
     final row = await _client.from('connected_devices').insert({
       'user_id': userId,
@@ -49,6 +50,7 @@ class DeviceGateway {
       'device_name': name.trim(),
       'is_active': true,
       'last_synced_at': DateTime.now().toUtc().toIso8601String(),
+      'ble_remote_id': ?bleRemoteId,
     }).select().single();
     return ConnectedDevice.fromJson(row);
   }

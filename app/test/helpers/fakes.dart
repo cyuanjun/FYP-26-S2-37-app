@@ -535,6 +535,14 @@ class FakeProfileGateway implements ProfileGateway {
   Future<void> updateName(String id, {required String firstName, String? lastName}) async =>
       nameWrites.add((firstName, lastName));
 
+  final avatarUrlWrites = <String>[];
+
+  @override
+  Future<void> updateAvatarUrl(String id, String url) async {
+    avatarUrlWrites.add(url);
+    profile = profile?.copyWith(avatarUrl: url);
+  }
+
   // ---- Premium (grows with the interface) ----
   Subscription? subscription;
   int startPremiumCalls = 0;
@@ -694,13 +702,17 @@ class FakeDeviceGateway implements DeviceGateway {
 
   @override
   Future<ConnectedDevice> addDevice(
-      {required String userId, required DeviceType type, required String name}) async {
+      {required String userId,
+      required DeviceType type,
+      required String name,
+      String? bleRemoteId}) async {
     final d = ConnectedDevice(
         id: 'dev-${devices.length + 1}',
         userId: userId,
         deviceType: type,
         deviceName: name.trim(),
-        lastSyncedAt: DateTime(2026, 6, 12));
+        lastSyncedAt: DateTime(2026, 6, 12),
+        bleRemoteId: bleRemoteId);
     devices.add(d);
     return d;
   }

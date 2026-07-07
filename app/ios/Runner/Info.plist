@@ -70,5 +70,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Connect to Bluetooth heart-rate sensors during workouts.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose a profile photo from your library.</string>
 </dict>
 </plist>

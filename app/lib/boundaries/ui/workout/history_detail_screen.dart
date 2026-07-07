@@ -12,6 +12,7 @@ import '../../../entities/enums.dart';
 import '../../../entities/workout_session.dart';
 import '../../gateways/workout_gateway.dart';
 import '../common/stat_tile.dart';
+import '../common/training_effect_card.dart';
 import '../social/post_detail_screen.dart';
 import '../common/status_badge.dart';
 
@@ -161,6 +162,12 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
             _stat('AVG HR', s.avgHeartRate?.toString() ?? '—'),
             _stat('MAX HR', s.maxHeartRate?.toString() ?? '—'),
           ],
+        ),
+        const SizedBox(height: 24),
+        // Training Effect — shared card; dimmed while editing (spec: locked).
+        Opacity(
+          opacity: _editing ? 0.5 : 1,
+          child: TrainingEffectCard(session: s),
         ),
         const SizedBox(height: 24),
         // Feel

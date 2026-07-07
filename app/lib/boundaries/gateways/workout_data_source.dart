@@ -107,11 +107,18 @@ class PhoneSensorSource implements WorkoutDataSource {
   }
 }
 
-/// Wearable heart-rate stream. SIMULATED for the FYP (the #7.1 spec's mock
-/// pairing) — stands in for the future `BleHeartRateSource` (flutter_blue_plus)
-/// behind the same interface, so swapping in real hardware is additive.
+/// A heart-rate-capable source: the simulated wearable (mock pairing) and
+/// the real `BleHeartRateSource` both satisfy this, so the Composite and the
+/// ActiveWorkout control don't care which fed the session.
+abstract class HrSource implements WorkoutDataSource {
+  int? get avgHeartRate;
+  int? get maxHeartRate;
+}
+
+/// Wearable heart-rate stream. SIMULATED (the #7.1 spec's mock pairing) —
+/// the class-swap counterpart of `BleHeartRateSource` in ble_heart_rate_source.dart.
 /// Deterministic: warm-up ramp to a working zone plus a gentle wave.
-class WearableHrSource implements WorkoutDataSource {
+class WearableHrSource implements HrSource {
   final _controller = StreamController<LiveMetrics>.broadcast();
   final samples = <int>[];
   Timer? _timer;
@@ -137,10 +144,12 @@ class WearableHrSource implements WorkoutDataSource {
     if (!_controller.isClosed) _controller.add(LiveMetrics(heartRate: hr));
   }
 
+  @override
   int? get avgHeartRate => samples.isEmpty
       ? null
       : (samples.reduce((a, b) => a + b) / samples.length).round();
 
+  @override
   int? get maxHeartRate =>
       samples.isEmpty ? null : samples.reduce((a, b) => a > b ? a : b);
 
@@ -163,7 +172,7 @@ class CompositeWorkoutDataSource implements WorkoutDataSource {
   CompositeWorkoutDataSource(this.phone, this.wearable);
 
   final WorkoutDataSource phone;
-  final WearableHrSource? wearable;
+  final HrSource? wearable;
 
   final _controller = StreamController<LiveMetrics>.broadcast();
   StreamSubscription<LiveMetrics>? _phoneSub;

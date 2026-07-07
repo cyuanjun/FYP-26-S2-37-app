@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/save_workout_details.dart';
+import '../../../controls/workout_history.dart';
 import '../../../controls/share_workout.dart';
 import '../../../core/format.dart';
 import '../../../core/theme/app_buttons.dart';
@@ -9,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/workout_type.dart';
+import '../common/training_effect_card.dart';
 import '../common/stat_tile.dart';
 
 /// BOUNDARY (#10 Workout Summary). Post-session recap: stats + XP, name / feel /
@@ -107,6 +109,20 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
             ],
           ),
           const SizedBox(height: 24),
+          // Training Effect (#10 spec: stats grid → TE → feel/notes). The
+          // finalized session comes back through historyProvider.
+          Consumer(builder: (context, ref, _) {
+            final session = ref
+                .watch(historyProvider)
+                .value
+                ?.where((s) => s.id == widget.sessionId)
+                .firstOrNull;
+            if (session == null) return const SizedBox.shrink();
+            return Column(children: [
+              TrainingEffectCard(session: session),
+              const SizedBox(height: 24),
+            ]);
+          }),
           TextField(controller: _name, decoration: const InputDecoration(labelText: 'NAME THIS WORKOUT (OPTIONAL)')),
           const SizedBox(height: 16),
           Text('HOW DID IT FEEL?', style: AppTypography.caption2),

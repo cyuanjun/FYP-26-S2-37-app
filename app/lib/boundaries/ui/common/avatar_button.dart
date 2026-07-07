@@ -25,9 +25,19 @@ class AvatarButton extends ConsumerWidget {
         child: Container(
           width: 40,
           height: 40,
-          decoration: const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            shape: BoxShape.circle,
+            image: profile?.avatarUrl == null
+                ? null
+                : DecorationImage(
+                    image: NetworkImage(profile!.avatarUrl!),
+                    fit: BoxFit.cover),
+          ),
           alignment: Alignment.center,
-          child: Text(initial,
+          child: profile?.avatarUrl != null
+              ? null
+              : Text(initial,
               style: const TextStyle(
                   fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.accent)),
         ),

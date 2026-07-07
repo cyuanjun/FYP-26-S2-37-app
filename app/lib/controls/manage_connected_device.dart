@@ -48,14 +48,14 @@ class ManageConnectedDevice {
 
   final Ref _ref;
 
-  Future<ConnectedDevice?> pair({required DeviceType type, required String name}) async {
+  Future<ConnectedDevice?> pair(
+      {required DeviceType type, required String name, String? bleRemoteId}) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null || name.isBlank) return null;
     SeqLog.msg('manage-device', 'ConnectedDevicesScreen', 'ManageConnectedDevice',
-        'pair(${type.name}, $name)');
-    final device = await _ref
-        .read(deviceGatewayProvider)
-        .addDevice(userId: userId, type: type, name: name);
+        'pair(${type.name}, $name${bleRemoteId != null ? ', ble' : ''})');
+    final device = await _ref.read(deviceGatewayProvider).addDevice(
+        userId: userId, type: type, name: name, bleRemoteId: bleRemoteId);
     _ref.invalidate(connectedDevicesProvider);
     return device;
   }

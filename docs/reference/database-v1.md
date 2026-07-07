@@ -196,6 +196,7 @@ A paired wearable / sensor. 1-to-many with `User` (FK directly, not via `Fitness
 | DeviceName | varchar(80) |  | display name, e.g. "Mia's Apple Watch" |
 | LastSyncedAt | timestamp |  | nullable |
 | IsActive | boolean |  | whether the device is currently usable as a data source |
+| BleRemoteId | text |  | nullable (added 9 Jul). The Bluetooth remote id captured when the device was paired via a **real BLE scan** — sessions with it stream live heart rate through `BleHeartRateSource`; null = mock/demo pairing (simulated HR stream) |
 
 ### FitnessGoal
 Per-athlete fitness target — the structured "what is the user trying to achieve" record. 1-to-many with `FitnessProfile` (only athletes have goals). The **active goal** is the row where `AchievedAt IS NULL`; achieving sets the timestamp and the user picks a new one.
