@@ -188,6 +188,10 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 2. **+ ADD DEVICE** → "Scanning for devices…" → pick **Apple Watch Series 9**.
    - **See:** snackbar "…connected — its heart rate feeds your next workout"; row shows
      "Last synced: just now".
+   - The sheet runs a **real Bluetooth scan** first (10 Jul): on a physical device with an HR
+     sensor nearby, a **NEARBY (BLUETOOTH)** section appears above the demo list — pairing one
+     stores its remote id and the next workout streams **real** GATT heart rate. The simulator
+     has no Bluetooth, so only the demo list shows there.
 3. Record a workout (step B).
    - **See:** a live **♥ N bpm · Apple Watch Series 9** readout under the metric tiles, climbing
      from ~70 as you "warm up" (simulated stream). After saving: avg/max HR on the session in
@@ -195,7 +199,21 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 4. **Negative check:** toggle the watch OFF (or remove it) → next workout has no HR readout and
    the session links to phone sensors instead.
 
+### B3. Log a workout manually (US13)
+1. Train → **"Log a workout manually"** (under the freeform CTA).
+   - **See:** **LOG A WORKOUT** — workout-type chips, date/time pickers, duration, distance
+     (cardio types only), feel pills, private notes; the CTA stays disabled until type +
+     duration are set, and future start times are blocked inline.
+2. Pick **Running**, yesterday 7:30 AM, 30 min, 5 km, feel **Good** → **LOG WORKOUT**.
+   - **See:** snackbar **"Workout logged — +75 XP"** (same server-side XP formula as tracked
+     sessions: 20 + 30 min + 5 km×5); the session appears in History under the right day with
+     pace computed and an honest **—** for AVG HR (no source device).
+
 ### F2. Profile & account flows
+0. Tap the avatar circle's **edit dot** → system photo picker → choose a photo.
+   - **See:** "Profile photo updated." — the photo replaces the initial everywhere the avatar
+     renders (profile circle + the top-right avatar button). Stored in the public `avatars`
+     bucket under your own folder (10 Jul).
 1. On any tab, tap the **avatar (top-right)**.
    - **See:** **PROFILE** — avatar with edit dot, **MIA PATEL @mia**, a **LEVEL n** XP bar (`x / 200 XP`),
      a **Workouts / Active days / Streak** stats row, five menu rows, and an outlined red **LOG OUT**.

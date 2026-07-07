@@ -3,7 +3,7 @@
 Every defect found while building the prototype — symptom, root cause, fix, and where it landed.
 Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity: **H**igh
 (blocks a core flow / data integrity), **M**edium (feature wrong but workaround exists),
-**L**ow (cosmetic/dev-experience). Last updated **29 Jun 2026** (+ BUG-017, regeneration monthly-reset).
+**L**ow (cosmetic/dev-experience). Last updated **10 Jul 2026** (+ BUG-018–021, July build-out; OPEN-004 resolved).
 
 ## Fixed — application code
 
@@ -26,6 +26,10 @@ Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity
 | BUG-015 | 12 Jun | **H** | Capture/stability | **App ANR'd ("isn't responding") while ending a workout**; UI froze, session left un-ended | Geolocator stream cancel wedged on the platform channel when a stale Flutter engine held the location service ("There is still another flutter engine connected"); `end()` blocked behind it | Sensor cancels made non-blocking (`unawaited`); `end()` reordered to do network reads before platform-channel teardown; orphaned session cleaned up | `7e8ede1` |
 | BUG-016 | 12 Jun | L | Plan Detail | Analyzer: regenerate callback shadowed `plan`, referenced before declaration | Variable shadowing | Renamed to `newPlan` (caught pre-commit) | `1ec02d5` |
 | BUG-017 | 29 Jun | M | Plans/tiering | Free plan regeneration never reset monthly — blocked forever after 1 regen; Plan Detail showed a nonsensical "2 of 1 free regenerations used" | `regeneratedCount` is a **cumulative** counter and the gate was `>= 1` (lifetime), but the spec + confirm-dialog copy say **1/month** | Month-aware gate (blocked only when the active plan's `startedAt` falls in the current calendar month, so it resets each month); raw count replaced with a "1 per month" description; disabled button greyed | `73c578c` |
+| BUG-018 | 7 Jul | M | Marketplace/data | Service Detail's "✓ Reviewed" footer never flipped after submitting a review; Riverpod kept serving retained stale state | `expert_reviews` has `UNIQUE(service_request_id)`, so PostgREST embeds it **one-to-one (object, not list)**; the `as List?` cast threw inside the row parser | Parser accepts both shapes: `reviewed: reviews is Map \|\| (reviews is List && reviews.isNotEmpty)` | `b8f6648` |
+| BUG-019 | 8 Jul | **H** | Notifications | Scheduled reminders **never fired**: everything landed ~8 h off (next morning) despite correct in-app times | `flutter_local_notifications` builds iOS triggers from the TZDateTime's **wall-clock components**, so scheduling UTC instants with `tz.UTC` silently shifts by the zone offset; `tz.local` defaulted to UTC | `flutter_timezone` resolves the device IANA zone at init (`tz.setLocalLocation`); schedule with `TZDateTime.from(when, tz.local)`; zone SEQ-logged | `24f90e7` |
+| BUG-020 | 9 Jul | M | Forms UI | Dropdown menu items rendered near-invisible (white-ish text on the tinted menu surface) in the service editor | `DropdownButtonFormField` menu inherited an unsuitable text style from the theme on `surface`-tinted popups | Explicit `AppTypography.body` + `dropdownColor: AppColors.surface` on the dropdowns | `6939f69` |
+| BUG-021 | 10 Jul | L | History UI | The Free month-cap **empty state** can't pull-to-refresh (the `RefreshIndicator` wraps only the non-empty list) — stale data stays until a tab switch/restart | Early-return empty-state branch sits outside the `RefreshIndicator` subtree | Accepted for now (in-app flows invalidate on mutation; only out-of-band DB edits notice) — tracked as OPEN-005 | — |
 
 ## Fixed — requirements / documentation defects
 
@@ -47,6 +51,8 @@ Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity
 | ENV-003 | 12 Jun | Emulator | Couldn't type with the Mac keyboard | AVD had `hw.keyboard=no` → set to `yes` in `~/.android/avd/pixel_api35.avd/config.ini` |
 | ENV-004 | 12 Jun | Process | App relaunch raced ahead of an SQL flag reset; force-stop silently hit a stale package id (`com.example.…` vs `com.wiseworkout.…`) | Sequence DB writes before relaunch; use the real `applicationId` |
 | ENV-005 | 10–12 Jun | Process | iOS simulator showed stale builds after Android-only deploys | `flutter run` targets one device — standing rule: redeploy iOS after every change batch |
+| ENV-006 | 8 Jul | Platform | iOS 26 **simulator** never delivers scheduled calendar-trigger local notifications (OS holds `pending=1` forever); display path itself works (`simctl push` renders the same payload) | Simulator limitation, not app code — verify delivery on a physical device / Android emulator (demo-script checklist) |
+| ENV-007 | 10 Jul | Platform | iOS simulator has no Bluetooth — real BLE scan yields nothing | By design the pairing sheet falls back to the demo device list; real-device pass pending (same session as ENV-006) |
 
 ## Investigated — verified NOT bugs
 
@@ -63,4 +69,5 @@ Feeds the PTD testing section and the module-testing evidence (11 Jul). Severity
 | OPEN-001 | Stability | Emulator memory pressure can still jank long sessions (ENV-002); prefer a real device or freshly-booted AVD for demos |
 | OPEN-002 | Duplication | Week-boundary, cardio-slug, and XP constants exist in both Dart and SQL/Edge Functions — drift risk; extract shared constants when convenient |
 | OPEN-003 | Capture | Sessions started from a plan don't yet link `planned_workout_id` (the +10 planned-XP bonus is unreachable) |
-| OPEN-004 | Devices | HR stream is simulated; real `BleHeartRateSource` / HealthKit is the designed follow-on (same interface) |
+| ~~OPEN-004~~ | Devices | ✅ Resolved 10 Jul — real `BleHeartRateSource` built (GATT 0x180D, real scan in the pairing sheet, `ble_remote_id`); HealthKit remains the follow-on (`90db630`) |
+| OPEN-005 | History UI | Month-cap empty state lacks pull-to-refresh (BUG-021) — wrap the empty branch in the RefreshIndicator when convenient |
