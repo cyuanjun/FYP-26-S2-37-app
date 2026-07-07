@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **9 Jul 2026** (8 Jul: premium upgrade, expert portal, notifications; 9 Jul: manual entry US13 ✅). Tally: 34 ✅ · 6 🟨 · 24 ⬜.
+Last updated **9 Jul 2026** (8 Jul: premium upgrade, expert portal, notifications; 9 Jul: manual entry US13, History search, #12.2 advanced analytics US34 ✅). Tally: 35 ✅ · 7 🟨 · 22 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -59,8 +59,8 @@ Last updated **9 Jul 2026** (8 Jul: premium upgrade, expert portal, notification
 |---|---|---|---|
 | US32 | ✅ | As a registered premium user, I want to access all registered free user features so that I can use the full platform experience. | Premium role inherits all Free features (role-aware UI) |
 | US33 | ✅ | As a registered premium user, I want to view full workout history so that I can review my long-term activity records. | Premium queries lifetime history (no from-bound); Free is month-capped |
-| US34 | ⬜ | As a registered premium user, I want to access advanced progress analytics so that I can understand my fitness trends in more detail. | Advanced analytics / detailed estimates pending |
-| US35 | ⬜ | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Advanced analytics / detailed estimates pending |
+| US34 | ✅ | As a registered premium user, I want to access advanced progress analytics so that I can understand my fitness trends in more detail. | #12.2 Advanced Workout Analytics (9 Jul): ACWR workload ratio w/ bands, weekly volume/HR-efficiency/training-load trends over 4wk–All ranges, Karvonen HR zones, all-time personal bests — all derived live from sessions (`entities/advanced_analytics.dart`, unit-tested) |
+| US35 | 🟨 | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Long-term side ✅ via #12.2 (ACWR estimate + load/efficiency trends); the per-session short-term Training Effect breakdown (#10/#12.1) remains unbuilt |
 | US36 | 🟨 | As a registered premium user, I want to receive personalised AI progress summaries, fitness plan suggestions, and personalised fitness reports so that I can get more relevant guidance. | Personalised AI summary live (goal context, gpt-4o-mini); reports pending |
 | US37 | ✅ | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | Live AI plans (gpt-4o-mini, strict schema + validation); My Plans + Plan Detail #8 with regenerate (Free capped at 1) |
 | US38 | ⬜ | As a registered premium user, I want to customise plan duration, workout frequency, preferred workout categories, target calories, daily or weekly weight loss goals, and preferred rest days so that the fitness plan fits my schedule and needs. | Personalised plans / reminders / subscription mgmt pending |

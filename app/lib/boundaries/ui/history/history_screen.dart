@@ -16,6 +16,7 @@ import '../common/stat_tile.dart';
 import '../common/workout_list_card.dart';
 import '../common/status_badge.dart';
 import '../premium/upgrade_screen.dart';
+import 'advanced_analytics_screen.dart';
 import '../workout/history_detail_screen.dart';
 
 enum _Period { day, week, month }
@@ -162,9 +163,27 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               children: [
                 if (isPremium) _searchField() else _searchLockedPill(),
-                const Padding(
-                  padding: EdgeInsets.only(top: 16, bottom: 8),
-                  child: Text('BASIC WORKOUT ANALYTICS', style: AppTypography.caption2),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16, bottom: 8),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                          child: Text('BASIC WORKOUT ANALYTICS',
+                              style: AppTypography.caption2)),
+                      if (isPremium)
+                        GestureDetector(
+                          onTap: () => Navigator.of(context,
+                                  rootNavigator: true)
+                              .push(MaterialPageRoute(
+                                  builder: (_) =>
+                                      const AdvancedAnalyticsScreen())),
+                          child: Text('Advanced ›',
+                              style: AppTypography.footnote.copyWith(
+                                  color: AppColors.accent,
+                                  fontWeight: FontWeight.w700)),
+                        ),
+                    ],
+                  ),
                 ),
                 _analyticsCard(visible, isPremium),
                 const SizedBox(height: 20),

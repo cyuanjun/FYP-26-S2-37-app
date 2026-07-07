@@ -217,6 +217,10 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
      search field** ("Search history by name or type"). Type `leg` → the list *and* the analytics narrow to the
      "Leg day" session; a nonsense query shows `No history matches "…"`. Same rich analytics + session history
      (7 seeded sessions).
+3. Tap **Advanced ›** on the Basic Workout Analytics card (Premium-only).
+   - **See:** **#12.2 Advanced Analytics** — the ACWR workload tile with a coloured band chip, range pills
+     (4 wks / 3 mo / 1 yr / All), weekly volume (metric toggle), HR efficiency, training load, the Karvonen
+     HR-zone stacked bar, and all-time personal bests — all computed live from the seeded sessions.
 
 ### H. Upgrade to Premium *(the live tier flip — great demo moment)*
 1. Log in as `free@wiseworkout.test` (Mia).
