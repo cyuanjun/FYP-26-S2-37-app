@@ -16,6 +16,16 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | `migrations/20260612090000_onboarding_completed_at.sql` | First-login onboarding gate on `profiles` (existing accounts backfilled complete). |
 | `migrations/20260612100000_private_custom_catalog_entries.sql` | RLS: custom workout types + health tags visible only to their creator. |
 | `migrations/20260612110000_admin_write_policy_checks.sql` | RLS: admin write policies keep owner checks for users while allowing admins to update target-user rows. |
+| `migrations/20260706090000_social_friend_rpcs.sql` | `add_friend`/`remove_friend` SECURITY DEFINER RPCs (mutual Follow pair). |
+| `migrations/20260706090100_challenge_leaderboards.sql` | `challenge_leaderboards(uuid[])` live-aggregation function. |
+| `migrations/20260706090200_baseline_table_grants.sql` | Local-stack parity for hosted's default table grants. |
+| `migrations/20260707090000_expert_request_rpcs.sql` | ServiceRequest lifecycle RPCs + `submit_expert_review` + grants lockdown. |
+| `migrations/20260707100000_expert_earnings.sql` | `expert_profiles.total_earned_cents` aggregate (complete adds quoted price). |
+| `migrations/20260708090000_start_premium_rpc.sql` | `start_premium()` (role flip past the guard via a txn-local flag) + subscriptions upsert. |
+| `migrations/20260708100000_expert_profile_column_lockdown.sql` | Column-level UPDATE grants: experts edit only their descriptive columns. |
+| `migrations/20260709090000_manual_entry_backdate.sql` | `end_workout_session` honours a backdated `started_at` (manual entry US13). |
+| `migrations/20260709100000_avatars_bucket.sql` | Public `avatars` storage bucket + owner-folder write policies. |
+| `migrations/20260709110000_ble_remote_id.sql` | `connected_devices.ble_remote_id` for real-BLE pairings. |
 | `seed.sql` | The three install-time catalogs: `workout_types`, `health_tags`, `expert_categories`. |
 | `seed-demo.sql` | **Demo data** (not install data): two login accounts (`free@`/`premium@wiseworkout.test`, pw `Password123!`) + varied workout sessions, XP/streak, and share posts. Idempotent — re-run to reset the demo. |
 

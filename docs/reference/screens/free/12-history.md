@@ -116,7 +116,7 @@ See [../../database-v1.md](../../database-v1.md).
 
 - **Only ended sessions appear.** Sessions where `EndedAt IS NULL` are in-progress (Active Workout screen owns them); History waits until the user finishes via End → Save.
 - **Aggregates are derived per render**, not cached. With ~1 session/day per active user, the volume is small enough that recomputing is fine. Production could memoize per week-window.
-- **No filtering / search in v1.** Most users won't have hundreds of sessions yet — defer until volume warrants it.
+- ~~**No filtering / search in v1.**~~ *(Superseded 9 Jul: Premium search shipped per §Search above; the locked pill routes Free to #16.)*
 - **No delete affordance on the list.** Delete lives on #12.1 Detail so it's always a deliberate two-tap action (open detail → delete with confirm).
 - **Cap is calendar-month, not rolling 30 days.** Resetting on the 1st gives users a predictable boundary they can plan around ("export June stats by July 1"); a rolling window would make the goalposts move daily and create surprise data loss. Older sessions are kept in the DB so an upgrade restores everything instantly — no migration needed.
 - **This card is the Free version. Premium drills into the richer #12.2 Advanced Workout Analytics** via the `Advanced ›` action — adding ACWR (workload ratio estimate with bands), HR zone stacked bar (Karvonen %HRR), weekly trend bars for volume / HR / load over 4w / 3mo / 1y / All, and a personal-bests grid. Same `WorkoutSession` data, just more dimensions and a longer time horizon.

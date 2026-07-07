@@ -49,6 +49,7 @@ Table ConnectedDevice [headercolor: #3B5BA5] {
   deviceName String [not null]
   lastSyncedAt DateTime [null]
   isActive bool [not null]
+  bleRemoteId String [null, note: 'set by a real BLE scan pairing (9 Jul) — sessions stream live HR via BleHeartRateSource; null = mock pairing (simulated HR)']
 }
 
 //////////////////////////////////////////////////////////////
@@ -237,6 +238,7 @@ Table ExpertProfile [headercolor: #B8860B] {
   ratingAvg double [not null]
   reviewCount int [not null]
   clientCount int [not null]
+  totalEarnedCents int [not null, note: 'simulated-earnings aggregate (7 Jul) — complete_service_request adds the quoted price; not a ledger']
   verificationStatus String [not null, note: "pending | verified | rejected — 'verified' drives the ✓ badge"]
 }
 

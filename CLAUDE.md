@@ -49,7 +49,7 @@ The app follows **Boundary–Control–Entity** (Jacobson). This is an FYP desig
 app/lib/entities/              ENTITY   — freezed models of the ~26 TDM §8 entities + data-owned rules (XP/level/streak)
 app/lib/controls/              CONTROL  — one class per use case (= the mock's store actions, e.g. EndWorkoutSession)
 app/lib/boundaries/ui/         BOUNDARY — actor-facing screens/widgets; ui/common/ = the shared widget library (StatTile, AppCard, StatusBadge, PremiumCta, AvatarButton, FieldLabel, SelectorPills, TrainingEffectCard) — use these instead of hand-rolling stat rows / surface cards / status pills / gold CTAs / form-field captions / single-select pill rows
-app/lib/boundaries/gateways/   BOUNDARY — system-facing adapters (Auth/Profile/Fitness/Plan/Workout/Social/Feedback/Device gateways + AiGateway, WorkoutDataSource, SocialShareGateway; Notification/Storage gateways pending)
+app/lib/boundaries/gateways/   BOUNDARY — system-facing adapters (Auth/Profile/Fitness/Plan/Workout/Social/Feedback/Device/Expert/Notification/Storage gateways + AiGateway, WorkoutDataSource incl. BleHeartRateSource, SocialShareGateway) — the full designed set is built
 app/lib/core/                  cross-cutting helpers — seq_log.dart (the SEQ logging convention below), format.dart, strings.dart (isBlank), config/env.dart, theme/ (palette + typography + app_buttons.dart outlined styles)
 app/lib/router/                app_router.dart — the go_router config with role-based redirects
 ```
