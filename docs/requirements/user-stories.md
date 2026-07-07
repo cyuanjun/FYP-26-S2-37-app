@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **8 Jul 2026** (premium upgrade US31+US40; expert portal US42–US47, US49–US50; notifications US19–US21 ✅). Tally: 33 ✅ · 6 🟨 · 25 ⬜.
+Last updated **9 Jul 2026** (8 Jul: premium upgrade, expert portal, notifications; 9 Jul: manual entry US13 ✅). Tally: 34 ✅ · 6 🟨 · 24 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -33,7 +33,7 @@ Last updated **8 Jul 2026** (premium upgrade US31+US40; expert portal US42–US4
 | US10 | ⬜ | As a registered free user, I want to access the mobile application after logging in so that I can install and use the application. | Website flow: log in on the site → download the app (clarified 12 Jun). The in-app splash auto-login (built) belongs to US07; website not built |
 | US11 | ✅ | As a registered free user, I want to create and update my fitness profile so that the system can understand my goals, preferences, and fitness needs. | Fitness Profile #13.1 (batched save, custom tags) |
 | US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
-| US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | Manual entry UI not built (schema supports it: null device) |
+| US13 | ✅ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | "Log a workout manually" on Train (9 Jul): type/date/time/duration/distance/feel/notes → same `end_workout_session` RPC (now honours a backdated `started_at`), so XP/streak/level-up and MET calories match tracked sessions; `connected_device_id` stays null |
 | US14 | ✅ | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone GPS/steps ✅ + wearable pairing (#7.1, mock BLE scan per spec) with simulated HR streaming into sessions (avg/max persisted, device linked); real BLE/HealthKit slots in behind the same WorkoutDataSource later |
 | US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + analytics ✅; Free cap = current calendar month, enforced at the query level (12 Jun) |
 | US16 | ✅ | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | MET-based calorie estimate per session (entity rule, profile weight w/ sex-based default 70/55 kg) + XP; computed live since 12 Jun. Method + accuracy caveat: [reference/calorie-estimation.md](../reference/calorie-estimation.md) |
