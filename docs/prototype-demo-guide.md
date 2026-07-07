@@ -1,5 +1,7 @@
 # Wise Workout — Prototype Demo & Test Guide
 
+> 🎤 **Presenting?** The stage run-of-show (acts, talking points, timings, fallbacks) is [demo-script.md](demo-script.md); this file is the reference manual behind it.
+
 How to run, demo, and verify the prototype. Last updated **7 Jul 2026**.
 
 The prototype implements the app's demo spine end-to-end:
