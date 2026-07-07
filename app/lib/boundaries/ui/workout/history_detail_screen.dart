@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/save_workout_details.dart';
+import '../../../controls/social_feed.dart';
 import '../../../controls/workout_history.dart';
 import '../../../core/format.dart';
 import '../../../core/theme/app_buttons.dart';
@@ -11,6 +12,7 @@ import '../../../entities/enums.dart';
 import '../../../entities/workout_session.dart';
 import '../../gateways/workout_gateway.dart';
 import '../common/stat_tile.dart';
+import '../social/post_detail_screen.dart';
 import '../common/status_badge.dart';
 
 /// BOUNDARY (#12.1 History Detail). Read-only recap of a completed session with
@@ -191,7 +193,26 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
           TextField(controller: _notes, maxLines: 3, decoration: const InputDecoration(hintText: 'Private notes'))
         else
           Text((s.notes?.isNotEmpty ?? false) ? s.notes! : '—', style: AppTypography.body),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
+        // Shared to the feed? Link the session to its post's likes/comments.
+        if (!_editing)
+          Consumer(builder: (context, ref, _) {
+            final postId =
+                ref.watch(sessionSharePostProvider(s.id)).value;
+            if (postId == null) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.of(context, rootNavigator: true)
+                    .push(MaterialPageRoute(
+                        builder: (_) => PostDetailScreen(postId: postId))),
+                style: AppButtonStyles.outlinedAccent(height: 48, radius: 12),
+                icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                label: const Text('VIEW SHARED POST'),
+              ),
+            );
+          }),
+        const SizedBox(height: 8),
         if (_editing)
           OutlinedButton(
             onPressed: _busy ? null : _delete,

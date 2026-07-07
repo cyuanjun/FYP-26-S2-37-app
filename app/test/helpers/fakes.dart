@@ -228,6 +228,14 @@ class FakeAiGateway implements AiGateway {
 /// Fake SocialGateway — in-memory posts/likes/comments/friends with recorded
 /// call lists, enough to drive the feed + post-detail controls.
 class FakeSocialGateway implements SocialGateway {
+  /// sessionId -> the caller's share post id (History→Social link).
+  final sharePostIds = <String, String>{};
+
+  @override
+  Future<String?> findSharePostId(
+          {required String sessionId, required String me}) async =>
+      sharePostIds[sessionId];
+
   final createdPosts = <Map<String, String?>>[];
   final deletedIds = <String>[];
 

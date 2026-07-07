@@ -59,6 +59,20 @@ class SocialGateway {
     return row == null ? null : FeedPost.fromRow(row, me: me);
   }
 
+  /// The caller's workout_share post for a session, if they shared it —
+  /// backs the History→Social "View shared post" link (#12.1).
+  Future<String?> findSharePostId(
+      {required String sessionId, required String me}) async {
+    final row = await _client
+        .from('posts')
+        .select('id')
+        .eq('workout_session_id', sessionId)
+        .eq('user_id', me)
+        .eq('kind', 'workout_share')
+        .maybeSingle();
+    return row?['id'] as String?;
+  }
+
   Future<List<PostComment>> listComments(String postId) async {
     final rows = await _client
         .from('post_comments')

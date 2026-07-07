@@ -122,3 +122,16 @@ class UpdatePostBody {
 }
 
 final updatePostBodyProvider = Provider<UpdatePostBody>(UpdatePostBody.new);
+
+/// The current user's share-post id for a session (null = not shared).
+/// #12.1 uses it to link a workout to its post's likes/comments.
+final sessionSharePostProvider =
+    FutureProvider.family<String?, String>((ref, sessionId) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return null;
+  SeqLog.msg('view-post', 'HistoryDetailScreen', 'SocialGateway',
+      'findSharePostId($sessionId)');
+  return ref
+      .watch(socialGatewayProvider)
+      .findSharePostId(sessionId: sessionId, me: userId);
+});
