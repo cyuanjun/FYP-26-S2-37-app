@@ -85,6 +85,10 @@ Multi-step atomic mutations live in **SECURITY DEFINER RPCs**, added as their co
   Cancel/resume on #13.6 are deliberately NOT RPCs — owner-scoped status writes under `subscriptions_owner`.
 - ⏳ Still deferred: client `cancel` of a pending ServiceRequest (no UI surface).
 
+**Column-level grants** (beyond RLS): `expert_profiles` UPDATE is granted only on the five
+self-descriptive columns (title/years/about/credentials/specialties) — the aggregates and
+`verification_status` are unwritable from clients even on the owner's own row (20260708100000).
+
 The RLS here gates *row access*; these RPCs enforce the *column-level transition* logic.
 
 

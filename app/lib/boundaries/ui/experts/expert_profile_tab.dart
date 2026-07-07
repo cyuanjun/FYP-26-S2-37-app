@@ -12,11 +12,11 @@ import '../common/status_badge.dart';
 import '../profile/account_settings_screen.dart';
 import '../profile/profile_widgets.dart';
 import '../profile/submit_feedback_screen.dart';
+import 'professional_info_screen.dart';
 
 /// BOUNDARY (#24 Expert Profile). The expert's own professional identity:
 /// what clients see (title, verification, credentials, specialties, stats),
-/// plus account-level actions. Editing professional info (#24.1) remains
-/// deferred with the full portal.
+/// plus account-level actions and the #24.1 professional-info editor.
 class ExpertProfileTab extends ConsumerWidget {
   const ExpertProfileTab({super.key});
 
@@ -130,6 +130,16 @@ class ExpertProfileTab extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 20),
+          ],
+          if (profile != null) ...[
+            MenuRow(
+                emoji: '🧾',
+                label: 'Manage Professional Info',
+                onTap: () => Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            ProfessionalInfoScreen(profile: profile)))),
+            const Divider(color: AppColors.faint, height: 1),
           ],
           MenuRow(
               emoji: '⚙️',

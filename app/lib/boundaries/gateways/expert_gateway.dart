@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../entities/deliverable.dart';
+import '../../entities/enums.dart';
 import '../../entities/expert_category.dart';
 import '../../entities/expert_profile.dart';
 import '../../entities/expert_service.dart';
@@ -167,6 +168,51 @@ class ExpertGateway {
         if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
         'sections': sections.map((s) => s.toJson()).toList(),
       });
+
+  /// #21.2 create — the expert's own listing (RLS with-check pins
+  /// expert_user_id to the caller). Status is chosen in the editor
+  /// (save as draft / publish live).
+  Future<void> createService(ExpertService service) =>
+      _client.from('expert_services').insert(_servicePayload(service));
+
+  /// #21.2 edit — full-row update of the expert's own listing.
+  Future<void> updateService(ExpertService service) => _client
+      .from('expert_services')
+      .update(_servicePayload(service))
+      .eq('id', service.id);
+
+  Map<String, dynamic> _servicePayload(ExpertService s) => {
+        'expert_user_id': s.expertUserId,
+        'status': s.status.name,
+        'name': s.name.trim(),
+        'description': s.description?.trim(),
+        'detail_bullets': s.detailBullets,
+        'category': s.category,
+        'fulfillment': s.fulfillment.dbValue,
+        'pricing_model': s.pricingModel.dbValue,
+        'price_cents': s.priceCents,
+        'duration_weeks': s.durationWeeks,
+        'accepting_bookings': s.acceptingBookings,
+        'response_time': s.responseTime.dbValue,
+      };
+
+  /// #24.1 — the self-descriptive columns only; aggregates + verification are
+  /// column-revoked (20260708100000) and change solely via the RPCs.
+  Future<void> updateExpertProfile(
+    String id, {
+    required String title,
+    required int yearsCoaching,
+    required String about,
+    required List<String> credentials,
+    required List<String> specialties,
+  }) =>
+      _client.from('expert_profiles').update({
+        'title': title.trim(),
+        'years_coaching': yearsCoaching,
+        'about': about.trim(),
+        'credentials': credentials,
+        'specialties': specialties,
+      }).eq('id', id);
 
   /// Follow-heart bookmark: read-modify-write of the caller's own profile row
   /// (the privileged-column guard only watches role/status).

@@ -718,6 +718,36 @@ const yogaType = WorkoutType(id: 'wt-yoga', name: 'Yoga', slug: 'yoga');
 /// Fake ExpertGateway — canned marketplace data + recorded mutation calls.
 class FakeExpertGateway implements ExpertGateway {
   var categories = <ExpertCategory>[];
+  final createdServices = <ExpertService>[];
+  final updatedServices = <ExpertService>[];
+  final profileUpdates = <Map<String, Object>>[];
+
+  @override
+  Future<void> createService(ExpertService service) async =>
+      createdServices.add(service);
+
+  @override
+  Future<void> updateService(ExpertService service) async =>
+      updatedServices.add(service);
+
+  @override
+  Future<void> updateExpertProfile(
+    String id, {
+    required String title,
+    required int yearsCoaching,
+    required String about,
+    required List<String> credentials,
+    required List<String> specialties,
+  }) async =>
+      profileUpdates.add({
+        'id': id,
+        'title': title,
+        'yearsCoaching': yearsCoaching,
+        'about': about,
+        'credentials': credentials,
+        'specialties': specialties,
+      });
+
   var experts = <ExpertSummary>[];
   var listings = <ServiceListing>[];
   var myRequests = <ServiceRequestSummary>[];

@@ -8,10 +8,11 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../common/app_card.dart';
 import '../common/status_badge.dart';
+import 'service_editor_screen.dart';
 
 /// BOUNDARY (#21 Expert Services). The expert's own listings, including
-/// drafts/archived (owner-visible via RLS). Read-only in this realization —
-/// PublishService / Create-Edit (#21.2) remain deferred.
+/// drafts/archived (owner-visible via RLS). Tap a card to edit (#21.2);
+/// the + action creates a new listing.
 class ExpertServicesTab extends ConsumerWidget {
   const ExpertServicesTab({super.key});
 
@@ -27,15 +28,31 @@ class ExpertServicesTab extends ConsumerWidget {
       appBar: AppBar(
         titleSpacing: 20,
         title: const Text('SERVICES', style: AppTypography.title1),
+        actions: [
+          IconButton(
+            tooltip: 'New service',
+            icon: const Icon(Icons.add_circle_outline,
+                color: AppColors.accent, size: 26),
+            onPressed: () => Navigator.of(context, rootNavigator: true).push(
+                MaterialPageRoute(
+                    builder: (_) => const ServiceEditorScreen())),
+          ),
+        ],
       ),
       body: services.isEmpty
           ? Center(
-              child: Text('No services yet.', style: AppTypography.subheadline))
+              child: Text('No services yet — tap + to create one.',
+                  style: AppTypography.subheadline))
           : ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               children: [
                 for (final s in services)
-                  AppCard(
+                  GestureDetector(
+                    onTap: () => Navigator.of(context, rootNavigator: true)
+                        .push(MaterialPageRoute(
+                            builder: (_) =>
+                                ServiceEditorScreen(existing: s))),
+                    child: AppCard(
                     margin: const EdgeInsets.only(bottom: 12),
                     borderColor: AppColors.faint,
                     child: Column(
@@ -73,11 +90,10 @@ class ExpertServicesTab extends ConsumerWidget {
                             style: AppTypography.caption2),
                       ],
                     ),
+                    ),
                   ),
-                Text(
-                    'Editing listings arrives with the full expert portal '
-                    '(later sprint) — services are provisioned with your '
-                    'account for now.',
+                Text('Tap a listing to edit it. Live listings appear in the '
+                    'client marketplace.',
                     style: AppTypography.footnote),
               ],
             ),

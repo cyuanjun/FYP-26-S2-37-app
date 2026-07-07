@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **8 Jul 2026** (after the premium upgrade flow: US31 + US40 ✅). Tally: 22 ✅ · 12 🟨 · 30 ⬜.
+Last updated **8 Jul 2026** (premium upgrade flow US31+US40 ✅; expert portal completed US42–US47, US49 ✅). Tally: 30 ✅ · 7 🟨 · 27 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -72,15 +72,15 @@ Last updated **8 Jul 2026** (after the premium upgrade flow: US31 + US40 ✅). T
 | ID | Status | User story | Build note |
 |---|---|---|---|
 | US41 | ⬜ | As an expert user, I want to register or apply as an expert so that I can offer professional fitness or wellness services through the platform. | Expert portal pending |
-| US42 | 🟨 | As an expert user, I want to log in securely so that I can access my expert account and manage my expert functions. | Shared auth (login/logout/reset) works; expert portal pending |
-| US43 | 🟨 | As an expert user, I want to log out of my expert account so that I can securely end my session. | Shared auth (login/logout/reset) works; expert portal pending |
-| US44 | 🟨 | As an expert user, I want to reset my password so that I can regain access if I forget my login details. | Shared auth (login/logout/reset) works; expert portal pending |
-| US45 | ⬜ | As an expert user, I want to create and manage my expert profile so that users can understand my background, specialisation, and services. | Expert portal pending |
-| US46 | ⬜ | As an expert user, I want to manage my professional information and expertise categories so that my profile accurately represents my services. | Expert portal pending |
-| US47 | ⬜ | As an expert user, I want to create and manage service listings so that users can request the services I offer. | Expert portal pending |
+| US42 | ✅ | As an expert user, I want to log in securely so that I can access my expert account and manage my expert functions. | Shared auth + the dedicated #20–#24 expert shell (role-based redirect on login) |
+| US43 | ✅ | As an expert user, I want to log out of my expert account so that I can securely end my session. | LOG OUT on #24 Expert Profile |
+| US44 | ✅ | As an expert user, I want to reset my password so that I can regain access if I forget my login details. | Shared forgot-password flow (#4/#4.1) |
+| US45 | ✅ | As an expert user, I want to create and manage my expert profile so that users can understand my background, specialisation, and services. | #24 Expert Profile + #24.1 editor (title, years, about, credentials, specialties); aggregates/verification column-locked, RPC-only |
+| US46 | ✅ | As an expert user, I want to manage my professional information and expertise categories so that my profile accurately represents my services. | #24.1 Manage Professional Info (8 Jul); specialties drive the marketplace chips |
+| US47 | ✅ | As an expert user, I want to create and manage service listings so that users can request the services I offer. | #21.2 Create/Edit Service (`PublishService`, 8 Jul): full editor incl. draft/live/archived status; live listings hit the client marketplace immediately |
 | US48 | ⬜ | As an expert user, I want to upload or manage expert-related content so that I can provide useful fitness or wellness information to users. | Expert portal pending |
-| US49 | 🟨 | As an expert user, I want to view user service requests so that I can understand what support users are asking for. | Expert shell live (7 Jul): dedicated 5-tab nav (#20–24 track) w/ dashboard, services list, request inbox, clients, expert profile; create/edit services deferred |
-| US50 | 🟨 | As an expert user, I want to accept or reject service requests so that I can manage the services I provide through the platform. | Accept/Decline live via RPC-guarded transitions (7 Jul); portal-grade management deferred |
+| US49 | ✅ | As an expert user, I want to view user service requests so that I can understand what support users are asking for. | #22 Requests triage + #23/#23.1 client engagements — the full #20–#24 track is built |
+| US50 | ✅ | As an expert user, I want to accept or reject service requests so that I can manage the services I provide through the platform. | Accept/Decline on #22 via RPC-guarded transitions; engagement management on #23.1 |
 | US51 | 🟨 | As an expert user, I want to respond with expert advice so that I can provide coaching advice, workout plans, nutrition support, or recovery guidance to users. | Deliverable composer (title/note/section) + Mark complete live (7 Jul); rich segment editor deferred |
 | US52 | ⬜ | As an expert user, I want my profile to be verified by an admin so that users can trust the professional services offered on the platform. | Expert portal pending |
 

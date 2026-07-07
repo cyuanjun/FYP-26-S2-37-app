@@ -155,6 +155,16 @@ extension FulfillmentTypeLabel on FulfillmentType {
 @JsonEnum(fieldRename: FieldRename.snake)
 enum PricingModel { oneTime, recurring }
 
+/// Postgres enum values (snake) — for direct column writes from gateways.
+extension FulfillmentTypeDb on FulfillmentType {
+  String get dbValue =>
+      this == FulfillmentType.workoutPlan ? 'workout_plan' : name;
+}
+
+extension PricingModelDb on PricingModel {
+  String get dbValue => this == PricingModel.oneTime ? 'one_time' : name;
+}
+
 /// Values aren't valid Dart identifiers — explicit wire values required.
 enum ResponseTime {
   @JsonValue('24h')
@@ -170,6 +180,13 @@ extension ResponseTimeLabel on ResponseTime {
         ResponseTime.h24 => 'Replies within 24h',
         ResponseTime.h48 => 'Replies within 48h',
         ResponseTime.h72 => 'Replies within 72h',
+      };
+
+  /// Postgres enum value ('24h' — not a Dart identifier).
+  String get dbValue => switch (this) {
+        ResponseTime.h24 => '24h',
+        ResponseTime.h48 => '48h',
+        ResponseTime.h72 => '72h',
       };
 }
 
