@@ -11,6 +11,7 @@ const notificationDefaults = <String, bool>{
   'daily_reminder': true,
   'missed_workout': true,
   'inactivity_reminder': true,
+  'rest_alert': true, // Premium-only at schedule time (US21)
   'weekly_summary': true,
   'friend_activity': true,
   'likes_comments': true,

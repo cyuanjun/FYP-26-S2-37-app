@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/manage_notification_prefs.dart';
+import '../../../controls/schedule_reminders.dart';
+import '../../../core/format.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import 'profile_widgets.dart';
@@ -15,6 +17,7 @@ const _sections = <(String, List<(String, String, String)>)>[
       ('daily_reminder', 'Daily reminder', 'Nudge me at my preferred time'),
       ('missed_workout', 'Missed workout', 'When a planned workout slips by'),
       ('inactivity_reminder', 'Inactivity reminder', 'After a few quiet days'),
+      ('rest_alert', 'Rest alert', 'After heavy training blocks (Premium)'),
     ]
   ),
   (
@@ -41,8 +44,17 @@ const _sections = <(String, List<(String, String, String)>)>[
   ),
 ];
 
+/// Keys whose flip changes the local-notification schedule (US19–US21).
+const _schedulingKeys = {
+  'daily_reminder',
+  'missed_workout',
+  'inactivity_reminder',
+  'rest_alert',
+};
+
 /// BOUNDARY (#13.4 Notifications). Per-type toggles; every flip commits
-/// immediately — no save button.
+/// immediately — no save button. The UPCOMING strip shows what the last
+/// reminder sync actually scheduled with the OS.
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
@@ -63,6 +75,7 @@ class NotificationsScreen extends ConsumerWidget {
         data: (prefs) => ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
+            _UpcomingStrip(),
             for (final (sectionLabel, rows) in _sections) ...[
               SectionLabel(label: sectionLabel),
               for (final (key, label, description) in rows) ...[
@@ -85,9 +98,15 @@ class NotificationsScreen extends ConsumerWidget {
                         activeThumbColor: AppColors.bg,
                         activeTrackColor: AppColors.accent,
                         inactiveTrackColor: AppColors.surface2,
-                        onChanged: (on) => ref
-                            .read(notificationPrefsProvider.notifier)
-                            .setEnabled(key, on),
+                        onChanged: (on) async {
+                          await ref
+                              .read(notificationPrefsProvider.notifier)
+                              .setEnabled(key, on);
+                          if (_schedulingKeys.contains(key)) {
+                            // Re-plan the local notifications to match.
+                            await ref.read(syncRemindersProvider).call();
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -99,6 +118,42 @@ class NotificationsScreen extends ConsumerWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// What the last sync scheduled — relative day + time per reminder.
+class _UpcomingStrip extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final upcoming = ref.watch(scheduledRemindersProvider);
+    if (upcoming.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SectionLabel(label: 'Upcoming'),
+          for (final r in upcoming.take(4))
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  const Icon(Icons.notifications_none,
+                      size: 16, color: AppColors.muted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                      child: Text(r.title, style: AppTypography.footnote)),
+                  Text(
+                      '${relativeDay(r.fireAt)} · '
+                      '${r.fireAt.hour.toString().padLeft(2, '0')}:'
+                      '${r.fireAt.minute.toString().padLeft(2, '0')}',
+                      style: AppTypography.caption2),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

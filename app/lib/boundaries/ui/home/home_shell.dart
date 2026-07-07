@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../boundaries/gateways/notification_gateway.dart';
 import '../../../controls/authenticate.dart';
+import '../../../controls/schedule_reminders.dart';
 import '../../../core/theme/app_colors.dart';
 import '../experts/expert_clients_tab.dart';
 import '../experts/expert_home_tab.dart';
@@ -31,6 +33,16 @@ class HomeShell extends ConsumerStatefulWidget {
 
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
+  bool _remindersSynced = false;
+
+  /// One permission ask + reminder sync per shell life (athletes only;
+  /// re-syncs happen from #13.4 toggles and future mutations).
+  Future<void> _syncReminders() async {
+    if (_remindersSynced) return;
+    _remindersSynced = true;
+    await ref.read(notificationGatewayProvider).requestPermission();
+    await ref.read(syncRemindersProvider).call();
+  }
 
   static const _athleteTabs = [
     DashboardTab(),
@@ -75,6 +87,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     }
 
     final isExpert = profile?.isExpert ?? false;
+    if (profile != null && !isExpert) {
+      // Post-frame so the first build isn't blocked on the permission prompt.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _syncReminders());
+    }
     final tabs = isExpert ? _expertTabs : _athleteTabs;
     final destinations = isExpert ? _expertDestinations : _athleteDestinations;
     final index = _index.clamp(0, tabs.length - 1);

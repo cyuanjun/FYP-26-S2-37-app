@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **8 Jul 2026** (premium upgrade flow US31+US40 ✅; expert portal completed US42–US47, US49 ✅). Tally: 30 ✅ · 7 🟨 · 27 ⬜.
+Last updated **8 Jul 2026** (premium upgrade US31+US40; expert portal US42–US47, US49–US50; notifications US19–US21 ✅). Tally: 33 ✅ · 6 🟨 · 25 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -39,9 +39,9 @@ Last updated **8 Jul 2026** (premium upgrade flow US31+US40 ✅; expert portal c
 | US16 | ✅ | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | MET-based calorie estimate per session (entity rule, profile weight w/ sex-based default 70/55 kg) + XP; computed live since 12 Jun. Method + accuracy caveat: [reference/calorie-estimation.md](../reference/calorie-estimation.md) |
 | US17 | 🟨 | As a registered free user, I want to view simple charts or reports so that my fitness progress is easier to understand. | Analytics tiles with +/- deltas ✅ - no graphical charts at basic tier by design. **Wording change queued (log C5): drop "charts"** |
 | US18 | ✅ | As a registered free user, I want to receive basic AI progress summaries and basic AI-assisted fitness plan suggestions so that I can better understand my activity data and follow a simple workout routine. | AI summary + basic AI plan — **live on OpenAI gpt-4o-mini** (12 Jun); Gemini → rule fallback |
-| US19 | 🟨 | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Preference toggles #13.4 ✅; flutter_local_notifications wired but no scheduling yet |
-| US20 | ⬜ | As a registered free user, I want to receive inactivity alerts so that I am reminded when I have not met my scheduled exercise goals. | Pref toggles exist; rule-based alert engine pending |
-| US21 | ⬜ | As a registered free user, I want to receive rest alerts when I may be exercising too much so that I can avoid overtraining. | Pref toggles exist; rule-based alert engine pending |
+| US19 | ✅ | As a registered free user, I want to receive workout reminders so that I can stay consistent with my planned exercise activities. | Rule-based `ScheduleReminders` (8 Jul): plan-day nudges at 08:00 (Premium adapts to median session hour), late nudge if the hour slipped, missed-workout catch-up; #13.4 UPCOMING strip shows the live schedule |
+| US20 | ✅ | As a registered free user, I want to receive inactivity alerts so that I am reminded when I have not met my scheduled exercise goals. | Inactivity alert 3 days after the last session (rule-based, US20) — verified scheduled with the OS |
+| US21 | ✅ | As a registered free user, I want to receive rest alerts when I may be exercising too much so that I can avoid overtraining. | Rest alert on 3+ sessions in 3 days — realized **Premium-only** (WBS wins over SRS wording; logged in the reconciliation log) |
 | US22 | ✅ | As a registered free user, I want to view community posts so that I can stay connected with other fitness users. | Community feed live (6 Jul): polymorphic posts (workout_share / level_up / challenge_result), friends+self scope |
 | US23 | ✅ | As a registered free user, I want to create posts, like posts, and comment on posts so that I can participate in the Wise Workout community. | Share-post creation, like toggle, flat comments + owner caption edit/delete all live (6 Jul) |
 | US24 | ✅ | As a registered free user, I want to follow other users so that I can keep up with their shared fitness progress. | Mutual friends model (6 Jul): search, Add Friend/Unfriend (atomic pair via add_friend RPC), User Profile #11.2 |
