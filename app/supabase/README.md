@@ -26,6 +26,7 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | `migrations/20260709090000_manual_entry_backdate.sql` | `end_workout_session` honours a backdated `started_at` (manual entry US13). |
 | `migrations/20260709100000_avatars_bucket.sql` | Public `avatars` storage bucket + owner-folder write policies. |
 | `migrations/20260709110000_ble_remote_id.sql` | `connected_devices.ble_remote_id` for real-BLE pairings. |
+| `migrations/20260711090000_landing_site.sql` | Marketing-site integration: `public_testimonials` / `landing_pricing_plans` / `landing_media_assets` tables, anon read policy on `expert_categories`, the anon-callable `landing_metric_summary()` / `landing_featured_experts()` SECURITY DEFINER functions, and signup-trigger v3 (last_name mirroring + expert-application metadata → pending `expert_profiles` + document metadata). |
 | `seed.sql` | The three install-time catalogs: `workout_types`, `health_tags`, `expert_categories`. |
 | `seed-demo.sql` | **Demo data** (not install data): two login accounts (`free@`/`premium@wiseworkout.test`, pw `Password123!`) + varied workout sessions, XP/streak, and share posts. Idempotent — re-run to reset the demo. |
 

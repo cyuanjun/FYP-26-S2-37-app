@@ -2,7 +2,7 @@
 
 This folder is the Wise Workout marketing website (Vue 3 + Vite + TypeScript), built with the same BCE-oriented structure as the Flutter app in `../app/`.
 
-The code is organized so user-facing UI calls controllers, and controllers call gateway boundaries. The current data source is explicit hardcoded seed data. Later, the gateway layer can be swapped to the shared Postgres/Supabase database in `../app/supabase/`. Its docs live in [../docs/web/](../docs/web/).
+The code is organized so user-facing UI calls controllers, and controllers call gateway boundaries. The site shares the app's Supabase database (`../app/supabase/`): metrics, pricing, testimonials, and featured experts are live reads; registration, login, expert applications, and the contact form write real rows. Bundled seed JSON remains as the offline fallback. Its docs live in [../docs/web/](../docs/web/).
 
 ## Current Status
 
@@ -26,18 +26,18 @@ Implemented:
   - Requires one identity document and at least one certification document.
   - Accepts PDF, JPG, PNG, and WebP files up to 5 MB each.
 - Login UI at `/login`.
-- Seed-backed gateway data.
-- Draft database migrations for shared app DB add-ons.
+- Shared-database gateways (live Supabase reads with bundled-seed fallback).
+- Real Supabase Auth for registration, login, and expert applications.
+- Contact form inserts into the shared `contact_messages` table.
 - BCE dependency checker.
 - Test, presentation, and demo documentation.
 
-Not yet connected:
+Not yet built:
 
-- Live Postgres/Supabase reads and writes.
-- Supabase Auth.
-- Real login/logout sessions.
+- Deployment (the site runs locally).
+- Persistent login sessions / logout on the site (login validates and points at the app).
 - Admin editing pages.
-- Real uploaded media.
+- Real uploaded media (verification documents are metadata-only).
 
 See [docs/limitations.md](../docs/web/limitations.md) for the full limitation list.
 
@@ -53,6 +53,14 @@ Start the dev server:
 
 ```bash
 npm run dev -- --host 127.0.0.1
+```
+
+The site talks to the hosted Supabase project by default (publishable key — RLS-gated).
+To use the local stack instead (`cd ../app && supabase start`), create `.env.local`:
+
+```bash
+VITE_SUPABASE_URL=http://127.0.0.1:55321
+VITE_SUPABASE_ANON_KEY=<local anon key from `supabase status`>
 ```
 
 Open:
@@ -103,32 +111,25 @@ npm run check:bce
 
 ## Seed Data
 
-Hardcoded demo data is stored under:
+Bundled demo data is stored under:
 
 ```text
 src/boundary/gateways/seed/
 ```
 
-These files are intentionally grouped as temporary gateway data sources. They are not the final database source of truth.
+The seed files now serve two purposes: page structure/copy that stays client-side (section order, labels, growth percentages), and the **offline fallback** every live gateway returns when the database is unreachable.
 
-Current seed data includes landing content, pricing, metrics, testimonials, experts, and expert categories.
+## Database
 
-## Database Drafts
+The landing add-ons are **live** in the shared schema — finalised from the drafts in
+`database/migrations/` (kept for provenance) as
+`../app/supabase/migrations/20260711090000_landing_site.sql`:
 
-Draft database add-ons are stored in:
-
-```text
-database/migrations/
-```
-
-They are intended to be added after the existing `../app/supabase/migrations/` migrations.
-
-Main planned additions:
-
-- `public_testimonials`
-- `landing_pricing_plans`
-- `landing_media_assets`
-- `landing_metric_summary`
+- `public_testimonials` (admin-moderated; anon reads approved rows)
+- `landing_pricing_plans` (display copy; $9.99/mo premium)
+- `landing_media_assets` (Storage references; not yet used)
+- `landing_metric_summary()` + `landing_featured_experts()` (the anon read functions)
+- signup trigger v3 (profile mirroring + expert applications)
 
 See [docs/database changes.md](<../docs/web/database changes.md>) and [database/README.md](database/README.md).
 

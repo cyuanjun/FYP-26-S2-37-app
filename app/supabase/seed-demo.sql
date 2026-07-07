@@ -455,5 +455,32 @@ from (values
 ) as v(cid, email)
 join public.profiles pr on pr.email = v.email;
 
+-- ============================================================================
+-- §10 LANDING SITE — approved public testimonials from the demo athletes
+-- (web/ marketing site; one per user, upserted).
+-- ============================================================================
+
+insert into public.public_testimonials
+  (user_id, display_name, user_category, rating, body, status, submitted_at, reviewed_at)
+select pr.id, v.display_name, v.user_category, v.rating, v.body,
+       'approved'::public_testimonial_status,
+       now() - (v.days_ago || ' days')::interval,
+       now() - (v.days_ago - 1 || ' days')::interval
+from (values
+  ('free@wiseworkout.test', 'Mia P.', 'Free runner', 5,
+   'Wise Workout helped me keep my training consistent. The progress summaries make it much easier to understand what changed week by week.', 34),
+  ('premium@wiseworkout.test', 'Alex T.', 'Premium athlete', 5,
+   'The advanced analytics are the reason I upgraded — workload ratio and HR zones straight from my sessions, no spreadsheet needed.', 21),
+  ('jordan@wiseworkout.test', 'Jordan L.', 'Distance runner', 4,
+   'The workout history is clean and easy to scan. I like seeing my routine and AI notes together instead of across separate apps.', 12),
+  ('priya@wiseworkout.test', 'Priya N.', 'Yoga & trails', 5,
+   'Challenges with friends keep me moving. The leaderboards update live and the streaks are weirdly motivating.', 6)
+) as v(email, display_name, user_category, rating, body, days_ago)
+join public.profiles pr on pr.email = v.email
+on conflict (user_id) do update set
+  display_name = excluded.display_name, user_category = excluded.user_category,
+  rating = excluded.rating, body = excluded.body, status = excluded.status,
+  submitted_at = excluded.submitted_at, reviewed_at = excluded.reviewed_at;
+
 -- Re-enable the guard.
 alter table public.profiles enable trigger trg_guard_profile_privileged_columns;

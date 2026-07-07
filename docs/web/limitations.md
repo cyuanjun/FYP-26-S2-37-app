@@ -4,29 +4,25 @@ This page lists the current limitations of the landing-page repo. These are know
 
 ## Data Source Limitations
 
-- The landing page currently uses hardcoded seed JSON files under `src/boundary/gateways/seed/`.
-- The seed files stand in for future Postgres/Supabase gateway reads.
-- Contact form submission currently goes through a placeholder gateway and does not insert into `contact_messages`.
-- Registration and expert application currently go through placeholder gateways and do not create real Supabase Auth users.
+*(Updated 11 Jul 2026 — the site now shares the app's Supabase database; see `app/supabase/migrations/20260711090000_landing_site.sql`.)*
+
+- Live reads: metrics (`landing_metric_summary()`), pricing (`landing_pricing_plans`), testimonials (`public_testimonials`), featured experts (`landing_featured_experts()`), expert categories. Page copy/structure and media placeholders stay in the bundled seed JSON.
+- Growth percentages on the statistics section still come from the seed — the database has no month-over-month history to derive them from.
+- Every live read falls back to the bundled seed when the database is unreachable (offline demo safety).
+- Contact form inserts into the shared `contact_messages` table (anon insert is by design; admin triages on #28.1).
 
 ## Authentication Limitations
 
-- Login UI exists, but real Supabase Auth sessions are not connected yet.
-- Logout is not implemented yet.
-- Supabase Auth is not connected yet.
-- Email verification is not implemented yet.
-- Role-based post-login home pages are not implemented yet.
-- User registration UI exists, but real account creation is not connected yet.
-- Expert application UI exists, but real account/profile creation is not connected yet.
+- Registration, login, and expert application use real Supabase Auth (`signUp` / `signInWithPassword`) against the shared project; `handle_new_user()` mirrors profile fields and creates the pending expert profile + document metadata.
+- The hosted project has email confirmation enabled — a hosted signup must confirm via email before logging in (the local stack auto-confirms). The hosted mailer also rejects non-deliverable domains (e.g. `.test` addresses).
+- The site does not keep a session after registration (accounts are for the app); login validates credentials and shows the role-based destination, but role-based post-login home pages are not implemented yet.
+- Logout UI is not implemented yet.
 
 ## Expert Verification Limitations
 
-- Expert verification document fields are present on the expert application form.
-- Actual file upload/storage is not implemented yet.
-- The future implementation should write to the existing app schema table `expert_verification_documents`.
-- Current expert application passes document metadata through the placeholder gateway only.
-- Accepted document types are PDF, JPG, PNG, and WebP.
-- Each document is limited to 5 MB in controller validation.
+- Expert applications now create the pending `expert_profiles` row and `expert_verification_documents` metadata rows via the signup trigger; role stays `free` until an admin approves (US06 approval flow is the admin portal's job).
+- Document **files are metadata-only** (title/file name) — actual file upload to Storage is not implemented, matching the app schema's `file_name` mock convention.
+- Accepted document types are PDF, JPG, PNG, and WebP; each document is limited to 5 MB in controller validation.
 
 ## Admin Limitations
 
@@ -37,12 +33,10 @@ This page lists the current limitations of the landing-page repo. These are know
 
 ## Database Limitations
 
-- SQL files in `database/migrations/` are draft add-ons for the shared `FYP-26-S2-37-app` database.
-- They have not been applied to a live local Postgres or Supabase instance from this repo.
-- Final migrations should live in `../FYP-26-S2-37-app` because that project owns the shared database schema.
-- RLS policies are drafted but not tested against a connected Supabase project.
-- `expert_profiles.rating_avg` and `review_count` still need an aggregate synchronization strategy in the app DB.
-- `expert_profiles.specialties` is a `text[]`; Postgres cannot enforce foreign keys inside the array, so validation must be handled in controller/gateway logic unless the app schema changes to a join table.
+- The drafts in `database/migrations/` were finalised as `app/supabase/migrations/20260711090000_landing_site.sql` and applied to both the local stack and the hosted project (the drafts remain for provenance).
+- RLS/policies are live and were smoke-tested as the `anon` role (approved testimonials, active pricing/categories, and the two landing functions are the whole anon read surface).
+- `expert_profiles.rating_avg` / `review_count` are kept consistent by the app's `submit_expert_review` RPC (no separate sync needed).
+- `expert_profiles.specialties` is a `text[]`; Postgres cannot enforce foreign keys inside the array, so validation stays in controller/gateway logic.
 
 ## Media Limitations
 
@@ -53,11 +47,8 @@ This page lists the current limitations of the landing-page repo. These are know
 
 ## Testing Limitations
 
-- Current automated checks cover BCE imports and production build only.
-- Browser automation tests are not implemented.
-- DB integration tests are not implemented.
-- RLS tests are not implemented.
-- Supabase Auth tests are not implemented.
+- Automated checks cover BCE imports and the production build only; there is no committed browser/DB/RLS test suite.
+- The 11 Jul integration was verified manually end-to-end: headless-browser runs of register/login/expert-application/contact against the local stack with row-level DB checks, plus a hosted signup-trigger test (rows verified, then removed).
 
 ## Payment/Pricing Limitations
 

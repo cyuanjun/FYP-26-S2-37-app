@@ -2,7 +2,7 @@
 
 These migrations are drafts for the shared `FYP-26-S2-37-app` Postgres/Supabase database.
 
-They are kept in this landing-page repo for planning and presentation, but final migrations should be copied into the app database project before real integration.
+**Applied 11 Jul 2026** — these drafts were finalised as `app/supabase/migrations/20260711090000_landing_site.sql` (plus seed additions in `app/supabase/seed.sql` and `seed-demo.sql` §10) and are live on both the local stack and the hosted project. The files below are kept for provenance; the app migration is canonical. Differences from the drafts: policies use the shared `is_admin()` helper, the metric view became an anon-callable `landing_metric_summary()` function (plus `landing_featured_experts()`), premium price corrected to $9.99/mth, and `contact_messages` already existed in the app schema (no new table needed).
 
 Current files:
 

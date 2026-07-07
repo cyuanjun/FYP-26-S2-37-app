@@ -12,6 +12,7 @@
     "verify": "npm run check:bce && npm run build"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.1",
     "lucide-vue-next": "^1.0.0",
     "vue": "^3.5.13",
     "vue-router": "^4.6.4"

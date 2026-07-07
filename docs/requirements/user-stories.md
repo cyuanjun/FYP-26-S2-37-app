@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, avatar upload, real BLE; 11 Jul: marketing website imported into `web/` — US01–US06 UI built, seed-backed). Tally: 36 ✅ · 12 🟨 · 16 ⬜.
+Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, avatar upload, real BLE; 11 Jul: website imported into `web/`, rethemed, and **wired to the shared Supabase DB** — live reads + real Auth). Tally: 37 ✅ · 12 🟨 · 15 ⬜.
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -16,12 +16,12 @@ Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, a
 
 | ID | Status | User story | Build note |
 |---|---|---|---|
-| US01 | 🟨 | As an unregistered user, I want to view the Wise Workout marketing website so that I can understand the platform before creating an account. | Vue 3 BCE site in `web/` — landing sections built (hero/features/stats/experts/pricing/testimonials/FAQ/contact), seed-backed; Supabase wiring + deploy pending |
-| US02 | 🟨 | As an unregistered user, I want to view app features, subscription highlights, and pricing so that I can understand the difference between free and premium access. | Vue 3 BCE site in `web/` — features, pricing and premium-highlight sections built (seed-backed) |
-| US03 | 🟨 | As an unregistered user, I want to view expert information so that I can understand what types of professional support are available through the platform. | Vue 3 BCE site in `web/` — featured-experts section built (seed-backed) |
-| US04 | 🟨 | As an unregistered user, I want to contact support so that I can ask questions about the platform before creating an account. | Vue 3 BCE site in `web/` — contact section built; submission not wired to a backend |
-| US05 | 🟨 | As an unregistered user, I want to create an account so that I can become a registered user and access the mobile application. | Vue 3 BCE site in `web/` — `/register` UI built; Supabase Auth signup not wired yet. App stays login-only by design |
-| US06 | 🟨 | As an unregistered user, I want to apply as an expert so that I can offer professional fitness or wellness services through the platform after approval. | Vue 3 BCE site in `web/` — `/expert-application` UI built (identity doc + certifications, PDF/JPG/PNG/WebP ≤5 MB); submission + admin approval not wired |
+| US01 | 🟨 | As an unregistered user, I want to view the Wise Workout marketing website so that I can understand the platform before creating an account. | Vue 3 BCE site in `web/` — landing sections built; **metrics/pricing/testimonials/experts read live from the shared DB** (seed = offline fallback); deploy pending |
+| US02 | 🟨 | As an unregistered user, I want to view app features, subscription highlights, and pricing so that I can understand the difference between free and premium access. | Vue 3 BCE site in `web/` — features + pricing sections built; pricing live from `landing_pricing_plans` ($9.99/mo) |
+| US03 | 🟨 | As an unregistered user, I want to view expert information so that I can understand what types of professional support are available through the platform. | Vue 3 BCE site in `web/` — featured experts live via `landing_featured_experts()` (verified experts from the shared DB — shows the app's Sam Rivera) |
+| US04 | 🟨 | As an unregistered user, I want to contact support so that I can ask questions about the platform before creating an account. | Vue 3 BCE site in `web/` — contact form inserts into the shared `contact_messages` table (admin triages on #28.1) |
+| US05 | ✅ | As an unregistered user, I want to create an account so that I can become a registered user and access the mobile application. | Vue 3 BCE site in `web/` — `/register` creates a real Supabase Auth account (trigger mirrors profiles + fitness_profiles); hosted requires email confirmation. App stays login-only by design |
+| US06 | 🟨 | As an unregistered user, I want to apply as an expert so that I can offer professional fitness or wellness services through the platform after approval. | Vue 3 BCE site in `web/` — `/expert-application` creates the account + **pending** `expert_profiles` + document metadata (files not uploaded); role flips on admin approval — portal pending |
 
 ## Registered Free user (US07–US31)
 
@@ -30,7 +30,7 @@ Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, a
 | US07 | ✅ | As a registered free user, I want to log in securely so that I can access my account and use the basic features of the platform. | Login / log out (Profile #13) |
 | US08 | ✅ | As a registered free user, I want to log out of my account so that I can securely end my session after using the platform. | Login / log out (Profile #13) |
 | US09 | ✅ | As a registered free user, I want to reset my password so that I can regain access if I forget my login details. | Forgot Password #4 + Change Password (#13.3) reset email |
-| US10 | ⬜ | As a registered free user, I want to access the mobile application after logging in so that I can install and use the application. | Website flow: log in on the site → download the app (clarified 12 Jun). `/login` UI exists in `web/` but real sessions are not wired; the in-app splash auto-login (built) belongs to US07 |
+| US10 | 🟨 | As a registered free user, I want to access the mobile application after logging in so that I can install and use the application. | Website flow: log in on the site → download the app (clarified 12 Jun). `/login` authenticates against shared Supabase Auth and shows the role-based destination; no persistent site session / app-download page yet |
 | US11 | ✅ | As a registered free user, I want to create and update my fitness profile so that the system can understand my goals, preferences, and fitness needs. | Fitness Profile #13.1 (batched save, custom tags) |
 | US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
 | US13 | ✅ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | "Log a workout manually" on Train (9 Jul): type/date/time/duration/distance/feel/notes → same `end_workout_session` RPC (now honours a backdated `started_at`), so XP/streak/level-up and MET calories match tracked sessions; `connected_device_id` stays null |
