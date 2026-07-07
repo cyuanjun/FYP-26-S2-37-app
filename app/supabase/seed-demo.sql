@@ -38,7 +38,8 @@ begin
       ('expert@wiseworkout.test',  'Sam',  'Rivera', 'expert'),
       ('jordan@wiseworkout.test',  'Jordan','Lee',   'free'),
       ('priya@wiseworkout.test',   'Priya', 'Nair',  'free'),
-      ('leo@wiseworkout.test',     'Leo',   'Chen',  'free')
+      ('leo@wiseworkout.test',     'Leo',   'Chen',  'free'),
+      ('admin@wiseworkout.test',   'Ava',   'Admin',  'admin')
     ) as t(email, first_name, last_name, role)
   loop
     select id into uid from auth.users where email = rec.email;

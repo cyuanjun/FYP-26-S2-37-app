@@ -22,9 +22,10 @@ live role flip, subscription management) → rule-based **notification reminders
 upload. A local Supabase stack (`supabase start`, ports 55321-9) mirrors hosted for development.
 The **marketing website lives in `web/`** (Vue 3 + Vite + TS, same BCE discipline; landing
 sections + register/expert-application/login UIs, seed-backed — Supabase wiring + deploy pending).
-Remaining work is outside the app: the website's backend wiring, the admin **web** portal,
-submitted-doc reconciliation edits, and one physical-device pass (notifications firing +
-real-BLE pairing).
+The site shares the app's Supabase database (live reads + real Auth) and hosts the **admin
+portal** at `/admin` (user management, expert-application review, moderation; demo account
+`admin@wiseworkout.test`). Remaining work: website deployment, submitted-doc reconciliation
+edits, and one physical-device pass (notifications firing + real-BLE pairing).
 
 - 📍 **Where we are / what's next:** [docs/STATUS.md](docs/STATUS.md)
 - 🏃 **Run & demo it** (setup, walkthroughs, test accounts): [docs/prototype-demo-guide.md](docs/app/prototype-demo-guide.md)

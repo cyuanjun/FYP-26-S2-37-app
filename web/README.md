@@ -29,14 +29,18 @@ Implemented:
 - Shared-database gateways (live Supabase reads with bundled-seed fallback).
 - Real Supabase Auth for registration, login, and expert applications.
 - Contact form inserts into the shared `contact_messages` table.
+- **Admin portal at `/admin`** (role-guarded): overview, user management
+  (suspend / tier switch), expert-application review, service-listing
+  moderation, categories, pricing, testimonials, feedback, contact inbox.
+  Demo account: `admin@wiseworkout.test` / `Password123!`.
 - BCE dependency checker.
 - Test, presentation, and demo documentation.
 
 Not yet built:
 
 - Deployment (the site runs locally).
-- Persistent login sessions / logout on the site (login validates and points at the app).
-- Admin editing pages.
+- Member-facing sessions (non-admin logins validate and point at the app; admins get a real portal session with sign-out).
+- Admin editing for landing feature copy / media (pricing + testimonials are editable).
 - Real uploaded media (verification documents are metadata-only).
 
 See [docs/limitations.md](../docs/web/limitations.md) for the full limitation list.

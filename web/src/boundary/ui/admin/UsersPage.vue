@@ -1,0 +1,115 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
+import { getUsers, reactivateUser, setUserTier, suspendUser } from "@/controller/admin/manageUsers";
+import type { AdminUser } from "@/controller/admin/adminModels";
+
+const users = ref<AdminUser[]>([]);
+const query = ref("");
+const error = ref<string | null>(null);
+const busyId = ref<string | null>(null);
+
+const filtered = computed(() => {
+  const q = query.value.trim().toLowerCase();
+  if (!q) return users.value;
+  return users.value.filter((u) =>
+    [u.email, u.first_name, u.last_name, u.username].some((v) => v?.toLowerCase().includes(q)),
+  );
+});
+
+async function reload() {
+  try {
+    users.value = await getUsers();
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e);
+  }
+}
+
+onMounted(reload);
+
+async function run(user: AdminUser, action: () => Promise<void>) {
+  error.value = null;
+  busyId.value = user.id;
+  try {
+    await action();
+    await reload();
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e);
+  } finally {
+    busyId.value = null;
+  }
+}
+
+function name(u: AdminUser) {
+  return [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
+}
+</script>
+
+<template>
+  <h1 class="admin-title">Users</h1>
+  <p class="admin-subtitle">
+    Accounts, tiers, and access (US56/US61/US62). Expert role comes from application approval;
+    tier switches here are free ↔ premium only.
+  </p>
+
+  <p v-if="error" class="admin-error">{{ error }}</p>
+
+  <div class="admin-card">
+    <input v-model="query" class="admin-field" placeholder="Search by name, email, or username" style="margin-bottom: 14px" />
+
+    <table class="admin-table">
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>Username</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <tr v-for="u in filtered" :key="u.id">
+          <td>{{ name(u) }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.username ? "@" + u.username : "—" }}</td>
+          <td><span class="pill" :class="u.role">{{ u.role }}</span></td>
+          <td>
+            <span v-if="u.status === 'suspended'" class="pill warn">suspended</span>
+            <span v-else class="pill ok">active</span>
+          </td>
+          <td>
+            <div class="admin-actions">
+              <button
+                v-if="u.role === 'free'"
+                class="admin-btn"
+                :disabled="busyId === u.id"
+                @click="run(u, () => setUserTier(u, 'premium'))"
+              >
+                Make Premium
+              </button>
+              <button
+                v-if="u.role === 'premium'"
+                class="admin-btn"
+                :disabled="busyId === u.id"
+                @click="run(u, () => setUserTier(u, 'free'))"
+              >
+                Make Free
+              </button>
+              <button
+                v-if="u.status !== 'suspended' && u.role !== 'admin'"
+                class="admin-btn danger"
+                :disabled="busyId === u.id"
+                @click="run(u, () => suspendUser(u))"
+              >
+                Suspend
+              </button>
+              <button
+                v-if="u.status === 'suspended'"
+                class="admin-btn primary"
+                :disabled="busyId === u.id"
+                @click="run(u, () => reactivateUser(u))"
+              >
+                Reactivate
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p v-if="!filtered.length" class="admin-empty">No accounts match.</p>
+  </div>
+</template>

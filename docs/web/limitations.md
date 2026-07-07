@@ -26,10 +26,11 @@ This page lists the current limitations of the landing-page repo. These are know
 
 ## Admin Limitations
 
-- Admin login is not implemented yet.
-- Admin pages are not implemented yet.
-- Admin editing for pricing, testimonials, experts, categories, media, and landing sections is not implemented yet.
-- Draft RLS policies assume admins are identified by `profiles.role = 'admin'`.
+*(Updated 12 Jul 2026 — the admin portal is live at `/admin`.)*
+
+- Admin login, logout, and role-guarded routes work against shared Supabase Auth (`profiles.role = 'admin'`, enforced by `is_admin()` RLS policies — the same identification the draft policies assumed).
+- Built: overview, user management (suspend / tier switch), expert-application review, service-listing archive/restore, categories, pricing display copy, testimonial moderation, feedback triage, contact inbox.
+- Not built: editing landing feature copy / media sections; password-reset page inside the portal (the shared pre-auth reset flow serves admins); contact responses are recorded, not emailed.
 
 ## Database Limitations
 

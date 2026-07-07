@@ -5,7 +5,7 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, avatar upload, real BLE; 11 Jul: website imported into `web/`, rethemed, and **wired to the shared Supabase DB** — live reads + real Auth). Tally: 37 ✅ · 12 🟨 · 15 ⬜.
+Last updated **12 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 12 Jul: **admin web portal built** at `/admin` — users, expert-application review, listings, categories, pricing, testimonials, feedback, contact). Tally: 51 ✅ · 10 🟨 · 3 ⬜ (US30/US48 expert content = out of scope; US38 plan customisation).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
@@ -50,7 +50,7 @@ Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, a
 | US27 | ✅ | As a registered free user, I want to browse expert profiles and service listings so that I can find professional support when needed. | #6 live (7 Jul): Experts/Service Listings sub-tabs, search, follow-heart; #6.1 Expert Detail |
 | US28 | ✅ | As a registered free user, I want to browse expert categories so that I can identify what type of expert support may suit my fitness goals. | Category chips from the active expert_categories catalog filter both sub-tabs (7 Jul) |
 | US29 | ✅ | As a registered free user, I want to request expert services as a paid add-on so that I can receive professional support when needed. | #6.2 request modal (simulated payment, price snapshot) → pending → deliverables → review; MY PURCHASES on #5 (7 Jul) |
-| US30 | ⬜ | As a registered free user, I want to browse and purchase expert-created content so that I can access professional fitness guidance when needed. | Experts marketplace — placeholder tab |
+| US30 | ⬜ | As a registered free user, I want to browse and purchase expert-created content so that I can access professional fitness guidance when needed. | Expert *content* library out of scope (WBS has services only); the expert *services* marketplace (#6) is built — see US27–29 |
 | US31 | ✅ | As a registered free user, I want to view upgrade options so that I can decide whether to subscribe to premium features. | #16 Upgrade built: hero + 6 honest unlocks + $9.99 pricing card; reached from every Free upsell hook (Dashboard banner, Profile pill, History cap/analytics, Plan Detail) |
 
 ## Registered Premium user (US32–US40)
@@ -63,15 +63,15 @@ Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, a
 | US35 | ✅ | As a registered premium user, I want to view detailed short-term and long-term exercise effect summaries so that I can understand how my workouts affect my progress over time. | Short-term: per-session TRAINING EFFECT card on #10 + #12.1 (band + 1–10 score, canned recovery line, Premium aerobic/anaerobic split + recovery window, Free upsell link, honest no-HR state). Long-term: #12.2 ACWR + trends |
 | US36 | 🟨 | As a registered premium user, I want to receive personalised AI progress summaries, fitness plan suggestions, and personalised fitness reports so that I can get more relevant guidance. | Personalised AI summary live (goal context, gpt-4o-mini); reports pending |
 | US37 | ✅ | As a registered premium user, I want to receive personalised AI-assisted fitness plan suggestions based on my profile, activity history, and goals so that the guidance matches my needs. | Live AI plans (gpt-4o-mini, strict schema + validation); My Plans + Plan Detail #8 with regenerate (Free capped at 1) |
-| US38 | ⬜ | As a registered premium user, I want to customise plan duration, workout frequency, preferred workout categories, target calories, daily or weekly weight loss goals, and preferred rest days so that the fitness plan fits my schedule and needs. | Personalised plans / reminders / subscription mgmt pending |
-| US39 | ⬜ | As a registered premium user, I want to receive personalised workout reminders, inactivity alerts, and rest alerts so that I can maintain a balanced routine. | Personalised plans / reminders / subscription mgmt pending |
+| US38 | ⬜ | As a registered premium user, I want to customise plan duration, workout frequency, preferred workout categories, target calories, daily or weekly weight loss goals, and preferred rest days so that the fitness plan fits my schedule and needs. | Plan-customisation UI not built (AI generation uses onboarding profile instead); subscription mgmt itself is #13.6 ✅ |
+| US39 | ✅ | As a registered premium user, I want to receive personalised workout reminders, inactivity alerts, and rest alerts so that I can maintain a balanced routine. | Built with US19–21 (8 Jul): Premium adaptive reminder hour, inactivity alert, Premium-only rest alert — tracker previously missed this row |
 | US40 | ✅ | As a registered premium user, I want to view or manage my subscription status so that I can understand and control my paid access. | #13.6 Subscription Management built: plan/status/renewal, mock payment method, synthesised billing history, cancel/resume (simulated payment; `start_premium` RPC does the live Free→Premium flip) |
 
 ## Expert user (US41–US52)
 
 | ID | Status | User story | Build note |
 |---|---|---|---|
-| US41 | ⬜ | As an expert user, I want to register or apply as an expert so that I can offer professional fitness or wellness services through the platform. | Expert portal pending |
+| US41 | ✅ | As an expert user, I want to register or apply as an expert so that I can offer professional fitness or wellness services through the platform. | Website `/expert-application` (real signup + pending profile + doc metadata) → admin approval on the web portal |
 | US42 | ✅ | As an expert user, I want to log in securely so that I can access my expert account and manage my expert functions. | Shared auth + the dedicated #20–#24 expert shell (role-based redirect on login) |
 | US43 | ✅ | As an expert user, I want to log out of my expert account so that I can securely end my session. | LOG OUT on #24 Expert Profile |
 | US44 | ✅ | As an expert user, I want to reset my password so that I can regain access if I forget my login details. | Shared forgot-password flow (#4/#4.1) |
@@ -82,7 +82,7 @@ Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, a
 | US49 | ✅ | As an expert user, I want to view user service requests so that I can understand what support users are asking for. | #22 Requests triage + #23/#23.1 client engagements — the full #20–#24 track is built |
 | US50 | ✅ | As an expert user, I want to accept or reject service requests so that I can manage the services I provide through the platform. | Accept/Decline on #22 via RPC-guarded transitions; engagement management on #23.1 |
 | US51 | 🟨 | As an expert user, I want to respond with expert advice so that I can provide coaching advice, workout plans, nutrition support, or recovery guidance to users. | Deliverable composer (title/note/section) + Mark complete live (7 Jul); rich segment editor deferred |
-| US52 | ⬜ | As an expert user, I want my profile to be verified by an admin so that users can trust the professional services offered on the platform. | Expert portal pending |
+| US52 | ✅ | As an expert user, I want my profile to be verified by an admin so that users can trust the professional services offered on the platform. | Admin web portal `/admin/applications`: approve verifies the profile + grants the expert role (`review_expert_application` RPC) |
 
 ## System Admin (US53–US64)
 
@@ -90,18 +90,18 @@ Last updated **11 Jul 2026** (10 Jul: finishing pass — Training Effect US35, a
 
 | ID | Status | User story | Build note |
 |---|---|---|---|
-| US53 | 🟨 | As a system admin, I want to log in securely so that I can access administrative functions. | Shared auth works; admin portal pending |
-| US54 | 🟨 | As a system admin, I want to log out securely so that I can end my administrative session. | Shared auth works; admin portal pending |
-| US55 | 🟨 | As a system admin, I want to reset my password so that I can regain access to the admin system if needed. | Shared auth works; admin portal pending |
-| US56 | ⬜ | As a system admin, I want to manage user accounts, roles, and access levels so that users can only access features suitable for their role and subscription tier. | Admin portal pending |
-| US57 | ⬜ | As a system admin, I want to review, approve, or reject expert applications so that only suitable experts can provide services on the platform. | Admin portal pending |
-| US58 | ⬜ | As a system admin, I want to manage expert categories so that expert services are organised clearly for users. | Admin portal pending |
-| US59 | ⬜ | As a system admin, I want to monitor expert content and service listings so that inappropriate or low-quality content can be handled. | Admin portal pending |
-| US60 | ⬜ | As a system admin, I want to manage feedback and platform activity so that the system remains reliable, organised, and trustworthy. | Admin triage pending; the user-side feedback pipeline is already built (no story covers it) |
-| US61 | ⬜ | As a system admin, I want to monitor subscription-tier access so that premium features are only available to eligible users. | Admin portal pending |
-| US62 | ⬜ | As a system admin, I want to manage subscription access so that free and premium access levels can be controlled correctly. | Admin portal pending |
-| US63 | ⬜ | As a system admin, I want to manage the marketing website so that platform information, feature highlights, subscription details, and expert service information remain accurate. | Admin portal pending |
-| US64 | ⬜ | As a system admin, I want to maintain platform quality and reliability so that users and experts can use the system safely and consistently. | Admin portal pending |
+| US53 | ✅ | As a system admin, I want to log in securely so that I can access administrative functions. | Website `/login` → role-based redirect into `/admin` (guard re-checks the admin role on every load) |
+| US54 | ✅ | As a system admin, I want to log out securely so that I can end my administrative session. | Sign out in the portal sidebar ends the Supabase session |
+| US55 | ✅ | As a system admin, I want to reset my password so that I can regain access to the admin system if needed. | Shared pre-auth reset flow (app #4/#4.1) serves admin accounts; no portal-specific page |
+| US56 | ✅ | As a system admin, I want to manage user accounts, roles, and access levels so that users can only access features suitable for their role and subscription tier. | `/admin/users`: search, suspend/reactivate, tier switch free ↔ premium (expert via approval only, admin never grantable) |
+| US57 | ✅ | As a system admin, I want to review, approve, or reject expert applications so that only suitable experts can provide services on the platform. | `/admin/applications` — approve/reject pending applications w/ credentials + document metadata |
+| US58 | ✅ | As a system admin, I want to manage expert categories so that expert services are organised clearly for users. | `/admin/categories`: add, retire/reactivate (retired keeps labels resolving) |
+| US59 | ✅ | As a system admin, I want to monitor expert content and service listings so that inappropriate or low-quality content can be handled. | `/admin/listings`: all experts' services incl. drafts; archive/restore (archived hides from the app instantly) |
+| US60 | ✅ | As a system admin, I want to manage feedback and platform activity so that the system remains reliable, organised, and trustworthy. | `/admin/feedback` (new/reviewed triage) + `/admin/contact` (#28.1 respond + resolve) |
+| US61 | ✅ | As a system admin, I want to monitor subscription-tier access so that premium features are only available to eligible users. | Overview tier tiles + role pills on `/admin/users`; tier access itself is RLS + role-gated in the app |
+| US62 | ✅ | As a system admin, I want to manage subscription access so that free and premium access levels can be controlled correctly. | Tier switch free ↔ premium on `/admin/users` (guard trigger allows admins) |
+| US63 | 🟨 | As a system admin, I want to manage the marketing website so that platform information, feature highlights, subscription details, and expert service information remain accurate. | `/admin/pricing` (price/description/visibility) + `/admin/testimonials` moderation; landing feature copy + media stay seed/static |
+| US64 | ✅ | As a system admin, I want to maintain platform quality and reliability so that users and experts can use the system safely and consistently. | Realised across the moderation surfaces: suspend accounts, archive listings, moderate testimonials, triage feedback/contact — all RLS-enforced (`is_admin()`) |
 
 ---
 

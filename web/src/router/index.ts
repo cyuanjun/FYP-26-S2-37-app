@@ -24,6 +24,21 @@ const router = createRouter({
       component: () => import("@/boundary/ui/auth/ExpertApplicationPage.vue"),
     },
     {
+      path: "/admin",
+      component: () => import("@/boundary/ui/admin/AdminLayout.vue"),
+      children: [
+        { path: "", name: "admin-overview", component: () => import("@/boundary/ui/admin/OverviewPage.vue") },
+        { path: "users", name: "admin-users", component: () => import("@/boundary/ui/admin/UsersPage.vue") },
+        { path: "applications", name: "admin-applications", component: () => import("@/boundary/ui/admin/ApplicationsPage.vue") },
+        { path: "listings", name: "admin-listings", component: () => import("@/boundary/ui/admin/ListingsPage.vue") },
+        { path: "categories", name: "admin-categories", component: () => import("@/boundary/ui/admin/CategoriesPage.vue") },
+        { path: "pricing", name: "admin-pricing", component: () => import("@/boundary/ui/admin/PricingPage.vue") },
+        { path: "testimonials", name: "admin-testimonials", component: () => import("@/boundary/ui/admin/TestimonialsPage.vue") },
+        { path: "feedback", name: "admin-feedback", component: () => import("@/boundary/ui/admin/FeedbackPage.vue") },
+        { path: "contact", name: "admin-contact", component: () => import("@/boundary/ui/admin/ContactPage.vue") },
+      ],
+    },
+    {
       path: "/:pathMatch(.*)*",
       redirect: "/",
     },

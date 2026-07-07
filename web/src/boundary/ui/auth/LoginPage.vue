@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { loginUser } from "@/controller/auth/loginUser";
+
+const router = useRouter();
 
 const form = reactive({
   email: "",
@@ -20,6 +22,10 @@ async function onSubmit() {
 
   try {
     const result = await loginUser(form);
+    if (result.redirectTo === "/admin") {
+      await router.push("/admin");
+      return;
+    }
     success.value = `${result.message} Continue to ${result.redirectTo}.`;
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e);
