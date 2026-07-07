@@ -108,7 +108,7 @@ function tagline(profile: ExpertProfile): string {
   height: 100%;
   max-height: 220px;
   aspect-ratio: 4 / 3;
-  color: var(--lime);
+  color: var(--accent);
   font-family: var(--display);
   font-size: 56px;
   font-weight: 800;
@@ -134,9 +134,9 @@ function tagline(profile: ExpertProfile): string {
 
 .expert-tag {
   padding: 4px 10px;
-  border: 1px solid var(--lime-border);
+  border: 1px solid var(--accent-border);
   border-radius: 999px;
-  color: var(--lime);
+  color: var(--accent);
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.08em;

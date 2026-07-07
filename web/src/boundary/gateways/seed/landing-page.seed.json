@@ -85,7 +85,7 @@
       "items": [
         {
           "metric_label": "Approved reviews",
-          "line_color": "#b8ff00",
+          "line_color": "#10b981",
           "chart_data_summary": "Approved user testimonials currently surfaced on the landing page",
           "data_source": "approved_reviews",
           "metric_value": "",
@@ -93,7 +93,7 @@
         },
         {
           "metric_label": "Active categories",
-          "line_color": "#00b4ff",
+          "line_color": "#2563eb",
           "chart_data_summary": "Expert categories curated by the admin team and currently visible in expert browsing",
           "data_source": "active_categories",
           "metric_value": "",
@@ -101,7 +101,7 @@
         },
         {
           "metric_label": "Verified experts",
-          "line_color": "#ff5c8a",
+          "line_color": "#db2777",
           "chart_data_summary": "Verified experts grouped by coaching, strength, running, nutrition, and recovery categories",
           "data_source": "verified_experts",
           "metric_value": "",

@@ -49,9 +49,9 @@ const hasVideo = computed(() => /^\/uploads\//.test(props.section.hero_media_url
   width: 100%;
   height: 100%;
   min-height: 540px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--faint);
   border-radius: 20px;
-  background: #030403;
+  background: #15161b;
   object-fit: cover;
 }
 </style>

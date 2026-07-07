@@ -78,7 +78,7 @@ onMounted(async () => {
 }
 
 .page-status code {
-  color: var(--lime);
+  color: var(--accent);
   font-family: var(--mono);
 }
 </style>

@@ -53,8 +53,9 @@ const hasLogoImage = computed(() => {
   align-items: center;
   gap: 10px;
   padding: 6px 14px 6px 6px;
-  border: 1px solid var(--lime-border);
-  background: rgba(184, 255, 0, 0.04);
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  background: rgba(123, 47, 247, 0.05);
   color: var(--ink);
 }
 
@@ -72,32 +73,33 @@ const hasLogoImage = computed(() => {
   justify-content: center;
   min-height: 42px;
   padding: 10px 16px;
-  border: 1px solid var(--lime-border);
+  border: 1px solid var(--faint);
+  border-radius: 12px;
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--bg2);
   cursor: pointer;
   font-family: var(--display);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
+  letter-spacing: 0.04em;
   line-height: 1;
   text-decoration: none;
   text-transform: uppercase;
 }
 
 .auth-pill:hover {
-  border-color: var(--lime);
-  color: var(--lime);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .auth-logout {
-  border-color: var(--lime);
-  color: #0b0c09;
-  background: var(--lime);
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  border-color: var(--accent);
+  color: #ffffff;
+  background: var(--accent);
 }
 
 .auth-logout:hover {
-  color: #0b0c09;
-  background: var(--lime);
+  color: #ffffff;
+  background: var(--accent-dim);
 }
 </style>

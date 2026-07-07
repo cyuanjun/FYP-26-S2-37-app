@@ -111,19 +111,20 @@ async function onSubmit() {
 .contact-feedback {
   margin: 0;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--faint);
+  border-radius: 12px;
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.04em;
 }
 .contact-feedback.success {
-  border-color: var(--lime);
-  color: var(--lime);
-  background: rgba(184, 255, 0, 0.06);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.07);
 }
 .contact-feedback.error {
-  border-color: rgba(255, 45, 85, 0.5);
-  color: #ff2d55;
-  background: rgba(255, 45, 85, 0.06);
+  border-color: rgba(225, 29, 72, 0.5);
+  color: var(--danger);
+  background: rgba(225, 29, 72, 0.06);
 }
 </style>

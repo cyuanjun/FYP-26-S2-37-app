@@ -221,9 +221,10 @@ onMounted(load);
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 1px solid var(--lime-border);
-  color: var(--lime);
-  background: rgba(184, 255, 0, 0.02);
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
+  color: var(--accent);
+  background: rgba(123, 47, 247, 0.04);
   cursor: pointer;
   font-family: var(--display);
   font-size: 26px;
@@ -236,12 +237,12 @@ onMounted(load);
 }
 
 .pager-arrow:hover:not(:disabled) {
-  border-color: var(--lime);
-  background: rgba(184, 255, 0, 0.08);
+  border-color: var(--accent);
+  background: rgba(123, 47, 247, 0.1);
 }
 
 .pager-status {
-  color: var(--lime);
+  color: var(--accent);
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.1em;

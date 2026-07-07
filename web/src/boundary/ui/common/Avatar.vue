@@ -34,11 +34,11 @@ const fontPx = computed(() => `${Math.max(11, Math.round((props.size ?? 32) * 0.
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  border: 1px solid var(--lime);
+  border: 1px solid var(--accent);
   border-radius: 50%;
   overflow: hidden;
-  color: var(--lime);
-  background: rgba(184, 255, 0, 0.1);
+  color: var(--accent);
+  background: rgba(123, 47, 247, 0.08);
   font-family: var(--display);
   font-weight: 800;
   letter-spacing: 0;

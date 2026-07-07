@@ -9,8 +9,10 @@
 .auth-card {
   width: min(100%, 460px);
   padding: 40px;
-  border: 1px solid var(--lime-border);
+  border: 1px solid var(--faint);
+  border-radius: 16px;
   background: var(--bg2);
+  box-shadow: var(--card-shadow);
 }
 
 .auth-card.wide {
@@ -27,8 +29,8 @@
 .brand-mark {
   width: 32px;
   height: 32px;
-  background: var(--lime);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  border-radius: 9px;
+  background: var(--accent);
 }
 
 .brand-name {
@@ -43,7 +45,7 @@
 .brand-name span,
 .auth-eyebrow,
 .form-section {
-  color: var(--lime);
+  color: var(--accent);
 }
 
 .auth-eyebrow,
@@ -59,7 +61,7 @@
 .auth-title {
   margin: 0 0 12px;
   font-family: var(--display);
-  font-size: 48px;
+  font-size: 34px;
   font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
@@ -103,9 +105,10 @@
   width: 100%;
   min-height: 46px;
   padding: 10px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--faint);
+  border-radius: 12px;
   color: var(--ink);
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--bg);
   font: inherit;
 }
 
@@ -121,7 +124,7 @@
 
 .auth-field input:focus,
 .auth-field textarea:focus {
-  border-color: var(--lime);
+  border-color: var(--accent);
   outline: none;
 }
 
@@ -133,19 +136,20 @@
 .auth-message {
   margin: 0;
   padding: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--faint);
+  border-radius: 12px;
   font-family: var(--mono);
   font-size: 12px;
 }
 
 .auth-message.error {
-  border-color: rgba(255, 45, 85, 0.5);
-  color: #ff2d55;
+  border-color: rgba(225, 29, 72, 0.5);
+  color: var(--danger);
 }
 
 .auth-message.success {
-  border-color: var(--lime);
-  color: var(--lime);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: var(--success);
 }
 
 .auth-switch {
@@ -154,7 +158,7 @@
 }
 
 .auth-link {
-  color: var(--lime);
+  color: var(--accent);
 }
 
 .inline-row {
@@ -165,9 +169,10 @@
 
 .mini-button,
 .chip {
-  border: 1px solid var(--lime-border);
+  border: 1px solid var(--faint);
+  border-radius: 999px;
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--bg2);
   cursor: pointer;
   font-family: var(--mono);
   font-size: 11px;
@@ -190,9 +195,9 @@
 }
 
 .chip.active {
-  border-color: var(--lime);
-  color: #0b0c09;
-  background: var(--lime);
+  border-color: var(--accent);
+  color: #ffffff;
+  background: var(--accent);
 }
 
 .field-note {
