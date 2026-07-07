@@ -4,6 +4,7 @@ import '../boundaries/gateways/workout_gateway.dart';
 import '../core/format.dart';
 import '../core/seq_log.dart';
 import '../entities/workout_session.dart';
+import '../entities/workout_type.dart';
 import 'authenticate.dart';
 
 /// Read-side: the current user's ended sessions (View Workout History activity).
@@ -50,3 +51,21 @@ class DeleteWorkoutSession {
 }
 
 final deleteWorkoutSessionProvider = Provider<DeleteWorkoutSession>(DeleteWorkoutSession.new);
+
+/// History search (#12, Premium): case-insensitive substring against the
+/// session's custom name + its resolved workout-type name (spec §Search).
+/// A blank query returns the list untouched.
+List<WorkoutSession> filterSessionsByQuery(
+  List<WorkoutSession> sessions,
+  Map<String, WorkoutType> typeById,
+  String query,
+) {
+  final q = query.trim().toLowerCase();
+  if (q.isEmpty) return sessions;
+  return sessions.where((s) {
+    final haystack =
+        '${s.customName ?? ''} ${typeById[s.workoutTypeId]?.name ?? ''}'
+            .toLowerCase();
+    return haystack.contains(q);
+  }).toList();
+}

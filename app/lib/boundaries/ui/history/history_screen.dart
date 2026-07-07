@@ -35,9 +35,13 @@ class HistoryScreen extends ConsumerStatefulWidget {
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   _Period _period = _Period.week;
+  final _search = TextEditingController();
 
-  void _soon(String what) => ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text('$what is a Premium feature (later sprint).')));
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   void _goUpgrade() => Navigator.of(context, rootNavigator: true)
       .push(MaterialPageRoute(builder: (_) => const UpgradeScreen()));
@@ -146,19 +150,34 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             );
           }
 
+          // Premium search narrows both the aggregates and the groups (#12).
+          final query = _search.text;
+          final visible = isPremium
+              ? filterSessionsByQuery(sessions, typeById, query)
+              : sessions;
+
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(historyProvider),
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               children: [
-                if (!isPremium) _searchLockedPill(),
+                if (isPremium) _searchField() else _searchLockedPill(),
                 const Padding(
                   padding: EdgeInsets.only(top: 16, bottom: 8),
                   child: Text('BASIC WORKOUT ANALYTICS', style: AppTypography.caption2),
                 ),
-                _analyticsCard(sessions, isPremium),
+                _analyticsCard(visible, isPremium),
                 const SizedBox(height: 20),
-                ..._buildGroups(sessions, typeById),
+                if (visible.isEmpty && query.trim().isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text('No history matches "${query.trim()}".',
+                          style: AppTypography.subheadline),
+                    ),
+                  )
+                else
+                  ..._buildGroups(visible, typeById),
                 if (!isPremium) ...[
                   const SizedBox(height: 12),
                   _capBanner(sessions.length),
@@ -171,10 +190,27 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  // ---- Search (Free = locked pill) ----
+  // ---- Search (Premium = live filter · Free = locked pill → #16) ----
+  Widget _searchField() {
+    return TextField(
+      controller: _search,
+      onChanged: (_) => setState(() {}),
+      decoration: InputDecoration(
+        hintText: 'Search history by name or type',
+        prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.muted),
+        suffixIcon: _search.text.isEmpty
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.close, size: 18, color: AppColors.muted),
+                onPressed: () => setState(_search.clear),
+              ),
+      ),
+    );
+  }
+
   Widget _searchLockedPill() {
     return GestureDetector(
-      onTap: () => _soon('History search'),  // search stays a later-sprint item
+      onTap: _goUpgrade, // point-of-friction upsell (#12 spec)
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(

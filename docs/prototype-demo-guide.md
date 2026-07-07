@@ -213,8 +213,10 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 ### G. Premium differences
 1. Log in as `premium@wiseworkout.test`.
 2. Open **History**.
-   - **See:** **no** "Unlock with Premium" pill, **no** monthly-cap banner, **no** search-lock — those Free-only
-     surfaces are hidden for Premium. Same rich analytics + session history (7 seeded sessions).
+   - **See:** **no** "Unlock with Premium" pill, **no** monthly-cap banner — and the search-lock is now a **real
+     search field** ("Search history by name or type"). Type `leg` → the list *and* the analytics narrow to the
+     "Leg day" session; a nonsense query shows `No history matches "…"`. Same rich analytics + session history
+     (7 seeded sessions).
 
 ### H. Upgrade to Premium *(the live tier flip — great demo moment)*
 1. Log in as `free@wiseworkout.test` (Mia).
