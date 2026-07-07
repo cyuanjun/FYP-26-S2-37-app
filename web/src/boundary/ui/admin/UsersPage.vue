@@ -71,39 +71,43 @@ function name(u: AdminUser) {
             <span v-else class="pill ok">active</span>
           </td>
           <td>
-            <div class="admin-actions">
-              <button
-                v-if="u.role === 'free'"
-                class="admin-btn"
-                :disabled="busyId === u.id"
-                @click="run(u, () => setUserTier(u, 'premium'))"
-              >
-                Make Premium
-              </button>
-              <button
-                v-if="u.role === 'premium'"
-                class="admin-btn"
-                :disabled="busyId === u.id"
-                @click="run(u, () => setUserTier(u, 'free'))"
-              >
-                Make Free
-              </button>
-              <button
-                v-if="u.status !== 'suspended' && u.role !== 'admin'"
-                class="admin-btn danger"
-                :disabled="busyId === u.id"
-                @click="run(u, () => suspendUser(u))"
-              >
-                Suspend
-              </button>
-              <button
-                v-if="u.status === 'suspended'"
-                class="admin-btn primary"
-                :disabled="busyId === u.id"
-                @click="run(u, () => reactivateUser(u))"
-              >
-                Reactivate
-              </button>
+            <div class="user-actions">
+              <span class="action-slot">
+                <button
+                  v-if="u.role === 'free'"
+                  class="admin-btn"
+                  :disabled="busyId === u.id"
+                  @click="run(u, () => setUserTier(u, 'premium'))"
+                >
+                  Make Premium
+                </button>
+                <button
+                  v-else-if="u.role === 'premium'"
+                  class="admin-btn"
+                  :disabled="busyId === u.id"
+                  @click="run(u, () => setUserTier(u, 'free'))"
+                >
+                  Make Free
+                </button>
+              </span>
+              <span class="action-slot">
+                <button
+                  v-if="u.status === 'suspended'"
+                  class="admin-btn primary"
+                  :disabled="busyId === u.id"
+                  @click="run(u, () => reactivateUser(u))"
+                >
+                  Reactivate
+                </button>
+                <button
+                  v-else-if="u.role !== 'admin'"
+                  class="admin-btn danger"
+                  :disabled="busyId === u.id"
+                  @click="run(u, () => suspendUser(u))"
+                >
+                  Suspend
+                </button>
+              </span>
             </div>
           </td>
         </tr>
@@ -113,3 +117,15 @@ function name(u: AdminUser) {
     <p v-if="!filtered.length" class="admin-empty">No accounts match.</p>
   </div>
 </template>
+
+<style scoped>
+.user-actions {
+  display: grid;
+  grid-template-columns: 132px 110px;
+  gap: 8px;
+}
+
+.action-slot .admin-btn {
+  width: 100%;
+}
+</style>
