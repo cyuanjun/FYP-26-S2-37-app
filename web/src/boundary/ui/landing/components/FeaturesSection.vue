@@ -25,8 +25,6 @@ function isImagePath(url: string): boolean {
               :src="item.icon_url"
               :alt="item.title"
               class="feature-image"
-              loading="lazy"
-              decoding="async"
             />
             <span v-else>{{ item.icon_url || "Feature image" }} {{ index + 1 }}</span>
           </div>
@@ -42,8 +40,6 @@ function isImagePath(url: string): boolean {
 .feature-image {
   width: 100%;
   height: 100%;
-  max-height: 190px;
-  aspect-ratio: 16 / 9;
   object-fit: cover;
   object-position: top;
 }

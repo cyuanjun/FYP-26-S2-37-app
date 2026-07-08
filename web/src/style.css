@@ -332,7 +332,6 @@ a {
   text-transform: uppercase;
 }
 
-.feature-grid,
 .segment-grid,
 .stat-grid,
 .expert-grid,
@@ -345,13 +344,37 @@ a {
   margin-top: 36px;
 }
 
-.feature-grid,
 .segment-grid,
 .stat-grid,
 .expert-grid,
 .pricing-grid,
 .testimonial-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Features: horizontal scroll-snap rail with tall app screenshots. */
+.feature-grid {
+  display: flex;
+  gap: 18px;
+  margin-top: 36px;
+  padding-bottom: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.feature-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.feature-grid::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--faint);
+}
+
+.feature-card {
+  flex: 0 0 min(340px, 82vw);
+  scroll-snap-align: start;
 }
 
 .feature-card,
@@ -398,9 +421,7 @@ a {
 
 .feature-media {
   width: 100%;
-  min-height: 170px;
-  max-height: 190px;
-  aspect-ratio: 16 / 9;
+  height: 380px;
   overflow: hidden;
   color: var(--muted);
   background: var(--bg3);
@@ -1006,7 +1027,6 @@ a {
     justify-content: flex-start;
   }
 
-  .feature-grid,
   .segment-grid,
   .stat-grid,
   .expert-grid,
