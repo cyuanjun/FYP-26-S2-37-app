@@ -87,11 +87,11 @@ async function onSubmit() {
 
 <template>
   <main class="auth-shell">
-    <div class="auth-column">
+    <div class="auth-column wide">
       <div class="auth-back-top">
         <RouterLink to="/" class="auth-back-link"><span aria-hidden="true">←</span> Back to landing</RouterLink>
       </div>
-      <section class="auth-card wide">
+      <section class="auth-card">
       <RouterLink to="/" class="auth-brand" aria-label="Wise Workout home">
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-name">Wise <span>Workout</span></span>

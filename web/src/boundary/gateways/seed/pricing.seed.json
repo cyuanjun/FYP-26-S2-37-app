@@ -4,7 +4,7 @@
     "price": "$0/mth",
     "description": "Basic tracking and summaries",
     "button_text": "Choose plan",
-    "button_url": "/register",
+    "button_url": "/login",
     "features": [
       "Workout activity logging",
       "Basic workout history",
@@ -18,7 +18,7 @@
     "price": "$9.90/mth",
     "description": "Advanced analytics and personalised AI",
     "button_text": "Choose plan",
-    "button_url": "/register",
+    "button_url": "/login",
     "features": [
       "Everything in Free",
       "Unlimited AI progress summaries",
@@ -33,7 +33,7 @@
     "price": "Add-on",
     "description": "Separate paid expert services",
     "button_text": "Explore",
-    "button_url": "/register",
+    "button_url": "/login",
     "features": [
       "Request verified experts by category",
       "Custom coaching or nutrition plans",

@@ -103,13 +103,13 @@ on conflict (id) do update set
 insert into landing_pricing_plans
   (plan_key, plan_name, price_label, description, button_text, button_url, features, display_order, is_active)
 values
-  ('free', 'Free tier', '$0/mth', 'Basic tracking and summaries', 'Choose plan', '/register',
+  ('free', 'Free tier', '$0/mth', 'Basic tracking and summaries', 'Choose plan', '/login',
    array['Workout activity logging', 'Basic workout history', 'Limited AI progress summaries',
          'Browse verified experts', 'Access FAQ and contact support'], 1, true),
-  ('premium', 'Premium tier', '$9.99/mth', 'Advanced analytics and personalised AI', 'Choose plan', '/register',
+  ('premium', 'Premium tier', '$9.99/mth', 'Advanced analytics and personalised AI', 'Choose plan', '/login',
    array['Everything in Free', 'Unlimited AI progress summaries', 'Personalised plan suggestions',
          'Advanced progress statistics', 'Priority reminder and goal tools', 'Premium support'], 2, true),
-  ('expert_services', 'Expert services', 'Add-on', 'Separate paid expert services', 'Explore', '/register',
+  ('expert_services', 'Expert services', 'Add-on', 'Separate paid expert services', 'Explore', '/login',
    array['Available to Free and Premium', 'Request verified experts by category',
          'Custom coaching or nutrition plans', 'Direct expert feedback',
          'Service add-ons for events or specialist goals'], 3, true)
