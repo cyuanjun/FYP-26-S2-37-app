@@ -41,11 +41,11 @@ async function onSubmit() {
 
 <template>
   <main class="auth-shell">
-    <section class="auth-card">
+    <div class="auth-column">
       <div class="auth-back-top">
         <RouterLink to="/" class="auth-link">← Back to landing page</RouterLink>
       </div>
-
+      <section class="auth-card">
       <RouterLink to="/" class="auth-brand" aria-label="Wise Workout home">
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-name">Wise <span>Workout</span></span>
@@ -120,7 +120,8 @@ async function onSubmit() {
         Applying as an expert?
         <RouterLink to="/expert-application" class="auth-link">Submit expert application</RouterLink>
       </div>
-    </section>
+      </section>
+    </div>
   </main>
 </template>
 

@@ -229,7 +229,12 @@
   }
 }
 
+.auth-column {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
 .auth-back-top {
-  margin-bottom: 14px;
-  font-size: 13px;
+  font-size: 14px;
 }

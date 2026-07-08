@@ -37,11 +37,11 @@ async function onSubmit() {
 
 <template>
   <main class="auth-shell">
-    <section class="auth-card">
+    <div class="auth-column">
       <div class="auth-back-top">
         <RouterLink to="/" class="auth-link">← Back to landing page</RouterLink>
       </div>
-
+      <section class="auth-card">
       <RouterLink to="/" class="auth-brand" aria-label="Wise Workout home">
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-name">Wise <span>Workout</span></span>
@@ -81,7 +81,8 @@ async function onSubmit() {
         New to Wise Workout?
         <RouterLink to="/register" class="auth-link">Create account</RouterLink>
       </div>
-    </section>
+      </section>
+    </div>
   </main>
 </template>
 
