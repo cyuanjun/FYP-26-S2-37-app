@@ -62,11 +62,28 @@ export async function listExpertApplications(): Promise<ExpertApplication[]> {
     .select(
       "id, title, years_coaching, about, credentials, specialties, verification_status, " +
         "profile:profiles!expert_profiles_id_fkey(email, first_name, last_name, created_at), " +
-        "documents:expert_verification_documents(id, doc_type, title, file_name, uploaded_at)",
+        "documents:expert_verification_documents(id, doc_type, title, file_name, uploaded_at, storage_path)",
     )
     .eq("verification_status", "pending");
   if (error) throw new Error(error.message);
-  return data as unknown as ExpertApplication[];
+  const apps = data as unknown as ExpertApplication[];
+
+  // Mint short-lived signed URLs so the admin can open each private document.
+  await Promise.all(
+    apps.flatMap((app) =>
+      app.documents.map(async (doc) => {
+        if (!doc.storage_path) {
+          doc.signed_url = null;
+          return;
+        }
+        const { data: signed } = await supabase.storage
+          .from("expert-docs")
+          .createSignedUrl(doc.storage_path, 600);
+        doc.signed_url = signed?.signedUrl ?? null;
+      }),
+    ),
+  );
+  return apps;
 }
 
 export async function reviewExpertApplication(expertId: string, approve: boolean): Promise<void> {

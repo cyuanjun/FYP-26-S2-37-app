@@ -35,6 +35,8 @@ export interface ExpertApplication {
     title: string;
     file_name: string;
     uploaded_at: string;
+    storage_path: string | null;
+    signed_url?: string | null; // minted by the gateway for admin viewing
   }[];
 }
 

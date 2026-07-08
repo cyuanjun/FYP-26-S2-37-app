@@ -21,7 +21,7 @@ This page lists the current limitations of the landing-page repo. These are know
 ## Expert Verification Limitations
 
 - Expert applications now create the pending `expert_profiles` row and `expert_verification_documents` metadata rows via the signup trigger; role stays `free` until an admin approves (US06 approval flow is the admin portal's job).
-- Document **files are metadata-only** (title/file name) — actual file upload to Storage is not implemented, matching the app schema's `file_name` mock convention.
+- Document **files are uploaded to a private Storage bucket** (`expert-docs`, owner-write / owner+admin-read) and the admin opens them via short-lived signed URLs on `/admin/applications`. Upload needs the new account to have a session, so it runs on the local/demo stack (email auto-confirmed); on a project with email confirmation the application still succeeds but documents stay name-only until a session exists.
 - Accepted document types are PDF, JPG, PNG, and WebP; each document is limited to 5 MB in controller validation.
 
 ## Admin Limitations

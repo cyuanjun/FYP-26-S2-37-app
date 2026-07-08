@@ -280,6 +280,20 @@ select.admin-field { width: auto; }
   font-size: 12px;
 }
 
+.doc-chip-link {
+  border-color: var(--accent-border);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.doc-chip-link:hover {
+  background: rgba(123, 47, 247, 0.06);
+}
+
+.doc-chip-muted {
+  opacity: 0.7;
+}
+
 @media (max-width: 900px) {
   .admin-shell { grid-template-columns: 1fr; }
   .admin-sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }

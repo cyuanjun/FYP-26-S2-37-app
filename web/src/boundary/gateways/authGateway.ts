@@ -61,8 +61,53 @@ export async function createExpertApplication(
   if (error) throw new Error(error.message);
   if (!data.user) throw new Error("Application failed. Please try again.");
 
+  // Upload the actual document files so an admin can open them during review.
+  // Needs a session: on the local/demo stack signUp returns one immediately so
+  // this runs; on a project with email confirmation the account has no session
+  // yet — the application still succeeds, documents stay name-only until later.
+  await uploadVerificationDocuments(data.user.id, input);
+
   await supabase.auth.signOut();
   return { id: data.user.id, role: "expert", status: "pending" };
+}
+
+async function uploadVerificationDocuments(
+  userId: string,
+  input: RegisterExpertRequest,
+): Promise<void> {
+  try {
+    let session = (await supabase.auth.getSession()).data.session;
+    if (!session) {
+      const signIn = await supabase.auth.signInWithPassword({
+        email: input.email,
+        password: input.password,
+      });
+      session = signIn.data.session;
+    }
+    if (!session) return; // e.g. email confirmation pending → name-only fallback
+
+    for (let i = 0; i < input.verification_documents.length; i++) {
+      const doc = input.verification_documents[i];
+      if (!doc.file) continue;
+      const safe = doc.file_name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `${userId}/${doc.doc_type}-${i}-${safe}`;
+      const up = await supabase.storage
+        .from("expert-docs")
+        .upload(path, doc.file, { contentType: doc.mime_type || undefined, upsert: true });
+      if (up.error) continue;
+      // Attach the object path to the metadata row the signup trigger created.
+      await supabase
+        .from("expert_verification_documents")
+        .update({ storage_path: path })
+        .eq("user_id", userId)
+        .eq("doc_type", doc.doc_type)
+        .eq("file_name", doc.file_name)
+        .is("storage_path", null);
+    }
+  } catch {
+    // Best-effort: the application already exists, so degrade to name-only
+    // rather than failing the whole submission.
+  }
 }
 
 export async function authenticateUser(input: LoginRequest): Promise<LoginResult> {

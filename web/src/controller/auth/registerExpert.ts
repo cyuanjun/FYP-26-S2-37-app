@@ -88,5 +88,6 @@ function toDocumentDraft(
     file_name: document.name,
     file_size: document.size,
     mime_type: document.type,
+    file: document,
   };
 }

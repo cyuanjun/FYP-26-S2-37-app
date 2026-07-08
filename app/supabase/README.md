@@ -30,6 +30,7 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | `migrations/20260712090000_admin_portal.sql` | Admin portal surface: `review_expert_application` RPC (approve → verified + expert role) + admin read/write policy on `expert_services`. |
 | `migrations/20260712100000_landing_faqs.sql` | `landing_faqs` (admin-editable FAQ; public reads active rows). |
 | `migrations/20260712110000_landing_activity_and_ranking.sql` | `landing_activity_series()` (weekly sessions/minutes for the public chart) + `landing_featured_experts()` v2 — Bayesian weighted-rating ranking (IMDb WR, m=10) returned with a `score` column. |
+| `migrations/20260713090000_expert_docs_storage.sql` | Private `expert-docs` Storage bucket (owner-write, owner/admin-read) + `expert_verification_documents.storage_path` — real ID/certificate files an admin can open via signed URLs. |
 | `seed.sql` | The three install-time catalogs: `workout_types`, `health_tags`, `expert_categories`. |
 | `seed-demo.sql` | **Demo data** (not install data): two login accounts (`free@`/`premium@wiseworkout.test`, pw `Password123!`) + varied workout sessions, XP/streak, and share posts. Idempotent — re-run to reset the demo. |
 

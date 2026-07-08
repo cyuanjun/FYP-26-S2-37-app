@@ -21,6 +21,7 @@ export interface ExpertVerificationDocumentDraft {
   file_name: string;
   file_size: number;
   mime_type: string;
+  file: File; // the actual upload — stored in the private expert-docs bucket
 }
 
 export interface LoginRequest {

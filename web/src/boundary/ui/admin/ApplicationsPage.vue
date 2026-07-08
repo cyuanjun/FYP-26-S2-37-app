@@ -46,7 +46,7 @@ function name(app: ExpertApplication) {
   <h1 class="admin-title">Expert applications</h1>
   <p class="admin-subtitle">
     Approving verifies the expert profile and flips the account to the expert role (US52/US57).
-    Document files are metadata-only — verify credentials out-of-band before approving.
+    Open each uploaded document to check identity and credentials before approving.
   </p>
 
   <p v-if="error" class="admin-error">{{ error }}</p>
@@ -66,9 +66,20 @@ function name(app: ExpertApplication) {
       <p style="margin: 0">{{ app.about || "No about text." }}</p>
       <div class="admin-note">Credentials: {{ app.credentials.join(" · ") || "—" }}</div>
       <div>
-        <span v-for="doc in app.documents" :key="doc.id" class="doc-chip">
-          {{ doc.doc_type === "identity" ? "🪪" : "📜" }} {{ doc.title }}
-        </span>
+        <template v-for="doc in app.documents" :key="doc.id">
+          <a
+            v-if="doc.signed_url"
+            class="doc-chip doc-chip-link"
+            :href="doc.signed_url"
+            target="_blank"
+            rel="noopener"
+          >
+            {{ doc.doc_type === "identity" ? "🪪" : "📜" }} {{ doc.title }} ↗
+          </a>
+          <span v-else class="doc-chip doc-chip-muted">
+            {{ doc.doc_type === "identity" ? "🪪" : "📜" }} {{ doc.title }} (name only)
+          </span>
+        </template>
         <span v-if="!app.documents.length" class="admin-note">No documents recorded.</span>
       </div>
       <div class="admin-actions">
