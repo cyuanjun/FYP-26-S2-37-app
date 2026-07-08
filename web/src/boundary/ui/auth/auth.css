@@ -229,6 +229,7 @@
   }
 }
 
-.auth-back {
-  margin-top: 10px;
+.auth-back-top {
+  margin-bottom: 14px;
+  font-size: 13px;
 }
