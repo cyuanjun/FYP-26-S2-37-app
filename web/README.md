@@ -31,8 +31,12 @@ Implemented:
 - Contact form inserts into the shared `contact_messages` table.
 - **Admin portal at `/admin`** (role-guarded): overview, user management
   (suspend / tier switch), expert-application review, service-listing
-  moderation, categories, pricing, testimonials, feedback, contact inbox.
+  moderation, categories, pricing, FAQ editor, testimonials, feedback, and
+  a contact inbox with mailto replies.
   Demo account: `admin@wiseworkout.test` / `Password123!`.
+- Landing sections use real app media (hero screen-capture video + tab
+  screenshots in a horizontal feature rail), a live SVG activity chart, and
+  algorithm-ranked experts/testimonials (see `../docs/web/algorithms.md`).
 - BCE dependency checker.
 - Test, presentation, and demo documentation.
 
