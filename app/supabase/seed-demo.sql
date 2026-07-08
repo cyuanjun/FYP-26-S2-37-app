@@ -548,7 +548,8 @@ on conflict (user_id) do update set
 
 -- ============================================================================
 -- §12 ADMIN PORTAL DEMO STATE — every portal page has live rows to triage:
--- a PENDING expert application (Noah), a PENDING testimonial (Leo), open +
+-- a PENDING expert application (Noah — run seed-expert-docs.sh after this to
+-- make his documents viewable), a PENDING testimonial (Leo), open +
 -- resolved contact messages, and feedback in both states. Fixed UUIDs keep
 -- re-runs idempotent.
 -- ============================================================================

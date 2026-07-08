@@ -322,6 +322,11 @@ To restore both demo accounts + their varied sessions to a known state, run
 It's **idempotent** — re-run anytime. (Separate from `supabase/seed.sql`, which seeds the install-time
 catalogs: workout types, health tags, expert categories.)
 
+**On the local stack**, follow with [`supabase/seed-expert-docs.sh`](../../app/supabase/seed-expert-docs.sh)
+(run from `app/`) to upload Noah's sample identity/certificate PDFs into the private `expert-docs` bucket and
+link them — this makes the pending expert application on `/admin/applications` **viewable** (the SQL seed can't
+ship file bytes). Without it, Noah's documents show as name-only.
+
 ---
 
 ## 8. Known limitations (intentional for the prototype)
