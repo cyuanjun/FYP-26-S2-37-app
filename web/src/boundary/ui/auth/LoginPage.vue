@@ -39,7 +39,7 @@ async function onSubmit() {
   <main class="auth-shell">
     <div class="auth-column">
       <div class="auth-back-top">
-        <RouterLink to="/" class="auth-link">← Back to landing page</RouterLink>
+        <RouterLink to="/" class="auth-back-link"><span aria-hidden="true">←</span> Back to landing</RouterLink>
       </div>
       <section class="auth-card">
       <RouterLink to="/" class="auth-brand" aria-label="Wise Workout home">

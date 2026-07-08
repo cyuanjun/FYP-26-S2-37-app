@@ -235,6 +235,27 @@
   justify-items: start;
 }
 
-.auth-back-top {
-  font-size: 14px;
+.auth-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-back-link span {
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.auth-back-link:hover {
+  color: var(--accent);
+}
+
+.auth-back-link:hover span {
+  transform: translateX(-2px);
 }
