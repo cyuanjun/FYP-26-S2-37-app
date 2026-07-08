@@ -24,6 +24,16 @@ const router = createRouter({
       component: () => import("@/boundary/ui/auth/ExpertApplicationPage.vue"),
     },
     {
+      path: "/privacy",
+      name: "privacy",
+      component: () => import("@/boundary/ui/legal/PrivacyPage.vue"),
+    },
+    {
+      path: "/terms",
+      name: "terms",
+      component: () => import("@/boundary/ui/legal/TermsPage.vue"),
+    },
+    {
       path: "/admin",
       component: () => import("@/boundary/ui/admin/AdminLayout.vue"),
       children: [
