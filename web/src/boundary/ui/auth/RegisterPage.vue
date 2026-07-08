@@ -116,6 +116,9 @@ async function onSubmit() {
         Applying as an expert?
         <RouterLink to="/expert-application" class="auth-link">Submit expert application</RouterLink>
       </div>
+      <div class="auth-switch auth-back">
+        <RouterLink to="/" class="auth-link">← Back to landing page</RouterLink>
+      </div>
     </section>
   </main>
 </template>

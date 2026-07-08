@@ -250,6 +250,9 @@ async function onSubmit() {
         Just tracking workouts?
         <RouterLink to="/register" class="auth-link">Register as member</RouterLink>
       </div>
+      <div class="auth-switch auth-back">
+        <RouterLink to="/" class="auth-link">← Back to landing page</RouterLink>
+      </div>
     </section>
   </main>
 </template>

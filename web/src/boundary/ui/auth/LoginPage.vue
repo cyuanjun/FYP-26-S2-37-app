@@ -77,6 +77,9 @@ async function onSubmit() {
         New to Wise Workout?
         <RouterLink to="/register" class="auth-link">Create account</RouterLink>
       </div>
+      <div class="auth-switch auth-back">
+        <RouterLink to="/" class="auth-link">← Back to landing page</RouterLink>
+      </div>
     </section>
   </main>
 </template>
