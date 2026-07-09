@@ -79,6 +79,116 @@ begin
 end $$;
 
 -- ----------------------------------------------------------------------------
+-- 1b. Onboarding artifacts for the two primary demo users, so a fresh seed
+--     reproduces fully-onboarded accounts (the #3 wizard writes exactly these:
+--     body metrics + one active goal + a generated plan with planned workouts).
+--     Mia = Free (basic plan); Alex = Premium (personalised plan — the rows are
+--     verbatim from a live suggest-plan generation, so it looks AI-authored).
+-- ----------------------------------------------------------------------------
+
+-- Body metrics (fitness_profiles rows already exist from the loop above).
+update public.fitness_profiles fp set
+  date_of_birth              = v.dob,
+  sex                        = v.sex::sex,
+  height_cm                  = v.h,
+  weight_kg                  = v.w,
+  activity_level             = v.al::activity_level,
+  training_experience        = v.te::training_experience,
+  resting_heart_rate         = v.rhr,
+  preferred_workout_type_ids = (select coalesce(array_agg(id), '{}')
+                                  from public.workout_types where slug = any(v.prefs))
+from (values
+  ('free@wiseworkout.test',    date '2000-01-13', 'male', 170, 60.0, 'light',  'intermediate', 58, array['running','yoga']),
+  ('premium@wiseworkout.test', date '2000-01-18', 'male', 178, 74.0, 'active', 'advanced',     52, array['running','cycling'])
+) as v(email, dob, sex, h, w, al, te, rhr, prefs)
+join public.profiles p on p.email = v.email
+where fp.id = p.id;
+
+-- Active fitness goal — one per user (partial-unique on achieved_at IS NULL).
+delete from public.fitness_goals
+ where user_id in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'));
+insert into public.fitness_goals
+  (user_id, primary_goal, target_value, target_unit, starting_value, timeline_weeks, weekly_commitment_days)
+select p.id, v.goal::primary_goal, v.tv, v.tu::target_unit, v.sv, v.wk, v.days
+from (values
+  ('free@wiseworkout.test',    'lose_weight',        5.0, 'kg',      60.0, 12, 3),
+  ('premium@wiseworkout.test', 'improve_endurance', 60.0, 'minutes', null, 12, 3)
+) as v(email, goal, tv, tu, sv, wk, days)
+join public.profiles p on p.email = v.email;
+
+-- Generated plans (reset first; planned_workouts cascade off fitness_plans).
+delete from public.fitness_plans
+ where user_id in (select id from public.profiles where email in ('free@wiseworkout.test','premium@wiseworkout.test'));
+
+-- Alex (Premium) — personalised endurance plan, weeks 1-4 (3x/week).
+with newplan as (
+  insert into public.fitness_plans
+    (user_id, fitness_goal_id, name, description, duration_weeks, workouts_per_week,
+     generation_strategy, regenerated_count, started_at, is_active)
+  select p.id, g.id,
+    'Endurance Elevation — 12-week plan',
+    'A progressive training plan to enhance your endurance through varied running and cycling workouts.',
+    12, 3, 'personalised', 0, now(), true
+  from public.profiles p
+  join public.fitness_goals g on g.user_id = p.id and g.achieved_at is null
+  where p.email = 'premium@wiseworkout.test'
+  returning id
+)
+insert into public.planned_workouts
+  (id, fitness_plan_id, workout_type_id, week_number, day_of_week, duration_minutes, name, descriptor, order_index)
+select gen_random_uuid(), np.id, wt.id, v.wk, v.dow, v.dur, v.nm, v.ds, v.oi
+from newplan np
+cross join (values
+  (1, 1,  0, 'running', 30, 'Easy Run',          'Maintain a steady pace, focusing on breathing.'),
+  (1, 4,  1, 'cycling', 50, 'Long Ride',          'Sustain a comfortable effort on flat terrain.'),
+  (1, 6,  2, 'running', 40, 'Tempo Run',          'Incorporate bursts of speed to elevate heart rate.'),
+  (2, 1,  3, 'running', 40, 'Easy Run',          'Focus on form and consistent rhythm.'),
+  (2, 4,  4, 'cycling', 70, 'Long Ride',          'Increase distance while keeping a steady cadence.'),
+  (2, 6,  5, 'running', 50, 'Interval Run',       'Alternate between fast and recovery paces.'),
+  (3, 1,  6, 'cycling', 50, 'Recovery Ride',      'Keep a light effort to promote recovery.'),
+  (3, 4,  7, 'running', 80, 'Long Run',           'Push your limits with a sustained long-distance effort.'),
+  (3, 6,  8, 'cycling', 60, 'Hill Climb Ride',    'Focus on strength by tackling inclines.'),
+  (4, 1,  9, 'running', 30, 'Easy Run',          'Enjoy a relaxed pace to aid recovery.'),
+  (4, 4, 10, 'cycling', 50, 'Recovery Ride',      'Keep it light and easy, focusing on enjoyment.'),
+  (4, 6, 11, 'running', 40, 'Gentle Tempo Run',   'Maintain a comfortable pace with slight speed bursts.')
+) as v(wk, dow, oi, slug, dur, nm, ds)
+join public.workout_types wt on wt.slug = v.slug;
+
+-- Mia (Free) — basic lose-weight plan, weeks 1-4 (3x/week).
+with newplan as (
+  insert into public.fitness_plans
+    (user_id, fitness_goal_id, name, description, duration_weeks, workouts_per_week,
+     generation_strategy, regenerated_count, started_at, is_active)
+  select p.id, g.id,
+    'Cycle to Fit — 12-week plan',
+    'A balanced cardio-first plan mixing running, cycling, and HIIT to support steady weight loss.',
+    12, 3, 'basic', 0, now(), true
+  from public.profiles p
+  join public.fitness_goals g on g.user_id = p.id and g.achieved_at is null
+  where p.email = 'free@wiseworkout.test'
+  returning id
+)
+insert into public.planned_workouts
+  (id, fitness_plan_id, workout_type_id, week_number, day_of_week, duration_minutes, name, descriptor, order_index)
+select gen_random_uuid(), np.id, wt.id, v.wk, v.dow, v.dur, v.nm, v.ds, v.oi
+from newplan np
+cross join (values
+  (1, 1,  0, 'running', 30, 'Easy Run',        'Relaxed pace to build an aerobic base.'),
+  (1, 4,  1, 'hiit',    25, 'HIIT Burn',       'Short high-intensity intervals for a calorie burn.'),
+  (1, 6,  2, 'cycling', 40, 'Steady Ride',     'Comfortable ride at a conversational effort.'),
+  (2, 1,  3, 'running', 35, 'Brisk Run',       'Pick up the pace slightly over the base run.'),
+  (2, 4,  4, 'hiit',    25, 'Circuit Session', 'Full-body circuit with minimal rest.'),
+  (2, 6,  5, 'cycling', 45, 'Endurance Ride',  'Longer steady ride to extend time on the bike.'),
+  (3, 1,  6, 'running', 35, 'Interval Run',    'Alternate efforts to lift your average pace.'),
+  (3, 4,  7, 'hiit',    25, 'Tabata Blast',    '20-on/10-off intervals to spike the heart rate.'),
+  (3, 6,  8, 'walking', 40, 'Recovery Walk',   'Easy walk to aid recovery and stay active.'),
+  (4, 1,  9, 'running', 30, 'Easy Run',        'Relaxed pace to consolidate fitness.'),
+  (4, 4, 10, 'hiit',    25, 'HIIT Burn',       'Repeat the interval session, pushing a little harder.'),
+  (4, 6, 11, 'cycling', 40, 'Steady Ride',     'Comfortable ride to close out the block.')
+) as v(wk, dow, oi, slug, dur, nm, ds)
+join public.workout_types wt on wt.slug = v.slug;
+
+-- ----------------------------------------------------------------------------
 -- 2. Reset + seed workout sessions for both demo users.
 -- ----------------------------------------------------------------------------
 delete from public.posts
