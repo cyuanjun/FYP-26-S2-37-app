@@ -9,11 +9,13 @@ import 'package:wise_workout/entities/public_profile.dart';
 
 import '../helpers/fakes.dart';
 
-Challenge _challenge(String id, {int? target = 20}) => Challenge(
+Challenge _challenge(String id, {int? target = 20, String code = ''}) =>
+    Challenge(
       id: id,
       name: 'Challenge $id',
       shortName: id.toUpperCase(),
       icon: '⚡',
+      joinCode: code,
       metricKind: ChallengeMetricKind.accumulator,
       metric: ChallengeMetric.totalSessions,
       targetValue: target,
@@ -116,6 +118,36 @@ void main() {
       final c = _container(social, userId: null);
       expect(await c.read(createChallengeProvider).call({'name': 'x'}), isNull);
       expect(social.createdChallenges, isEmpty);
+    });
+  });
+
+  group('FindChallengeByCode', () {
+    test('resolves a code, upper-casing + trimming the input', () async {
+      final social = FakeSocialGateway()
+        ..challenges = [
+          (_challenge('c1', code: 'K7QP2M'), <String>[]),
+          (_challenge('c2', code: 'ABC123'), <String>[]),
+        ];
+      final c = _container(social);
+
+      // typed lowercase with surrounding spaces still matches the stored code
+      final found =
+          await c.read(findChallengeByCodeProvider).call('  abc123 ');
+      expect(found?.id, 'c2');
+    });
+
+    test('unknown code → null (negative)', () async {
+      final social = FakeSocialGateway()
+        ..challenges = [(_challenge('c1', code: 'K7QP2M'), <String>[])];
+      final c = _container(social);
+      expect(await c.read(findChallengeByCodeProvider).call('ZZZZZZ'), isNull);
+    });
+
+    test('blank input → null without hitting the gateway (negative)', () async {
+      final social = FakeSocialGateway()
+        ..challenges = [(_challenge('c1', code: 'K7QP2M'), <String>[])];
+      final c = _container(social);
+      expect(await c.read(findChallengeByCodeProvider).call('   '), isNull);
     });
   });
 

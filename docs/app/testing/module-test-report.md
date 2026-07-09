@@ -1,6 +1,6 @@
 # Wise Workout — Module Test Report
 
-**Date:** 10 Jul 2026 · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, 221 automated tests)
+**Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **222 automated tests**)
 **Environment:** Flutter stable · iPhone 17 Pro simulator (iOS 26) + Pixel API 35 emulator · Supabase local stack (ports 55321-9) mirroring hosted
 **Reproduce:** `cd app && flutter analyze && flutter test` (all automated cases) · manual procedures in [../prototype-demo-guide.md](../prototype-demo-guide.md) §4
 
@@ -14,16 +14,18 @@ Two evidence streams per module:
 |---|---|---|---|---|---|
 | ENT | Entity rules (domain logic) | 78 | ✅ 78/78 pass | — (rules exercised via every manual flow) | — |
 | AUTH | Auth & profile cluster | 26 | ✅ 26/26 pass | Guide §A, §F, §F2 (login/logout/reset, profile edits, photo upload) | Pass (10 Jul) |
-| CAP | Capture & devices | 24 | ✅ 24/24 pass | Guide §B, §B2 + manual-entry flow | Pass (BLE: sim-safe path; hardware pass pending) |
+| CAP | Capture & devices | 22 | ✅ 22/22 pass | Guide §B, §B2 (phone GPS / freeform / wearable) | Pass (BLE: sim-safe path; hardware pass pending) |
 | HIST | History & analytics | 14 | ✅ 14/14 pass | Guide §C, §G + search cases | Pass (9 Jul) |
 | PLAN | Plans & AI | 15 | ✅ 15/15 pass | Guide §A2 (onboarding → AI plan), regen cap | Pass (earlier sprints) |
-| SOC | Social & challenges | 30 | ✅ 30/30 pass | Guide §E + Social walkthrough + History→post link | Pass (9–10 Jul, 5-athlete feed) |
+| SOC | Social & challenges | 33 | ✅ 33/33 pass | Guide §E + Social walkthrough + History→post link + join-by-code | Pass (9–10 Jul, 5-athlete feed; join-code verified on sim) |
 | MKT | Marketplace & expert portal | 17 | ✅ 17/17 pass | Expert walkthrough: 2-account lifecycle + portal editors | Pass (7–9 Jul, DB checked) |
 | PREM | Premium subscription | 6 | ✅ 6/6 pass | Guide §H (upgrade → #13.6 → reset) | Pass (8 Jul, DB checked) |
 | NOTIF | Notifications (rule engine) | 11 | ✅ 11/11 pass | #13.4 UPCOMING + pending=1 + push-payload display | Pass (delivery = device pass pending) |
-| | **Total** | **221** | **✅ 221/221 pass** | | |
+| | **Total** | **222** | **✅ 222/222 pass** | | |
 
-All 221 automated cases pass on the report date (0 failures, `flutter analyze` clean).
+All 222 automated cases pass on the refresh date (0 failures, `flutter analyze` clean).
+
+> **Delta since the 11 Jul milestone (221 → 222):** **US13 manual workout entry was descoped/removed** — its 2 automated cases dropped (CAP 24 → 22) because a free-text entry let users farm XP/level/streak with no sensor evidence (see [user-stories.md](../../requirements/user-stories.md) US13, reconciliation §C8). **Challenge join codes added** — `FindChallengeByCode` gained 3 automated cases (SOC 30 → 33: resolve + input-normalisation, unknown-code, blank-input negatives).
 
 ## Requirements traceability
 
@@ -31,7 +33,7 @@ All 221 automated cases pass on the report date (0 failures, `flutter analyze` c
 |---|---|
 | ENT — Entity rules (domain logic) | US14–US18, US32–US35 (rules layer) |
 | AUTH — Auth & profile cluster | US07–US09, US11, US14, US26, US31 hooks |
-| CAP — Capture & devices | US12, US13, wearable scope (#7.1) |
+| CAP — Capture & devices | US12, wearable scope (#7.1); US13 manual entry **descoped/removed** |
 | HIST — History & analytics | US15–US17, US33; #12 §Search |
 | PLAN — Plans & AI | US18, US36–US37 |
 | SOC — Social & challenges | US22–US25 |
