@@ -20,12 +20,12 @@ Everything below is real: a Flutter app (BCE architecture) talking to a live Sup
 | **Auth** | Login (email/password), session-aware splash, sign-out, role-aware routing | Sign-up is on the marketing website (app is login-only by design) |
 | **Capture** | Train → free-form workout → live timer + phone GPS/steps → finish → summary | `end_workout_session` RPC: XP + weekly streak + level-up post (atomic) |
 | **History** | Analytics card (Day/Week/Month + vs-prior deltas), sessions grouped by week, detail with edit/delete | Free tier shows upsell/cap/search-lock; Premium hides them |
-| **Manual entry (9 Jul)** | Train → "Log a workout manually": type/date/time/duration/distance/feel/notes → lands in History like any tracked session | Same RPC = same XP/streak/calories; no source device recorded (US13) |
+| ~~Manual entry (US13)~~ | **DESCOPED / REMOVED** — a free-text entry ran the same XP/streak/level RPC as a captured session, so it let users farm progress with no sensor evidence | All progress now requires a captured session (freeform / phone GPS / wearable); see reconciliation §C8 |
 | **Notifications (8 Jul)** | Rule-based local reminders (US19–21): plan-day nudges (Premium adaptive hour), missed-workout, 3-day inactivity, Premium rest alert; #13.4 shows an **UPCOMING** strip of the live schedule | ⚠️ iOS-simulator quirk: calendar-trigger notifications don't deliver on the iOS 26 sim (schedule + display verified separately) — demo the UPCOMING strip, or use a device/Android |
 | **AI summary** | "✨" on History → progress summary written by **OpenAI (gpt-4o-mini)** from your real stats | Premium summaries include goal context; Gemini fallback → deterministic stub if keys/AI fail |
 | **Premium upgrade (8 Jul)** | Free upsell hooks (Dashboard banner, Profile pill, History locks, Plan Detail CTAs) → #16 Upgrade → simulated payment sheet → **live role flip**; #13.6 Subscription Management (plan card, billing history, cancel/resume) | `start_premium` SECURITY DEFINER RPC past the role guard; payment simulated by scope |
 | **Advanced analytics (9 Jul)** | History → **Advanced ›** (Premium): ACWR workload tile w/ bands, range-scoped weekly volume/HR-efficiency/load trends, Karvonen HR zones, personal bests | All derived live from sessions (`entities/advanced_analytics.dart`, unit-tested); History also gains Premium **search** |
-| **Training Effect (10 Jul)** | #10 Summary + #12.1 Detail: band + 1–10 score + recovery line; Premium adds aerobic/anaerobic split + recovery window | Spec formula; honest "unavailable" state for HR-less (manual) sessions |
+| **Training Effect (10 Jul)** | #10 Summary + #12.1 Detail: band + 1–10 score + recovery line; Premium adds aerobic/anaerobic split + recovery window | Spec formula; honest "unavailable" state for HR-less (no-wearable) sessions |
 | **Share** | Summary → "Share to Social" toggle → caption + Facebook/Instagram/Twitter/TikTok | Creates a `workout_share` Post; platform buttons open the OS share |
 | **Social (6 Jul)** | Community feed (friends+self; workout_share/level_up posts, likes, comments, caption edit) → Post Detail; find-friends search + Add Friend/Unfriend + User Profile; Challenges (Joined/Active/Past, join/leave/create, live leaderboards) | Friendship = mutual pair via `add_friend` RPC; leaderboards live-computed by `challenge_leaderboards`; demo seed gives Mia↔Alex + likes/comments + a joined challenge |
 | **Experts (7–8 Jul)** | Browse experts + service listings (search, category chips, follow-heart) → Expert Detail → Service Detail (Request modal → pending → deliverables → Leave a review → ✓ Reviewed); Dashboard MY PURCHASES; log in as `expert@` → the complete expert portal (Home · Services · Requests · Clients · Profile): triage on Requests, deliverables + Mark complete on Client Detail (#23.1), **create/edit service listings** (⊕ on Services, draft/live/archived) and **Manage Professional Info** (#24.1 on Profile) | Payment simulated (price snapshots, no charge); transitions + reviews via SECURITY DEFINER RPCs; expert aggregates column-locked (RPC-only); demo: Sam Rivera w/ 3 live services + one engagement in every footer state |
@@ -202,15 +202,11 @@ Do each step and check **"You should see"**. (Tip: use `free@` for the standard 
 4. **Negative check:** toggle the watch OFF (or remove it) → next workout has no HR readout and
    the session links to phone sensors instead.
 
-### B3. Log a workout manually (US13)
-1. Train → **"Log a workout manually"** (under the freeform CTA).
-   - **See:** **LOG A WORKOUT** — workout-type chips, date/time pickers, duration, distance
-     (cardio types only), feel pills, private notes; the CTA stays disabled until type +
-     duration are set, and future start times are blocked inline.
-2. Pick **Running**, yesterday 7:30 AM, 30 min, 5 km, feel **Good** → **LOG WORKOUT**.
-   - **See:** snackbar **"Workout logged — +75 XP"** (same server-side XP formula as tracked
-     sessions: 20 + 30 min + 5 km×5); the session appears in History under the right day with
-     pace computed and an honest **—** for AVG HR (no source device).
+### B3. ~~Log a workout manually (US13)~~ — DESCOPED / REMOVED
+Manual entry was cut: a free-text entry ran the same XP/streak/level RPC as a captured
+session, so it let users fabricate workouts and farm progress with no sensor evidence.
+There is no "Log a workout manually" button anymore — all progress requires a captured
+session (freeform / phone GPS / wearable). See reconciliation log §C8.
 
 ### F2. Profile & account flows
 0. Tap the avatar circle's **edit dot** → system photo picker → choose a photo.

@@ -67,16 +67,14 @@ Do this the night before **and** ~30 min before the slot:
    save.
    > "Finalisation is one atomic server-side call — XP, weekly streak, even
    > the level-up post are computed in Postgres, so no client can cheat."
-4. *(Optional 20 s, if pressed for time skip)* **Train → Log a workout
-   manually** — show the form exists for sessions done without the phone.
-5. **History**: the new session at top, Basic Workout Analytics with
+4. **History**: the new session at top, Basic Workout Analytics with
    vs-last-week deltas. Tap **✨**.
    > "The AI progress summary is one of exactly two AI features — summaries
    > and plan suggestions, both behind a Supabase Edge Function so the key
    > never ships in the app. Note the honesty label: AI-assisted, not
    > medical advice. If the model is down it degrades to a deterministic
    > fallback — the demo never breaks."
-6. Open the new session's detail → **share to feed** (platform buttons:
+5. Open the new session's detail → **share to feed** (platform buttons:
    Facebook / Instagram / Twitter / TikTok) → post it.
 
 *Pause point — state: Mia has a fresh session + a fresh post.*
@@ -172,7 +170,7 @@ Do this the night before **and** ~30 min before the slot:
 |---|---|
 | Venue wifi dies | Local Supabase stack + `--dart-define`s (decide **before**, not mid-demo) |
 | OpenAI/Gemini down or slow | Automatic deterministic stub — same response shape; don't mention unless asked |
-| Live GPS capture awkward indoors | Duration/steps still tick without movement; or use **Log a workout manually** and narrate the same atomic-finalise story |
+| Live GPS capture awkward indoors | Duration/steps still tick without movement — just start a **freeform workout**, let the timer run a few seconds, and end it to narrate the atomic server-side finalise |
 | iOS notification delivery | Known simulator limitation — demo the UPCOMING strip; live banner only on device/Android |
 | Rehearsal state drift | Re-run `seed-demo.sql` + the Mia revert SQL above — both are idempotent |
 | Accidental wrong tap mid-flow | Every act is independent; pull-to-refresh or re-login re-syncs state |

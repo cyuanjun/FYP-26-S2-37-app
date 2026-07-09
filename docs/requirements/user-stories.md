@@ -5,11 +5,11 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **12 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 12 Jul: **admin web portal built** at `/admin` — users, expert-application review, listings, categories, pricing, testimonials, feedback, contact). Tally: 51 ✅ · 10 🟨 · 3 ⬜ (US30/US48 expert content = out of scope; US38 plan customisation).
+Last updated **12 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 12 Jul: **admin web portal built** at `/admin` — users, expert-application review, listings, categories, pricing, testimonials, feedback, contact). Tally: 50 ✅ · 10 🟨 · 4 ⬜ (US30/US48 expert content = out of scope; US38 plan customisation; **US13 manual entry descoped — removed to stop XP/level/streak farming**).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 13 built · 10 partial · 41 not started
+**Score:** 12 built · 10 partial · 42 not started
 
 
 ## Unregistered user (US01–US06)
@@ -33,7 +33,7 @@ Last updated **12 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 
 | US10 | 🟨 | As a registered free user, I want to access the mobile application after logging in so that I can install and use the application. | Website flow: log in on the site → download the app (clarified 12 Jun). `/login` authenticates against shared Supabase Auth and shows the role-based destination; no persistent site session / app-download page yet |
 | US11 | ✅ | As a registered free user, I want to create and update my fitness profile so that the system can understand my goals, preferences, and fitness needs. | Fitness Profile #13.1 (batched save, custom tags) |
 | US12 | ✅ | As a registered free user, I want to record and manage workout activities so that I can keep my exercise history accurate. | Capture #7/#9/#10 + edit/delete in History detail |
-| US13 | ✅ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | "Log a workout manually" on Train (9 Jul): type/date/time/duration/distance/feel/notes → same `end_workout_session` RPC (now honours a backdated `started_at`), so XP/streak/level-up and MET calories match tracked sessions; `connected_device_id` stays null |
+| US13 | ⬜ | As a registered free user, I want to manually enter workout details so that I can record activities that are not automatically detected. | **Descoped — removed to protect the integrity of the XP/level/streak system.** Was built 9 Jul (Train → "Log a workout manually" → `end_workout_session` RPC), but a free-text manual entry lets users fabricate sessions and farm XP/levels/streaks with no captured evidence, defeating the gamification. Cut (screen + `LogManualWorkout` control + tests removed); all progress now requires a captured session (phone GPS / freeform / wearable). Logged in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md) |
 | US14 | ✅ | As a registered free user, I want to synchronise exercise data from smartphone sensors or supported wearable devices so that my fitness records are more complete. | Phone GPS/steps ✅ + wearable pairing (#7.1, mock BLE scan per spec) with simulated HR streaming into sessions (avg/max persisted, device linked); real BLE/HealthKit slots in behind the same WorkoutDataSource later |
 | US15 | ✅ | As a registered free user, I want to view limited workout history and basic progress summaries so that I can understand my recent activity and consistency. | History #12 + analytics ✅; Free cap = current calendar month, enforced at the query level (12 Jun) |
 | US16 | ✅ | As a registered free user, I want to view basic exercise effect estimates so that I can understand the results of my workout activities. | MET-based calorie estimate per session (entity rule, profile weight w/ sex-based default 70/55 kg) + XP; computed live since 12 Jun. Method + accuracy caveat: [reference/calorie-estimation.md](../app/reference/calorie-estimation.md) |
@@ -110,7 +110,7 @@ Last updated **12 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 
 Four-way trace: stories ↔ **PRD v3** ↔ **TDM v5** ↔ **latest WBS** ↔ **code**. Statuses above already reflect the code audit.
 
 ### Latest WBS (post-review drawio) vs stories
-- **Stories with no WBS work package:** US13 manual entry (only a generic "Record Workout Activity" node), **US21 rest alerts — WBS plans them Premium-only but the SRS grants them to Free** (divergence to resolve), US30 + US48 expert *content* browse/purchase/upload (WBS only has service listings), US35 detailed effect estimates (nearest node is "View Advanced Workout Analytics"), US38 customise plan (absent from the Premium branch).
+- **Stories with no WBS work package:** US13 manual entry (only a generic "Record Workout Activity" node — now descoped anyway), **US21 rest alerts — WBS plans them Premium-only but the SRS grants them to Free** (divergence to resolve), US30 + US48 expert *content* browse/purchase/upload (WBS only has service listings), US35 detailed effect estimates (nearest node is "View Advanced Workout Analytics"), US38 customise plan (absent from the Premium branch).
 - **WBS work packages with no story:** Change Password (all four roles), Update Posts, Create Challenge, Quit Challenge, Save Expert (bookmark), Submit Feedback (Free + Expert "Misc"), Search Workout History (Premium), View Followed Users.
 
 ### PRD vs stories

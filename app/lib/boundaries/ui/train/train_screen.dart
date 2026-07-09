@@ -11,7 +11,6 @@ import '../../../entities/fitness_plan.dart';
 import '../../../entities/planned_workout.dart';
 import '../common/app_card.dart';
 import '../common/avatar_button.dart';
-import 'manual_entry_screen.dart';
 import '../common/status_badge.dart';
 import '../profile/fitness_goals_screen.dart';
 import '../workout/active_workout_screen.dart';
@@ -107,15 +106,6 @@ class TrainScreen extends ConsumerWidget {
                           builder: (_) => const ActiveWorkoutScreen())),
                   icon: const Icon(Icons.play_arrow_rounded),
                   label: const Text('START FREEFORM WORKOUT'),
-                ),
-                const SizedBox(height: 8),
-                // US13 — sessions done without the phone still count.
-                TextButton.icon(
-                  onPressed: () => Navigator.of(context, rootNavigator: true)
-                      .push(MaterialPageRoute(
-                          builder: (_) => const ManualEntryScreen())),
-                  icon: const Icon(Icons.edit_calendar_outlined, size: 18),
-                  label: const Text('Log a workout manually'),
                 ),
               ],
             ),
