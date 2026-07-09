@@ -8,6 +8,7 @@ import '../../../entities/challenge.dart';
 import '../../../entities/enums.dart';
 import '../../gateways/workout_gateway.dart';
 import '../profile/profile_widgets.dart';
+import 'invite_code_dialog.dart';
 
 const _icons = ['⚡', '🏃', '🚴', '🏊', '🏋️', '🧘', '🥊', '🧗', '🎯', '🏆'];
 
@@ -89,8 +90,23 @@ class _CreateChallengeScreenState
     });
     if (!mounted) return;
     setState(() => _saving = false);
-    if (challenge != null) Navigator.of(context).pop();
+    if (challenge != null) {
+      await _showCreatedDialog(challenge);
+      if (mounted) Navigator.of(context).pop();
+    }
   }
+
+  /// Confirmation with the shareable code — the natural moment to send it to
+  /// friends so they can Join by code.
+  Future<void> _showCreatedDialog(Challenge challenge) => showInviteCodeDialog(
+        context,
+        ref,
+        title: 'Challenge created',
+        code: challenge.joinCode,
+        shareText:
+            'Join my "${challenge.name}" challenge on Wise Workout — use code '
+            '${challenge.joinCode} in the Challenges tab (Join by code).',
+      );
 
   @override
   Widget build(BuildContext context) {

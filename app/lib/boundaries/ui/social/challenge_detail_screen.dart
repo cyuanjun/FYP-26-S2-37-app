@@ -6,9 +6,11 @@ import '../../../controls/challenges.dart';
 import '../../../core/theme/app_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../entities/challenge.dart';
 import '../../../entities/challenge_summary.dart';
 import '../../../entities/enums.dart';
 import '../common/app_card.dart';
+import 'invite_code_dialog.dart';
 import 'user_profile_screen.dart';
 
 /// BOUNDARY (#11.3 Challenge Detail). Hero + your progress + how-it-works +
@@ -23,10 +25,23 @@ class ChallengeDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final summaryAsync = ref.watch(challengeSummaryProvider(challengeId));
 
+    final c = summaryAsync.value?.challenge;
+    final showInvite =
+        c != null && c.joinCode.isNotEmpty && !c.isPast(DateTime.now());
+
     return Scaffold(
       backgroundColor: AppColors.bg,
-      appBar:
-          AppBar(title: const Text('CHALLENGE', style: AppTypography.caption2)),
+      appBar: AppBar(
+        title: const Text('CHALLENGE', style: AppTypography.caption2),
+        actions: [
+          if (showInvite)
+            IconButton(
+              tooltip: 'Invite code',
+              onPressed: () => _showInviteDialog(context, ref, c),
+              icon: const Icon(Icons.ios_share_rounded, color: AppColors.accent),
+            ),
+        ],
+      ),
       bottomNavigationBar: summaryAsync.value == null
           ? null
           : _footer(context, ref, summaryAsync.value!),
@@ -114,6 +129,18 @@ class ChallengeDetailScreen extends ConsumerWidget {
       ),
     );
   }
+
+  /// Popup revealing the shareable code with copy + system-share actions.
+  Future<void> _showInviteDialog(
+          BuildContext context, WidgetRef ref, Challenge c) =>
+      showInviteCodeDialog(
+        context,
+        ref,
+        title: 'Invite code',
+        code: c.joinCode,
+        shareText: 'Join my "${c.name}" challenge on Wise Workout — use code '
+            '${c.joinCode} in the Challenges tab (Join by code).',
+      );
 
   String _howItWorks(ChallengeSummary summary) {
     final c = summary.challenge;

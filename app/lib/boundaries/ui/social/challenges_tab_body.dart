@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../controls/challenges.dart';
@@ -6,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/challenge_summary.dart';
 import 'challenge_card.dart';
+import 'challenge_detail_screen.dart';
 import 'create_challenge_sheet.dart';
 
 enum _ChallengeFilter { joined, active, past }
@@ -22,6 +24,13 @@ class ChallengesTabBody extends ConsumerStatefulWidget {
 
 class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
   _ChallengeFilter _filter = _ChallengeFilter.joined;
+  final _codeCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _codeCtrl.dispose();
+    super.dispose();
+  }
 
   List<ChallengeSummary> _partition(List<ChallengeSummary> all) {
     final now = DateTime.now();
@@ -37,6 +46,23 @@ class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
     };
   }
 
+  /// Resolve a typed join code → open the challenge detail so the user reviews
+  /// it before joining. Unknown code → inline error.
+  Future<void> _resolveCode(String code) async {
+    if (code.trim().isEmpty) return;
+    final challenge = await ref.read(findChallengeByCodeProvider).call(code);
+    if (!mounted) return;
+    if (challenge == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No challenge found for that code.')));
+      return;
+    }
+    _codeCtrl.clear();
+    FocusScope.of(context).unfocus();
+    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+        builder: (_) => ChallengeDetailScreen(challengeId: challenge.id)));
+  }
+
   String get _emptyCopy => switch (_filter) {
         _ChallengeFilter.joined =>
           "You haven't joined any challenges yet — browse Active to find one.",
@@ -50,6 +76,32 @@ class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
 
     return Column(
       children: [
+        // Join-by-code search — enter a shared code to open its challenge.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+          child: TextField(
+            controller: _codeCtrl,
+            textCapitalization: TextCapitalization.characters,
+            textInputAction: TextInputAction.go,
+            maxLength: 6,
+            onSubmitted: _resolveCode,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9]')),
+              TextInputFormatter.withFunction((_, n) =>
+                  n.copyWith(text: n.text.toUpperCase())),
+            ],
+            decoration: InputDecoration(
+              hintText: 'Enter challenge code',
+              prefixIcon: const Icon(Icons.vpn_key_outlined, size: 20),
+              isDense: true,
+              counterText: '',
+              suffixIcon: TextButton(
+                onPressed: () => _resolveCode(_codeCtrl.text),
+                child: const Text('Join'),
+              ),
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
           child: Row(

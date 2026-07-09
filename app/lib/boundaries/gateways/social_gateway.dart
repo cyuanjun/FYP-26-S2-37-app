@@ -224,6 +224,17 @@ class SocialGateway {
     }).toList();
   }
 
+  /// Resolve a shared join code → the challenge (null if no match). Codes are
+  /// stored uppercase; the caller normalises before calling.
+  Future<Challenge?> findChallengeByCode(String code) async {
+    final row = await _client
+        .from('challenges')
+        .select()
+        .eq('join_code', code)
+        .maybeSingle();
+    return row == null ? null : Challenge.fromJson(row);
+  }
+
   /// Batched leaderboards — one RPC for every visible challenge card.
   Future<List<LeaderboardRow>> leaderboards(List<String> challengeIds) async {
     if (challengeIds.isEmpty) return const [];

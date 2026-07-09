@@ -13,6 +13,14 @@ class SocialShareGateway {
       ShareParams(text: '$text\n\n#WiseWorkout', subject: 'My Wise Workout'),
     );
   }
+
+  /// Generic system share (no named platform) — used for a challenge invite,
+  /// where the payload is a join code rather than a per-network post.
+  Future<void> shareInvite(String text) async {
+    await SharePlus.instance.share(
+      ShareParams(text: text, subject: 'Join my Wise Workout challenge'),
+    );
+  }
 }
 
 final socialShareGatewayProvider = Provider<SocialShareGateway>((ref) => SocialShareGateway());

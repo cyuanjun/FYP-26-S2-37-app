@@ -118,6 +118,27 @@ class CreateChallenge {
   }
 }
 
+/// CONTROL — Find Challenge by Code (#11). Resolves a shared join code to a
+/// challenge so the UI can open its detail before the user joins. Codes are
+/// stored uppercase; input is trimmed + upper-cased here.
+class FindChallengeByCode {
+  FindChallengeByCode(this._ref);
+
+  final Ref _ref;
+
+  Future<Challenge?> call(String code) async {
+    final normalised = code.trim().toUpperCase();
+    if (normalised.isEmpty) return null;
+    SeqLog.msg('find-challenge-by-code', 'ChallengesTab', 'FindChallengeByCode',
+        'find($normalised)');
+    SeqLog.msg('find-challenge-by-code', 'FindChallengeByCode', 'SocialGateway',
+        'findChallengeByCode');
+    return _ref.read(socialGatewayProvider).findChallengeByCode(normalised);
+  }
+}
+
 final joinChallengeProvider = Provider<JoinChallenge>(JoinChallenge.new);
 final leaveChallengeProvider = Provider<LeaveChallenge>(LeaveChallenge.new);
 final createChallengeProvider = Provider<CreateChallenge>(CreateChallenge.new);
+final findChallengeByCodeProvider =
+    Provider<FindChallengeByCode>(FindChallengeByCode.new);

@@ -381,6 +381,14 @@ class FakeSocialGateway implements SocialGateway {
       profiles.where((p) => ids.contains(p.id)).toList();
 
   @override
+  Future<Challenge?> findChallengeByCode(String code) async {
+    for (final (c, _) in challenges) {
+      if (c.joinCode == code) return c;
+    }
+    return null;
+  }
+
+  @override
   Future<void> joinChallenge(String challengeId, String userId) async {
     joinCalls.add((challengeId, userId));
     challenges = [
@@ -442,9 +450,16 @@ class FakeSocialGateway implements SocialGateway {
 class FakeSocialShareGateway implements SocialShareGateway {
   final shares = <(SocialPlatform, String)>[];
 
+  final invites = <String>[];
+
   @override
   Future<void> shareTo(SocialPlatform platform, {required String text}) async {
     shares.add((platform, text));
+  }
+
+  @override
+  Future<void> shareInvite(String text) async {
+    invites.add(text);
   }
 }
 

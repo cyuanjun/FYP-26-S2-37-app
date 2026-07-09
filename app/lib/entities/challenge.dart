@@ -21,6 +21,7 @@ abstract class Challenge with _$Challenge {
     required String shortName,
     String? description,
     required String icon,
+    @Default('') String joinCode, // server-assigned shareable code (#11)
     @Default(ChallengeVisibility.public) ChallengeVisibility visibility,
     required ChallengeMetricKind metricKind,
     required ChallengeMetric metric,
