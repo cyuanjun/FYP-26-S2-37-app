@@ -9,14 +9,14 @@ import '../../../entities/expert_summary.dart';
 import '../common/app_card.dart';
 import 'expert_detail_screen.dart';
 
-/// BOUNDARY widget — one directory expert (#6): identity + rating, the
-/// follow-heart (which intercepts card navigation), title, two-line about,
-/// and the "N services · from $X" footer.
+// (#) One expert's card in the directory. Shows name, rating, title and blurb. Tapping opens the
+// (#) detail page and the heart calls the ToggleFollowExpert control.
 class ExpertCard extends ConsumerWidget {
   const ExpertCard({super.key, required this.expert});
 
-  final ExpertSummary expert;
+  final ExpertSummary expert; // (#) the expert this card is showing
 
+  // (#) Builds the card: avatar initials, name and rating row, follow heart, title, about, and footer.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider).value;

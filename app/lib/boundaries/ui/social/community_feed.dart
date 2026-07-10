@@ -8,19 +8,22 @@ import 'find_friends_strip.dart';
 import 'post_card.dart';
 import 'user_row.dart';
 
-/// BOUNDARY — the Community tab body (#11): find-friends strip over the
-/// friends+self post feed. A non-empty search query swaps the feed for user
-/// search results (list-in-place, not an overlay — approved trim).
+// (#) The Community tab feed. Shows friends' and your own posts with a search
+// (#) strip on top. Typing a query swaps the feed for member search results.
+// (#) Both lists are watched from controls.
 class CommunityFeed extends ConsumerStatefulWidget {
   const CommunityFeed({super.key});
 
+  // (#) Creates the state that tracks the current search text.
   @override
   ConsumerState<CommunityFeed> createState() => _CommunityFeedState();
 }
 
+// (#) Holds the feed state, mainly the live search query.
 class _CommunityFeedState extends ConsumerState<CommunityFeed> {
-  String _query = '';
+  String _query = ''; // (#) what the user typed into the find-friends box
 
+  // (#) Builds the search strip plus either the post feed or search results.
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -33,6 +36,7 @@ class _CommunityFeedState extends ConsumerState<CommunityFeed> {
     );
   }
 
+  // (#) Builds the friends-plus-self post list, with loading, error and empty states.
   Widget _feed() {
     final feed = ref.watch(feedProvider);
     return feed.when(
@@ -65,6 +69,7 @@ class _CommunityFeedState extends ConsumerState<CommunityFeed> {
     );
   }
 
+  // (#) Builds the member search results for the current query.
   Widget _searchResults() {
     final results = ref.watch(searchUsersProvider(_query.trim()));
     return results.when(

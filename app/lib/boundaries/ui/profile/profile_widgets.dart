@@ -4,16 +4,18 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../common/status_badge.dart';
 
-/// Shared building blocks for the Profile cluster (#13.x): iOS grouped-settings
-/// rows, section labels, chips, and the searchable multi-select picker sheet.
+// (#) Shared little widgets reused across all the Profile screens: setting rows,
+// section labels, chips, a number-input dialog and the searchable tag picker.
 
+// (#) An all-caps section heading, with an optional action icon on the right.
 class SectionLabel extends StatelessWidget {
   const SectionLabel({super.key, required this.label, this.onAction, this.actionIcon});
 
-  final String label;
-  final VoidCallback? onAction;
-  final IconData? actionIcon;
+  final String label; // (#) the heading text
+  final VoidCallback? onAction; // (#) tap handler for the trailing icon, if any
+  final IconData? actionIcon; // (#) icon to show on the right, defaults to a plus
 
+  // (#) Builds the heading row with the label and optional action icon.
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -31,14 +33,15 @@ class SectionLabel extends StatelessWidget {
   }
 }
 
-/// Label-above-value row with a chevron (#13.1 body metrics, #13.3 personal info).
+// (#) A tappable row with a label over its value and a chevron on the right.
 class SettingRow extends StatelessWidget {
   const SettingRow({super.key, required this.label, required this.value, this.onTap});
 
-  final String label;
-  final String value;
-  final VoidCallback? onTap;
+  final String label; // (#) the setting name
+  final String value; // (#) the current value shown under the label
+  final VoidCallback? onTap; // (#) called when the row is tapped
 
+  // (#) Builds the label/value column with a trailing chevron.
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -65,14 +68,15 @@ class SettingRow extends StatelessWidget {
   }
 }
 
-/// Emoji + label + chevron menu row (#13 menu list).
+// (#) A menu list row: emoji, label and a chevron, used on the profile hub.
 class MenuRow extends StatelessWidget {
   const MenuRow({super.key, required this.emoji, required this.label, required this.onTap});
 
-  final String emoji;
-  final String label;
-  final VoidCallback onTap;
+  final String emoji; // (#) leading emoji icon
+  final String label; // (#) the menu item text
+  final VoidCallback onTap; // (#) called when the row is tapped
 
+  // (#) Builds the emoji, label and trailing chevron row.
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -92,13 +96,15 @@ class MenuRow extends StatelessWidget {
   }
 }
 
+// (#) A pill-shaped chip that highlights when selected, for multi-select rows.
 class SelectChip extends StatelessWidget {
   const SelectChip({super.key, required this.label, required this.selected, required this.onTap});
 
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
+  final String label; // (#) the chip text
+  final bool selected; // (#) whether this chip is currently picked
+  final VoidCallback onTap; // (#) called when the chip is tapped
 
+  // (#) Builds the pill, filled when selected and outlined when not.
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -119,8 +125,8 @@ class SelectChip extends StatelessWidget {
   }
 }
 
-/// Boxed numeric-entry dialog (height/weight etc.) — visible input field with
-/// a unit suffix, used by Fitness Profile (#13.1) and Onboarding (#3).
+// (#) Pops a dialog with a number field and unit suffix (height, weight, etc.)
+// and calls onSet with the value once it's within the min/max range.
 Future<void> showNumberInputDialog(
   BuildContext context, {
   required String title,
@@ -172,18 +178,17 @@ Future<void> showNumberInputDialog(
   if (v != null && v >= min && v <= max) onSet(v);
 }
 
-/// One pickable option in [showTagPicker].
+// (#) One selectable option in the tag picker sheet.
 class PickerOption {
   const PickerOption({required this.id, required this.label, this.isCustom = false});
 
-  final String id;
-  final String label;
-  final bool isCustom;
+  final String id; // (#) unique id of the option
+  final String label; // (#) text shown for the option
+  final bool isCustom; // (#) true if the user added this one themselves
 }
 
-/// Searchable multi-select sheet (#13.1 "+ More" pattern). Returns the updated
-/// selection set, or null if dismissed. When [onAddCustom] is provided and the
-/// query has no exact match, an `+ Add "X"` row appears at the top.
+// (#) Opens the searchable multi-select sheet and returns the new selection set,
+// or null if dismissed. onAddCustom lets the user create a new option inline.
 Future<Set<String>?> showTagPicker(
   BuildContext context, {
   required String title,
@@ -202,31 +207,37 @@ Future<Set<String>?> showTagPicker(
   );
 }
 
+// (#) The bottom-sheet body for the tag picker: search box plus the option list.
 class _TagPickerSheet extends StatefulWidget {
   const _TagPickerSheet(
       {required this.title, required this.options, required this.initial, this.onAddCustom});
 
-  final String title;
-  final List<PickerOption> options;
-  final Set<String> initial;
-  final Future<PickerOption?> Function(String name)? onAddCustom;
+  final String title; // (#) sheet heading
+  final List<PickerOption> options; // (#) all options to choose from
+  final Set<String> initial; // (#) ids selected when the sheet opened
+  final Future<PickerOption?> Function(String name)? onAddCustom; // (#) add-new hook
 
+  // (#) Creates the sheet's state.
   @override
   State<_TagPickerSheet> createState() => _TagPickerSheetState();
 }
 
+// (#) Live state for the picker sheet: current selection, options and search query.
 class _TagPickerSheetState extends State<_TagPickerSheet> {
-  late final Set<String> _selected = {...widget.initial};
-  late List<PickerOption> _options = [...widget.options];
-  final _searchCtl = TextEditingController();
-  String _query = '';
+  late final Set<String> _selected = {...widget.initial}; // (#) ids picked so far
+  late List<PickerOption> _options = [...widget.options]; // (#) options incl. any added
+  final _searchCtl = TextEditingController(); // (#) controller for the search box
+  String _query = ''; // (#) current search text
 
+  // (#) Frees the search controller when the sheet closes.
   @override
   void dispose() {
     _searchCtl.dispose();
     super.dispose();
   }
 
+  // (#) The options to show right now: filtered by the query and sorted so
+  // selected and custom ones float to the top.
   List<PickerOption> get _visible {
     final q = _query.trim().toLowerCase();
     final filtered = q.isEmpty
@@ -249,6 +260,7 @@ class _TagPickerSheetState extends State<_TagPickerSheet> {
     return indexed.map((e) => e.value).toList();
   }
 
+  // (#) True when the query is new text that should offer an "add this" row.
   bool get _showAddCustom {
     final q = _query.trim();
     return widget.onAddCustom != null &&
@@ -256,6 +268,7 @@ class _TagPickerSheetState extends State<_TagPickerSheet> {
         !_options.any((o) => o.label.toLowerCase() == q.toLowerCase());
   }
 
+  // (#) Creates the typed option via the hook, then selects it and clears search.
   Future<void> _addCustom() async {
     final added = await widget.onAddCustom!(_query.trim());
     if (added == null) return;
@@ -267,6 +280,8 @@ class _TagPickerSheetState extends State<_TagPickerSheet> {
     });
   }
 
+  // (#) Builds the sheet: title with a DONE button, the search field, and the
+  // scrolling list of options with tick marks.
   @override
   Widget build(BuildContext context) {
     return Padding(

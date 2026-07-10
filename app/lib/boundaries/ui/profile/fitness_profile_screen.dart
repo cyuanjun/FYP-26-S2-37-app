@@ -13,27 +13,30 @@ import '../../gateways/workout_gateway.dart';
 import '../common/app_card.dart';
 import 'profile_widgets.dart';
 
-/// BOUNDARY (#13.1 Fitness Profile). Physical baseline + training context.
-/// Edits batch locally; SAVE PROFILE commits everything in one update.
+// (#) Fitness profile screen. Edit body metrics, activity level, training
+// experience, preferred workouts and health tags. Changes are gathered locally
+// and SAVE PROFILE pushes them all at once via the UpdateFitnessProfile control.
 class FitnessProfileScreen extends ConsumerStatefulWidget {
   const FitnessProfileScreen({super.key});
 
+  // (#) Creates the state holding the local draft of the profile.
   @override
   ConsumerState<FitnessProfileScreen> createState() => _FitnessProfileScreenState();
 }
 
+// (#) Local draft of the profile, seeded once from the loaded FitnessProfile.
 class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
-  // Local draft — seeded from the loaded FitnessProfile once.
-  bool _seeded = false;
-  DateTime? _dob;
-  Sex? _sex;
-  int? _heightCm;
-  double? _weightKg;
-  ActivityLevel? _activity;
-  TrainingExperience? _experience;
-  Set<String> _healthTagIds = {};
-  Set<String> _workoutTypeIds = {};
+  bool _seeded = false; // (#) so we copy the loaded profile in only once
+  DateTime? _dob; // (#) date of birth
+  Sex? _sex; // (#) selected sex
+  int? _heightCm; // (#) height in centimetres
+  double? _weightKg; // (#) weight in kilograms
+  ActivityLevel? _activity; // (#) day-to-day activity level
+  TrainingExperience? _experience; // (#) beginner/intermediate/advanced
+  Set<String> _healthTagIds = {}; // (#) picked diet/allergy/injury tag ids
+  Set<String> _workoutTypeIds = {}; // (#) picked preferred workout type ids
 
+  // (#) Copies the loaded profile into the draft fields, just the first time.
   void _seed(FitnessProfile fp) {
     if (_seeded) return;
     _seeded = true;
@@ -47,6 +50,8 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     _workoutTypeIds = {...fp.preferredWorkoutTypeIds};
   }
 
+  // (#) Bundles the whole draft into a map and saves it through the control,
+  // then snackbars and pops on success.
   Future<void> _save() async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -73,6 +78,8 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     }
   }
 
+  // (#) Builds the screen: body-metric rows, activity picker, experience chips,
+  // the workout and tag sections, and the save button.
   @override
   Widget build(BuildContext context) {
     final fitnessAsync = ref.watch(fitnessProfileProvider);
@@ -202,7 +209,8 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     );
   }
 
-  // ---- Preferred workouts (workout_types catalog) ----
+  // (#) The preferred-workouts block: default chips plus anything picked, with
+  // a "+" that opens the full workout-type picker.
   Widget _workoutSection() {
     final types = ref.watch(workoutTypesProvider).value ?? [];
     final byId = {for (final t in types) t.id: t};
@@ -259,7 +267,8 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     );
   }
 
-  // ---- Diet / Allergies / Injuries (health_tags catalog) ----
+  // (#) One health-tag block (diet, allergies or injuries) with chips and a
+  // "+" that opens the tag picker for that kind.
   Widget _tagSection(String label, HealthTagKind kind) {
     final tags = (ref.watch(healthTagsProvider).value ?? [])
         .where((t) => t.kind == kind)
@@ -327,6 +336,7 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
   }
 
 
+  // (#) Opens the date picker and stores the chosen date of birth.
   Future<void> _pickDob() async {
     final picked = await showDatePicker(
       context: context,
@@ -337,6 +347,7 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     if (picked != null) setState(() => _dob = picked);
   }
 
+  // (#) Opens a bottom sheet to pick sex and stores the choice.
   Future<void> _pickSex() async {
     final picked = await showModalBottomSheet<Sex>(
       context: context,
@@ -361,6 +372,7 @@ class _FitnessProfileScreenState extends ConsumerState<FitnessProfileScreen> {
     if (picked != null) setState(() => _sex = picked);
   }
 
+  // (#) Opens a bottom sheet listing activity levels and stores the pick.
   Future<void> _pickActivity() async {
     final picked = await showModalBottomSheet<ActivityLevel>(
       context: context,

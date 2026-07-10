@@ -12,16 +12,14 @@ import '../../../entities/service_request_summary.dart';
 import '../common/app_card.dart';
 import 'expert_detail_screen.dart';
 
-/// BOUNDARY (#6.2 Service Detail). One service in full: hero, deliverables
-/// (once the engagement is underway), what's included, who offers it — and
-/// the pinned footer state machine: Request · $X → pending → in progress →
-/// Leave a review → ✓ Reviewed. "Completed" means accepted work finished,
-/// not paid — payment is simulated.
+// (#) Full page for one service. Shows the details, any deliverables so far, and a footer that changes
+// (#) with the engagement state. From it the client can request the service or leave a review, each via a control.
 class ServiceDetailScreen extends ConsumerWidget {
   const ServiceDetailScreen({super.key, required this.serviceId});
 
-  final String serviceId;
+  final String serviceId; // (#) id of the service being shown
 
+  // (#) Watches the listing and any active engagement, then builds the details, deliverables, includes and footer.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listingAsync = ref.watch(serviceListingProvider(serviceId));
@@ -148,11 +146,13 @@ class ServiceDetailScreen extends ConsumerWidget {
   }
 }
 
+// (#) One deliverable card the expert sent: title, note, and each section with its list of items.
 class _DeliverableCard extends StatelessWidget {
   const _DeliverableCard(this.deliverable);
 
-  final Deliverable deliverable;
+  final Deliverable deliverable; // (#) the deliverable to render
 
+  // (#) Builds the card with the title, optional note, and the section headings and their items.
   @override
   Widget build(BuildContext context) {
     return AppCard(
@@ -195,13 +195,14 @@ class _DeliverableCard extends StatelessWidget {
   }
 }
 
-/// The #6.2 pinned footer: which action (if any) the engagement state allows.
+// (#) The pinned bottom footer that shows the right action for the engagement state.
 class _Footer extends ConsumerWidget {
   const _Footer({required this.listing, required this.engagement});
 
-  final ServiceListing listing;
-  final ServiceRequestSummary? engagement;
+  final ServiceListing listing; // (#) the service this footer acts on
+  final ServiceRequestSummary? engagement; // (#) the current engagement, null if none yet
 
+  // (#) Picks the footer content: request button, pending note, in progress note, review button, or thanks line.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final request = engagement?.request;
@@ -238,12 +239,14 @@ class _Footer extends ConsumerWidget {
     );
   }
 
+  // (#) Turns the service response time into a friendly "24 hours" style phrase.
   String _replyWindow() => switch (listing.service.responseTime) {
         ResponseTime.h24 => '24 hours',
         ResponseTime.h48 => '48 hours',
         ResponseTime.h72 => '72 hours',
       };
 
+  // (#) Opens the request sheet where the client types their goal and RequestService fires it off.
   void _openRequestSheet(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
     showModalBottomSheet<void>(
@@ -302,6 +305,7 @@ class _Footer extends ConsumerWidget {
     );
   }
 
+  // (#) Opens the review sheet with a star picker and text box, then sends it through SubmitReview.
   void _openReviewSheet(BuildContext context, WidgetRef ref, String requestId) {
     final controller = TextEditingController();
     var rating = 5;

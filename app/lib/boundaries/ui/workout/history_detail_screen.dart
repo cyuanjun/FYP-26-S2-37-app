@@ -16,26 +16,29 @@ import '../common/training_effect_card.dart';
 import '../social/post_detail_screen.dart';
 import '../common/status_badge.dart';
 
-/// BOUNDARY (#12.1 History Detail). Read-only recap of a completed session with
-/// an edit mode (name / feel / notes) and a delete action. Matches the activity
-/// diagram: View Completed Workout Details → Update / Delete.
+// (#) Workout detail screen. Read-only recap of a finished session, plus an
+// edit mode for the name, feel and notes and a delete. Saves and deletes go
+// through the SaveWorkoutDetails and delete controls.
 class HistoryDetailScreen extends ConsumerStatefulWidget {
   const HistoryDetailScreen({super.key, required this.sessionId});
 
-  final String sessionId;
+  final String sessionId; // (#) id of the session being viewed
 
+  // (#) Creates the state that tracks edit mode and the edited fields.
   @override
   ConsumerState<HistoryDetailScreen> createState() => _HistoryDetailScreenState();
 }
 
+// (#) Live state: whether we're editing, the busy flag and the editable fields.
 class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
-  bool _editing = false;
-  bool _busy = false;
-  final _name = TextEditingController();
-  final _notes = TextEditingController();
-  FeelRating? _feel;
-  bool _seeded = false;
+  bool _editing = false; // (#) true when the edit fields are showing
+  bool _busy = false; // (#) true while a save or delete is running
+  final _name = TextEditingController(); // (#) editable custom name
+  final _notes = TextEditingController(); // (#) editable private notes
+  FeelRating? _feel; // (#) how the session felt
+  bool _seeded = false; // (#) so we copy the session into the fields only once
 
+  // (#) Frees the name and notes controllers when the screen closes.
   @override
   void dispose() {
     _name.dispose();
@@ -43,6 +46,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     super.dispose();
   }
 
+  // (#) Copies the session's name, notes and feel into the edit fields, once.
   void _seed(WorkoutSession s) {
     if (_seeded) return;
     _name.text = s.customName ?? '';
@@ -51,6 +55,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     _seeded = true;
   }
 
+  // (#) Saves the edited name, feel and notes through the control, then leaves edit mode.
   Future<void> _saveAndExitEdit() async {
     setState(() => _busy = true);
     await ref.read(saveWorkoutDetailsProvider).call(
@@ -66,6 +71,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     });
   }
 
+  // (#) Confirms, then deletes the session via the control and pops back.
   Future<void> _delete() async {
     final ok = await showDialog<bool>(
       context: context,
@@ -87,6 +93,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     if (mounted) Navigator.of(context).pop();
   }
 
+  // (#) Builds the app bar with the Edit/Done button and hands off to _body.
   @override
   Widget build(BuildContext context) {
     final history = ref.watch(historyProvider);
@@ -121,6 +128,8 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     );
   }
 
+  // (#) Builds the recap body: name, date, stats grid, Training Effect, feel,
+  // notes, a shared-post link and, in edit mode, the delete button.
   Widget _body(WorkoutSession s, Map<String, dynamic> typeById) {
     _seed(s);
     final type = typeById[s.workoutTypeId];
@@ -230,6 +239,7 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     );
   }
 
+  // (#) A labelled text field used in edit mode, e.g. the workout name.
   Widget _editField(String label, TextEditingController c, {String? hint}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,8 +251,10 @@ class _HistoryDetailScreenState extends ConsumerState<HistoryDetailScreen> {
     );
   }
 
+  // (#) One boxed stat tile for the stats grid.
   Widget _stat(String label, String value) => StatTile(label, value, boxed: true);
 
+  // (#) Maps a feel rating to its emoji and word.
   String _feelLabel(FeelRating f) => switch (f) {
         FeelRating.great => '🔥 Great',
         FeelRating.good => '💪 Good',

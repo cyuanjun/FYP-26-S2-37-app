@@ -9,11 +9,14 @@ import '../common/premium_cta.dart';
 import '../premium/upgrade_screen.dart';
 import 'my_purchases_section.dart';
 
-/// BOUNDARY (#5 Dashboard — minimal slice version). Greets the signed-in user
-/// and offers sign-out; the full digest (today card, weekly stats, goal) lands later.
+// (#) The Home tab you land on after login. Says hi to the user, pushes Free
+// members toward Premium, and shows the stuff they've bought. Reads the profile
+// via the Authenticate control.
 class DashboardTab extends ConsumerWidget {
   const DashboardTab({super.key});
 
+  // (#) Builds the tab: app bar with avatar, greeting, member line, a Premium
+  // nudge for Free users, a "get moving" card, and the purchases strip.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider);

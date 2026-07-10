@@ -6,14 +6,15 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import 'friends_sheet.dart';
 
-/// BOUNDARY widget — the Community tab's search strip: find-friends input +
-/// a 👥 friend-count badge that opens the friends sheet. A non-empty query
-/// swaps the feed below for search results (no floating dropdown — trim).
+// (#) The search strip at the top of Community: a find-friends box plus a
+// (#) friend-count badge that opens the friends sheet. Typing passes the query
+// (#) back up to the feed above.
 class FindFriendsStrip extends ConsumerWidget {
   const FindFriendsStrip({super.key, required this.onQuery});
 
-  final ValueChanged<String> onQuery;
+  final ValueChanged<String> onQuery; // (#) callback fired as the search text changes
 
+  // (#) Builds the search field beside the tappable friend-count badge.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final friendCount = ref.watch(friendCountProvider).value ?? 0;

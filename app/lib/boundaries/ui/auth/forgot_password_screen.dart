@@ -7,31 +7,39 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/strings.dart';
 import '../common/app_card.dart';
 
-/// BOUNDARY (#4 Forgot Password). Sends a reset link; always shows the
-/// "sent" card regardless of whether the email matched (anti-enumeration).
+// (#) The forgot password screen. User types their email and taps send, which
+// hands it to the RequestPasswordReset control. It always shows the same sent
+// message so nobody can tell which emails are actually registered.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
+  // (#) Makes the state object that holds this screen's changing data.
   @override
   ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
+// (#) Holds the live state: the email box and whether the link was already sent.
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
-  final _email = TextEditingController();
-  bool _sent = false;
+  final _email = TextEditingController(); // (#) what the user typed as their email
+  bool _sent = false; // (#) flips to true once we've fired the reset request
 
+  // (#) Frees the email text box when the screen closes so it doesn't leak.
   @override
   void dispose() {
     _email.dispose();
     super.dispose();
   }
 
+  // (#) Runs on send. Ignores a blank email, asks the control to send the reset
+  // link, then flips the view over to the sent confirmation.
   Future<void> _submit() async {
     if (_email.text.isBlank) return;
     await ref.read(requestPasswordResetProvider.notifier).send(_email.text);
     if (mounted) setState(() => _sent = true);
   }
 
+  // (#) Builds the screen: the eyebrow, big heading, a line of help text, then
+  // either the email field and send button or the sent card, plus a back link.
   @override
   Widget build(BuildContext context) {
     final sending = ref.watch(requestPasswordResetProvider).isLoading;

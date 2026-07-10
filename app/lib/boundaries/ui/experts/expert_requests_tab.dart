@@ -4,11 +4,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import 'expert_requests_view.dart';
 
-/// BOUNDARY (#22 Expert Requests). The inbox tab of the expert shell —
-/// wraps the requests view in its own scaffold.
+// (#) The Requests tab shell in the expert app. Just wraps a scaffold and title around the requests
+// (#) view that does the real work.
 class ExpertRequestsTab extends StatelessWidget {
   const ExpertRequestsTab({super.key});
 
+  // (#) Builds the scaffold with a REQUESTS title and drops the requests view in the body.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

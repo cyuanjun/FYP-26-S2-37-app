@@ -9,11 +9,12 @@ import '../../../core/theme/app_typography.dart';
 import '../common/app_card.dart';
 import '../common/stat_tile.dart';
 
-/// BOUNDARY (#20 Expert Dashboard). The expert shell's Home: greeting,
-/// reputation stats, and today's workload at a glance.
+// (#) The expert dashboard home. A greeting plus reputation stats and today's workload numbers,
+// (#) all read from the controls. Nothing is written here.
 class ExpertHomeTab extends ConsumerWidget {
   const ExpertHomeTab({super.key});
 
+  // (#) Reads the expert's summary and incoming requests, then shows greeting, stat cards and workload.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(currentUserIdProvider);

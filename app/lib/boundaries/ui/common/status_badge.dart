@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_typography.dart';
 
-/// Shared status pill (PREMIUM / ACTIVE / CONNECTED / EDITING / CUSTOM / …) —
-/// a small rounded tag in caption2. Filled ([bg]) or outlined ([borderColor]);
-/// [fg]/[weight] default to caption2's muted w700.
+// (#) Small rounded status tag like PREMIUM, ACTIVE or CONNECTED. It comes out
+// filled or outlined depending on the colours you pass in. Reused anywhere the
+// app needs a little status pill.
 class StatusBadge extends StatelessWidget {
   const StatusBadge(
-    this.text, {
+    this.text, { // (#) the short label inside the tag
     super.key,
-    this.bg,
-    this.fg,
-    this.borderColor,
-    this.weight,
-    this.radius = 6,
-    this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+    this.bg, // (#) fill colour, leave null for an outlined tag
+    this.fg, // (#) text colour
+    this.borderColor, // (#) outline colour when there's no fill
+    this.weight, // (#) text weight
+    this.radius = 6, // (#) corner roundness
+    this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 2), // (#) inner spacing
   });
 
   final String text;
@@ -25,6 +25,7 @@ class StatusBadge extends StatelessWidget {
   final double radius;
   final EdgeInsetsGeometry padding;
 
+  // (#) Builds the tag: a rounded box with the fill or border, holding the label text.
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -5,8 +5,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/public_profile.dart';
 
-/// BOUNDARY widget — post/comment author strip: initials avatar + name +
-/// `@handle · when`. [onTap] links to the user profile (wired in Phase 2).
+// (#) Small strip that shows who wrote a post or comment: avatar, name and
+// (#) @handle plus a timestamp. Tapping it opens their profile. Pure display,
+// (#) it holds no data of its own.
 class AuthorRow extends StatelessWidget {
   const AuthorRow({
     super.key,
@@ -17,12 +18,13 @@ class AuthorRow extends StatelessWidget {
     this.trailing,
   });
 
-  final PublicProfile author;
-  final DateTime when;
-  final VoidCallback? onTap;
-  final double size;
-  final Widget? trailing;
+  final PublicProfile author; // (#) the person who made the post or comment
+  final DateTime when; // (#) when it was posted, shown as a relative day
+  final VoidCallback? onTap; // (#) what to run when the row is tapped, usually open profile
+  final double size; // (#) avatar diameter in pixels
+  final Widget? trailing; // (#) optional extra widget pinned to the right
 
+  // (#) Builds the avatar, name and the "handle · when" meta line in a row.
   @override
   Widget build(BuildContext context) {
     final meta = [

@@ -6,9 +6,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../gateways/social_share_gateway.dart';
 
-/// Shared invite-code popup (#11): bold title + circular close, a boxed code
-/// area with inline copy, and a full-width Share action. Used from the
-/// challenge detail (share icon) and right after creating a challenge.
+// (#) Popup that shows a shareable invite code. You can copy it to the clipboard
+// (#) or hit Share, which pushes the text out through the share gateway. Opened
+// (#) right after making a challenge and from the challenge detail.
 Future<void> showInviteCodeDialog(
   BuildContext context,
   WidgetRef ref, {
@@ -63,12 +63,13 @@ Future<void> showInviteCodeDialog(
   );
 }
 
-/// Circular close affordance — the ring signals it's tappable.
+// (#) The little round close button in the dialog corner, the ring hints it taps.
 class _CircleClose extends StatelessWidget {
   const _CircleClose({required this.onTap});
 
-  final VoidCallback onTap;
+  final VoidCallback onTap; // (#) what to run when the close button is tapped
 
+  // (#) Draws the circular grey button with an X icon inside.
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -86,13 +87,14 @@ class _CircleClose extends StatelessWidget {
   }
 }
 
-/// The code in its own boxed area, with inline copy.
+// (#) Shows the invite code in its own boxed area with a copy button beside it.
 class _CodeBox extends StatelessWidget {
   const _CodeBox({required this.code, required this.onCopy});
 
-  final String code;
-  final VoidCallback onCopy;
+  final String code; // (#) the invite code text to display
+  final VoidCallback onCopy; // (#) what to run when the copy icon is tapped
 
+  // (#) Draws the rounded box holding the spaced-out code and the copy icon.
   @override
   Widget build(BuildContext context) {
     return Container(

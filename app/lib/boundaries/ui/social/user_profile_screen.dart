@@ -10,15 +10,15 @@ import '../common/app_card.dart';
 import '../common/stat_tile.dart';
 import 'post_detail_screen.dart';
 
-/// BOUNDARY (#11.2 User Profile). Public profile for any user: identity from
-/// `public_profiles`, Workouts / Friends / Active-days stats (mutual graph —
-/// deliberately not followers/following), the Add Friend / Unfriend toggle
-/// (hidden on the self-view), and a compact recent-posts index.
+// (#) Any user's public profile. Shows identity, a stats row, recent posts and
+// (#) an Add Friend / Unfriend button that's hidden on your own view. The toggle
+// (#) calls the friend controls.
 class UserProfileScreen extends ConsumerWidget {
   const UserProfileScreen({super.key, required this.userId});
 
-  final String userId;
+  final String userId; // (#) id of the user whose profile to show
 
+  // (#) Builds the profile: identity, stats, friend toggle, about and recent posts.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(currentUserIdProvider);
@@ -71,6 +71,7 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Builds the big avatar, display name and the level plus streak line.
   Widget _identity(PublicProfile profile) {
     return Column(
       children: [
@@ -93,6 +94,7 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Builds the workouts, friends and active-days stat row.
   Widget _statsCard(WidgetRef ref) {
     final stats = ref.watch(userProfileStatsProvider(userId)).value;
     return AppCard(
@@ -106,6 +108,7 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Builds the Add Friend / Unfriend button wired to the friend controls.
   Widget _friendToggle(WidgetRef ref) {
     final isFriend = ref.watch(isFriendProvider(userId)).value ?? false;
     return OutlinedButton(
@@ -121,6 +124,7 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Builds the compact list of the user's recent posts, each tapping to detail.
   Widget _recentPosts(WidgetRef ref, {required bool isSelf}) {
     final posts = ref.watch(userPostsProvider(userId));
     return posts.when(

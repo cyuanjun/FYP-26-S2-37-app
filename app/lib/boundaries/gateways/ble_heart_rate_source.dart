@@ -4,44 +4,44 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'workout_data_source.dart';
 
-/// BOUNDARY (gateway) — REAL Bluetooth heart-rate capture, the class-swap
-/// counterpart of the simulated WearableHrSource (locked architecture: new
-/// class, no refactor). Connects to a device paired via a real BLE scan
-/// (ConnectedDevice.bleRemoteId) and subscribes to the standard GATT Heart
-/// Rate service. Requires physical hardware — the iOS simulator has no
-/// Bluetooth, which is why the mock pairing path stays the demo default.
+// (#) Talks to a real Bluetooth heart-rate strap over the standard GATT service.
+// (#) The workout controls use it to stream live bpm off a paired device while a
+// (#) session runs. Needs real hardware, so the mock source stays the demo default.
 class BleHeartRateSource implements HrSource {
+  // (#) Builds the source for one paired device, given its Bluetooth id.
   BleHeartRateSource(this.remoteId);
 
-  /// The platform Bluetooth identifier stored at pairing time.
-  final String remoteId;
+  final String remoteId; // (#) the device's Bluetooth id saved when it was paired
 
-  static final heartRateService = Guid('180D');
-  static final hrMeasurementChar = Guid('2A37');
+  static final heartRateService = Guid('180D'); // (#) standard GATT heart-rate service id
+  static final hrMeasurementChar = Guid('2A37'); // (#) the bpm reading inside that service
 
-  final _controller = StreamController<LiveMetrics>.broadcast();
-  final samples = <int>[];
-  BluetoothDevice? _device;
-  StreamSubscription<List<int>>? _hrSub;
+  final _controller = StreamController<LiveMetrics>.broadcast(); // (#) pushes each bpm reading out
+  final samples = <int>[]; // (#) every bpm seen this session, for avg and max
+  BluetoothDevice? _device; // (#) the connected strap, once start() finds it
+  StreamSubscription<List<int>>? _hrSub; // (#) listener on the device's bpm notifications
 
+  // (#) The live metrics stream the workout control listens to.
   @override
   Stream<LiveMetrics> get metrics => _controller.stream;
 
+  // (#) No GPS track from a heart-rate strap, so this is always empty.
   @override
   List<Map<String, dynamic>> get trackPoints => const [];
 
+  // (#) Average bpm over the whole session, or null if nothing was read.
   @override
   int? get avgHeartRate => samples.isEmpty
       ? null
       : (samples.reduce((a, b) => a + b) / samples.length).round();
 
+  // (#) Highest bpm seen this session, or null if nothing was read.
   @override
   int? get maxHeartRate =>
       samples.isEmpty ? null : samples.reduce((a, b) => a > b ? a : b);
 
-  /// Parses a GATT Heart Rate Measurement (0x2A37) packet. Flags bit 0
-  /// selects the value width: 0 → uint8 at byte 1, 1 → uint16 LE at bytes
-  /// 1–2. Returns null for malformed packets. Pure — unit-tested.
+  // (#) Decodes one raw GATT bpm packet. The first flag bit says whether the
+  // (#) value is one byte or two. Returns null for a broken packet. Unit tested.
   static int? parseHeartRate(List<int> data) {
     if (data.isEmpty) return null;
     final flags = data[0];
@@ -54,6 +54,8 @@ class BleHeartRateSource implements HrSource {
     return data[1];
   }
 
+  // (#) Connects to the strap, finds the heart-rate service, and starts
+  // (#) collecting each bpm reading as it arrives.
   @override
   Future<void> start() async {
     final device = BluetoothDevice.fromId(remoteId);
@@ -80,6 +82,7 @@ class BleHeartRateSource implements HrSource {
     });
   }
 
+  // (#) Stops listening, disconnects the strap, and closes the stream.
   @override
   Future<void> stop() async {
     await _hrSub?.cancel();
@@ -90,17 +93,17 @@ class BleHeartRateSource implements HrSource {
   }
 }
 
-/// A device found by a real BLE scan (the pairing sheet's live section).
+// (#) A nearby heart-rate device that a live scan turned up, shown in the pairing sheet.
 class ScannedBleDevice {
+  // (#) Holds one found device's Bluetooth id and display name.
   const ScannedBleDevice({required this.remoteId, required this.name});
 
-  final String remoteId;
-  final String name;
+  final String remoteId; // (#) the device's Bluetooth id
+  final String name; // (#) the name to show in the list
 }
 
-/// Scans for nearby devices advertising the Heart Rate service. Returns []
-/// wherever Bluetooth is unavailable (simulator, permission denied, adapter
-/// off) so the pairing sheet can fall back to the demo device list.
+// (#) Scans a few seconds for nearby heart-rate straps. Returns an empty list
+// (#) when Bluetooth is off or unavailable, so the sheet falls back to demo devices.
 Future<List<ScannedBleDevice>> scanForHeartRateDevices(
     {Duration timeout = const Duration(seconds: 4)}) async {
   try {

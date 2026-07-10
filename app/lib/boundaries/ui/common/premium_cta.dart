@@ -3,34 +3,31 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 
-/// Gold "go premium" call-to-action — solid [AppColors.premium] fill with ink
-/// text, as a pill (default) or full-width banner. Untappable when [onTap] is
-/// null (pure info banner).
+// (#) The gold "go Premium" button or banner used to nudge people to upgrade.
+// Draws as a pill by default or a full-width bar. Leave onTap null and it's just
+// an info banner you can't tap.
 class PremiumCta extends StatelessWidget {
   const PremiumCta(
-    this.text, {
+    this.text, { // (#) the label shown on the pill or banner
     super.key,
-    this.onTap,
-    this.icon,
-    this.fullWidth = false,
-    this.radius = 20,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    this.style,
+    this.onTap, // (#) what to do on tap, null makes it a plain banner
+    this.icon, // (#) optional small leading icon, like the star
+    this.fullWidth = false, // (#) stretch to fill the row as a bar
+    this.radius = 20, // (#) corner roundness
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // (#) inner spacing
+    this.style, // (#) override the text style, defaults to footnote ink bold
   });
 
   final String text;
   final VoidCallback? onTap;
-
-  /// Small leading icon (the Profile pill's star).
   final IconData? icon;
-
   final bool fullWidth;
   final double radius;
   final EdgeInsetsGeometry padding;
-
-  /// Defaults to footnote · ink · w700.
   final TextStyle? style;
 
+  // (#) Builds the CTA: gold rounded box holding the text (and icon if given),
+  // wrapped in a tap handler only when onTap was provided.
   @override
   Widget build(BuildContext context) {
     final textWidget = Text(

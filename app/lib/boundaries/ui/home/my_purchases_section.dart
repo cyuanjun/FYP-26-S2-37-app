@@ -9,12 +9,14 @@ import '../common/app_card.dart';
 import '../common/status_badge.dart';
 import '../experts/service_detail_screen.dart';
 
-/// BOUNDARY widget — the Dashboard "MY PURCHASES" strip (#5): the user's
-/// service requests, newest first, linking back to each service (#6.2).
-/// Renders nothing when the user has never requested a service.
+// (#) The "My Purchases" strip on the dashboard. Lists the user's expert-service
+// requests, newest first, each tapping through to its service. Draws nothing
+// when they've never bought anything. Reads via the ServiceRequests control.
 class MyPurchasesSection extends ConsumerWidget {
   const MyPurchasesSection({super.key});
 
+  // (#) Builds the strip: a heading plus one tappable card per purchase, with
+  // the service name, expert, date, price and a status badge.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final requests = ref.watch(myServiceRequestsProvider).value ?? [];

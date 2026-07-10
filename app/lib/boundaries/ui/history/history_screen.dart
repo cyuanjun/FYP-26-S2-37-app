@@ -19,34 +19,40 @@ import '../premium/upgrade_screen.dart';
 import 'advanced_analytics_screen.dart';
 import '../workout/history_detail_screen.dart';
 
+// (#) The three time buckets the basic analytics can show.
 enum _Period { day, week, month }
 
+// (#) Month names indexed 1 to 12, with a blank at slot 0 so the month number lines up.
 const _monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
 
-/// BOUNDARY (#12 History). Basic Workout Analytics (Day/Week/Month) + the
-/// "View Workout History" list grouped by relative week. Matches TDM activity
-/// diagram: History → analytics + history list → completed-workout details.
+// (#) History screen. Shows the basic Day/Week/Month analytics plus the list of past workouts grouped
+// (#) by week, and an AI summary sheet. Free members hit the upgrade prompts here; it only talks to controls.
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
+  // (#) Makes the state that keeps the picked period and the search text.
   @override
   ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
 }
 
+// (#) Live state for the history screen: the current period pill and the search box.
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
-  _Period _period = _Period.week;
-  final _search = TextEditingController();
+  _Period _period = _Period.week; // (#) which analytics period is selected
+  final _search = TextEditingController(); // (#) the Premium search text
 
+  // (#) Frees the search box when the screen closes.
   @override
   void dispose() {
     _search.dispose();
     super.dispose();
   }
 
+  // (#) Pushes the Premium upgrade screen.
   void _goUpgrade() => Navigator.of(context, rootNavigator: true)
       .push(MaterialPageRoute(builder: (_) => const UpgradeScreen()));
 
+  // (#) Opens a bottom sheet that watches the SummariseProgress control and shows the AI summary text.
   void _showAiSummary() {
     showModalBottomSheet<void>(
       context: context,
@@ -89,6 +95,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
+  // (#) Reads the history and lays out search, the analytics card, and the grouped workout list, with empty and cap states.
   @override
   Widget build(BuildContext context) {
     final history = ref.watch(historyProvider);
@@ -210,6 +217,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   // ---- Search (Premium = live filter · Free = locked pill → #16) ----
+  // (#) The live search box Premium members type into to filter their history.
   Widget _searchField() {
     return TextField(
       controller: _search,
@@ -227,6 +235,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
+  // (#) The locked search pill Free members see, tapping it nudges them to upgrade.
   Widget _searchLockedPill() {
     return GestureDetector(
       onTap: _goUpgrade, // point-of-friction upsell (#12 spec)
@@ -249,6 +258,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   // ---- Basic Workout Analytics card ----
+  // (#) The stats card: period pills, this-window totals with deltas versus the prior window, and a Free upsell.
   Widget _analyticsCard(List<WorkoutSession> all, bool isPremium) {
     final now = DateTime.now();
     final (curWin, priorWin) = _windows(_period, now);
@@ -319,6 +329,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   // ---- Session list grouped by relative week ----
+  // (#) Splits the sessions into This week, Last week and Earlier, then builds a header and cards for each group.
   List<Widget> _buildGroups(List<WorkoutSession> sessions, Map<String, WorkoutType> typeById) {
     final now = DateTime.now();
     final thisWeek = startOfWeek(now);
@@ -356,6 +367,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     return widgets;
   }
 
+  // (#) The banner reminding Free members their history only covers this month, with an upgrade button.
   Widget _capBanner(int visible) {
     final now = DateTime.now();
     return Container(
@@ -393,6 +405,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   // ---- analytics helpers ----
+  // (#) Works out the current and prior date ranges for the picked period.
   (DateTimeRange, DateTimeRange) _windows(_Period p, DateTime now) {
     switch (p) {
       case _Period.day:
@@ -415,11 +428,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     }
   }
 
+  // (#) True when a session's end time falls inside the given range.
   bool _inWindow(WorkoutSession s, DateTimeRange w) {
     final when = (s.endedAt ?? s.startedAt).toLocal();
     return !when.isBefore(w.start) && when.isBefore(w.end);
   }
 
+  // (#) Rolls up a set of sessions into totals: count, minutes, calories, and duration-weighted avg and max HR.
   _Agg _aggregate(Iterable<WorkoutSession> s) {
     int sessions = 0, activeMin = 0, calories = 0, hrWeight = 0, hrDur = 0, maxHr = 0;
     bool anyHr = false, anyMax = false;
@@ -442,8 +457,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 }
 
+// (#) Small holder for one window's rolled-up numbers.
 class _Agg {
   const _Agg(this.sessions, this.activeMin, this.calories, this.avgHr, this.maxHr);
-  final int sessions, activeMin, calories;
-  final int? avgHr, maxHr;
+  final int sessions, activeMin, calories; // (#) session count, active minutes and calories
+  final int? avgHr, maxHr; // (#) average and max heart rate, null when there's no HR data
 }

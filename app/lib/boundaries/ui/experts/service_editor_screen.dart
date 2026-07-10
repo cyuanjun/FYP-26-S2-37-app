@@ -12,45 +12,46 @@ import '../../../entities/expert_service.dart';
 import '../common/field_label.dart';
 import '../common/selector_pills.dart';
 
-/// BOUNDARY (#21.2 Create / Edit Service). The expert's listing editor —
-/// create when [existing] is null, edit otherwise. Status (draft / live /
-/// archived) is part of the form; saving live publishes straight to the
-/// client marketplace (#6).
+// (#) The expert's create-or-edit listing form. Fill in name, price, category and the rest, then save
+// (#) runs the PublishService control. New when nothing is passed in, edit when an existing service is.
 class ServiceEditorScreen extends ConsumerStatefulWidget {
   const ServiceEditorScreen({super.key, this.existing});
 
-  final ExpertService? existing;
+  final ExpertService? existing; // (#) the service being edited, null means create a new one
 
+  // (#) Makes the state that holds all the form fields.
   @override
   ConsumerState<ServiceEditorScreen> createState() =>
       _ServiceEditorScreenState();
 }
 
+// (#) Live state for the editor: every field prefilled from the existing service or left at a default.
 class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
-  late final _name = TextEditingController(text: widget.existing?.name ?? '');
+  late final _name = TextEditingController(text: widget.existing?.name ?? ''); // (#) service name
   late final _description =
-      TextEditingController(text: widget.existing?.description ?? '');
+      TextEditingController(text: widget.existing?.description ?? ''); // (#) short description
   late final _price = TextEditingController(
       text: widget.existing == null
           ? ''
           : (widget.existing!.priceCents / 100).toStringAsFixed(
-              widget.existing!.priceCents % 100 == 0 ? 0 : 2));
+              widget.existing!.priceCents % 100 == 0 ? 0 : 2)); // (#) price in dollars
   late final _durationWeeks = TextEditingController(
-      text: widget.existing?.durationWeeks?.toString() ?? '');
+      text: widget.existing?.durationWeeks?.toString() ?? ''); // (#) optional length in weeks
   late final _bullets =
-      TextEditingController(text: (widget.existing?.detailBullets ?? []).join('\n'));
+      TextEditingController(text: (widget.existing?.detailBullets ?? []).join('\n')); // (#) what's included, one per line
 
-  late String? _category = widget.existing?.category;
+  late String? _category = widget.existing?.category; // (#) chosen category id
   late FulfillmentType _fulfillment =
-      widget.existing?.fulfillment ?? FulfillmentType.coaching;
+      widget.existing?.fulfillment ?? FulfillmentType.coaching; // (#) how the service is delivered
   late PricingModel _pricingModel =
-      widget.existing?.pricingModel ?? PricingModel.oneTime;
+      widget.existing?.pricingModel ?? PricingModel.oneTime; // (#) one-time or monthly billing
   late ResponseTime _responseTime =
-      widget.existing?.responseTime ?? ResponseTime.h48;
-  late ServiceStatus _status = widget.existing?.status ?? ServiceStatus.live;
-  late bool _acceptingBookings = widget.existing?.acceptingBookings ?? true;
-  bool _busy = false;
+      widget.existing?.responseTime ?? ResponseTime.h48; // (#) promised reply window
+  late ServiceStatus _status = widget.existing?.status ?? ServiceStatus.live; // (#) draft, live or archived
+  late bool _acceptingBookings = widget.existing?.acceptingBookings ?? true; // (#) whether new bookings are open
+  bool _busy = false; // (#) true while the save is running
 
+  // (#) Frees all the text boxes when the screen closes.
   @override
   void dispose() {
     _name.dispose();
@@ -61,11 +62,13 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
     super.dispose();
   }
 
+  // (#) True when the name is filled, a category is picked and the price parses to zero or more.
   bool get _valid =>
       _name.text.isNotBlank &&
       _category != null &&
       (double.tryParse(_price.text.trim()) ?? -1) >= 0;
 
+  // (#) Builds an ExpertService from the fields and calls PublishService, then pops with a snackbar or shows the error.
   Future<void> _save() async {
     final me = ref.read(currentUserIdProvider);
     if (me == null || !_valid) return;
@@ -107,6 +110,7 @@ class _ServiceEditorScreenState extends ConsumerState<ServiceEditorScreen> {
     }
   }
 
+  // (#) Lays out the whole editor form: name, description, category, fulfillment, price, billing, status and SAVE.
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(expertCategoriesProvider).value ?? [];

@@ -3,21 +3,22 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 
-/// BOUNDARY — shared body for bottom-nav tabs whose feature is scoped to a
-/// later sprint (Experts #6, Social #11). Keeps the 5-tab nav matching the
-/// spec while the slice only implements Home / Train / History flows.
+// (#) Placeholder screen for a tab whose feature isn't built yet. Just an icon,
+// a "coming later" line and a short blurb, so the nav bar can still show every
+// tab while the actual feature waits for a later sprint.
 class LaterSprintTab extends StatelessWidget {
   const LaterSprintTab({
     super.key,
-    required this.title,
-    required this.icon,
-    required this.blurb,
+    required this.title, // (#) the tab name shown in the app bar
+    required this.icon, // (#) the big circle icon in the middle
+    required this.blurb, // (#) one line describing what's coming
   });
 
   final String title;
   final IconData icon;
   final String blurb;
 
+  // (#) Builds the placeholder: centred icon, the coming soon caption and the blurb.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

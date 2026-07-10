@@ -10,16 +10,20 @@ import '../../../entities/enums.dart';
 import '../common/app_card.dart';
 import 'profile_widgets.dart';
 
-/// BOUNDARY (#13.3 Account Settings). Account-level data only — fitness data
-/// lives on #13.1 by design. Inline commits (no save button).
+// (#) Account settings screen. Handles account-level bits only: name, username,
+// email, unit preference and change password. Fitness stuff lives elsewhere.
+// Edits commit right away through the UpdateAccountSettings control.
 class AccountSettingsScreen extends ConsumerWidget {
   const AccountSettingsScreen({super.key});
 
+  // (#) Pops a "coming later" snackbar for edits that aren't wired up yet.
   void _soon(BuildContext context, String what) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text('$what arrives in a later sprint.')));
   }
 
+  // (#) Builds the screen: personal info rows, the units toggle, and the
+  // change-password button that emails a reset link.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider).value;
@@ -100,14 +104,16 @@ class AccountSettingsScreen extends ConsumerWidget {
   }
 }
 
+// (#) Small two-option pill toggle, used here for metric vs imperial.
 class _Segmented extends StatelessWidget {
   const _Segmented(
       {required this.options, required this.selectedIndex, required this.onChanged});
 
-  final List<String> options;
-  final int selectedIndex;
-  final ValueChanged<int> onChanged;
+  final List<String> options; // (#) the labels to show, one per segment
+  final int selectedIndex; // (#) which segment is currently active
+  final ValueChanged<int> onChanged; // (#) called with the tapped segment's index
 
+  // (#) Builds the row of pills, highlighting the selected one.
   @override
   Widget build(BuildContext context) {
     return AppCard(

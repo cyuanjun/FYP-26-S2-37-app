@@ -5,11 +5,14 @@ import '../../../controls/authenticate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../profile/profile_screen.dart';
 
-/// BOUNDARY — the top-right circular avatar on tab landings; the canonical
-/// entry to Profile (#13), which is deliberately not a bottom-nav tab.
+// (#) The small round avatar in the top-right corner of the tab screens. Tap it
+// to open Profile. Shows the user's photo when they have one, otherwise the
+// first letter of their name. This is the main way into Profile.
 class AvatarButton extends ConsumerWidget {
   const AvatarButton({super.key});
 
+  // (#) Builds the avatar: reads the current profile, works out the fallback
+  // initial, and draws a circle with the photo or that letter, tappable to Profile.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider).value;

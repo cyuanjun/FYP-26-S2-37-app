@@ -7,14 +7,15 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/public_profile.dart';
 import 'user_profile_screen.dart';
 
-/// BOUNDARY widget — one user in search results / friends list: identity +
-/// the action-first **Add Friend / Unfriend** toggle (the label says what
-/// tapping does — project convention).
+// (#) One user in a search list or the friends sheet. Shows their avatar and
+// (#) name and carries the Add Friend / Unfriend toggle wired to the friend
+// (#) control. Tapping the row opens their profile.
 class UserRow extends ConsumerWidget {
   const UserRow({super.key, required this.user});
 
-  final PublicProfile user;
+  final PublicProfile user; // (#) the user this row represents
 
+  // (#) Builds the tappable identity block plus the follow/unfollow button.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isFriend = ref.watch(isFriendProvider(user.id)).value ?? false;

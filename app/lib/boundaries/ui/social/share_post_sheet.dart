@@ -8,8 +8,9 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/feed_post.dart';
 
-/// Share-post sheet (#11) — the four named platforms (a grading requirement),
-/// reusing the same ShareWorkoutToSocial control as the workout summary.
+// (#) Opens the bottom sheet for sharing a post out. Lists the four named
+// (#) platforms and, when one is tapped, sends the text through the
+// (#) ShareWorkoutToSocial control, the same one the workout summary uses.
 void showSharePostSheet(BuildContext context, FeedPost feedPost) {
   showModalBottomSheet<void>(
     context: context,
@@ -19,11 +20,13 @@ void showSharePostSheet(BuildContext context, FeedPost feedPost) {
   );
 }
 
+// (#) The inner sheet body that lays out the platform buttons.
 class _SharePostSheet extends ConsumerWidget {
   const _SharePostSheet({required this.feedPost});
 
-  final FeedPost feedPost;
+  final FeedPost feedPost; // (#) the post being shared, used to build the share text
 
+  // (#) Builds the share message from the post: level-up, workout stats, or plain body.
   String _shareText() {
     final author = feedPost.author.displayName;
     final session = feedPost.session;
@@ -40,6 +43,7 @@ class _SharePostSheet extends ConsumerWidget {
     return feedPost.post.body ?? 'Shared from Wise Workout';
   }
 
+  // (#) Builds the SHARE TO label and a wrapped row of the four platform buttons.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(

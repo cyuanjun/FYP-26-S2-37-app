@@ -20,17 +20,19 @@ import 'notifications_screen.dart';
 import 'profile_widgets.dart';
 import 'submit_feedback_screen.dart';
 
-/// BOUNDARY (#13 Profile). The account hub — identity, level/XP, headline
-/// stats, and entry points to all account-level sub-screens. Reached from the
-/// top-right avatar on tab landings; deliberately not a bottom-nav tab.
+// (#) Profile screen, the account hub. Shows who you are, your level and XP,
+// headline stats, and links out to every account sub-screen. Also handles the
+// avatar upload and log-out through controls. Opened from the top-right avatar.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
+  // (#) Pushes a sub-screen onto the navigator.
   void _push(BuildContext context, Widget screen) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
   }
 
-  /// Gallery pick → UpdateAvatar control (resize keeps uploads small).
+  // (#) Picks a photo from the gallery, shrinks it, and sends it to the
+  // UpdateAvatar control, with a snackbar for success or failure.
   Future<void> _pickAvatar(BuildContext context, WidgetRef ref) async {
     final picked = await ImagePicker().pickImage(
         source: ImageSource.gallery,
@@ -53,6 +55,8 @@ class ProfileScreen extends ConsumerWidget {
     }
   }
 
+  // (#) Builds the screen: avatar and name, level bar, stats row, the menu of
+  // sub-screens, and the log out button.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider).value;
@@ -209,19 +213,23 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
+  // (#) One value-over-label stat tile for the stats row.
   Widget _stat(String value, String label) => StatTile(label, value,
       valueFirst: true,
       valueStyle: AppTypography.title1.copyWith(fontWeight: FontWeight.w900),
       labelStyle: AppTypography.caption2.copyWith(letterSpacing: 1.2));
 
+  // (#) A thin vertical rule between stats.
   Widget _divider() => Container(width: 1, height: 40, color: AppColors.faint);
 }
 
+// (#) The level and XP progress bar shown near the top of the profile.
 class _LevelBar extends StatelessWidget {
   const _LevelBar({required this.fitness});
 
-  final FitnessProfile fitness;
+  final FitnessProfile fitness; // (#) the profile we read level and XP from
 
+  // (#) Builds the "LEVEL n" row and the XP progress bar under it.
   @override
   Widget build(BuildContext context) {
     final progress = fitness.xpIntoLevel / FitnessProfile.xpPerLevel;

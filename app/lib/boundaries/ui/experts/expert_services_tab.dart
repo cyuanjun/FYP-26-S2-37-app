@@ -10,12 +10,12 @@ import '../common/app_card.dart';
 import '../common/status_badge.dart';
 import 'service_editor_screen.dart';
 
-/// BOUNDARY (#21 Expert Services). The expert's own listings, including
-/// drafts/archived (owner-visible via RLS). Tap a card to edit (#21.2);
-/// the + action creates a new listing.
+// (#) The expert's own service listings, drafts and archived included. Tap a card to edit it, or the
+// (#) plus to add one. Listings come from a control and the editor screen handles changes.
 class ExpertServicesTab extends ConsumerWidget {
   const ExpertServicesTab({super.key});
 
+  // (#) Reads the expert's listings and shows each as a card, with a + in the bar to make a new one.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(currentUserIdProvider);

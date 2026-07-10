@@ -8,23 +8,26 @@ import '../common/avatar_button.dart';
 import 'expert_card.dart';
 import 'service_card.dart';
 
-/// BOUNDARY (#6 Experts). The client marketplace directory — Experts /
-/// Service Listings sub-tabs over a shared search + category filter.
-/// (Expert accounts never see this tab — they get their own shell, #20–#24.)
+// (#) The client-facing expert marketplace. Experts and Service Listings sub-tabs over a search box
+// (#) and category chips. Filtering happens here, the lists come from controls, cards open detail screens.
 class ExpertsTab extends ConsumerStatefulWidget {
   const ExpertsTab({super.key});
 
+  // (#) Makes the state that tracks which sub-tab, the search text and the picked category.
   @override
   ConsumerState<ExpertsTab> createState() => _ExpertsTabState();
 }
 
+// (#) The two sub-tabs the marketplace can show.
 enum _ExpertsSubTab { experts, services }
 
+// (#) Live state for the marketplace: current sub-tab, search query and category filter.
 class _ExpertsTabState extends ConsumerState<ExpertsTab> {
-  _ExpertsSubTab _tab = _ExpertsSubTab.experts;
-  String _query = '';
-  String? _category; // null = All
+  _ExpertsSubTab _tab = _ExpertsSubTab.experts; // (#) which sub-tab is showing
+  String _query = ''; // (#) what's typed in the search box
+  String? _category; // (#) picked category, null means All
 
+  // (#) Builds the scaffold with an EXPERTS title, an avatar button, and the browse body.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,6 +41,7 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
     );
   }
 
+  // (#) The browse layout: sub-tab pills, search field, category chips, and the matching list below.
   Widget _browse() {
     final categories = ref.watch(expertCategoriesProvider).value ?? [];
 
@@ -88,6 +92,7 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
     );
   }
 
+  // (#) The little header above a list showing the result count and a fixed sort label.
   Widget _resultsHeader(int n) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
         child: Row(
@@ -100,6 +105,7 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
         ),
       );
 
+  // (#) Watches the experts, filters by query and category, and shows them as ExpertCards.
   Widget _expertsList() {
     final experts = ref.watch(expertsProvider);
     return experts.when(
@@ -134,6 +140,7 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
     );
   }
 
+  // (#) Watches the service listings, filters them the same way, and shows them as ServiceCards.
   Widget _servicesList() {
     final listings = ref.watch(serviceListingsProvider);
     return listings.when(
@@ -169,6 +176,7 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
     );
   }
 
+  // (#) One sub-tab pill that switches the tab when tapped and highlights when it's the current one.
   Widget _pill(String label, _ExpertsSubTab value) {
     final selected = _tab == value;
     return GestureDetector(
@@ -188,6 +196,7 @@ class _ExpertsTabState extends ConsumerState<ExpertsTab> {
     );
   }
 
+  // (#) One category chip that sets the filter when tapped and highlights the selected category.
   Widget _chip(String label, String? id) {
     final selected = _category == id;
     return Padding(

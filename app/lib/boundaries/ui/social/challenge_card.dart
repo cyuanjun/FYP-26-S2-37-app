@@ -8,14 +8,15 @@ import '../../../entities/challenge_summary.dart';
 import '../common/app_card.dart';
 import 'challenge_detail_screen.dart';
 
-/// BOUNDARY widget — one challenge card (#11 Challenges): window + joined
-/// count, accumulator progress bar, and a top-3(+you) leaderboard preview.
-/// Whole card taps to #11.3.
+// (#) One challenge's card in the list. Shows the time window, how many joined,
+// (#) a progress bar and a small leaderboard preview. Tapping anywhere on it
+// (#) opens the challenge detail screen.
 class ChallengeCard extends ConsumerWidget {
   const ChallengeCard({super.key, required this.summary});
 
-  final ChallengeSummary summary;
+  final ChallengeSummary summary; // (#) the challenge plus its standings and my progress
 
+  // (#) Builds the card: header row, name, description, progress bar and top-3 preview.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(currentUserIdProvider);
@@ -78,6 +79,7 @@ class ChallengeCard extends ConsumerWidget {
     );
   }
 
+  // (#) Builds the accumulator bar showing my value against the target.
   Widget _progressBar() {
     final c = summary.challenge;
     final progress = summary.progressToTarget();
@@ -102,6 +104,7 @@ class ChallengeCard extends ConsumerWidget {
     );
   }
 
+  // (#) Builds one leaderboard line: medal or rank number, name, and value.
   Widget _standingRow(ChallengeStanding s, {required bool isMe}) {
     final medal = switch (s.rank) {
       1 => '🥇',

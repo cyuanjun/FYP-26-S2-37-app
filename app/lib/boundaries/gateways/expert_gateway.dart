@@ -11,18 +11,20 @@ import '../../entities/public_profile.dart';
 import '../../entities/service_request.dart';
 import '../../entities/service_request_summary.dart';
 
-/// BOUNDARY (gateway) — the expert marketplace (#6 cluster): directory reads
-/// through `public_profiles`, service requests, deliverables, and the
-/// SECURITY DEFINER transition/review RPCs. Payment is simulated — prices are
-/// display figures only.
+// (#) The whole expert marketplace side of Supabase: the expert directory,
+// (#) service listings, requests, deliverables, and the review RPCs. Controls use
+// (#) it to browse experts and run an engagement start to finish. Payment is faked.
 class ExpertGateway {
+  // (#) Keeps the Supabase client used across all marketplace calls.
   ExpertGateway(this._client);
 
-  final SupabaseClient _client;
+  final SupabaseClient _client; // (#) the Supabase client for every query here
 
+  // (#) The safe public columns to pull when embedding a person's identity.
   static const _identitySelect =
       'id, first_name, last_name, username, avatar_url, level, bio';
 
+  // (#) Lists the active expert categories, A to Z, for the browse filters.
   Future<List<ExpertCategory>> listCategories() async {
     final rows = await _client
         .from('expert_categories')
@@ -32,8 +34,8 @@ class ExpertGateway {
     return rows.map(ExpertCategory.fromJson).toList();
   }
 
-  /// Every expert with identity + their services (RLS trims embedded services
-  /// to `live` for everyone but the owning expert). Top-rated first.
+  // (#) Loads every expert with their identity and services, best-rated first.
+  // (#) RLS only shows live services to anyone but the expert who owns them.
   Future<List<ExpertSummary>> listExperts() async {
     final rows = await _client
         .from('expert_profiles')
@@ -52,7 +54,7 @@ class ExpertGateway {
         .toList();
   }
 
-  /// All live services + who offers them. Cheapest first.
+  // (#) Loads every live service plus who offers it, cheapest first.
   Future<List<ServiceListing>> listServices() async {
     final rows = await _client
         .from('expert_services')
@@ -72,11 +74,13 @@ class ExpertGateway {
     }).toList();
   }
 
+  // (#) The embedded columns to pull with each request: its service,
+  // (#) deliverables, and whether a review exists.
   static const _requestSelect = '*, '
       'service:expert_services!service_requests_expert_service_id_fkey(*), '
       'deliverables(*), reviews:expert_reviews(id)';
 
-  /// The client's engagements, newest first (MY PURCHASES + #6.2 footer).
+  // (#) Lists the requests a user has bought, newest first, for MY PURCHASES.
   Future<List<ServiceRequestSummary>> listMyRequests(String userId) async {
     final rows = await _client
         .from('service_requests')
@@ -87,7 +91,7 @@ class ExpertGateway {
     return rows.map(_summaryFromRow).toList();
   }
 
-  /// The expert's inbox, newest first.
+  // (#) Lists the requests coming in to an expert, newest first, for their inbox.
   Future<List<ServiceRequestSummary>> listIncomingRequests(
       String expertId) async {
     final rows = await _client
@@ -99,6 +103,8 @@ class ExpertGateway {
     return rows.map(_summaryFromRow).toList();
   }
 
+  // (#) Builds a request summary from one embedded row, folding in its service,
+  // (#) the other party, deliverables, and whether it has been reviewed.
   ServiceRequestSummary _summaryFromRow(Map<String, dynamic> r) {
     // expert_reviews.service_request_id is UNIQUE, so PostgREST embeds the
     // review one-to-one: a single object (or null), not a list.
@@ -118,7 +124,8 @@ class ExpertGateway {
     );
   }
 
-  /// Insert with the price snapshotted from the service (simulated payment).
+  // (#) Places a new request, copying the service's current price onto it as the
+  // (#) quote. Payment is simulated so this is just a row insert.
   Future<void> createRequest({
     required String userId,
     required ExpertService service,
@@ -132,17 +139,22 @@ class ExpertGateway {
         'request_message': message.trim(),
       });
 
-  // Status transitions + review go through the SECURITY DEFINER RPCs — direct
-  // table writes are revoked (20260707090000).
+  // (#) Status changes and reviews all go through server-side RPCs, since direct
+  // (#) table writes for these are blocked.
+
+  // (#) Expert accepts a request via the accept_service_request RPC.
   Future<void> acceptRequest(String requestId) =>
       _client.rpc('accept_service_request', params: {'p_request': requestId});
 
+  // (#) Expert turns a request down via the decline_service_request RPC.
   Future<void> declineRequest(String requestId) =>
       _client.rpc('decline_service_request', params: {'p_request': requestId});
 
+  // (#) Marks a request finished via the complete_service_request RPC.
   Future<void> completeRequest(String requestId) =>
       _client.rpc('complete_service_request', params: {'p_request': requestId});
 
+  // (#) Client leaves a star rating and comment via the submit_expert_review RPC.
   Future<void> submitReview({
     required String requestId,
     required int rating,
@@ -154,8 +166,8 @@ class ExpertGateway {
         'p_body': body,
       });
 
-  /// Plain insert — the deliverables RLS policy already restricts writes to
-  /// the engagement's expert.
+  // (#) Expert delivers the finished work as a deliverable row. RLS already
+  // (#) makes sure only that engagement's expert can write it.
   Future<void> sendDeliverable({
     required String requestId,
     required String title,
@@ -169,18 +181,18 @@ class ExpertGateway {
         'sections': sections.map((s) => s.toJson()).toList(),
       });
 
-  /// #21.2 create — the expert's own listing (RLS with-check pins
-  /// expert_user_id to the caller). Status is chosen in the editor
-  /// (save as draft / publish live).
+  // (#) Creates a new service listing owned by the expert. RLS pins it to them,
+  // (#) and the editor decides whether it starts as a draft or goes live.
   Future<void> createService(ExpertService service) =>
       _client.from('expert_services').insert(_servicePayload(service));
 
-  /// #21.2 edit — full-row update of the expert's own listing.
+  // (#) Saves edits to the expert's own service listing, whole row at once.
   Future<void> updateService(ExpertService service) => _client
       .from('expert_services')
       .update(_servicePayload(service))
       .eq('id', service.id);
 
+  // (#) Turns a service object into the column map used for insert and update.
   Map<String, dynamic> _servicePayload(ExpertService s) => {
         'expert_user_id': s.expertUserId,
         'status': s.status.name,
@@ -196,8 +208,8 @@ class ExpertGateway {
         'response_time': s.responseTime.dbValue,
       };
 
-  /// #24.1 — the self-descriptive columns only; aggregates + verification are
-  /// column-revoked (20260708100000) and change solely via the RPCs.
+  // (#) Saves an expert's editable bio fields. Rating and verification columns
+  // (#) are locked off and only ever change through the RPCs.
   Future<void> updateExpertProfile(
     String id, {
     required String title,
@@ -214,13 +226,13 @@ class ExpertGateway {
         'specialties': specialties,
       }).eq('id', id);
 
-  /// Follow-heart bookmark: read-modify-write of the caller's own profile row
-  /// (the privileged-column guard only watches role/status).
+  // (#) Saves the user's list of hearted experts back onto their own profile row.
   Future<void> setFollowedExperts(String userId, List<String> expertIds) =>
       _client
           .from('profiles')
           .update({'followed_expert_ids': expertIds}).eq('id', userId);
 }
 
+// (#) Riverpod provider handing out the expert gateway on the live client.
 final expertGatewayProvider =
     Provider<ExpertGateway>((ref) => ExpertGateway(Supabase.instance.client));

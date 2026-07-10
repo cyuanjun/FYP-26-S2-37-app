@@ -14,12 +14,12 @@ import '../profile/profile_widgets.dart';
 import '../profile/submit_feedback_screen.dart';
 import 'professional_info_screen.dart';
 
-/// BOUNDARY (#24 Expert Profile). The expert's own professional identity:
-/// what clients see (title, verification, credentials, specialties, stats),
-/// plus account-level actions and the #24.1 professional-info editor.
+// (#) The expert's own profile tab. Shows what clients see plus account actions. Editing pro info,
+// (#) settings and log out each open a screen or call a control.
 class ExpertProfileTab extends ConsumerWidget {
   const ExpertProfileTab({super.key});
 
+  // (#) Reads the expert's own summary and lays out avatar, stats, about, credentials, menu rows and log out.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(currentUserIdProvider);

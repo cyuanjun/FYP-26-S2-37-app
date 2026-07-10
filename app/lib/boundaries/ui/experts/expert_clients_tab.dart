@@ -10,13 +10,11 @@ import '../common/app_card.dart';
 import '../common/status_badge.dart';
 import 'expert_client_detail_screen.dart';
 
-/// BOUNDARY (#23 Expert Clients). Everyone who has engaged this expert,
-/// split Active/Past per the fulfillment model. Tapping a client opens
-/// #23.1 Client Detail, where deliverables are sent and engagements
-/// marked complete.
+// (#) The expert's list of clients, split into active and past. Tapping a client opens their detail page.
 class ExpertClientsTab extends ConsumerWidget {
   const ExpertClientsTab({super.key});
 
+  // (#) Reads incoming requests, groups them by client, then lists active clients above past ones.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final requests = ref.watch(incomingRequestsProvider).value ?? [];
@@ -72,6 +70,7 @@ class ExpertClientsTab extends ConsumerWidget {
     );
   }
 
+  // (#) One row per client: avatar, name, engagement counts, an ACTIVE badge, and a chevron into detail.
   Widget _clientCard(BuildContext context, PublicProfile client,
       List<ServiceRequestSummary> engagements) {
     final active = engagements.where((e) => e.request.isAccepted).length;

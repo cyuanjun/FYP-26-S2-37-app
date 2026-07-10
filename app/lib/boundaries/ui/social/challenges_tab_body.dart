@@ -10,28 +10,33 @@ import 'challenge_card.dart';
 import 'challenge_detail_screen.dart';
 import 'create_challenge_sheet.dart';
 
+// (#) The three sub-tabs the challenge list can be filtered by.
 enum _ChallengeFilter { joined, active, past }
 
-/// BOUNDARY — the Challenges tab body (#11): create button + Joined/Active/
-/// Past sub-tabs over challenge cards. Partitioning uses the entity's window
-/// rules; invite-only challenges appear only once joined (approved trim).
+// (#) The Challenges tab contents. Has a join-by-code box, the Joined/Active/Past
+// (#) filters, and the list of challenge cards. Typing a code asks a control to
+// (#) look it up, and the plus button opens the create sheet.
 class ChallengesTabBody extends ConsumerStatefulWidget {
   const ChallengesTabBody({super.key});
 
+  // (#) Creates the state that tracks the current filter and the code field.
   @override
   ConsumerState<ChallengesTabBody> createState() => _ChallengesTabBodyState();
 }
 
+// (#) Holds the tab state: which filter is picked and the join-code text box.
 class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
-  _ChallengeFilter _filter = _ChallengeFilter.joined;
-  final _codeCtrl = TextEditingController();
+  _ChallengeFilter _filter = _ChallengeFilter.joined; // (#) which sub-tab is active
+  final _codeCtrl = TextEditingController(); // (#) text the user types as a join code
 
+  // (#) Frees the code text box when the tab is torn down.
   @override
   void dispose() {
     _codeCtrl.dispose();
     super.dispose();
   }
 
+  // (#) Filters the full challenge list down to just the rows the active tab shows.
   List<ChallengeSummary> _partition(List<ChallengeSummary> all) {
     final now = DateTime.now();
     return switch (_filter) {
@@ -46,8 +51,8 @@ class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
     };
   }
 
-  /// Resolve a typed join code → open the challenge detail so the user reviews
-  /// it before joining. Unknown code → inline error.
+  // (#) Looks up a typed join code and opens the challenge detail, or shows an
+  // (#) error snackbar if no challenge matches.
   Future<void> _resolveCode(String code) async {
     if (code.trim().isEmpty) return;
     final challenge = await ref.read(findChallengeByCodeProvider).call(code);
@@ -63,6 +68,7 @@ class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
         builder: (_) => ChallengeDetailScreen(challengeId: challenge.id)));
   }
 
+  // (#) The empty-state message that fits whichever filter has no results.
   String get _emptyCopy => switch (_filter) {
         _ChallengeFilter.joined =>
           "You haven't joined any challenges yet — browse Active to find one.",
@@ -70,6 +76,7 @@ class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
         _ChallengeFilter.past => 'No finished challenges yet.',
       };
 
+  // (#) Builds the code box, filter pills, create button and the card list.
   @override
   Widget build(BuildContext context) {
     final challenges = ref.watch(challengesProvider);
@@ -161,6 +168,7 @@ class _ChallengesTabBodyState extends ConsumerState<ChallengesTabBody> {
     );
   }
 
+  // (#) Builds one filter pill and highlights it when its tab is selected.
   Widget _pill(_ChallengeFilter f) {
     final selected = _filter == f;
     final label = switch (f) {

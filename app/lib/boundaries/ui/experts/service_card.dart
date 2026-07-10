@@ -8,13 +8,14 @@ import '../common/app_card.dart';
 import '../common/status_badge.dart';
 import 'service_detail_screen.dart';
 
-/// BOUNDARY widget — one Service Listings row (#6): category badge + price,
-/// name, description, and who offers it.
+// (#) One row in the Service Listings list. Category badge, price, name, blurb and who offers it.
+// (#) Tapping opens the service detail screen. Pure display, no data access of its own.
 class ServiceCard extends StatelessWidget {
   const ServiceCard({super.key, required this.listing});
 
-  final ServiceListing listing;
+  final ServiceListing listing; // (#) the service this card shows
 
+  // (#) Builds the card: badges and price row, service name, description, and the "By expert" line.
   @override
   Widget build(BuildContext context) {
     final service = listing.service;

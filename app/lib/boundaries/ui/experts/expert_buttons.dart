@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_typography.dart';
 
-/// Matched 44px single-line action pair for expert cards — same height/
-/// radius/type for the filled and outlined halves.
+// (#) Shared style for the filled half of the little action pair on expert cards, fixed 44px tall.
 final ButtonStyle expertCompactFilled = ElevatedButton.styleFrom(
   minimumSize: const Size(0, 44),
   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -11,6 +10,7 @@ final ButtonStyle expertCompactFilled = ElevatedButton.styleFrom(
   textStyle: AppTypography.footnote.copyWith(fontWeight: FontWeight.w700),
 );
 
+// (#) Matching outlined half in the colour you pass in, same height and shape as the filled one.
 ButtonStyle expertCompactOutlined(Color color) => OutlinedButton.styleFrom(
       foregroundColor: color,
       side: BorderSide(color: color),

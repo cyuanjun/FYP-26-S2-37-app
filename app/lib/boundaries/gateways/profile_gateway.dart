@@ -6,30 +6,31 @@ import '../../entities/profile.dart';
 import '../../entities/subscription.dart';
 import '../../core/strings.dart';
 
-/// BOUNDARY (gateway) — reads/writes the `profiles` table. Controls call this;
-/// the UI never queries Supabase directly.
+// (#) Reads and writes the profiles and subscriptions tables. Controls use it to
+// (#) load a user's profile, change their settings, and run the premium upgrade.
 class ProfileGateway {
+  // (#) Keeps the Supabase client used for all profile queries.
   ProfileGateway(this._client);
 
-  final SupabaseClient _client;
+  final SupabaseClient _client; // (#) the Supabase client for table calls
 
+  // (#) Loads a user's profile row by id.
   Future<Profile> fetchProfile(String id) async {
     final row = await _client.from('profiles').select().eq('id', id).single();
     return Profile.fromJson(row);
   }
 
-  /// Instant-commit preference toggle (#13.3 — no save button by design).
+  // (#) Saves the metric/imperial choice right away, no save button needed.
   Future<void> updatePreferredUnits(String id, PreferredUnits units) async {
     await _client.from('profiles').update({'preferred_units': units.name}).eq('id', id);
   }
 
-  /// Replaces the whole notification_prefs map (#13.4 — per-flip commit).
+  // (#) Overwrites the user's notification toggle settings as a whole map.
   Future<void> updateNotificationPrefs(String id, Map<String, dynamic> prefs) async {
     await _client.from('profiles').update({'notification_prefs': prefs}).eq('id', id);
   }
 
-  /// Fills in the user's name when the website signup didn't provide one
-  /// (onboarding fallback) — also backs future #13.3 name editing.
+  // (#) Sets the user's name, used when signup left it blank and for later editing.
   Future<void> updateName(String id, {required String firstName, String? lastName}) async {
     await _client.from('profiles').update({
       'first_name': firstName.trim(),
@@ -37,32 +38,32 @@ class ProfileGateway {
     }).eq('id', id);
   }
 
-  /// Simulated Free→Premium upgrade (#16) — the SECURITY DEFINER RPC flips the
-  /// role and upserts the subscriptions row; direct role writes stay blocked.
+  // (#) Runs the start_premium RPC to flip the user to Premium. Payment is
+  // (#) simulated, and the RPC is what changes the role since direct writes are blocked.
   Future<void> startPremium() async {
     await _client.rpc<void>('start_premium');
   }
 
-  /// The caller's subscription row, or null while Free (#13.6).
+  // (#) Loads the user's subscription row, or null while they are still Free.
   Future<Subscription?> fetchSubscription(String id) async {
     final row =
         await _client.from('subscriptions').select().eq('id', id).maybeSingle();
     return row == null ? null : Subscription.fromJson(row);
   }
 
-  /// Cancel / resume (#13.6) — owner-scoped status write, RLS-covered.
+  // (#) Cancels or resumes a subscription by writing its status.
   Future<void> setSubscriptionStatus(String id, SubscriptionStatus status) async {
     await _client
         .from('subscriptions')
         .update({'status': status.dbValue}).eq('id', id);
   }
 
-  /// Points the profile at a freshly uploaded avatar (public URL).
+  // (#) Saves the public URL of a newly uploaded avatar onto the profile.
   Future<void> updateAvatarUrl(String id, String url) async {
     await _client.from('profiles').update({'avatar_url': url}).eq('id', id);
   }
 
-  /// Marks first-time onboarding done — Splash/Login stop routing to the wizard.
+  // (#) Stamps onboarding as finished so the app stops sending the user to it.
   Future<void> completeOnboarding(String id) async {
     await _client
         .from('profiles')
@@ -71,6 +72,7 @@ class ProfileGateway {
   }
 }
 
+// (#) Riverpod provider handing out the profile gateway on the live client.
 final profileGatewayProvider = Provider<ProfileGateway>(
   (ref) => ProfileGateway(Supabase.instance.client),
 );

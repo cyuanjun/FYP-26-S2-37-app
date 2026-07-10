@@ -15,24 +15,27 @@ import 'author_row.dart';
 import 'share_post_sheet.dart';
 import 'user_profile_screen.dart';
 
-/// BOUNDARY (#11.1 Post Detail). A single polymorphic post in full: wrapped
-/// content, like toggle, flat comment thread (oldest first) and a pinned
-/// reply input. The owner gets an inline caption editor.
+// (#) A single post in full with its comments. You can like it, reply, and if
+// (#) it's yours edit the caption, each going through a control. The reply box
+// (#) is pinned at the bottom.
 class PostDetailScreen extends ConsumerStatefulWidget {
   const PostDetailScreen({super.key, required this.postId});
 
-  final String postId;
+  final String postId; // (#) id of the post to load and show
 
+  // (#) Creates the state that holds the reply and caption text boxes.
   @override
   ConsumerState<PostDetailScreen> createState() => _PostDetailScreenState();
 }
 
+// (#) Holds the detail screen's live state: the reply box, caption editor and flags.
 class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
-  final _reply = TextEditingController();
-  final _caption = TextEditingController();
-  bool _editingCaption = false;
-  bool _sending = false;
+  final _reply = TextEditingController(); // (#) text the user is typing as a comment
+  final _caption = TextEditingController(); // (#) text while editing your own caption
+  bool _editingCaption = false; // (#) true when the inline caption editor is open
+  bool _sending = false; // (#) true while a reply is being posted
 
+  // (#) Frees the reply and caption text boxes when the screen closes.
   @override
   void dispose() {
     _reply.dispose();
@@ -40,6 +43,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     super.dispose();
   }
 
+  // (#) Sends the typed comment through the add-comment control and clears the box.
   Future<void> _sendReply() async {
     if (_reply.text.trim().isEmpty || _sending) return;
     setState(() => _sending = true);
@@ -51,6 +55,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     setState(() => _sending = false);
   }
 
+  // (#) Saves the edited caption through the update-body control and closes the editor.
   Future<void> _saveCaption() async {
     await ref
         .read(updatePostBodyProvider)
@@ -58,6 +63,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     if (mounted) setState(() => _editingCaption = false);
   }
 
+  // (#) Builds the screen: the post card, the comment list and the pinned reply bar.
   @override
   Widget build(BuildContext context) {
     final me = ref.watch(currentUserIdProvider);
@@ -107,6 +113,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
+  // (#) Builds the main post card with the caption editor, content, like and share.
   Widget _postCard(FeedPost feedPost, {required bool isOwner}) {
     final post = feedPost.post;
     final types = ref.watch(workoutTypesProvider).value ?? [];
@@ -201,6 +208,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
+  // (#) Builds one comment card, with a delete button when the comment is yours.
   Widget _commentCard(PostComment c, {required String? me}) {
     return AppCard(
       margin: const EdgeInsets.only(bottom: 8),
@@ -234,6 +242,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
+  // (#) Builds the bottom-pinned comment input and its Post button.
   Widget _replyBar() {
     return SafeArea(
       child: Padding(

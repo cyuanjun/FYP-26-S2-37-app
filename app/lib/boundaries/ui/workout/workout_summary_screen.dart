@@ -13,8 +13,9 @@ import '../../../entities/workout_type.dart';
 import '../common/training_effect_card.dart';
 import '../common/stat_tile.dart';
 
-/// BOUNDARY (#10 Workout Summary). Post-session recap: stats + XP, name / feel /
-/// notes, and Share to Social (creates a workout_share Post + named-platform share).
+// (#) Post-workout summary screen. Shows stats and XP right after a session,
+// lets you name it, rate how it felt and add notes, and optionally share to the
+// feed and named platforms. Everything saves through the workout controls.
 class WorkoutSummaryScreen extends ConsumerStatefulWidget {
   const WorkoutSummaryScreen({
     super.key,
@@ -25,24 +26,27 @@ class WorkoutSummaryScreen extends ConsumerStatefulWidget {
     required this.result,
   });
 
-  final String sessionId;
-  final WorkoutType type;
-  final Duration elapsed;
-  final double distanceMeters;
-  final Map<String, dynamic> result;
+  final String sessionId; // (#) id of the finished session
+  final WorkoutType type; // (#) the activity that was recorded
+  final Duration elapsed; // (#) total time of the session
+  final double distanceMeters; // (#) distance covered, for cardio activities
+  final Map<String, dynamic> result; // (#) XP/streak/level payload from ending it
 
+  // (#) Creates the state holding the form and share toggle.
   @override
   ConsumerState<WorkoutSummaryScreen> createState() => _WorkoutSummaryScreenState();
 }
 
+// (#) Live state: the name/notes/caption fields, feel, and saving/share flags.
 class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
-  final _name = TextEditingController();
-  final _notes = TextEditingController();
-  final _caption = TextEditingController();
-  FeelRating? _feel;
-  bool _saving = false;
-  bool _share = false;
+  final _name = TextEditingController(); // (#) optional custom workout name
+  final _notes = TextEditingController(); // (#) private notes
+  final _caption = TextEditingController(); // (#) public caption when sharing
+  FeelRating? _feel; // (#) how the session felt
+  bool _saving = false; // (#) true while the save is running
+  bool _share = false; // (#) whether to post this session to the feed
 
+  // (#) Frees the three text controllers when the screen closes.
   @override
   void dispose() {
     _name.dispose();
@@ -51,6 +55,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     super.dispose();
   }
 
+  // (#) Builds the sentence used for the external named-platform shares.
   String _shareText() {
     final t = widget.type.name;
     final dur = fmtDuration(widget.elapsed);
@@ -59,6 +64,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
         : 'I just finished a $t workout — $dur on Wise Workout!';
   }
 
+  // (#) Saves name/feel/notes, posts a share to the feed if toggled, then pops.
   Future<void> _save() async {
     setState(() => _saving = true);
     await ref.read(saveWorkoutDetailsProvider).call(
@@ -77,6 +83,8 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     Navigator.of(context).pop(); // back to the app shell (Train tab)
   }
 
+  // (#) Builds the recap: XP and streak, stats grid, Training Effect, the
+  // name/feel/notes fields, the share section, and the save button.
   @override
   Widget build(BuildContext context) {
     final xp = widget.result['xp_gained'] ?? 0;
@@ -191,6 +199,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     );
   }
 
+  // (#) Maps a feel rating to its emoji and word.
   String _feelLabel(FeelRating f) => switch (f) {
         FeelRating.great => '🔥 Great',
         FeelRating.good => '💪 Good',

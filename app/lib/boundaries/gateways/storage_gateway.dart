@@ -3,17 +3,16 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// BOUNDARY (gateway) — Supabase Storage. First consumer: profile photos
-/// (public `avatars` bucket, one folder per user). Expert verification docs
-/// join later on a private bucket.
+// (#) Talks to Supabase Storage buckets. Right now controls use it to upload a
+// (#) user's avatar photo and hand back the public URL to save on their profile.
 class StorageGateway {
+  // (#) Keeps the Supabase client used to reach Storage.
   StorageGateway(this._client);
 
-  final SupabaseClient _client;
+  final SupabaseClient _client; // (#) the Supabase client for storage calls
 
-  /// Uploads (upserting) the user's avatar and returns its public URL with a
-  /// cache-busting version parameter, so a changed photo shows immediately
-  /// despite the stable object path.
+  // (#) Uploads the avatar (replacing any old one) and returns its public URL
+  // (#) with a version tag on the end so the new photo shows up right away.
   Future<String> uploadAvatar(
       {required String userId, required Uint8List bytes}) async {
     final path = '$userId/avatar.jpg';
@@ -28,5 +27,6 @@ class StorageGateway {
   }
 }
 
+// (#) Riverpod provider handing out the storage gateway on the live client.
 final storageGatewayProvider =
     Provider<StorageGateway>((ref) => StorageGateway(Supabase.instance.client));

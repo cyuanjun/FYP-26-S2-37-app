@@ -15,20 +15,25 @@ import '../common/premium_cta.dart';
 import '../premium/upgrade_screen.dart';
 import '../common/status_badge.dart';
 
-/// BOUNDARY (#8 Plan Detail). Read-only view of an active or saved plan:
-/// header + meta, week schedule, and active-plan actions.
+// (#) The plan detail screen. A read-only look at a plan: the header, the
+// week-by-week schedule, and on the active plan the regenerate and activate
+// buttons. Free members see the Premium upsell on the locked coaching detail.
 class PlanDetailScreen extends ConsumerStatefulWidget {
   const PlanDetailScreen({super.key, this.planId});
 
-  final String? planId;
+  final String? planId; // (#) which plan to show, null means the active one
 
+  // (#) Makes the state that remembers which week is being viewed.
   @override
   ConsumerState<PlanDetailScreen> createState() => _PlanDetailScreenState();
 }
 
+// (#) Holds the screen's state: which week of the plan the user is looking at.
 class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
   int? _selectedWeek; // null = current active week, or week 1 for inactive plans
 
+  // (#) Builds the screen: loads the plan and its workouts, then draws the
+  // header, the week selector, the selected week's schedule, and the actions.
   @override
   Widget build(BuildContext context) {
     final planAsync = widget.planId == null
@@ -197,7 +202,7 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
     );
   }
 
-  /// Week within the generated full timeline.
+  // (#) Works out which week of the plan we're currently in based on its start date.
   int _cycleWeek(FitnessPlan plan) {
     final started = plan.startedAt;
     if (!plan.isActive || started == null) return 1;
@@ -206,6 +211,8 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
         .toInt();
   }
 
+  // (#) One tappable row in the week schedule: the day, the workout name and its
+  // length. Today's row gets a green tint. Tapping opens the workout detail modal.
   Widget _scheduleRow(BuildContext context, PlannedWorkout w,
       Map<String, WorkoutType> byId,
       {required bool isToday, required int currentWeek, required bool isPremium}) {
@@ -241,6 +248,8 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
     );
   }
 
+  // (#) Pops up the workout detail dialog: the week/day, name, type and length,
+  // its descriptor, and for Free members the upsell for full coaching detail.
   void _showWorkoutModal(BuildContext context, PlannedWorkout w, WorkoutType? type,
       {required bool isToday, required int currentWeek, required bool isPremium}) {
     showDialog<void>(
@@ -304,12 +313,16 @@ class _PlanDetailScreenState extends ConsumerState<PlanDetailScreen> {
   }
 }
 
+// (#) The regenerate-plan control shown under the active plan. Free members get
+// one regeneration a month; once used it's blocked and swapped for an upsell.
 class _RegenerateLink extends ConsumerWidget {
   const _RegenerateLink({required this.plan, required this.isPremium});
 
-  final FitnessPlan plan;
-  final bool isPremium;
+  final FitnessPlan plan; // (#) the active plan being regenerated
+  final bool isPremium; // (#) Premium skips the monthly limit
 
+  // (#) Builds the button: checks whether Free's monthly regen is used up, then
+  // shows the button (with a confirm dialog) and the upsell when blocked.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final generating = ref.watch(generatePlanProvider).isLoading;
@@ -389,11 +402,15 @@ class _RegenerateLink extends ConsumerWidget {
   }
 }
 
+// (#) The sticky "use this plan" button shown on a saved (inactive) plan. Tap
+// it to make that plan the active one via the control.
 class _UsePlanButton extends ConsumerWidget {
   const _UsePlanButton({required this.plan});
 
-  final FitnessPlan plan;
+  final FitnessPlan plan; // (#) the saved plan to activate
 
+  // (#) Builds the button: asks the control to activate the plan and shows a
+  // snackbar with the result, with a spinner while it works.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selecting = ref.watch(selectFitnessPlanProvider).isLoading;

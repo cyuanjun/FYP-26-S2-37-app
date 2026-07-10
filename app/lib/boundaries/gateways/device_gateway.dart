@@ -4,13 +4,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../entities/connected_device.dart';
 import '../../entities/enums.dart';
 
-/// BOUNDARY (gateway) — `connected_devices` CRUD (#7.1). Controls call this;
-/// the UI never queries Supabase directly.
+// (#) Handles the connected_devices table in Supabase. Controls use it to list a
+// (#) user's paired devices, add or remove one, and keep the last-synced time fresh.
 class DeviceGateway {
+  // (#) Keeps the Supabase client used for all device rows.
   DeviceGateway(this._client);
 
-  final SupabaseClient _client;
+  final SupabaseClient _client; // (#) the Supabase client for table calls
 
+  // (#) Loads all of a user's paired devices, ordered by type.
   Future<List<ConnectedDevice>> listDevices(String userId) async {
     final rows = await _client
         .from('connected_devices')
@@ -20,7 +22,8 @@ class DeviceGateway {
     return rows.map(ConnectedDevice.fromJson).toList();
   }
 
-  /// The system-managed virtual device — present for every user, never removed.
+  // (#) Makes sure the built-in phone-sensors device exists for a user, adding
+  // (#) it if missing. It is virtual and never gets removed.
   Future<ConnectedDevice> ensurePhoneSensors(String userId) async {
     final existing = await _client
         .from('connected_devices')
@@ -38,6 +41,7 @@ class DeviceGateway {
     return ConnectedDevice.fromJson(row);
   }
 
+  // (#) Adds a newly paired device row and stamps it as just synced.
   Future<ConnectedDevice> addDevice({
     required String userId,
     required DeviceType type,
@@ -55,14 +59,17 @@ class DeviceGateway {
     return ConnectedDevice.fromJson(row);
   }
 
+  // (#) Turns a device on or off without deleting it.
   Future<void> setActive(String deviceId, bool active) async {
     await _client.from('connected_devices').update({'is_active': active}).eq('id', deviceId);
   }
 
+  // (#) Deletes a device row for good.
   Future<void> removeDevice(String deviceId) async {
     await _client.from('connected_devices').delete().eq('id', deviceId);
   }
 
+  // (#) Bumps a device's last-synced time to now.
   Future<void> touchLastSynced(String deviceId) async {
     await _client
         .from('connected_devices')
@@ -70,6 +77,7 @@ class DeviceGateway {
         .eq('id', deviceId);
   }
 
+  // (#) Turns a device-type enum into the snake_case string the column expects.
   String _toDb(DeviceType t) => switch (t) {
         DeviceType.appleWatch => 'apple_watch',
         DeviceType.phoneSensors => 'phone_sensors',
@@ -77,5 +85,6 @@ class DeviceGateway {
       };
 }
 
+// (#) Riverpod provider handing out the device gateway on the live client.
 final deviceGatewayProvider =
     Provider<DeviceGateway>((ref) => DeviceGateway(Supabase.instance.client));

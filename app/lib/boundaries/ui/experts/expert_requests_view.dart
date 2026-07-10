@@ -11,12 +11,12 @@ import '../common/status_badge.dart';
 import 'expert_buttons.dart';
 import 'expert_client_detail_screen.dart';
 
-/// BOUNDARY (#22 Requests) — triage: accept or decline incoming requests.
-/// Once accepted, the engagement is managed under Clients → #23.1 (per the
-/// fulfillment model); active rows here link straight there.
+// (#) The expert's request inbox. Groups requests into new, active and history. Accept and decline
+// (#) call their controls, and active rows jump to the client detail page.
 class ExpertRequestsView extends ConsumerWidget {
   const ExpertRequestsView({super.key});
 
+  // (#) Watches incoming requests, buckets them into pending, active and done, and lists each bucket.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final requests = ref.watch(incomingRequestsProvider);
@@ -68,12 +68,14 @@ class ExpertRequestsView extends ConsumerWidget {
   }
 }
 
+// (#) One request card. Shows the service, price, client and message, plus buttons that fit its state.
 class _RequestCard extends ConsumerWidget {
   const _RequestCard({required this.summary, this.muted = false});
 
-  final ServiceRequestSummary summary;
-  final bool muted;
+  final ServiceRequestSummary summary; // (#) the request this card shows
+  final bool muted; // (#) dims the card for history rows
 
+  // (#) Builds the card and picks the footer: accept/decline if pending, a manage link if active, else a badge.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final request = summary.request;

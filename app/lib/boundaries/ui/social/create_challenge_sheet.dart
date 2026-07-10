@@ -10,40 +10,45 @@ import '../../gateways/workout_gateway.dart';
 import '../profile/profile_widgets.dart';
 import 'invite_code_dialog.dart';
 
+// (#) The emoji choices offered in the icon picker.
 const _icons = ['⚡', '🏃', '🚴', '🏊', '🏋️', '🧘', '🥊', '🧗', '🎯', '🏆'];
 
-/// Create Challenge (#11) — full-screen sheet: visibility + metric-kind
-/// toggles, icon picker, name/short-name/description, kind-filtered metric,
-/// target (accumulator only), optional workout type, date range.
+// (#) Opens the full-screen sheet for building a new challenge. Pick visibility,
+// (#) metric, icon, dates and the rest, then Create hands it to the
+// (#) CreateChallenge control and shows the share code afterwards.
 void showCreateChallengeSheet(BuildContext context) {
   Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
       fullscreenDialog: true, builder: (_) => const _CreateChallengeScreen()));
 }
 
+// (#) The full-screen create-challenge form itself.
 class _CreateChallengeScreen extends ConsumerStatefulWidget {
   const _CreateChallengeScreen();
 
+  // (#) Creates the state holding all the form fields and choices.
   @override
   ConsumerState<_CreateChallengeScreen> createState() =>
       _CreateChallengeScreenState();
 }
 
+// (#) Holds every field the form collects while the user fills out the challenge.
 class _CreateChallengeScreenState
     extends ConsumerState<_CreateChallengeScreen> {
-  final _name = TextEditingController();
-  final _shortName = TextEditingController();
-  final _description = TextEditingController();
-  final _target = TextEditingController();
+  final _name = TextEditingController(); // (#) the challenge's full name
+  final _shortName = TextEditingController(); // (#) short tag shown on the card
+  final _description = TextEditingController(); // (#) optional blurb about the challenge
+  final _target = TextEditingController(); // (#) target value for accumulator challenges
 
-  var _visibility = ChallengeVisibility.public;
-  var _kind = ChallengeMetricKind.accumulator;
-  var _metric = ChallengeMetric.totalSessions;
-  String _icon = '⚡';
-  String? _workoutTypeId;
-  DateTime _start = DateTime.now();
-  DateTime _end = DateTime.now().add(const Duration(days: 14));
-  bool _saving = false;
+  var _visibility = ChallengeVisibility.public; // (#) public or invite-only
+  var _kind = ChallengeMetricKind.accumulator; // (#) race-a-target vs best-single-effort
+  var _metric = ChallengeMetric.totalSessions; // (#) which stat is being measured
+  String _icon = '⚡'; // (#) the emoji picked for the challenge
+  String? _workoutTypeId; // (#) optional workout type filter, null means any
+  DateTime _start = DateTime.now(); // (#) when the challenge window opens
+  DateTime _end = DateTime.now().add(const Duration(days: 14)); // (#) when it closes
+  bool _saving = false; // (#) true while the create request is in flight
 
+  // (#) Frees all four text boxes when the screen closes.
   @override
   void dispose() {
     _name.dispose();
@@ -53,6 +58,7 @@ class _CreateChallengeScreenState
     super.dispose();
   }
 
+  // (#) True only when the form has enough valid input to allow Create.
   bool get _valid =>
       _name.text.trim().isNotEmpty &&
       _shortName.text.trim().isNotEmpty &&
@@ -60,6 +66,8 @@ class _CreateChallengeScreenState
       (_kind == ChallengeMetricKind.bestOf ||
           (int.tryParse(_target.text) ?? 0) > 0);
 
+  // (#) Packs the form into a map and sends it to the CreateChallenge control,
+  // (#) then shows the share code and closes on success.
   Future<void> _submit() async {
     setState(() => _saving = true);
     final challenge = await ref.read(createChallengeProvider).call({
@@ -96,8 +104,7 @@ class _CreateChallengeScreenState
     }
   }
 
-  /// Confirmation with the shareable code — the natural moment to send it to
-  /// friends so they can Join by code.
+  // (#) Pops the confirmation dialog carrying the join code so it can be shared.
   Future<void> _showCreatedDialog(Challenge challenge) => showInviteCodeDialog(
         context,
         ref,
@@ -108,6 +115,8 @@ class _CreateChallengeScreenState
             '${challenge.joinCode} in the Challenges tab (Join by code).',
       );
 
+  // (#) Builds the whole form: type toggles, icon grid, text fields, metric,
+  // (#) target, workout type, date window and the create button.
   @override
   Widget build(BuildContext context) {
     final types = ref.watch(workoutTypesProvider).value ?? [];
@@ -255,6 +264,7 @@ class _CreateChallengeScreenState
     );
   }
 
+  // (#) Builds a start or end date button that opens a date picker when tapped.
   Widget _dateButton({required bool isStart}) {
     final value = isStart ? _start : _end;
     return OutlinedButton(

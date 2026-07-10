@@ -10,15 +10,16 @@ import '../../../entities/workout_session.dart';
 import '../premium/upgrade_screen.dart';
 import 'app_card.dart';
 
-/// Shared TRAINING EFFECT card (#10 Summary + #12.1 History Detail, US35).
-/// Free: band + score + a canned recovery line + the Premium upsell link.
-/// Premium: adds the aerobic/anaerobic split and an indicative recovery
-/// window. No avg HR → the honest "unavailable" state.
+// (#) The Training Effect card shown after a workout and on history detail. Free
+// members see the band and score; Premium also gets the aerobic/anaerobic split
+// and a recovery estimate. The numbers come from an entity via controls, so
+// there's no database work in here.
 class TrainingEffectCard extends ConsumerWidget {
   const TrainingEffectCard({super.key, required this.session});
 
-  final WorkoutSession session;
+  final WorkoutSession session; // (#) the workout we're describing the effect of
 
+  // (#) The colour for each effect band, low blue through to very high red.
   static const _bandColors = {
     TeBand.low: Color(0xFF0284C7), // info blue
     TeBand.moderate: AppColors.accent,
@@ -26,6 +27,9 @@ class TrainingEffectCard extends ConsumerWidget {
     TeBand.veryHigh: AppColors.danger,
   };
 
+  // (#) Builds the card: computes the effect from the session, shows the
+  // unavailable note if there's no HR, else the band and score plus either the
+  // Premium breakdown or the upsell link for Free members.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremium =
@@ -103,6 +107,7 @@ class TrainingEffectCard extends ConsumerWidget {
     );
   }
 
+  // (#) One labelled progress bar for the aerobic/anaerobic split, out of 5.
   Widget _effectBar(String label, double value) {
     return Row(
       children: [

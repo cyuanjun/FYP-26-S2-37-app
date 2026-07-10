@@ -8,8 +8,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import 'profile_widgets.dart';
 
-/// Display catalog for #13.4 — UI strings only; keys live in
-/// profiles.notification_prefs (see manage_notification_prefs.dart).
+// (#) The list of notification toggles grouped into sections. Just the display
+// text and keys, the actual saved values live in profiles.notification_prefs.
 const _sections = <(String, List<(String, String, String)>)>[
   (
     'Workout Reminders',
@@ -44,7 +44,7 @@ const _sections = <(String, List<(String, String, String)>)>[
   ),
 ];
 
-/// Keys whose flip changes the local-notification schedule (US19–US21).
+// (#) The toggle keys that, when flipped, need the reminder schedule redone.
 const _schedulingKeys = {
   'daily_reminder',
   'missed_workout',
@@ -52,12 +52,14 @@ const _schedulingKeys = {
   'rest_alert',
 };
 
-/// BOUNDARY (#13.4 Notifications). Per-type toggles; every flip commits
-/// immediately — no save button. The UPCOMING strip shows what the last
-/// reminder sync actually scheduled with the OS.
+// (#) Notification settings screen. One switch per notification type, each flip
+// saves straight away, and flipping a reminder type re-runs the scheduling
+// control. The Upcoming strip shows what was last scheduled.
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
+  // (#) Builds the screen: the Upcoming strip on top, then a switch row for
+  // every notification type grouped by section.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefsAsync = ref.watch(notificationPrefsProvider);
@@ -123,8 +125,10 @@ class NotificationsScreen extends ConsumerWidget {
   }
 }
 
-/// What the last sync scheduled — relative day + time per reminder.
+// (#) The Upcoming strip: lists the next few reminders the last sync scheduled,
+// each with its relative day and time.
 class _UpcomingStrip extends ConsumerWidget {
+  // (#) Builds the strip, or nothing when there's nothing scheduled.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final upcoming = ref.watch(scheduledRemindersProvider);

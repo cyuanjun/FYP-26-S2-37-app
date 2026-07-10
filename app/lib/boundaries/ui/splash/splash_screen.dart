@@ -8,17 +8,21 @@ import '../../../core/theme/app_typography.dart';
 import '../auth/login_screen.dart';
 import '../home/home_shell.dart';
 
-/// BOUNDARY (#1 Splash). Brand entry point; routes to Home or Login based on session.
+// (#) The branded landing screen shown on launch. After a short pause it checks
+// (#) whether anyone is signed in and sends them to Home or Login.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
-  static const path = '/';
+  static const path = '/'; // (#) route address for this screen, the app root
 
+  // (#) Creates the state object that runs the launch delay and redirect.
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
+// (#) Holds the splash screen state, mainly the startup timer and redirect logic.
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  // (#) Waits a moment after first paint, then routes to Home if signed in else Login.
   @override
   void initState() {
     super.initState();
@@ -30,6 +34,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     });
   }
 
+  // (#) Draws the centered WISE WORKOUT wordmark and the tagline underneath.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

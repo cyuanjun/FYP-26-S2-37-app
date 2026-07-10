@@ -10,11 +10,13 @@ import '../common/status_badge.dart';
 import '../profile/fitness_goals_screen.dart';
 import 'plan_detail_screen.dart';
 
-/// BOUNDARY — saved training plans. Users can inspect prior generated plans
-/// and choose which one is active.
+// (#) The My Plans screen. Lists your saved and active training plans. Tap one
+// to open its detail. The active plan is flagged and shown at the top.
 class MyPlansScreen extends ConsumerWidget {
   const MyPlansScreen({super.key});
 
+  // (#) Builds the screen: watches the plans, shows the empty state if there are
+  // none, otherwise an ACTIVE section then a SAVED section of plan cards.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final plansAsync = ref.watch(plansProvider);
@@ -69,11 +71,14 @@ class MyPlansScreen extends ConsumerWidget {
   }
 }
 
+// (#) A tappable card for one plan: its name, an ACTIVE badge if it's active, a
+// meta line, and its start date. Tapping opens the plan detail.
 class _PlanCard extends StatelessWidget {
   const _PlanCard({required this.plan});
 
-  final FitnessPlan plan;
+  final FitnessPlan plan; // (#) the plan this card represents
 
+  // (#) Builds the card and wires its tap to push the plan detail screen.
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -134,6 +139,7 @@ class _PlanCard extends StatelessWidget {
     );
   }
 
+  // (#) Formats a date like "5 Jul 2026" for the started line.
   String _dateLabel(DateTime date) {
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -143,11 +149,14 @@ class _PlanCard extends StatelessWidget {
   }
 }
 
+// (#) The empty state shown when there are no plans yet: a message and a button
+// to go set a goal so the first plan can be generated.
 class _EmptyPlans extends StatelessWidget {
   const _EmptyPlans({required this.onSetGoal});
 
-  final VoidCallback onSetGoal;
+  final VoidCallback onSetGoal; // (#) called when the set a goal button is tapped
 
+  // (#) Builds the centred empty message and the set a goal button.
   @override
   Widget build(BuildContext context) {
     return Center(

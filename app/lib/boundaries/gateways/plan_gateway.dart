@@ -4,14 +4,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../entities/fitness_plan.dart';
 import '../../entities/planned_workout.dart';
 
-/// BOUNDARY (gateway) — `fitness_plans` + `planned_workouts`. Controls call
-/// this; the UI never queries Supabase directly.
+// (#) Handles the fitness_plans and planned_workouts tables. Controls use it to
+// (#) fetch a user's active plan, list past plans, and save a new one with its
+// (#) weekly workouts.
 class PlanGateway {
+  // (#) Keeps the Supabase client used for all plan queries.
   PlanGateway(this._client);
 
-  final SupabaseClient _client;
+  final SupabaseClient _client; // (#) the Supabase client for table calls
 
-  /// The user's active plan, or null when none.
+  // (#) Loads the user's currently active plan, or null if none is active.
   Future<FitnessPlan?> fetchActivePlan(String userId) async {
     final row = await _client
         .from('fitness_plans')
@@ -22,6 +24,7 @@ class PlanGateway {
     return row == null ? null : FitnessPlan.fromJson(row);
   }
 
+  // (#) Loads one plan by its id, or null if it does not exist.
   Future<FitnessPlan?> fetchPlan(String planId) async {
     final row = await _client
         .from('fitness_plans')
@@ -31,6 +34,7 @@ class PlanGateway {
     return row == null ? null : FitnessPlan.fromJson(row);
   }
 
+  // (#) Lists all of a user's plans, active one first then newest.
   Future<List<FitnessPlan>> listPlans(String userId) async {
     final rows = await _client
         .from('fitness_plans')
@@ -41,6 +45,7 @@ class PlanGateway {
     return rows.map(FitnessPlan.fromJson).toList();
   }
 
+  // (#) Loads a plan's weekly workouts in week, day, then slot order.
   Future<List<PlannedWorkout>> listPlannedWorkouts(String planId) async {
     final rows = await _client
         .from('planned_workouts')
@@ -52,15 +57,15 @@ class PlanGateway {
     return rows.map(PlannedWorkout.fromJson).toList();
   }
 
-  /// One active plan per user (unique partial index) — clear the old one.
+  // (#) Turns off whatever plan is currently active, since only one can be.
   Future<void> _deactivatePriorPlan(String userId) => _client
       .from('fitness_plans')
       .update({'is_active': false})
       .eq('user_id', userId)
       .eq('is_active', true);
 
-  /// Inserts a plan + its weekly template. Deactivates any prior active plan
-  /// first (unique partial index allows one active plan per user).
+  // (#) Saves a brand-new plan and its weekly workouts, clearing the old active
+  // (#) plan first so the user only has one running at a time.
   Future<FitnessPlan> insertPlan({
     required String userId,
     required String fitnessGoalId,
@@ -85,6 +90,7 @@ class PlanGateway {
     return created;
   }
 
+  // (#) Switches which existing plan is the active one and restarts its clock.
   Future<void> setActivePlan({
     required String userId,
     required String planId,
@@ -98,5 +104,6 @@ class PlanGateway {
   }
 }
 
+// (#) Riverpod provider handing out the plan gateway on the live client.
 final planGatewayProvider =
     Provider<PlanGateway>((ref) => PlanGateway(Supabase.instance.client));

@@ -12,22 +12,27 @@ import '../../../entities/fitness_goal.dart';
 import '../common/app_card.dart';
 import 'profile_widgets.dart';
 
-/// BOUNDARY (#13.2 Fitness Goals). Primary goal cards + target/commitment
-/// steppers + timeline chips. SAVE GOAL upserts the single active goal.
+// (#) Fitness goals screen. Pick a primary goal, set the target, weekly days
+// and timeline, then SAVE GOAL stores the one active goal through the
+// SetFitnessGoal control.
 class FitnessGoalsScreen extends ConsumerStatefulWidget {
   const FitnessGoalsScreen({super.key});
 
+  // (#) Creates the state that holds the goal being edited.
   @override
   ConsumerState<FitnessGoalsScreen> createState() => _FitnessGoalsScreenState();
 }
 
+// (#) Live state: the chosen goal and its target, weekly days and timeline.
 class _FitnessGoalsScreenState extends ConsumerState<FitnessGoalsScreen> {
-  bool _seeded = false;
-  PrimaryGoal _goal = PrimaryGoal.maintainFitness;
-  double? _target;
-  int _weeklyDays = 3;
-  int _timelineWeeks = 12;
+  bool _seeded = false; // (#) so we only copy the saved goal into the form once
+  PrimaryGoal _goal = PrimaryGoal.maintainFitness; // (#) currently selected goal
+  double? _target; // (#) the target value (weight or minutes) for the goal
+  int _weeklyDays = 3; // (#) how many days a week they plan to train
+  int _timelineWeeks = 12; // (#) how many weeks to hit the goal in
 
+  // (#) Copies an existing saved goal into the form fields, once, or falls back
+  // to a sensible default target.
   void _seed(FitnessGoal? existing, double? weightKg) {
     if (_seeded) return;
     _seeded = true;
@@ -42,6 +47,7 @@ class _FitnessGoalsScreenState extends ConsumerState<FitnessGoalsScreen> {
     }
   }
 
+  // (#) Switches the active goal and resets the target to that goal's default.
   void _selectGoal(PrimaryGoal g, double? weightKg) {
     setState(() {
       _goal = g;
@@ -50,6 +56,7 @@ class _FitnessGoalsScreenState extends ConsumerState<FitnessGoalsScreen> {
     });
   }
 
+  // (#) Sends the goal to the control, then shows a snackbar and pops on success.
   Future<void> _save(double? weightKg) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -72,6 +79,8 @@ class _FitnessGoalsScreenState extends ConsumerState<FitnessGoalsScreen> {
     }
   }
 
+  // (#) Builds the screen: goal cards, target stepper, weekly-days stepper,
+  // timeline chips and the save button.
   @override
   Widget build(BuildContext context) {
     final goalAsync = ref.watch(activeGoalProvider);
@@ -195,13 +204,15 @@ class _FitnessGoalsScreenState extends ConsumerState<FitnessGoalsScreen> {
   }
 }
 
+// (#) A tappable card for one goal option, with a tick when it's selected.
 class _GoalCard extends StatelessWidget {
   const _GoalCard({required this.goal, required this.selected, required this.onTap});
 
-  final PrimaryGoal goal;
-  final bool selected;
-  final VoidCallback onTap;
+  final PrimaryGoal goal; // (#) the goal this card represents
+  final bool selected; // (#) whether this is the chosen goal
+  final VoidCallback onTap; // (#) called when the card is tapped
 
+  // (#) Builds the card: label, descriptor and a check circle when selected.
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -238,6 +249,7 @@ class _GoalCard extends StatelessWidget {
   }
 }
 
+// (#) A big minus/value/plus stepper for a numeric field like target or days.
 class _Stepper extends StatelessWidget {
   const _Stepper({
     required this.value,
@@ -247,12 +259,13 @@ class _Stepper extends StatelessWidget {
     required this.onPlus,
   });
 
-  final double value;
-  final String unit;
-  final String subtitle;
-  final VoidCallback onMinus;
-  final VoidCallback onPlus;
+  final double value; // (#) the number to show in the middle
+  final String unit; // (#) unit label shown after the number, like KG or MINS
+  final String subtitle; // (#) small helper line under the number
+  final VoidCallback onMinus; // (#) called when the minus button is tapped
+  final VoidCallback onPlus; // (#) called when the plus button is tapped
 
+  // (#) Builds the row: minus button, value with unit and subtitle, plus button.
   @override
   Widget build(BuildContext context) {
     final display = fmtCompactNum(value);
@@ -279,6 +292,7 @@ class _Stepper extends StatelessWidget {
     );
   }
 
+  // (#) One rounded square icon button used for the minus and plus.
   Widget _btn(IconData icon, VoidCallback onTap) => InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),

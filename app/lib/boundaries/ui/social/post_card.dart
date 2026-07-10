@@ -13,18 +13,21 @@ import 'post_detail_screen.dart';
 import 'user_profile_screen.dart';
 import 'share_post_sheet.dart';
 
-/// BOUNDARY widget — one polymorphic feed card (#11). The whole card is the
-/// tap target → Post Detail; the action-row buttons intercept their own taps.
+// (#) One post in the feed, whatever its type. Tapping the card opens the post
+// (#) detail, the like button calls the like control, and share opens the
+// (#) platform sheet.
 class PostCard extends ConsumerWidget {
   const PostCard({super.key, required this.feedPost});
 
-  final FeedPost feedPost;
+  final FeedPost feedPost; // (#) the post plus its author, session, likes and comments
 
+  // (#) Pushes the full post detail screen.
   void _openDetail(BuildContext context) {
     Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
         builder: (_) => PostDetailScreen(postId: feedPost.post.id)));
   }
 
+  // (#) Builds the card: author strip, body text, the type-specific panel and actions.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final post = feedPost.post;
@@ -72,11 +75,13 @@ class PostCard extends ConsumerWidget {
   }
 }
 
+// (#) The gold panel a level-up post shows, with a bolt and the new level.
 class _LevelUpPanel extends StatelessWidget {
   const _LevelUpPanel({required this.level});
 
-  final int level;
+  final int level; // (#) the level the user just reached
 
+  // (#) Draws the highlighted "Reached Level X" row.
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -99,11 +104,11 @@ class _LevelUpPanel extends StatelessWidget {
   }
 }
 
-/// challenge_result posts are auto-created at a challenge deadline — that job
-/// is deferred, but seeded/manual rows must still render (11-social.md).
+// (#) The trophy panel a challenge-result post shows.
 class _ChallengeResultPanel extends StatelessWidget {
   const _ChallengeResultPanel();
 
+  // (#) Draws the highlighted "Challenge result" row.
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -125,11 +130,13 @@ class _ChallengeResultPanel extends StatelessWidget {
   }
 }
 
+// (#) The like, comment count and share row along the bottom of a post card.
 class _ActionRow extends ConsumerWidget {
   const _ActionRow({required this.feedPost});
 
-  final FeedPost feedPost;
+  final FeedPost feedPost; // (#) the post these actions act on
 
+  // (#) Draws the like toggle with counts and the share button.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final liked = feedPost.likedByMe;

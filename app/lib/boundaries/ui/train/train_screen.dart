@@ -17,12 +17,14 @@ import '../workout/active_workout_screen.dart';
 import 'connected_devices_screen.dart';
 import 'my_plans_screen.dart';
 
-/// BOUNDARY (#7 Train). Active-plan card + device status + a sticky
-/// "Start Freeform Workout" CTA. Plans aren't built in the slice, so the plan
-/// card shows the no-plan variant; the free-form path is the live one.
+// (#) The Train tab. Shows your active plan, your connected devices and a sticky
+// button to start a workout. It can kick off free-form or planned sessions and
+// links out to the plans and devices screens.
 class TrainScreen extends ConsumerWidget {
   const TrainScreen({super.key});
 
+  // (#) Builds the tab: the selected-plan section, the devices section with an
+  // add button, and the sticky start-freeform-workout button at the bottom.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
@@ -116,13 +118,15 @@ class TrainScreen extends ConsumerWidget {
   }
 }
 
+// (#) A little section title row with an optional tappable action link on the right.
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader({required this.label, this.action, this.onAction});
 
-  final String label;
-  final String? action;
-  final VoidCallback? onAction;
+  final String label; // (#) the section title text
+  final String? action; // (#) optional link text on the right, like VIEW PLANS
+  final VoidCallback? onAction; // (#) what that link does when tapped
 
+  // (#) Builds the row: the label on the left and the action link on the right if set.
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -139,11 +143,13 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
+// (#) The card shown when there's no active plan: a prompt and a set a goal button.
 class _NoPlanCard extends StatelessWidget {
   const _NoPlanCard({required this.onSetGoal});
 
-  final VoidCallback onSetGoal;
+  final VoidCallback onSetGoal; // (#) called when the set a goal button is tapped
 
+  // (#) Builds the no-plan card with its message and button.
   @override
   Widget build(BuildContext context) {
     return AppCard(
@@ -168,15 +174,18 @@ class _NoPlanCard extends StatelessWidget {
   }
 }
 
+// (#) The devices summary card on the Train tab: emoji, name, a status line and
+// a CONNECTED badge. Tapping it (from the parent) opens the devices screen.
 class _DevicesCard extends StatelessWidget {
   const _DevicesCard(
       {required this.title, required this.subtitle, required this.emoji, this.extra});
 
-  final String title;
-  final String subtitle;
-  final String emoji;
-  final String? extra;
+  final String title; // (#) the device name or "Phone sensors"
+  final String subtitle; // (#) the readiness line, like "GPS + steps ready"
+  final String emoji; // (#) the device's emoji icon
+  final String? extra; // (#) optional extra like "2 sources"
 
+  // (#) Builds the card: emoji, the title and subtitle, and the CONNECTED badge.
   @override
   Widget build(BuildContext context) {
     return AppCard(
@@ -206,12 +215,16 @@ class _DevicesCard extends StatelessWidget {
   }
 }
 
+// (#) The active-plan card on the Train tab: the plan name and meta, this week's
+// schedule, and a button to start today's planned workout if there is one.
 class _ActivePlanCard extends StatelessWidget {
   const _ActivePlanCard({required this.plan, required this.workouts});
 
-  final FitnessPlan plan;
-  final List<PlannedWorkout> workouts;
+  final FitnessPlan plan; // (#) the active plan
+  final List<PlannedWorkout> workouts; // (#) all its planned workouts
 
+  // (#) Builds the card: figures out the current week and today's workout, lists
+  // this week's days, and shows the start-planned-workout button when applicable.
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now().weekday;
@@ -286,8 +299,8 @@ class _ActivePlanCard extends StatelessWidget {
     );
   }
 
-  /// One row of the weekly schedule. The [isNext] session is highlighted with a
-  /// green tint + a NEXT tag so the user can see what's coming up.
+  // (#) One row of the weekly schedule. The next session gets a green tint so
+  // the user can see what's coming up.
   Widget _dayRow(PlannedWorkout w, bool isNext) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),

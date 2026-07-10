@@ -6,8 +6,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import 'user_row.dart';
 
-/// Friends sheet (#11) — everyone you're friends with; rows link to profiles
-/// and carry the Unfriend toggle.
+// (#) Opens the bottom sheet listing everyone you're friends with. Each row links
+// (#) to a profile and carries the Unfriend toggle. It just watches the friends
+// (#) list coming from a control.
 void showFriendsSheet(BuildContext context) {
   showModalBottomSheet<void>(
     context: context,

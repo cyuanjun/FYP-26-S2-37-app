@@ -6,20 +6,25 @@ import '../common/avatar_button.dart';
 import 'challenges_tab_body.dart';
 import 'community_feed.dart';
 
-/// BOUNDARY (#11 Social). Segmented Community / Challenges tab. Community is
-/// the live feed; Challenges arrives in Phase 3 (inline placeholder card).
+// (#) The Social screen with Community and Challenges sub-tabs. It just switches
+// (#) between the two bodies under the pills, the real content lives in those
+// (#) child widgets.
 class SocialTab extends StatefulWidget {
   const SocialTab({super.key});
 
+  // (#) Creates the state that remembers which sub-tab is showing.
   @override
   State<SocialTab> createState() => _SocialTabState();
 }
 
+// (#) The two sub-tabs the Social screen can show.
 enum _SocialSubTab { community, challenges }
 
+// (#) Holds which sub-tab is currently selected.
 class _SocialTabState extends State<SocialTab> {
-  _SocialSubTab _tab = _SocialSubTab.community;
+  _SocialSubTab _tab = _SocialSubTab.community; // (#) the active sub-tab
 
+  // (#) Builds the app bar, the two pills, and whichever tab body is picked.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +57,7 @@ class _SocialTabState extends State<SocialTab> {
     );
   }
 
+  // (#) Builds one tab pill and highlights it when its tab is the active one.
   Widget _pill(String label, _SocialSubTab value) {
     final selected = _tab == value;
     return GestureDetector(

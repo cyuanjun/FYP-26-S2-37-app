@@ -7,13 +7,13 @@ import '../../../core/theme/app_typography.dart';
 import '../common/app_card.dart';
 import '../common/premium_cta.dart';
 
-/// BOUNDARY (#16 Upgrade to Premium). Marketing surface pitching the Premium
-/// tier — every bullet maps to a real built gate. START PREMIUM opens the
-/// simulated-payment sheet; confirming runs the `start_premium` RPC and the
-/// whole app flips to Premium live (no re-login).
+// (#) The upgrade-to-Premium screen. Pitches the Premium tier and, on Start
+// (#) Premium, opens the simulated checkout. Confirming runs the StartPremium
+// (#) control and the whole app flips to Premium without a re-login.
 class UpgradeScreen extends ConsumerWidget {
   const UpgradeScreen({super.key});
 
+  // (#) The list of Premium perks, each a title and a one-line explainer.
   static const _unlocks = [
     (
       'Personalised AI fitness plans',
@@ -41,6 +41,7 @@ class UpgradeScreen extends ConsumerWidget {
     ),
   ];
 
+  // (#) Builds the pitch: hero heading, the unlock list, pricing card and CTA.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
@@ -160,6 +161,7 @@ class UpgradeScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Opens the simulated payment bottom sheet.
   void _showPaymentSheet(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
@@ -171,21 +173,22 @@ class UpgradeScreen extends ConsumerWidget {
   }
 }
 
-/// The simulated checkout: plan summary + mock card + confirm. Confirming
-/// calls the StartPremium control; on success both sheet and screen pop so
-/// the user lands back on the (now Premium) screen that sent them here.
+// (#) The fake checkout sheet: plan summary, mock card and a confirm button.
 class _SimulatedPaymentSheet extends ConsumerStatefulWidget {
   const _SimulatedPaymentSheet();
 
+  // (#) Creates the state that tracks whether a confirm is in progress.
   @override
   ConsumerState<_SimulatedPaymentSheet> createState() =>
       _SimulatedPaymentSheetState();
 }
 
+// (#) Holds the sheet state, mainly the busy flag during the upgrade call.
 class _SimulatedPaymentSheetState
     extends ConsumerState<_SimulatedPaymentSheet> {
-  bool _busy = false;
+  bool _busy = false; // (#) true while the StartPremium call is running
 
+  // (#) Runs the StartPremium control, then pops the sheet and screen on success.
   Future<void> _confirm() async {
     setState(() => _busy = true);
     try {
@@ -203,6 +206,7 @@ class _SimulatedPaymentSheetState
     }
   }
 
+  // (#) Builds the sheet: plan row, mock card row, a note and the confirm button.
   @override
   Widget build(BuildContext context) {
     return Padding(

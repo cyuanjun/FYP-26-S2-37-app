@@ -6,14 +6,14 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../../core/seq_log.dart';
 
-/// BOUNDARY (gateway) — wraps `flutter_local_notifications`. Controls hand it
-/// absolute fire instants; it never decides *when* to remind (that rule logic
-/// lives in ScheduleReminders). Local notifications only — FCM/push is a
-/// later sprint.
+// (#) Wraps the phone's local-notifications plugin. Controls use it to ask for
+// (#) permission and to put a reminder on the clock for a set time. It never
+// (#) decides when to fire, the ScheduleReminders control does that.
 class NotificationGateway {
-  final _plugin = FlutterLocalNotificationsPlugin();
-  bool _initialized = false;
+  final _plugin = FlutterLocalNotificationsPlugin(); // (#) the OS notification plugin
+  bool _initialized = false; // (#) tracks whether first-time setup has run
 
+  // (#) The look of our reminders on Android and iOS, reused for every one.
   static const _details = NotificationDetails(
     android: AndroidNotificationDetails(
       'reminders',
@@ -28,6 +28,8 @@ class NotificationGateway {
     ),
   );
 
+  // (#) Runs the plugin's one-time setup, including finding the device time zone
+  // (#) so scheduled reminders fire at the right wall-clock moment.
   Future<void> _ensureInit() async {
     if (_initialized) return;
     tzdata.initializeTimeZones();
@@ -57,7 +59,7 @@ class NotificationGateway {
     _initialized = true;
   }
 
-  /// One-time OS permission prompt; returns whether notifications are allowed.
+  // (#) Asks the OS for notification permission and reports whether it was granted.
   Future<bool> requestPermission() async {
     await _ensureInit();
     final ios = _plugin.resolvePlatformSpecificImplementation<
@@ -78,9 +80,8 @@ class NotificationGateway {
     return false;
   }
 
-  /// One-shot notification at an absolute local instant, expressed in the
-  /// device's zone (see _ensureInit). Inexact Android mode avoids the
-  /// exact-alarm permission.
+  // (#) Books one reminder to show at the given local time. Uses Android's
+  // (#) inexact mode so it doesn't need the special exact-alarm permission.
   Future<void> scheduleAt({
     required int id,
     required String title,
@@ -98,17 +99,19 @@ class NotificationGateway {
     );
   }
 
+  // (#) Wipes every scheduled reminder, used before re-scheduling from scratch.
   Future<void> cancelAll() async {
     await _ensureInit();
     await _plugin.cancelAll();
   }
 
-  /// How many notifications the OS currently holds for us (verification aid).
+  // (#) Counts how many reminders the OS is still holding, handy for testing.
   Future<int> pendingCount() async {
     await _ensureInit();
     return (await _plugin.pendingNotificationRequests()).length;
   }
 }
 
+// (#) Riverpod provider handing out a single notification gateway.
 final notificationGatewayProvider =
     Provider<NotificationGateway>((ref) => NotificationGateway());

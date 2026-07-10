@@ -13,14 +13,15 @@ import '../common/app_card.dart';
 import 'invite_code_dialog.dart';
 import 'user_profile_screen.dart';
 
-/// BOUNDARY (#11.3 Challenge Detail). Hero + your progress + how-it-works +
-/// the full leaderboard (You highlighted, others link to #11.2), with the
-/// Join / Leave action pinned to a footer band. Ended → caption only.
+// (#) The full challenge page. Shows the header, your progress, how it works and
+// (#) the whole leaderboard, with a Join or Leave button pinned at the bottom
+// (#) that calls the matching control.
 class ChallengeDetailScreen extends ConsumerWidget {
   const ChallengeDetailScreen({super.key, required this.challengeId});
 
-  final String challengeId;
+  final String challengeId; // (#) id of the challenge to load and show
 
+  // (#) Builds the whole page: header, progress, how-it-works, leaderboard and footer.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final summaryAsync = ref.watch(challengeSummaryProvider(challengeId));
@@ -130,7 +131,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Popup revealing the shareable code with copy + system-share actions.
+  // (#) Opens the invite-code popup with copy and share actions.
   Future<void> _showInviteDialog(
           BuildContext context, WidgetRef ref, Challenge c) =>
       showInviteCodeDialog(
@@ -142,6 +143,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
             '${c.joinCode} in the Challenges tab (Join by code).',
       );
 
+  // (#) Builds the plain-English explanation of how this challenge is scored.
   String _howItWorks(ChallengeSummary summary) {
     final c = summary.challenge;
     final scope = c.workoutTypeId == null
@@ -154,6 +156,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
             '(${c.metric.label.toLowerCase()}).';
   }
 
+  // (#) Builds one leaderboard row, linking to the user's profile unless it's you.
   Widget _leaderRow(BuildContext context, ChallengeSummary summary,
       ChallengeStanding s,
       {required bool isMe}) {
@@ -189,6 +192,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Builds the pinned bottom bar: Join, Leave, or an ended caption.
   Widget _footer(BuildContext context, WidgetRef ref, ChallengeSummary summary) {
     final ended = summary.challenge.isPast(DateTime.now());
     return SafeArea(

@@ -12,13 +12,13 @@ import '../common/premium_cta.dart';
 import '../common/status_badge.dart';
 import 'upgrade_screen.dart';
 
-/// BOUNDARY (#13.6 Subscription Management). Premium counterpart to #16:
-/// plan + status, mock payment method, synthesised billing history, and
-/// cancel / resume. Cancel keeps access until the renewal date (and keeps
-/// role = premium in this simulated realization).
+// (#) Subscription management for Premium members. Shows the plan, a mock
+// (#) payment method and fake billing history, and lets them cancel or resume.
+// (#) Those actions go through the control, the payment side is simulated.
 class SubscriptionManagementScreen extends ConsumerWidget {
   const SubscriptionManagementScreen({super.key});
 
+  // (#) Builds the screen, or an empty-state if there's no subscription.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sub = ref.watch(subscriptionProvider).value;
@@ -32,7 +32,7 @@ class SubscriptionManagementScreen extends ConsumerWidget {
     );
   }
 
-  /// Defensive Free-state (#13.6 is premium-gated, but don't crash).
+  // (#) Builds the fallback shown to a Free user with no active subscription.
   Widget _empty(BuildContext context) {
     return Center(
       child: Column(
@@ -49,6 +49,7 @@ class SubscriptionManagementScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Builds the plan card, payment method, billing history and cancel/resume.
   Widget _body(BuildContext context, WidgetRef ref, Subscription sub) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -160,6 +161,7 @@ class SubscriptionManagementScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Pops a confirm dialog and, if agreed, calls the control to cancel.
   void _confirmCancel(BuildContext context, WidgetRef ref, Subscription sub) {
     showDialog<void>(
       context: context,

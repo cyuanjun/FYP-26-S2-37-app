@@ -6,20 +6,22 @@ import '../../entities/workout_session.dart';
 import '../../entities/workout_type.dart';
 import '../../core/strings.dart';
 
-/// BOUNDARY (gateway) — `workout_types` + `workout_sessions` CRUD and the
-/// `end_workout_session` RPC. Controls call this; the UI never queries Supabase.
+// (#) Handles the workout_types and workout_sessions tables plus the end-session
+// (#) RPC. Controls use it to start, finish, list, and tidy up a user's workouts.
 class WorkoutGateway {
+  // (#) Keeps the Supabase client used for all workout queries.
   WorkoutGateway(this._client);
 
-  final SupabaseClient _client;
+  final SupabaseClient _client; // (#) the Supabase client for table and RPC calls
 
+  // (#) Loads the workout-type catalog, A to Z, for the Train screen picker.
   Future<List<WorkoutType>> listWorkoutTypes() async {
     final rows = await _client.from('workout_types').select().order('name', ascending: true);
     return rows.map(WorkoutType.fromJson).toList();
   }
 
-  /// User-added catalog entry ("+ Add your own" in pickers). Slug derived from
-  /// the name; unknown slugs fall back to a moderate MET for calories.
+  // (#) Adds a user's own workout type when they use "+ Add your own". Builds a
+  // (#) slug from the name for the calorie lookup later.
   Future<WorkoutType> addCustomWorkoutType({
     required String userId,
     required String name,
@@ -34,9 +36,8 @@ class WorkoutGateway {
     return WorkoutType.fromJson(row);
   }
 
-  /// Inserts a fresh free-form session (StartWorkoutSession use case).
-  /// [connectedDeviceId] records the capture source (phone-sensors row for
-  /// in-app GPS capture, a wearable row when one is active; null = manual).
+  // (#) Starts a new workout session row and returns it. connectedDeviceId notes
+  // (#) what captured it: the phone, a wearable, or null for a manual entry.
   Future<WorkoutSession> startSession({
     required String userId,
     required String workoutTypeId,
@@ -51,8 +52,8 @@ class WorkoutGateway {
     return WorkoutSession.fromJson(row);
   }
 
-  /// Finalizes the session atomically (EndWorkoutSession use case) — returns the
-  /// RPC result: { xp_gained, total_xp, new_level, leveled_up, current_streak }.
+  // (#) Finishes a session in one server call and returns the XP, level, and
+  // (#) streak results the RPC hands back.
   Future<Map<String, dynamic>> endSession({
     required String sessionId,
     required Map<String, dynamic> metrics,
@@ -64,9 +65,8 @@ class WorkoutGateway {
     return Map<String, dynamic>.from(res as Map);
   }
 
-  /// Ended sessions for a user, newest first (History list). [from] bounds
-  /// the window at the query level — the Free monthly cap passes the start of
-  /// the current calendar month; Premium passes nothing (lifetime).
+  // (#) Loads a user's finished sessions, newest first, for History. from limits
+  // (#) the window: Free users pass this month's start, Premium passes nothing.
   Future<List<WorkoutSession>> listEndedSessions(String userId, {DateTime? from}) async {
     var query = _client
         .from('workout_sessions')
@@ -80,9 +80,8 @@ class WorkoutGateway {
     return rows.map(WorkoutSession.fromJson).toList();
   }
 
-  /// Whether the user has any ended session that started before [before].
-  /// Lets History tell "no workouts ever" apart from "earlier workouts exist
-  /// but are hidden by the Free monthly cap". Limited to 1 row (existence only).
+  // (#) Tells whether any finished session exists before a given date, so History
+  // (#) can tell "no workouts ever" apart from "older ones hidden by the Free cap".
   Future<bool> hasEndedSessionsBefore(String userId, DateTime before) async {
     final rows = await _client
         .from('workout_sessions')
@@ -94,11 +93,13 @@ class WorkoutGateway {
     return (rows as List).isNotEmpty;
   }
 
+  // (#) Deletes a session by id.
   Future<void> deleteSession(String sessionId) async {
     await _client.from('workout_sessions').delete().eq('id', sessionId);
   }
 
-  /// Captures the post-session inputs from the summary screen.
+  // (#) Saves the extras the user adds on the summary screen: a name, a feel
+  // (#) rating, and notes. Skips the write if nothing was filled in.
   Future<void> updateSummary({
     required String sessionId,
     String? customName,
@@ -114,10 +115,11 @@ class WorkoutGateway {
   }
 }
 
+// (#) Riverpod provider handing out the workout gateway on the live client.
 final workoutGatewayProvider =
     Provider<WorkoutGateway>((ref) => WorkoutGateway(Supabase.instance.client));
 
-/// The seeded workout-type catalog (Train screen picker).
+// (#) Provider that loads the workout-type catalog once for the Train picker.
 final workoutTypesProvider = FutureProvider<List<WorkoutType>>(
   (ref) => ref.watch(workoutGatewayProvider).listWorkoutTypes(),
 );

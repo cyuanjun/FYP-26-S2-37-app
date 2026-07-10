@@ -10,14 +10,14 @@ import '../common/app_card.dart';
 import '../common/stat_tile.dart';
 import 'service_card.dart';
 
-/// BOUNDARY (#6.1 Expert Detail). One expert in full: identity, stored
-/// aggregates (Rating / Reviews / Clients), about, credentials, specialties,
-/// and their live service listings.
+// (#) Full page for one expert as a client sees it. Shows stats, about, credentials, specialties and
+// (#) service listings. The heart in the bar toggles following via the ToggleFollowExpert control.
 class ExpertDetailScreen extends ConsumerWidget {
   const ExpertDetailScreen({super.key, required this.expertId});
 
-  final String expertId;
+  final String expertId; // (#) id of the expert being shown
 
+  // (#) Watches the expert summary, then builds identity, stat card, about, credentials, specialties and services.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final expertAsync = ref.watch(expertSummaryProvider(expertId));
@@ -123,6 +123,7 @@ class ExpertDetailScreen extends ConsumerWidget {
     );
   }
 
+  // (#) The header: large avatar, expert name, and a line with title, years coaching and verified tick.
   Widget _identity(ExpertSummary expert) {
     return Column(
       children: [

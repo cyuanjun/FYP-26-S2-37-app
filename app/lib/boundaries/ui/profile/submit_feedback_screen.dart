@@ -7,40 +7,48 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 
+// (#) The three feedback categories with their labels and hint text.
 const _categories = <(FeedbackCategory, String, String)>[
   (FeedbackCategory.bug, 'Bug', 'Something is broken or behaving unexpectedly'),
   (FeedbackCategory.featureRequest, 'Feature request', "Idea for something new you'd like to see"),
   (FeedbackCategory.general, 'General', 'Praise, complaints, or anything else'),
 ];
 
-/// BOUNDARY (#13.5 Submit Feedback). Fire-and-forget: category tiles +
-/// body (≥10 chars) + pinned submit; in-screen success state.
+// (#) Submit-feedback screen. Pick a category, write at least a few characters,
+// tap submit and the SubmitFeedback control fires it off. Flips to a thank-you
+// state once it's sent.
 class SubmitFeedbackScreen extends ConsumerStatefulWidget {
   const SubmitFeedbackScreen({super.key});
 
+  // (#) Creates the state holding the form and submitted flag.
   @override
   ConsumerState<SubmitFeedbackScreen> createState() => _SubmitFeedbackScreenState();
 }
 
+// (#) Live state: chosen category, the body text and whether it's been sent.
 class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
-  FeedbackCategory _category = FeedbackCategory.general; // valid even on autopilot
-  final _body = TextEditingController();
-  bool _submitted = false;
+  FeedbackCategory _category = FeedbackCategory.general; // (#) selected category, valid by default
+  final _body = TextEditingController(); // (#) the feedback text the user types
+  bool _submitted = false; // (#) true once submit succeeded, switches to success view
 
+  // (#) Frees the body text controller when the screen closes.
   @override
   void dispose() {
     _body.dispose();
     super.dispose();
   }
 
+  // (#) Placeholder hint for the body field, changes with the chosen category.
   String get _placeholder => switch (_category) {
         FeedbackCategory.bug => 'What happened? What did you expect?',
         FeedbackCategory.featureRequest => 'What would you like to see? How would it help you?',
         FeedbackCategory.general => "Tell us what's on your mind…",
       };
 
+  // (#) How many more characters are needed before the body is long enough.
   int get _remaining => SubmitFeedback.minBodyLength - _body.text.trim().length;
 
+  // (#) Sends the feedback via the control; shows success or an error snackbar.
   Future<void> _submit() async {
     final ok = await ref
         .read(submitFeedbackProvider.notifier)
@@ -54,6 +62,7 @@ class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
     }
   }
 
+  // (#) Builds either the form or the success view depending on _submitted.
   @override
   Widget build(BuildContext context) {
     final sending = ref.watch(submitFeedbackProvider).isLoading;
@@ -69,6 +78,8 @@ class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
     );
   }
 
+  // (#) Builds the form: intro, category tiles, body field, char counter and
+  // the pinned submit button at the bottom.
   Widget _form(bool sending) {
     final valid = _remaining <= 0;
     return Column(
@@ -149,6 +160,7 @@ class _SubmitFeedbackScreenState extends ConsumerState<SubmitFeedbackScreen> {
     );
   }
 
+  // (#) Builds the thank-you view with buttons to submit another or go back.
   Widget _success() {
     return Center(
       child: Padding(

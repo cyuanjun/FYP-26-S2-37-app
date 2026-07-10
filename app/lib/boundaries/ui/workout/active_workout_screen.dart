@@ -10,23 +10,25 @@ import '../../gateways/workout_gateway.dart';
 import '../common/stat_tile.dart';
 import 'workout_summary_screen.dart';
 
-/// BOUNDARY (#9 Active Workout). Free-form capture with a pre-start phase:
-/// landing does NOT start the session — the user confirms/swaps the activity,
-/// then taps START. Same layout pre-start and in-session (values switch on).
+// (#) The live workout capture screen. Pick an activity, tap START, then
+// pause/resume and END. Time, distance and heart rate stream in from the
+// ActiveWorkout control; ending it opens the summary. Landing does not auto-start.
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   const ActiveWorkoutScreen({super.key, this.initialTypeId});
 
-  /// Pre-selects the activity (e.g. "Start Planned Workout" from the Train plan card).
-  final String? initialTypeId;
+  final String? initialTypeId; // (#) activity to pre-select, e.g. from a plan card
 
+  // (#) Creates the state holding the picked activity and finishing flag.
   @override
   ConsumerState<ActiveWorkoutScreen> createState() => _ActiveWorkoutScreenState();
 }
 
+// (#) Live state: which activity is selected and whether we're ending the session.
 class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
-  WorkoutType? _selected;
-  bool _finishing = false;
+  WorkoutType? _selected; // (#) the activity chosen before/while recording
+  bool _finishing = false; // (#) guard while the end/save is in flight
 
+  // (#) Opens a bottom sheet of activities and stores the chosen one.
   Future<void> _pickActivity(List<WorkoutType> types) async {
     final picked = await showModalBottomSheet<WorkoutType>(
       context: context,
@@ -49,11 +51,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
     if (picked != null) setState(() => _selected = picked);
   }
 
+  // (#) Tells the control to start recording the selected activity.
   Future<void> _start() async {
     if (_selected == null) return;
     await ref.read(activeWorkoutProvider.notifier).start(_selected!);
   }
 
+  // (#) Asks "end workout?" and, if confirmed, runs the finish flow.
   Future<void> _confirmEnd() async {
     final ok = await showDialog<bool>(
       context: context,
@@ -70,6 +74,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
     if (ok == true) _finish();
   }
 
+  // (#) Grabs the final stats, ends the session via the control, and pushes the
+  // summary screen.
   Future<void> _finish() async {
     if (_finishing) return;
     setState(() => _finishing = true);
@@ -91,6 +97,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
     ));
   }
 
+  // (#) Builds the screen: big timer, the stat pair, live HR, and the
+  // activity/START/END control row, laid out the same before and during a session.
   @override
   Widget build(BuildContext context) {
     final typesAsync = ref.watch(workoutTypesProvider);

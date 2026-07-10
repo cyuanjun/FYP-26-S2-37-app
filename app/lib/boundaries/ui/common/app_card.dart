@@ -2,39 +2,33 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-/// Shared surface card — the white rounded container behind every card in the
-/// app (train/plan cards, analytics, goal cards, settings groups, …).
-///
-/// Defaults match the house style: surface colour, radius 16, uniform
-/// [AppColors.cardShadow], padding 16. Pass [borderColor] for a hairline
-/// ([AppColors.faint]) or emphasis (e.g. accent on a selected card).
+// (#) The plain rounded card that most things in the app sit on. Wraps its
+// child with the house surface colour, rounded corners and a soft shadow so
+// every card looks the same. Used all over: train, analytics, goals, settings.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(16),
-    this.margin,
-    this.radius = 16,
-    this.borderColor,
-    this.borderWidth = 1,
-    this.shadow = true,
-    this.width,
+    required this.child, // (#) whatever goes inside the card
+    this.padding = const EdgeInsets.all(16), // (#) inner spacing around the child
+    this.margin, // (#) optional outer spacing around the card
+    this.radius = 16, // (#) how round the corners are
+    this.borderColor, // (#) hairline or emphasis border colour, none when null
+    this.borderWidth = 1, // (#) thickness of that border
+    this.shadow = true, // (#) draw the drop shadow or not
+    this.width, // (#) fixed width, e.g. infinity to fill the parent
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry? margin;
   final double radius;
-
-  /// Hairline/emphasis border; no border when null.
   final Color? borderColor;
   final double borderWidth;
-
   final bool shadow;
-
-  /// e.g. `double.infinity` to fill the parent.
   final double? width;
 
+  // (#) Builds the container: surface fill, rounded corners, optional shadow
+  // and border, with the child placed inside.
   @override
   Widget build(BuildContext context) {
     return Container(

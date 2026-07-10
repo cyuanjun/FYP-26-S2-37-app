@@ -8,32 +8,33 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/expert_profile.dart';
 import '../common/field_label.dart';
 
-/// BOUNDARY (#24.1 Manage Professional Info). Edits the expert's
-/// self-descriptive columns — title, years coaching, about, credentials,
-/// specialties. Aggregates and verification status are not editable here
-/// (column-revoked; RPC/admin-only).
+// (#) Form where the expert edits their public info: title, years, about, credentials and specialties.
+// (#) Tapping save hands it to the UpdateExpertProfile control. Stats and verification aren't editable here.
 class ProfessionalInfoScreen extends ConsumerStatefulWidget {
   const ProfessionalInfoScreen({super.key, required this.profile});
 
-  final ExpertProfile profile;
+  final ExpertProfile profile; // (#) the expert's current profile to prefill the form
 
+  // (#) Makes the state that holds the editable text boxes.
   @override
   ConsumerState<ProfessionalInfoScreen> createState() =>
       _ProfessionalInfoScreenState();
 }
 
+// (#) Live state for the editor: the five text boxes prefilled from the profile, plus a saving flag.
 class _ProfessionalInfoScreenState
     extends ConsumerState<ProfessionalInfoScreen> {
-  late final _title = TextEditingController(text: widget.profile.title);
+  late final _title = TextEditingController(text: widget.profile.title); // (#) professional title
   late final _years =
-      TextEditingController(text: widget.profile.yearsCoaching.toString());
-  late final _about = TextEditingController(text: widget.profile.about);
+      TextEditingController(text: widget.profile.yearsCoaching.toString()); // (#) years coaching
+  late final _about = TextEditingController(text: widget.profile.about); // (#) the about blurb
   late final _credentials =
-      TextEditingController(text: widget.profile.credentials.join('\n'));
+      TextEditingController(text: widget.profile.credentials.join('\n')); // (#) credentials, one per line
   late final _specialties =
-      TextEditingController(text: widget.profile.specialties.join(', '));
-  bool _busy = false;
+      TextEditingController(text: widget.profile.specialties.join(', ')); // (#) specialties, comma separated
+  bool _busy = false; // (#) true while the save is running
 
+  // (#) Frees the five text boxes when the screen closes.
   @override
   void dispose() {
     _title.dispose();
@@ -44,9 +45,11 @@ class _ProfessionalInfoScreenState
     super.dispose();
   }
 
+  // (#) True when the title isn't blank and years is a real number, so save can be enabled.
   bool get _valid =>
       _title.text.isNotBlank && int.tryParse(_years.text.trim()) != null;
 
+  // (#) Splits the fields into lists and calls UpdateExpertProfile, then pops with a snackbar or shows the error.
   Future<void> _save() async {
     if (!_valid) return;
     setState(() => _busy = true);
@@ -78,6 +81,7 @@ class _ProfessionalInfoScreenState
     }
   }
 
+  // (#) Lays out the form: title, years, about, credentials and specialties fields plus the SAVE button.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

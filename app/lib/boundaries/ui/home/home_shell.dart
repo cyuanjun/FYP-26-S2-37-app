@@ -17,26 +17,27 @@ import '../social/social_tab.dart';
 import '../train/train_screen.dart';
 import 'dashboard_tab.dart';
 
-/// BOUNDARY — the authenticated app shell. First-time athletes are routed
-/// through Onboarding (#3) first. The nav is role-based:
-/// athletes (free/premium) get Home · Experts · Train · Social · History;
-/// experts get their own track (#20–#24: Home · Services · Requests ·
-/// Clients · Profile), mirroring the wireframes' dedicated expert nav.
+// (#) The main shell after login. Holds the bottom nav bar and flips between
+// tabs. Shows the athlete tabs or the expert tabs depending on the role, and
+// packs brand-new athletes off to onboarding first.
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
-  static const path = '/home';
+  static const path = '/home'; // (#) route the router uses to reach the shell
 
+  // (#) Makes the state object that tracks which tab is open.
   @override
   ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
+// (#) Live state for the shell: which tab is selected and whether reminders
+// have been synced yet this session.
 class _HomeShellState extends ConsumerState<HomeShell> {
-  int _index = 0;
-  bool _remindersSynced = false;
+  int _index = 0; // (#) index of the currently selected bottom-nav tab
+  bool _remindersSynced = false; // (#) guard so we only sync reminders once
 
-  /// One permission ask + reminder sync per shell life (athletes only;
-  /// re-syncs happen from #13.4 toggles and future mutations).
+  // (#) Asks for notification permission once and runs the reminder sync,
+  // athletes only. Later re-syncs come from the #13.4 toggles.
   Future<void> _syncReminders() async {
     if (_remindersSynced) return;
     _remindersSynced = true;
@@ -44,6 +45,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     await ref.read(syncRemindersProvider).call();
   }
 
+  // (#) The five screens shown to athletes, one per bottom-nav slot.
   static const _athleteTabs = [
     DashboardTab(),
     ExpertsTab(),
@@ -52,6 +54,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     HistoryScreen(),
   ];
 
+  // (#) The matching nav bar icons and labels for the athlete tabs.
   static const _athleteDestinations = [
     NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
     NavigationDestination(icon: Icon(Icons.school_outlined), selectedIcon: Icon(Icons.school), label: 'Experts'),
@@ -60,6 +63,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     NavigationDestination(icon: Icon(Icons.history_outlined), selectedIcon: Icon(Icons.history), label: 'History'),
   ];
 
+  // (#) The five screens shown to experts instead of the athlete set.
   static const _expertTabs = [
     ExpertHomeTab(),
     ExpertServicesTab(),
@@ -68,6 +72,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     ExpertProfileTab(),
   ];
 
+  // (#) The matching nav bar icons and labels for the expert tabs.
   static const _expertDestinations = [
     NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
     NavigationDestination(icon: Icon(Icons.storefront_outlined), selectedIcon: Icon(Icons.storefront), label: 'Services'),
@@ -76,6 +81,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profile'),
   ];
 
+  // (#) Picks athlete vs expert tabs by role, sends first-time athletes to
+  // onboarding, kicks off the reminder sync, and draws the nav bar.
   @override
   Widget build(BuildContext context) {
     // First login → onboarding wizard before the shell (spec: Splash/Login

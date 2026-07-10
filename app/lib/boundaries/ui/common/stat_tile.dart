@@ -3,47 +3,35 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 
-/// Shared "label + value" stat tile — the one widget behind every stats row
-/// (history analytics/cards, profile lifetime stats, live capture metrics,
-/// workout summary and history detail).
-///
-/// The value is coloured by [AppColors.metricColor] from the label, so the
-/// same metric is always the same colour app-wide.
+// (#) The little "label + number" block behind every stats row in the app. It
+// colours the value based on its label, so the same metric always shows up in
+// the same colour wherever it appears (history, profile, live capture, summary).
 class StatTile extends StatelessWidget {
   const StatTile(
-    this.label,
-    this.value, {
+    this.label, // (#) the metric name, also drives the value colour
+    this.value, { // (#) the number or text to show big
     super.key,
-    this.delta,
-    this.dim = false,
-    this.valueFirst = false,
-    this.boxed = false,
-    this.valueStyle,
-    this.labelStyle,
-    this.gap = 2,
+    this.delta, // (#) change vs last period, draws an up/down arrow
+    this.dim = false, // (#) fade the value out, used when capture is paused
+    this.valueFirst = false, // (#) put the value above the label instead of below
+    this.boxed = false, // (#) fixed width tile on its own little card
+    this.valueStyle, // (#) override the value text style
+    this.labelStyle, // (#) override the label text style
+    this.gap = 2, // (#) space between label and value
   });
 
   final String label;
   final String value;
-
-  /// vs-prior-period change: renders an ↑/↓ arrow next to the value
-  /// (green up / red down). Hidden when null or 0.
   final int? delta;
-
-  /// Fade the value to [AppColors.faint] (paused live capture).
   final bool dim;
-
-  /// Render the value above the label instead of below it.
   final bool valueFirst;
-
-  /// Fixed-width tile on its own surface card instead of expanding into the
-  /// enclosing Row.
   final bool boxed;
-
   final TextStyle? valueStyle;
   final TextStyle? labelStyle;
   final double gap;
 
+  // (#) Builds the tile: the label and coloured value, an optional delta arrow,
+  // and either the boxed card layout or the expanding column.
   @override
   Widget build(BuildContext context) {
     final labelText = Text(label, style: labelStyle ?? AppTypography.caption2);

@@ -6,9 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../common/field_label.dart';
 
-/// Deliverable composer (expert view) — deliberately simple: title, note,
-/// and one optional section where each line becomes an item. Not the full
-/// WorkoutSegment editor (approved trim).
+// (#) Pops open the composer bottom sheet where an expert types up a deliverable to send a client.
 void showDeliverableComposer(BuildContext context, String requestId) {
   showModalBottomSheet<void>(
     context: context,
@@ -19,22 +17,25 @@ void showDeliverableComposer(BuildContext context, String requestId) {
   );
 }
 
+// (#) The sheet body itself. Holds the form and fires the SendDeliverable control when SEND is tapped.
 class _ComposerSheet extends ConsumerStatefulWidget {
   const _ComposerSheet({required this.requestId});
 
-  final String requestId;
-
+  final String requestId; // (#) which request this deliverable belongs to
+  // (#) Makes the state object that keeps the typed-in text.
   @override
   ConsumerState<_ComposerSheet> createState() => _ComposerSheetState();
 }
 
+// (#) Live state for the composer: the four text boxes plus a flag for the in-flight send.
 class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
-  final _title = TextEditingController();
-  final _note = TextEditingController();
-  final _heading = TextEditingController();
-  final _lines = TextEditingController();
-  bool _sending = false;
+  final _title = TextEditingController();   // (#) the deliverable title
+  final _note = TextEditingController();    // (#) an optional note for the client
+  final _heading = TextEditingController(); // (#) optional heading for the one section
+  final _lines = TextEditingController();   // (#) section items, one per line
+  bool _sending = false; // (#) true while the send is going out
 
+  // (#) Cleans up the four text boxes when the sheet closes.
   @override
   void dispose() {
     _title.dispose();
@@ -44,6 +45,7 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
     super.dispose();
   }
 
+  // (#) Gathers the fields and asks SendDeliverable to send them, then closes the sheet if it worked.
   Future<void> _send() async {
     setState(() => _sending = true);
     final ok = await ref.read(sendDeliverableProvider).call(
@@ -59,6 +61,7 @@ class _ComposerSheetState extends ConsumerState<_ComposerSheet> {
   }
 
 
+  // (#) Lays out the sheet: heading, the title, note, section heading and items fields, and the SEND button.
   @override
   Widget build(BuildContext context) {
     return Padding(

@@ -19,45 +19,49 @@ import '../common/app_card.dart';
 import '../profile/profile_widgets.dart';
 import '../../../core/strings.dart';
 
-/// BOUNDARY (#3 Onboarding, post-login). First-time wizard: profile basics →
-/// training context → goal → AI/rule plan generation. The plan needs the
-/// profile, which is why this flow exists before the main shell.
+// (#) First-run onboarding wizard. Walks a new user through their details, how
+// they train and their goal, then calls the GeneratePlan control to build a
+// starter plan before dropping them into the main app.
 class OnboardingFlow extends ConsumerStatefulWidget {
   const OnboardingFlow({super.key});
 
+  // (#) Creates the state that tracks the wizard step and all the answers.
   @override
   ConsumerState<OnboardingFlow> createState() => _OnboardingFlowState();
 }
 
+// (#) Live state: the page controller, current step, and every field collected
+// across the four steps.
 class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
-  final _page = PageController();
-  int _step = 0;
+  final _page = PageController(); // (#) drives the swiping between steps
+  int _step = 0; // (#) which step is showing, for the progress bar
 
-  // Step 1 — body metrics (+ name fallback when website signup gave none)
-  final _firstName = TextEditingController();
-  final _lastName = TextEditingController();
-  DateTime? _dob;
-  Sex? _sex;
-  int? _heightCm;
-  double? _weightKg;
+  // (#) Step 1 body metrics, plus name fields shown only if signup gave none.
+  final _firstName = TextEditingController(); // (#) first name entry
+  final _lastName = TextEditingController(); // (#) last name entry (optional)
+  DateTime? _dob; // (#) date of birth
+  Sex? _sex; // (#) selected sex
+  int? _heightCm; // (#) height in centimetres
+  double? _weightKg; // (#) weight in kilograms
 
-  // Step 2 — training context
-  ActivityLevel? _activity;
-  TrainingExperience? _experience;
-  final Set<String> _workoutTypeIds = {};
+  // (#) Step 2 training context.
+  ActivityLevel? _activity; // (#) day-to-day activity level
+  TrainingExperience? _experience; // (#) training experience level
+  final Set<String> _workoutTypeIds = {}; // (#) preferred workout type ids
 
-  // Step 3 — goal
-  PrimaryGoal _goal = PrimaryGoal.maintainFitness;
-  double? _target;
-  int _weeklyDays = 3;
-  int _timelineWeeks = 12;
-  bool _goalTouched = false;
+  // (#) Step 3 goal.
+  PrimaryGoal _goal = PrimaryGoal.maintainFitness; // (#) chosen primary goal
+  double? _target; // (#) target value for the goal
+  int _weeklyDays = 3; // (#) planned training days per week
+  int _timelineWeeks = 12; // (#) weeks to reach the goal
+  bool _goalTouched = false; // (#) so we set the default target only once
 
-  // Step 4 — result
-  FitnessPlan? _plan;
-  String? _error;
-  bool _generating = false;
+  // (#) Step 4 result.
+  FitnessPlan? _plan; // (#) the generated plan once it comes back
+  String? _error; // (#) error message if generation failed
+  bool _generating = false; // (#) true while the plan is being generated
 
+  // (#) Frees the page controller and name fields when the wizard closes.
   @override
   void dispose() {
     _page.dispose();
@@ -66,23 +70,28 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     super.dispose();
   }
 
+  // (#) True when the profile has no first name yet, so we must ask for one.
   bool get _needsName =>
       ref.read(currentProfileProvider).value?.firstName == null;
 
+  // (#) Jumps to a step and animates the page across to it.
   void _go(int step) {
     setState(() => _step = step);
     _page.animateToPage(step,
         duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
   }
 
+  // (#) True when step 1 has all the required body metrics (and a name if needed).
   bool get _step1Valid =>
       _dob != null &&
       _sex != null &&
       _heightCm != null &&
       _weightKg != null &&
       (!_needsName || _firstName.text.isNotBlank);
+  // (#) True when step 2 has an activity level and experience chosen.
   bool get _step2Valid => _activity != null && _experience != null;
 
+  // (#) Saves the profile and goal, then asks the control to generate the plan.
   Future<void> _generate() async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -124,11 +133,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     });
   }
 
+  // (#) Marks onboarding done via the control, which hands over to HomeShell.
   Future<void> _finish() async {
     await ref.read(completeOnboardingProvider).call();
     // currentProfileProvider invalidated by the control → HomeShell takes over.
   }
 
+  // (#) Prompts for a custom workout name, creates it, and selects the new chip.
   Future<void> _addCustomWorkout() async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -161,6 +172,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     }
   }
 
+  // (#) Builds the wizard: the top progress bar and the swipeable page view of
+  // the five steps.
   @override
   Widget build(BuildContext context) {
     final firstName =
@@ -207,7 +220,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     );
   }
 
-  // ---- Step 0: welcome ----
+  // (#) Step 0: the welcome page with a quick overview and a start button.
   Widget _welcome(String firstName) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -235,7 +248,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     );
   }
 
-  // ---- Step 1: body metrics ----
+  // (#) Step 1: the body-metrics form (name, DOB, sex, height, weight).
   Widget _bodyMetrics() {
     return _stepShell(
       title: 'ABOUT YOU',
@@ -336,7 +349,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     );
   }
 
-  // ---- Step 2: training context ----
+  // (#) Step 2: activity level, experience and preferred-workout chips.
   Widget _trainingContext() {
     final types = ref.watch(workoutTypesProvider).value ?? [];
     return _stepShell(
@@ -400,7 +413,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     );
   }
 
-  // ---- Step 3: goal ----
+  // (#) Step 3: pick a goal, set its target, weekly days and timeline, then
+  // kick off plan generation.
   Widget _goalStep() {
     if (!_goalTouched) {
       _target = FitnessGoal.defaultTargetFor(_goal, currentWeightKg: _weightKg);
@@ -489,7 +503,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     );
   }
 
-  // ---- Step 4: generating / result ----
+  // (#) Step 4: shows the spinner while generating, then the finished plan or an
+  // error with retry/skip.
   Widget _planStep() {
     final premium = ref.watch(currentProfileProvider).value?.isPremium ?? false;
     return Padding(
@@ -557,7 +572,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     );
   }
 
-  // ---- shared bits ----
+  // (#) Common step frame: scrolling title/subtitle/content with a Back button
+  // and a validated Next button pinned at the bottom.
   Widget _stepShell({
     required String title,
     required String subtitle,
@@ -606,6 +622,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     );
   }
 
+  // (#) A compact label + minus/value/plus row used for target and days steppers.
   Widget _miniStepper({
     required String label,
     required double value,

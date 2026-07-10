@@ -12,15 +12,14 @@ import '../common/status_badge.dart';
 import 'deliverable_composer_sheet.dart';
 import 'expert_buttons.dart';
 
-/// BOUNDARY (#23.1 Client Detail). One client's engagements with this
-/// expert. Per the fulfillment model, this is where the work happens:
-/// send deliverables and mark active engagements complete; past
-/// engagements archive below.
+// (#) One client's page for the expert. Lists that client's engagements and lets the expert send
+// (#) deliverables or mark work complete, each going through a control.
 class ExpertClientDetailScreen extends ConsumerWidget {
   const ExpertClientDetailScreen({super.key, required this.clientId});
 
-  final String clientId;
+  final String clientId; // (#) which client we're looking at
 
+  // (#) Reads the incoming requests, keeps this client's ones, and lays them out as pending, active and past.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final all = ref.watch(incomingRequestsProvider).value ?? [];
@@ -82,6 +81,7 @@ class ExpertClientDetailScreen extends ConsumerWidget {
     );
   }
 
+  // (#) The header block: big avatar, client name, and a count of engagements and how many finished.
   Widget _identity(PublicProfile client, List<ServiceRequestSummary> all) {
     final completed = all.where((e) => e.request.isCompleted).length;
     return Column(
@@ -109,6 +109,7 @@ class ExpertClientDetailScreen extends ConsumerWidget {
     );
   }
 
+  // (#) One engagement card: service name, price, when it was asked, the client's message, and an optional footer.
   Widget _engagementCard(
       BuildContext context, WidgetRef ref, ServiceRequestSummary summary,
       {Widget? footer, bool muted = false}) {
@@ -151,6 +152,7 @@ class ExpertClientDetailScreen extends ConsumerWidget {
     );
   }
 
+  // (#) The action row under an active engagement: deliverable count plus Send and Mark complete buttons.
   Widget _actions(
       BuildContext context, WidgetRef ref, ServiceRequestSummary summary) {
     return Column(
@@ -185,6 +187,7 @@ class ExpertClientDetailScreen extends ConsumerWidget {
     );
   }
 
+  // (#) Pops a confirm dialog, then calls CompleteServiceRequest if the expert taps Complete.
   void _confirmComplete(
       BuildContext context, WidgetRef ref, ServiceRequestSummary summary) {
     showDialog<void>(

@@ -10,13 +10,14 @@ import '../../../entities/connected_device.dart';
 import '../../../entities/enums.dart';
 import '../common/status_badge.dart';
 
-/// BOUNDARY (#7.1 Connected Devices). Manage paired wearables/sensors.
-/// Phone sensors are the pinned system device; pairing uses the spec's mock
-/// Bluetooth scan (a real BLE/HealthKit source slots in behind the same
-/// WorkoutDataSource interface later).
+// (#) The connected devices screen. Lists your paired wearables and sensors and
+// lets you add or remove them. Adding runs a real Bluetooth HR scan alongside
+// the demo device list; pairing and toggling all go through the control.
 class ConnectedDevicesScreen extends ConsumerWidget {
   const ConnectedDevicesScreen({super.key});
 
+  // (#) Builds the screen: the device list with a divider between each row, and
+  // an add device button at the bottom that opens the scan sheet.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final devicesAsync = ref.watch(connectedDevicesProvider);
@@ -55,10 +56,9 @@ class ConnectedDevicesScreen extends ConsumerWidget {
     );
   }
 
-  /// Pairing sheet (#7.1): a REAL BLE scan for heart-rate devices runs
-  /// alongside the spec's demo list — real finds show first; wherever
-  /// Bluetooth is unavailable (simulator) the scan yields nothing and the
-  /// demo list remains the pairing path.
+  // (#) Opens the pairing sheet, waits for a pick, then asks the control to pair
+  // it and shows a snackbar saying whether it worked. Real Bluetooth finds show
+  // first; on a simulator the scan finds nothing so the demo list is the path.
   Future<void> _openScanModal(BuildContext context, WidgetRef ref) async {
     const discoverable = <(DeviceType, String)>[
       (DeviceType.appleWatch, 'Apple Watch Series 9'),
@@ -91,19 +91,24 @@ class ConnectedDevicesScreen extends ConsumerWidget {
   }
 }
 
+// (#) The bottom sheet that appears while pairing: shows a scanning spinner,
+// then the list of devices to pick from.
 class _ScanSheet extends StatefulWidget {
   const _ScanSheet({required this.discoverable});
 
-  final List<(DeviceType, String)> discoverable;
+  final List<(DeviceType, String)> discoverable; // (#) the demo devices to always offer
 
+  // (#) Makes the state that tracks the scan progress and nearby finds.
   @override
   State<_ScanSheet> createState() => _ScanSheetState();
 }
 
+// (#) Holds the sheet's state: whether we're still scanning and any real devices found.
 class _ScanSheetState extends State<_ScanSheet> {
-  bool _scanning = true;
-  List<ScannedBleDevice> _nearby = const [];
+  bool _scanning = true; // (#) true while the spinner shows
+  List<ScannedBleDevice> _nearby = const []; // (#) real Bluetooth devices the scan turned up
 
+  // (#) Kicks off the real BLE scan and a timer to drop the spinner after a moment.
   @override
   void initState() {
     super.initState();
@@ -116,6 +121,8 @@ class _ScanSheetState extends State<_ScanSheet> {
     });
   }
 
+  // (#) Builds the sheet: the spinner while scanning, then a nearby section for
+  // real finds (if any) and the demo device list, each row tappable to pick it.
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -178,11 +185,14 @@ class _ScanSheetState extends State<_ScanSheet> {
   }
 }
 
+// (#) One row in the device list: emoji, name, connected badge, last-synced
+// line, and for real devices a toggle and a delete button.
 class _DeviceRow extends ConsumerWidget {
   const _DeviceRow({required this.device});
 
-  final ConnectedDevice device;
+  final ConnectedDevice device; // (#) the device this row shows
 
+  // (#) Builds the friendly "last synced" line from the device's timestamp.
   String _lastSynced() {
     final t = device.lastSyncedAt;
     if (t == null) return device.isPhoneSensors ? 'Built-in · always available' : 'Not synced yet';
@@ -194,6 +204,8 @@ class _DeviceRow extends ConsumerWidget {
     return 'Last synced: ${hours ~/ 24}d ago';
   }
 
+  // (#) Builds the row: the device info on the left, and for non-phone devices a
+  // toggle to turn it on/off plus a delete button that confirms before removing.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final manage = ref.read(manageConnectedDeviceProvider);
