@@ -128,12 +128,21 @@ async function uploadVerificationDocuments(
   }
 }
 
+// Sentinel message the login controller maps to a verify-your-email prompt.
+export const EMAIL_NOT_CONFIRMED = "EMAIL_NOT_CONFIRMED";
+
 export async function authenticateUser(input: LoginRequest): Promise<LoginResult> {
   const { data, error } = await supabase.auth.signInWithPassword({
     email: input.email,
     password: input.password,
   });
-  if (error || !data.user) throw new Error("Invalid email or password.");
+  if (error || !data.user) {
+    // Tell "unverified email" apart from bad credentials so the UI can prompt.
+    const unconfirmed =
+      (error as { code?: string } | null)?.code === "email_not_confirmed" ||
+      /not confirmed|not been confirmed|verify/i.test(error?.message ?? "");
+    throw new Error(unconfirmed ? EMAIL_NOT_CONFIRMED : "Invalid email or password.");
+  }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
@@ -175,4 +184,14 @@ export async function fetchSessionMember(): Promise<SessionMember | null> {
 // Ends the session (used by the /home and /expert/home sign-out buttons).
 export async function signOutMember(): Promise<void> {
   await supabase.auth.signOut();
+}
+
+// Re-sends the sign-up verification email for an unverified account.
+export async function resendVerificationEmail(email: string): Promise<void> {
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: { emailRedirectTo: `${window.location.origin}/login` },
+  });
+  if (error) throw new Error(error.message);
 }

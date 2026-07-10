@@ -1,5 +1,14 @@
-import { authenticateUser } from "@/boundary/gateways/authGateway";
+import { authenticateUser, EMAIL_NOT_CONFIRMED } from "@/boundary/gateways/authGateway";
 import type { LoginForm, LoginViewResult } from "./loginModels";
+
+// Thrown when the account exists but its email hasn't been verified yet.
+// The login page catches this to show the "check your email" prompt.
+export class EmailNotConfirmedError extends Error {
+  constructor(public email: string) {
+    super("Please verify your email before logging in.");
+    this.name = "EmailNotConfirmedError";
+  }
+}
 
 export async function loginUser(form: LoginForm): Promise<LoginViewResult> {
   const email = form.email.trim().toLowerCase();
@@ -11,10 +20,15 @@ export async function loginUser(form: LoginForm): Promise<LoginViewResult> {
     throw new Error("Password is required.");
   }
 
-  const user = await authenticateUser({
-    email,
-    password: form.password,
-  });
+  let user;
+  try {
+    user = await authenticateUser({ email, password: form.password });
+  } catch (e) {
+    if (e instanceof Error && e.message === EMAIL_NOT_CONFIRMED) {
+      throw new EmailNotConfirmedError(email);
+    }
+    throw e;
+  }
 
   if (user.status === "suspended") {
     throw new Error("This account is suspended.");
