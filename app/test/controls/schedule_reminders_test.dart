@@ -3,9 +3,12 @@ import 'package:wise_workout/controls/schedule_reminders.dart';
 import 'package:wise_workout/entities/planned_workout.dart';
 import 'package:wise_workout/entities/workout_session.dart';
 
+// (#) Tests planReminders, the rule-based reminder scheduler (US19-21).
+
 // Wed 8 Jul 2026, 07:00 local.
 final _now = DateTime(2026, 7, 8, 7);
 
+// (#) Makes a planned workout on the given day of week.
 PlannedWorkout _pw(int day, {String? name}) => PlannedWorkout(
       id: 'pw$day',
       fitnessPlanId: 'plan1',
@@ -16,6 +19,7 @@ PlannedWorkout _pw(int day, {String? name}) => PlannedWorkout(
       name: name ?? 'Workout $day',
     );
 
+// (#) Makes a one-hour workout session starting at the given hour.
 WorkoutSession _session(DateTime start, {int hour = 18}) => WorkoutSession(
       id: 's${start.day}-$hour',
       userId: 'u1',
@@ -32,7 +36,9 @@ const _allOn = {
 };
 
 void main() {
+  // (#) Daily plan-day nudges.
   group('daily_reminder (US19)', () {
+    // (#) (+) Check if one nudge is scheduled per plan day, defaulting to 08:00 for Free.
     test('one nudge per plan day in the next week, Free at 08:00', () {
       // Wednesdays (3) and Fridays (5) are plan days.
       final plan = planReminders(
@@ -48,6 +54,7 @@ void main() {
       expect(daily.last.fireAt, DateTime(2026, 7, 10, 8));
     });
 
+    // (#) (+) Check if Premium moves the nudge to the median of past session start hours.
     test('Premium adapts the hour to the median session start (adaptive)',
         () {
       final sessions = [
@@ -65,6 +72,7 @@ void main() {
       expect(plan.single.fireAt.hour, 19); // median of 6, 19, 19
     });
 
+    // (#) (-) Check if no nudge is scheduled for today once a session is already logged.
     test('no nudge today when a session is already logged (negative)', () {
       final plan = planReminders(
         prefs: const {'daily_reminder': true},
@@ -76,6 +84,7 @@ void main() {
       expect(plan.where((r) => r.kind == 'daily_reminder'), isEmpty);
     });
 
+    // (#) (+) Check if a plan-day whose hour already passed still fires as a near-term late nudge.
     test('passed hour becomes a near-term late nudge', () {
       final plan = planReminders(
         prefs: const {'daily_reminder': true},
@@ -90,7 +99,9 @@ void main() {
     });
   });
 
+  // (#) Alerts for a missed plan day.
   group('missed_workout (US19)', () {
+    // (#) (+) Check if a missed-workout alert fires when yesterday was a plan day with no session.
     test('fires when yesterday was a plan day with no session', () {
       final plan = planReminders(
         prefs: const {'missed_workout': true},
@@ -104,6 +115,7 @@ void main() {
       expect(missed.fireAt, DateTime(2026, 7, 8, 9));
     });
 
+    // (#) (-) Check if no missed-workout alert fires when yesterday was actually trained.
     test('silent when yesterday was trained (negative)', () {
       final plan = planReminders(
         prefs: const {'missed_workout': true},
@@ -116,7 +128,9 @@ void main() {
     });
   });
 
+  // (#) Nudges after a stretch of inactivity.
   group('inactivity_reminder (US20)', () {
+    // (#) (+) Check if the inactivity nudge fires 3 days after the last session at 10:00.
     test('fires 3 days after the last session at 10:00', () {
       final plan = planReminders(
         prefs: const {'inactivity_reminder': true},
@@ -128,6 +142,7 @@ void main() {
       expect(plan.single.fireAt, DateTime(2026, 7, 9, 10));
     });
 
+    // (#) (+) Check if an already-overdue inactivity alert is bumped to a near-term fire time.
     test('an overdue alert moves to a near-term fire', () {
       final plan = planReminders(
         prefs: const {'inactivity_reminder': true},
@@ -140,6 +155,7 @@ void main() {
     });
   });
 
+  // (#) Premium-only recovery alerts after a heavy block.
   group('rest_alert (US21, Premium)', () {
     final heavyBlock = [
       _session(DateTime(2026, 7, 6)),
@@ -147,6 +163,7 @@ void main() {
       _session(DateTime(2026, 7, 8), hour: 6),
     ];
 
+    // (#) (+) Check if 3 sessions across 3 days triggers a recovery alert tomorrow at 08:00.
     test('3 sessions in 3 days → recovery alert tomorrow 08:00', () {
       final plan = planReminders(
         prefs: _allOn,
@@ -159,6 +176,7 @@ void main() {
       expect(rest.fireAt, DateTime(2026, 7, 9, 8));
     });
 
+    // (#) (-) Check if a Free account never gets a rest alert even with the pref toggled on.
     test('Free never gets a rest alert even when toggled on (negative)', () {
       final plan = planReminders(
         prefs: _allOn,
@@ -171,6 +189,7 @@ void main() {
     });
   });
 
+  // (#) (-) Check if empty/disabled prefs schedule no reminders at all.
   test('disabled prefs schedule nothing (negative)', () {
     final plan = planReminders(
       prefs: const {},

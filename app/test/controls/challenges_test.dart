@@ -9,6 +9,10 @@ import 'package:wise_workout/entities/public_profile.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the challenges controls: viewing, joining/leaving, creating, and
+// (#) finding challenges by code, all with a fake social gateway.
+
+// (#) Builds a sample Challenge entity for the tests.
 Challenge _challenge(String id, {int? target = 20, String code = ''}) =>
     Challenge(
       id: id,
@@ -23,6 +27,7 @@ Challenge _challenge(String id, {int? target = 20, String code = ''}) =>
       endedAt: DateTime.utc(2026, 7, 30),
     );
 
+// (#) Builds a container with the given signed-in user and fake social gateway.
 ProviderContainer _container(FakeSocialGateway social, {String? userId = 'u1'}) {
   final c = ProviderContainer(overrides: [
     currentUserIdProvider.overrideWithValue(userId),
@@ -33,7 +38,9 @@ ProviderContainer _container(FakeSocialGateway social, {String? userId = 'u1'}) 
 }
 
 void main() {
+  // (#) The challenges list provider that assembles each challenge summary.
   group('ViewChallenges (challengesProvider)', () {
+    // (#) (+) Check if the summary has the right participant count, joined flag, my value, and named leaderboard.
     test('assembles counts, joined state, myValue and named standings', () async {
       final social = FakeSocialGateway()
         ..challenges = [
@@ -62,6 +69,7 @@ void main() {
       expect(c2.myValue, 0); // not ranked → zero progress
     });
 
+    // (#) (-) Check if a signed-out user gets an empty challenges list.
     test('signed out → empty (negative)', () async {
       final social = FakeSocialGateway();
       final c = _container(social, userId: null);
@@ -69,7 +77,9 @@ void main() {
     });
   });
 
+  // (#) The join and leave challenge controls.
   group('JoinChallenge / LeaveChallenge', () {
+    // (#) (+) Check if joining records (challenge, user) and the list refetches showing joined.
     test('join records (id, user) and the list refetches as joined', () async {
       final social = FakeSocialGateway()
         ..challenges = [(_challenge('c1'), <String>[])];
@@ -81,6 +91,7 @@ void main() {
       expect((await c.read(challengesProvider.future)).single.joined, isTrue);
     });
 
+    // (#) (+) Check if leaving records (challenge, user) and the list shows not joined.
     test('leave removes participation', () async {
       final social = FakeSocialGateway()
         ..challenges = [
@@ -94,7 +105,9 @@ void main() {
     });
   });
 
+  // (#) The create challenge control.
   group('CreateChallenge', () {
+    // (#) (+) Check if creating forwards the fields and the creator is auto-joined.
     test('forwards fields and the new challenge appears joined (auto-join)', () async {
       final social = FakeSocialGateway();
       final c = _container(social);
@@ -113,6 +126,7 @@ void main() {
       expect(all.single.joined, isTrue); // creator auto-joined
     });
 
+    // (#) (-) Check if a signed-out user cannot create a challenge (nothing written).
     test('signed out → no-op (negative)', () async {
       final social = FakeSocialGateway();
       final c = _container(social, userId: null);
@@ -120,6 +134,7 @@ void main() {
       expect(social.createdChallenges, isEmpty);
     });
 
+    // (#) (-) Check if an accumulator challenge with a zero/negative target is rejected.
     test('accumulator with a non-positive target is rejected (negative)', () async {
       final social = FakeSocialGateway();
       final c = _container(social);
@@ -133,7 +148,9 @@ void main() {
     });
   });
 
+  // (#) The find-challenge-by-join-code control.
   group('FindChallengeByCode', () {
+    // (#) (+) Check if a lowercase, space-padded code still resolves to the right challenge.
     test('resolves a code, upper-casing + trimming the input', () async {
       final social = FakeSocialGateway()
         ..challenges = [
@@ -148,6 +165,7 @@ void main() {
       expect(found?.id, 'c2');
     });
 
+    // (#) (-) Check if an unknown join code resolves to null.
     test('unknown code → null (negative)', () async {
       final social = FakeSocialGateway()
         ..challenges = [(_challenge('c1', code: 'K7QP2M'), <String>[])];
@@ -155,6 +173,7 @@ void main() {
       expect(await c.read(findChallengeByCodeProvider).call('ZZZZZZ'), isNull);
     });
 
+    // (#) (-) Check if a blank code returns null without querying the gateway.
     test('blank input → null without hitting the gateway (negative)', () async {
       final social = FakeSocialGateway()
         ..challenges = [(_challenge('c1', code: 'K7QP2M'), <String>[])];
@@ -163,7 +182,9 @@ void main() {
     });
   });
 
+  // (#) The single-challenge-by-id derived provider.
   group('challengeSummaryProvider', () {
+    // (#) (+) Check if it pulls one challenge by id from the list, and an unknown id gives null.
     test('derives one challenge by id from the list', () async {
       final social = FakeSocialGateway()
         ..challenges = [

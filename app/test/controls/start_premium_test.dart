@@ -9,8 +9,11 @@ import 'package:wise_workout/entities/subscription.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the StartPremium and ManageSubscription controls plus Subscription entity rules.
+
 const _free = Profile(id: 'u1', email: 'mia@test', role: UserRole.free);
 
+// (#) Builds a ProviderContainer wired to the fake profile gateway and a signed-in user.
 ProviderContainer _container(FakeProfileGateway gateway, {String? userId}) {
   final c = ProviderContainer(overrides: [
     currentUserIdProvider.overrideWithValue(userId ?? 'u1'),
@@ -21,7 +24,9 @@ ProviderContainer _container(FakeProfileGateway gateway, {String? userId}) {
 }
 
 void main() {
+  // (#) Upgrading a Free account to Premium.
   group('StartPremium', () {
+    // (#) (+) Check if the upgrade runs the RPC and refreshes the profile and subscription.
     test('runs the RPC and refreshes profile + subscription (positive)',
         () async {
       final gateway = FakeProfileGateway(profile: _free);
@@ -39,6 +44,7 @@ void main() {
       expect(sub!.isActive, isTrue);
     });
 
+    // (#) (-) Check if an already-Premium account is blocked from upgrading again.
     test('a non-free account cannot upgrade (negative)', () async {
       final gateway = FakeProfileGateway(
           profile: _free.copyWith(role: UserRole.premium));
@@ -50,7 +56,9 @@ void main() {
     });
   });
 
+  // (#) Cancelling and resuming a subscription.
   group('ManageSubscription', () {
+    // (#) (+) Check if cancel then resume writes the cancelled and active status transitions.
     test('cancel then resume writes the status transitions', () async {
       final gateway = FakeProfileGateway(profile: _free);
       await gateway.startPremium();
@@ -67,6 +75,7 @@ void main() {
     });
   });
 
+  // (#) Data-owned pricing and billing-date logic on the Subscription entity.
   group('Subscription entity rules', () {
     final sub = Subscription(
       id: 'u1',
@@ -74,10 +83,12 @@ void main() {
       renewsAt: DateTime(2026, 8, 15),
     );
 
+    // (#) (+) Check if priceLabel formats the settled $9.99 / mo price.
     test('priceLabel formats the settled price', () {
       expect(sub.priceLabel, r'$9.99 / mo');
     });
 
+    // (#) (+) Check if billingDates lists one charge per month, newest first, excluding a future date.
     test('billingDates synthesises one charge per month, most recent first',
         () {
       final dates = sub.billingDates(DateTime(2026, 7, 8));
@@ -90,6 +101,7 @@ void main() {
       ]);
     });
 
+    // (#) (+) Check if billingDates keeps only the 12 most recent charges.
     test('billingDates caps at the 12 most recent charges', () {
       final old = sub.copyWith(startedAt: DateTime(2024, 1, 1));
       final dates = old.billingDates(DateTime(2026, 7, 8));

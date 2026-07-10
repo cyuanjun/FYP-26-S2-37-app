@@ -2,7 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/feed_post.dart';
 
+// (#) Tests the FeedPost entity: decoding embedded PostgREST rows, like/comment counts, post-kind helpers.
 void main() {
+  // (#) Group covering decoding a feed row into a FeedPost.
   group('FeedPost.fromRow', () {
     // Mirrors the gateway's embedded PostgREST row (snake_case, nested).
     final row = <String, dynamic>{
@@ -45,6 +47,7 @@ void main() {
       ],
     };
 
+    // (#) (+) Check if a row decodes into post, author, session and correct like/comment counts.
     test('decodes post, author, session and computes counts (positive)', () {
       final fp = FeedPost.fromRow(row, me: 'u1');
       expect(fp.post.kind, PostKind.workoutShare);
@@ -56,11 +59,13 @@ void main() {
       expect(fp.likedByMe, isTrue);
     });
 
+    // (#) (-) Check if likedByMe is false when my id is not among the likes.
     test('likedByMe false when I have not liked (negative)', () {
       final fp = FeedPost.fromRow(row, me: 'u9');
       expect(fp.likedByMe, isFalse);
     });
 
+    // (#) (+) Check if a level_up row carries the level and has no session.
     test('level_up rows carry level and no session', () {
       final levelUp = <String, dynamic>{
         ...row,
@@ -79,7 +84,9 @@ void main() {
     });
   });
 
+  // (#) Group covering the mutually-exclusive post-kind flags.
   group('Post kind helpers', () {
+    // (#) (+) Check if exactly one kind helper is true for a workout-share post.
     test('exactly one is true per kind', () {
       final fp = FeedPost.fromRow(rowWs, me: 'u1').post;
       expect(fp.isWorkoutShare, isTrue);

@@ -17,9 +17,13 @@ import 'package:wise_workout/entities/profile.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the Profile cluster controls: fitness profile, fitness goal, feedback,
+// (#) notification prefs, account settings, password reset, and custom workout types.
 void main() {
   // ---- UpdateFitnessProfile (#13.1) ----
+  // (#) The control that edits the fitness profile and custom health tags.
   group('UpdateFitnessProfile', () {
+    // (#) (+) Check if save forwards the patch to the gateway.
     test('save commits the patch via the gateway (positive)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(overrides: [
@@ -34,6 +38,7 @@ void main() {
       expect(fake.profilePatches.single['height_cm'], 170);
     });
 
+    // (#) (-) Check if a gateway failure returns false and lands in an error state.
     test('save surfaces gateway failure (negative)', () async {
       final fake = FakeFitnessGateway()..throwOnWrite = true;
       final c = ProviderContainer(
@@ -45,6 +50,7 @@ void main() {
       expect(c.read(updateFitnessProfileProvider).hasError, isTrue);
     });
 
+    // (#) (-) Check if an out-of-range height is rejected before reaching the gateway.
     test('out-of-range height is rejected before the gateway (negative)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(overrides: [
@@ -59,6 +65,7 @@ void main() {
       expect(fake.profilePatches, isEmpty); // nothing reached the gateway
     });
 
+    // (#) (+) Check if adding a custom health tag inserts and returns it flagged custom.
     test('addCustomTag inserts and returns the tag (positive)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(
@@ -71,6 +78,7 @@ void main() {
       expect(fake.tags, hasLength(1));
     });
 
+    // (#) (-) Check if a blank tag name is rejected and nothing is inserted.
     test('addCustomTag rejects empty names (negative)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(
@@ -85,7 +93,9 @@ void main() {
   });
 
   // ---- SetFitnessGoal (#13.2) ----
+  // (#) The control that saves the user's fitness goal.
   group('SetFitnessGoal', () {
+    // (#) (+) Check if a lose-weight goal writes the kg target, unit, and timeline.
     test('lose_weight goal writes kg target + timeline (positive)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(
@@ -107,6 +117,7 @@ void main() {
       expect(values['timeline_weeks'], 12);
     });
 
+    // (#) (+) Check if a maintain-fitness goal nulls out target and timeline but keeps commitment days.
     test('maintain_fitness nulls target + timeline (positive)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(
@@ -127,6 +138,7 @@ void main() {
       expect(values['weekly_commitment_days'], 3);
     });
 
+    // (#) (-) Check if a weekly commitment outside 1 to 7 is rejected before the gateway.
     test('weekly commitment out of 1–7 is rejected before the gateway (negative)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(
@@ -141,6 +153,7 @@ void main() {
       expect(fake.goalUpserts, isEmpty);
     });
 
+    // (#) (-) Check if a target-based goal with a zero/negative target is rejected.
     test('target-racing goal with a non-positive target is rejected (negative)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(
@@ -156,6 +169,7 @@ void main() {
       expect(fake.goalUpserts, isEmpty);
     });
 
+    // (#) (-) Check if a gateway failure returns false and sets an error state.
     test('gateway failure → false + error state (negative)', () async {
       final fake = FakeFitnessGateway()..throwOnWrite = true;
       final c = ProviderContainer(
@@ -172,7 +186,9 @@ void main() {
   });
 
   // ---- SubmitFeedback (#13.5) ----
+  // (#) The control that submits user feedback.
   group('SubmitFeedback', () {
+    // (#) Builds a container with the given signed-in user and fake feedback gateway.
     ProviderContainer feedbackContainer(FakeFeedbackGateway fake, {String? userId = 'user-1'}) {
       final c = ProviderContainer(overrides: [
         feedbackGatewayProvider.overrideWithValue(fake),
@@ -182,6 +198,7 @@ void main() {
       return c;
     }
 
+    // (#) (+) Check if a valid body is trimmed and submitted with its category.
     test('valid body submits trimmed (positive)', () async {
       final fake = FakeFeedbackGateway();
       final c = feedbackContainer(fake);
@@ -193,6 +210,7 @@ void main() {
       expect(fake.submissions.single.$3, 'The timer drifts on pause.');
     });
 
+    // (#) (-) Check if a too-short body (under 10 chars after trim) never reaches the gateway.
     test('under 10 chars after trim never reaches the gateway (negative)', () async {
       final fake = FakeFeedbackGateway();
       final c = feedbackContainer(fake);
@@ -203,6 +221,7 @@ void main() {
       expect(fake.submissions, isEmpty);
     });
 
+    // (#) (-) Check if a signed-out user cannot submit feedback.
     test('signed out → false (negative)', () async {
       final fake = FakeFeedbackGateway();
       final c = feedbackContainer(fake, userId: null);
@@ -213,6 +232,7 @@ void main() {
       expect(fake.submissions, isEmpty);
     });
 
+    // (#) (-) Check if a gateway failure returns false.
     test('gateway failure → false (negative)', () async {
       final fake = FakeFeedbackGateway()..throwOnSubmit = true;
       final c = feedbackContainer(fake);
@@ -224,7 +244,9 @@ void main() {
   });
 
   // ---- ManageNotificationPrefs (#13.4) ----
+  // (#) The control that reads and writes notification preferences.
   group('ManageNotificationPrefs', () {
+    // (#) Builds a profile carrying the given notification prefs map.
     Profile profileWith(Map<String, dynamic> prefs) => Profile(
         id: 'user-1',
         email: 'mia@test',
@@ -232,6 +254,7 @@ void main() {
         firstName: 'Mia',
         notificationPrefs: prefs);
 
+    // (#) Builds a container signed in as user-1 with the given profile and fake profile gateway.
     ProviderContainer prefsContainer(FakeProfileGateway fake, Profile profile) {
       final c = ProviderContainer(overrides: [
         profileGatewayProvider.overrideWithValue(fake),
@@ -242,6 +265,7 @@ void main() {
       return c;
     }
 
+    // (#) (+) Check if stored prefs override the defaults and unset keys fall back to defaults.
     test('build merges stored prefs over defaults (positive)', () async {
       final fake = FakeProfileGateway();
       final c = prefsContainer(fake, profileWith({'promotions': true, 'daily_reminder': false}));
@@ -252,6 +276,7 @@ void main() {
       expect(prefs['product_tips'], isFalse); // default (marketing off)
     });
 
+    // (#) (+) Check if setEnabled persists the full prefs map and updates the state.
     test('setEnabled writes the whole map (positive)', () async {
       final fake = FakeProfileGateway();
       final c = prefsContainer(fake, profileWith({}));
@@ -263,7 +288,9 @@ void main() {
   });
 
   // ---- UpdateAccountSettings (#13.3) ----
+  // (#) The control for account settings: units, name, and password-change email.
   group('UpdateAccountSettings', () {
+    // (#) (+) Check if setting preferred units writes them immediately.
     test('setPreferredUnits writes instantly (positive)', () async {
       final fake = FakeProfileGateway();
       final c = ProviderContainer(overrides: [
@@ -277,6 +304,7 @@ void main() {
       expect(fake.unitWrites.single, PreferredUnits.imperial);
     });
 
+    // (#) (-) Check if setting units does nothing when signed out.
     test('setPreferredUnits is a no-op when signed out (negative)', () async {
       final fake = FakeProfileGateway();
       final c = ProviderContainer(overrides: [
@@ -290,6 +318,7 @@ void main() {
       expect(fake.unitWrites, isEmpty);
     });
 
+    // (#) (+) Check if saving a valid first/last name writes them.
     test('saveName writes the onboarding name fallback (positive)', () async {
       final fake = FakeProfileGateway();
       final c = ProviderContainer(overrides: [
@@ -304,6 +333,7 @@ void main() {
       expect(fake.nameWrites.single, ('Mia', 'Patel'));
     });
 
+    // (#) (-) Check if a blank first name is rejected and nothing is written.
     test('saveName rejects empty first name (negative)', () async {
       final fake = FakeProfileGateway();
       final c = ProviderContainer(overrides: [
@@ -318,6 +348,7 @@ void main() {
       expect(fake.nameWrites, isEmpty);
     });
 
+    // (#) (+) Check if sending the change-password email returns true on success and false on gateway failure.
     test('sendChangePasswordEmail success/failure', () async {
       final fake = FakeAuthGateway();
       final c = ProviderContainer(
@@ -340,7 +371,9 @@ void main() {
   });
 
   // ---- RequestPasswordReset (#4) ----
+  // (#) The forgot-password control.
   group('RequestPasswordReset', () {
+    // (#) (+) Check if send forwards the email to the gateway with no error.
     test('send delegates to the gateway (positive)', () async {
       final fake = FakeAuthGateway();
       final c = ProviderContainer(
@@ -351,6 +384,7 @@ void main() {
       expect(c.read(requestPasswordResetProvider).hasError, isFalse);
     });
 
+    // (#) (-) Check if a gateway failure is swallowed so unknown emails look identical (anti-enumeration).
     test('gateway failure is swallowed — same "sent" outcome (anti-enumeration)', () async {
       final fake = FakeAuthGateway()..throwOnReset = true;
       final c = ProviderContainer(
@@ -362,7 +396,9 @@ void main() {
   });
 
   // ---- Custom workout types (onboarding + #13.1 pickers) ----
+  // (#) Adding user-defined workout types.
   group('addCustomWorkoutType', () {
+    // (#) (+) Check if a custom workout type is inserted and returned with a slug, flagged custom.
     test('inserts a custom type and returns it (positive)', () async {
       final gw = FakeWorkoutGateway(types: [runningType]);
       final c = ProviderContainer(overrides: [
@@ -379,6 +415,7 @@ void main() {
       expect(gw.types, hasLength(2));
     });
 
+    // (#) (-) Check if a blank workout-type name is rejected and nothing is inserted.
     test('rejects empty names (negative)', () async {
       final gw = FakeWorkoutGateway(types: [runningType]);
       final c = ProviderContainer(overrides: [

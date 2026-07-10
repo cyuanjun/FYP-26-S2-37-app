@@ -8,6 +8,9 @@ import 'package:wise_workout/entities/expert_service.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the PublishService and UpdateExpertProfile controls plus the service enum wire values.
+
+// (#) Builds a ProviderContainer wired to the fake expert gateway and a signed-in user.
 ProviderContainer _container(FakeExpertGateway gateway, {String? userId = 'x1'}) {
   final c = ProviderContainer(overrides: [
     currentUserIdProvider.overrideWithValue(userId),
@@ -29,7 +32,9 @@ const _service = ExpertService(
 );
 
 void main() {
+  // (#) Publishing a new service versus updating an existing one.
   group('PublishService', () {
+    // (#) (+) Check if a blank id creates a new service and a set id updates the existing one.
     test('empty id creates, non-empty id updates', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);
@@ -45,6 +50,7 @@ void main() {
       expect(gateway.updatedServices.single.priceCents, 9000);
     });
 
+    // (#) (-) Check if a negative price is blocked before it reaches the gateway.
     test('negative price is rejected before the gateway (negative)', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);
@@ -55,7 +61,9 @@ void main() {
     });
   });
 
+  // (#) Editing the expert's descriptive profile fields.
   group('UpdateExpertProfile', () {
+    // (#) (+) Check if the title, specialties and other fields are written for the current user.
     test('writes the descriptive fields for the current user', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);
@@ -75,6 +83,7 @@ void main() {
       expect(u['specialties'], ['strength', 'mobility']);
     });
 
+    // (#) (-) Check if nothing is written when there is no signed-in user.
     test('signed out → no-op, nothing written (negative)', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway, userId: null);
@@ -90,6 +99,7 @@ void main() {
       expect(gateway.profileUpdates, isEmpty);
     });
 
+    // (#) (-) Check if an implausible years-coaching value is rejected and nothing is written.
     test('out-of-range years coaching is rejected (negative)', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);
@@ -106,7 +116,9 @@ void main() {
     });
   });
 
+  // (#) The enum-to-Postgres string mappings.
   group('service enum wire values', () {
+    // (#) (+) Check if each enum's dbValue matches the exact Postgres enum spelling.
     test('dbValue matches the Postgres enum spellings', () {
       expect(FulfillmentType.workoutPlan.dbValue, 'workout_plan');
       expect(FulfillmentType.coaching.dbValue, 'coaching');

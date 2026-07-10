@@ -9,10 +9,13 @@ import 'package:wise_workout/entities/fitness_profile.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the ActiveWorkout control: starting/ending a session, live sensor
+// (#) metrics, calorie estimates, and pause/resume, all with fake gateways.
 void main() {
   late FakeWorkoutGateway gw;
   late FakeWorkoutDataSource src;
 
+  // (#) Builds a ProviderContainer wired to fake workout/sensor/fitness gateways.
   ProviderContainer makeContainer({double? weightKg}) {
     gw = FakeWorkoutGateway(endResult: {'xp_gained': 42, 'leveled_up': false, 'current_streak': 1});
     src = FakeWorkoutDataSource();
@@ -30,6 +33,7 @@ void main() {
     return c;
   }
 
+  // (#) (+) Check if start flips to running, inserts a session for the current user, and starts the sensors.
   test('start → running, inserts session for current user, starts sensors (positive)', () async {
     final c = makeContainer();
     await c.read(activeWorkoutProvider.notifier).start(runningType);
@@ -42,6 +46,7 @@ void main() {
     expect(src.started, isTrue);
   });
 
+  // (#) (+) Check if live sensor readings flow into the state (distance updates).
   test('live sensor metrics update state', () async {
     final c = makeContainer();
     await c.read(activeWorkoutProvider.notifier).start(runningType);
@@ -50,6 +55,7 @@ void main() {
     expect(c.read(activeWorkoutProvider).distanceMeters, 1200);
   });
 
+  // (#) (+) Check if ending a cardio session sends distance/calories, returns the RPC result, and resets to idle.
   test('end cardio → distance in metrics, returns RPC result, resets state (positive)', () async {
     final c = makeContainer();
     await c.read(activeWorkoutProvider.notifier).start(runningType);
@@ -63,6 +69,7 @@ void main() {
     expect(c.read(activeWorkoutProvider).status, WorkoutStatus.idle);
   });
 
+  // (#) (+) Check if a heavier profile weight yields a higher calorie estimate than the default.
   test('end → calorie estimate uses profile weight when set (positive)', () async {
     final c = makeContainer(weightKg: 100); // heavier burns more than default 70
     await c.read(activeWorkoutProvider.notifier).start(runningType);
@@ -77,6 +84,7 @@ void main() {
     expect(heavy, greaterThanOrEqualTo(defaultW));
   });
 
+  // (#) (-) Check if a non-cardio session (yoga) records no distance metric.
   test('end non-cardio → no distance in metrics (negative for distance)', () async {
     final c = makeContainer();
     await c.read(activeWorkoutProvider.notifier).start(yogaType);
@@ -84,6 +92,7 @@ void main() {
     expect(gw.endSessionCalls.single.metrics.containsKey('distance_meters'), isFalse);
   });
 
+  // (#) (-) Check if pause and resume do nothing while there is no active session.
   test('pause/resume are no-ops while idle (negative)', () {
     final c = makeContainer();
     final n = c.read(activeWorkoutProvider.notifier);
@@ -93,6 +102,7 @@ void main() {
     expect(c.read(activeWorkoutProvider).status, WorkoutStatus.idle);
   });
 
+  // (#) (+) Check if pause sets paused and resume returns to running.
   test('pause then resume toggles status', () async {
     final c = makeContainer();
     final n = c.read(activeWorkoutProvider.notifier);

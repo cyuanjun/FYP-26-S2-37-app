@@ -11,6 +11,10 @@ import 'package:wise_workout/entities/public_profile.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the friend/social controls: follow/unfollow, user search, profile
+// (#) stats, the self-friend guard, and per-author post scoping.
+
+// (#) Builds a container with the given signed-in user and fake social gateway.
 ProviderContainer _container(FakeSocialGateway social, {String? userId = 'u1'}) {
   final c = ProviderContainer(overrides: [
     currentUserIdProvider.overrideWithValue(userId),
@@ -20,11 +24,14 @@ ProviderContainer _container(FakeSocialGateway social, {String? userId = 'u1'}) 
   return c;
 }
 
+// (#) Sample public profiles used across the tests.
 const _alex = PublicProfile(id: 'u2', firstName: 'Alex', lastName: 'Tan', username: 'alex');
 const _sam = PublicProfile(id: 'u3', firstName: 'Sam', lastName: 'Lee', username: 'sam');
 
 void main() {
+  // (#) The follow and unfollow user controls.
   group('FollowUser / UnfollowUser', () {
+    // (#) (+) Check if following calls addFriend and the friend state/count refresh.
     test('FollowUser calls addFriend and refreshes friend state (positive)', () async {
       final social = FakeSocialGateway()..profiles = [_alex];
       final c = _container(social);
@@ -36,6 +43,7 @@ void main() {
       expect(await c.read(friendCountProvider.future), 1);
     });
 
+    // (#) (+) Check if unfollowing removes the friend and the feed refetches for the new scope.
     test('UnfollowUser removes and the feed refetches (scope changed)', () async {
       final social = FakeSocialGateway()
         ..friends = ['u2']
@@ -52,7 +60,9 @@ void main() {
     });
   });
 
+  // (#) The user-search provider.
   group('searchUsersProvider', () {
+    // (#) (+) Check if it passes the query to the gateway and returns the matches.
     test('passes the query and returns matches (positive)', () async {
       final social = FakeSocialGateway()..profiles = [_alex, _sam];
       final c = _container(social);
@@ -62,6 +72,7 @@ void main() {
       expect(social.searchQueries.single, 'alex');
     });
 
+    // (#) (-) Check if a blank query returns empty without hitting the gateway.
     test('blank query short-circuits (negative)', () async {
       final social = FakeSocialGateway();
       final c = _container(social);
@@ -71,7 +82,9 @@ void main() {
     });
   });
 
+  // (#) The provider that assembles a user's public profile stats.
   group('userProfileStatsProvider', () {
+    // (#) (+) Check if it combines workout count, friend count, and active days.
     test('assembles workouts / friends / activeDays', () async {
       final social = FakeSocialGateway()
         ..friends = ['u2', 'u3']
@@ -85,7 +98,9 @@ void main() {
     });
   });
 
+  // (#) The provider that reports whether a user is a friend.
   group('isFriendProvider', () {
+    // (#) (-) Check if your own id is never reported as a friend.
     test('self is never a friend (guard)', () async {
       final social = FakeSocialGateway()..friends = ['u1'];
       final c = _container(social);
@@ -93,7 +108,9 @@ void main() {
     });
   });
 
+  // (#) The provider that lists one author's posts.
   group('userPostsProvider', () {
+    // (#) (+) Check if it returns only the requested author's posts.
     test('scoped to the requested author', () async {
       final social = FakeSocialGateway()
         ..feed = [

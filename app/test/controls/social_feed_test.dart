@@ -10,6 +10,9 @@ import 'package:wise_workout/entities/public_profile.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the social feed controls: viewing, liking, commenting, and editing posts.
+
+// (#) Makes a feed post from the given author for use in the fake feed.
 FeedPost _post(String id, {String userId = 'u2', PostKind kind = PostKind.workoutShare, bool likedByMe = false}) {
   return FeedPost(
     post: Post(
@@ -26,6 +29,7 @@ FeedPost _post(String id, {String userId = 'u2', PostKind kind = PostKind.workou
   );
 }
 
+// (#) Builds a ProviderContainer wired to the fake social gateway and a signed-in user.
 ProviderContainer _container(FakeSocialGateway social, {String? userId = 'u1'}) {
   final c = ProviderContainer(overrides: [
     currentUserIdProvider.overrideWithValue(userId),
@@ -36,7 +40,9 @@ ProviderContainer _container(FakeSocialGateway social, {String? userId = 'u1'}) 
 }
 
 void main() {
+  // (#) Loading the feed.
   group('ViewSocialFeed (feedProvider)', () {
+    // (#) (+) Check if the feed query is scoped to the current user plus their friends.
     test('scopes the feed to self + friends (positive)', () async {
       final social = FakeSocialGateway()
         ..friends = ['u2', 'u3']
@@ -48,6 +54,7 @@ void main() {
       expect(social.lastFeedScope, ['u1', 'u2', 'u3']);
     });
 
+    // (#) (-) Check if a signed-out user gets an empty feed without touching the gateway.
     test('signed out → empty feed, gateway untouched (negative)', () async {
       final social = FakeSocialGateway();
       final c = _container(social, userId: null);
@@ -57,7 +64,9 @@ void main() {
     });
   });
 
+  // (#) Liking and unliking posts.
   group('TogglePostLike', () {
+    // (#) (+) Check if toggling an unliked post calls likePost and refetches the feed.
     test('not liked → likePost, and the feed refetches', () async {
       final social = FakeSocialGateway()..feed = [_post('p1')];
       final c = _container(social);
@@ -70,6 +79,7 @@ void main() {
       expect(social.fetchFeedCalls, 2); // invalidate → refetch
     });
 
+    // (#) (-) Check if toggling an already-liked post calls unlikePost instead of likePost.
     test('already liked → unlikePost (negative path of the toggle)', () async {
       final social = FakeSocialGateway()..feed = [_post('p1', likedByMe: true)];
       final c = _container(social);
@@ -80,7 +90,9 @@ void main() {
     });
   });
 
+  // (#) Commenting on a post.
   group('AddPostComment', () {
+    // (#) (+) Check if a comment is added for the current user.
     test('adds a comment for the current user (positive)', () async {
       final social = FakeSocialGateway();
       final c = _container(social);
@@ -91,6 +103,7 @@ void main() {
           {'postId': 'p1', 'userId': 'u1', 'body': 'Nice run!'});
     });
 
+    // (#) (-) Check if a blank comment body is rejected before the gateway.
     test('blank body is rejected before the gateway (negative)', () async {
       final social = FakeSocialGateway();
       final c = _container(social);
@@ -101,7 +114,9 @@ void main() {
     });
   });
 
+  // (#) Removing a comment.
   group('DeletePostComment', () {
+    // (#) (+) Check if the comment is deleted by its id.
     test('deletes by comment id', () async {
       final social = FakeSocialGateway();
       final c = _container(social);
@@ -111,7 +126,9 @@ void main() {
     });
   });
 
+  // (#) Editing a post's caption.
   group('UpdatePostBody', () {
+    // (#) (+) Check if the new caption is passed through to the gateway.
     test('passes the new caption through', () async {
       final social = FakeSocialGateway();
       final c = _container(social);
@@ -121,7 +138,9 @@ void main() {
     });
   });
 
+  // (#) Listing comments for one post.
   group('ListPostComments (postCommentsProvider)', () {
+    // (#) (+) Check if only the requested post's comments come back.
     test('scoped to the requested post', () async {
       final social = FakeSocialGateway();
       final c = _container(social);

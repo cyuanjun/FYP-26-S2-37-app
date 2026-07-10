@@ -14,9 +14,13 @@ import 'package:wise_workout/entities/profile.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests plan generation: the pure rule-based skeleton builder, the GeneratePlan
+// (#) control (AI vs fallback, Free vs Premium), saved plans, and onboarding gates.
 void main() {
   // ---- BuildPlanSkeleton (pure rule) ----
+  // (#) The offline rule-based plan skeleton builder.
   group('buildPlanSkeleton rule', () {
+    // (#) (+) Check if it honours the commitment days and lays out the full week-by-week timeline.
     test('honours commitment days and generates the full timeline (positive)', () {
       final d = buildPlanSkeleton(
         goal: PrimaryGoal.loseWeight,
@@ -33,6 +37,7 @@ void main() {
       expect(d.slots.map((s) => s.week).toSet(), equals({for (var wk = 1; wk <= 12; wk++) wk}));
     });
 
+    // (#) (+) Check if only the user's preferred workout types get scheduled.
     test('preferences are a contract — only preferred types scheduled', () {
       final d = buildPlanSkeleton(
         goal: PrimaryGoal.maintainFitness,
@@ -42,6 +47,7 @@ void main() {
       expect(d.slots.map((s) => s.slug).toSet(), {'yoga'});
     });
 
+    // (#) (+) Check if higher experience gives longer session durations.
     test('experience scales duration (beginner < advanced)', () {
       final beginner = buildPlanSkeleton(
           goal: PrimaryGoal.buildMuscle, experience: TrainingExperience.beginner);
@@ -51,6 +57,7 @@ void main() {
           lessThan(advanced.slots.first.durationMinutes));
     });
 
+    // (#) (+) Check if week 4 is a lighter recovery week than week 3.
     test('week 4 is a recovery week (lighter than week 3)', () {
       final d = buildPlanSkeleton(goal: PrimaryGoal.improveEndurance);
       final w3 = d.slots.firstWhere((s) => s.week == 3);
@@ -58,6 +65,7 @@ void main() {
       expect(w4.durationMinutes, lessThan(w3.durationMinutes));
     });
 
+    // (#) (-) Check if out-of-range commitment days clamp to the 1 to 7 range.
     test('commitment days clamp to 1–7 (negative input)', () {
       expect(buildPlanSkeleton(goal: PrimaryGoal.loseWeight, weeklyCommitmentDays: 99)
           .workoutsPerWeek, 7);
@@ -67,6 +75,7 @@ void main() {
   });
 
   // ---- GeneratePlan control ----
+  // (#) The GeneratePlan control that calls AI and persists a plan.
   group('GeneratePlan', () {
     const goal = FitnessGoal(
       id: 'g1',
@@ -76,6 +85,7 @@ void main() {
       timelineWeeks: 8,
     );
 
+    // (#) Builds a container for the given role wired to fake AI/plan/fitness gateways.
     ProviderContainer makeContainer({
       required UserRole role,
       FitnessGoal? activeGoal = goal,
@@ -97,6 +107,7 @@ void main() {
       return c;
     }
 
+    // (#) (+) Check if a Free user gets a basic AI plan persisted with workouts.
     test('free user → basic AI plan persisted (positive)', () async {
       final plans = FakePlanGateway();
       final ai = FakeAiGateway()..planResult['strategy'] = 'basic';
@@ -108,6 +119,7 @@ void main() {
       expect(plans.insertedWorkouts.single, isNotEmpty);
     });
 
+    // (#) (+) Check if a Premium user gets an AI-personalised plan.
     test('premium user → AI-personalised plan (positive)', () async {
       final plans = FakePlanGateway();
       final ai = FakeAiGateway()..planResult['strategy'] = 'personalised';
@@ -118,6 +130,7 @@ void main() {
       expect(plans.insertedPlans.single['generation_strategy'], 'personalised');
     });
 
+    // (#) (+) Check if, when AI throws, the rule-based fallback still delivers a basic plan for both roles.
     test('AI down → rule-based fallback still delivers a plan (resilience)', () async {
       for (final role in [UserRole.free, UserRole.premium]) {
         final plans = FakePlanGateway();
@@ -129,6 +142,7 @@ void main() {
       }
     });
 
+    // (#) (-) Check if generating with no active goal errors and persists nothing.
     test('no active goal → error, nothing persisted (negative)', () async {
       final plans = FakePlanGateway();
       final c = makeContainer(role: UserRole.free, activeGoal: null, plans: plans);
@@ -140,7 +154,9 @@ void main() {
   });
 
   // ---- My Plans / SelectFitnessPlan ----
+  // (#) Listing saved plans and activating one.
   group('Saved plans', () {
+    // (#) (+) Check if plansProvider lists only the signed-in user's plans, active first.
     test('plansProvider lists the signed-in user plans', () async {
       final gw = FakePlanGateway()
         ..activePlan = FitnessPlan(
@@ -181,6 +197,7 @@ void main() {
       expect(plans.map((p) => p.id), ['p1', 'p2']);
     });
 
+    // (#) (+) Check if selecting a saved plan makes it active and deactivates the old one.
     test('SelectFitnessPlan activates a saved plan', () async {
       final gw = FakePlanGateway()
         ..activePlan = FitnessPlan(
@@ -219,7 +236,9 @@ void main() {
   });
 
   // ---- CompleteOnboarding ----
+  // (#) The control that marks onboarding finished.
   group('CompleteOnboarding', () {
+    // (#) (+) Check if it marks onboarding complete for the signed-in user.
     test('marks onboarding done for the signed-in user (positive)', () async {
       final gw = FakeProfileGateway();
       final c = ProviderContainer(overrides: [
@@ -231,6 +250,7 @@ void main() {
       expect(gw.onboardingCompletions, ['u1']);
     });
 
+    // (#) (-) Check if it does nothing when signed out.
     test('no-op when signed out (negative)', () async {
       final gw = FakeProfileGateway();
       final c = ProviderContainer(overrides: [
@@ -244,12 +264,15 @@ void main() {
   });
 
   // ---- Onboarding gate rule ----
+  // (#) The Profile entity rule deciding if onboarding is still needed.
   group('Profile.needsOnboarding', () {
+    // (#) (+) Check if a null completion timestamp means the wizard is still required.
     test('null onboardingCompletedAt → wizard required', () {
       const p = Profile(id: 'u', email: 'x@test', role: UserRole.free);
       expect(p.needsOnboarding, isTrue);
     });
 
+    // (#) (-) Check if a set completion timestamp means onboarding is not needed.
     test('completed → straight to the shell', () {
       final p = Profile(
           id: 'u',

@@ -6,15 +6,18 @@ import 'package:wise_workout/boundaries/ui/auth/login_screen.dart';
 
 import '../../helpers/fakes.dart';
 
-/// BOUNDARY (widget) test — #2 Login screen. The screen renders its fields and,
-/// on tap, drives the Authenticate control (→ the auth gateway); a failed
-/// sign-in surfaces the mapped error message.
+// (#) Widget tests for the Login screen. They mount the real screen with a fake
+// (#) auth gateway, then check it renders, that tapping log in reaches the
+// (#) gateway, and that a failed sign in shows the error message.
+
+// (#) Wraps the Login screen in a ProviderScope with the given fake auth gateway.
 Widget _app(FakeAuthGateway auth) => ProviderScope(
       overrides: [authGatewayProvider.overrideWithValue(auth)],
       child: const MaterialApp(home: LoginScreen()),
     );
 
 void main() {
+  // (#) (+) Check if the screen shows the email box, the password box, and the LOG IN button.
   testWidgets('renders the email/password fields + LOG IN', (tester) async {
     await tester.pumpWidget(_app(FakeAuthGateway()));
     await tester.pumpAndSettle(); // let the AsyncNotifier build() resolve
@@ -23,6 +26,7 @@ void main() {
     expect(find.widgetWithText(ElevatedButton, 'LOG IN'), findsOneWidget);
   });
 
+  // (#) (+) Check if typing an email and password and tapping LOG IN calls the auth gateway once.
   testWidgets('tapping LOG IN drives the control → auth gateway (positive)',
       (tester) async {
     final auth = FakeAuthGateway();
@@ -36,6 +40,7 @@ void main() {
     expect(auth.signInCount, 1); // the input reached the gateway
   });
 
+  // (#) (-) Check if a failed sign in shows the "Incorrect email or password." message.
   testWidgets('failed sign-in shows the mapped error message (negative)',
       (tester) async {
     final auth = FakeAuthGateway(throwOnSignIn: true);

@@ -10,6 +10,8 @@ import 'package:wise_workout/entities/service_request_summary.dart';
 
 import '../helpers/fakes.dart';
 
+// (#) Tests the RequestService, active-request selection, and SubmitReview controls.
+
 const _service = ExpertService(
   id: 's1',
   expertUserId: 'x1',
@@ -20,6 +22,7 @@ const _service = ExpertService(
   priceCents: 4500,
 );
 
+// (#) Makes a request summary for the given service and status.
 ServiceRequestSummary _summary(String serviceId, ServiceRequestStatus status,
         {DateTime? at}) =>
     ServiceRequestSummary(
@@ -35,6 +38,7 @@ ServiceRequestSummary _summary(String serviceId, ServiceRequestStatus status,
       ),
     );
 
+// (#) Builds a ProviderContainer wired to the fake expert gateway and a signed-in user.
 ProviderContainer _container(FakeExpertGateway gateway, {String? userId = 'u1'}) {
   final c = ProviderContainer(overrides: [
     currentUserIdProvider.overrideWithValue(userId),
@@ -45,7 +49,9 @@ ProviderContainer _container(FakeExpertGateway gateway, {String? userId = 'u1'})
 }
 
 void main() {
+  // (#) Buying an expert service.
   group('RequestService', () {
+    // (#) (+) Check if a request is created carrying the price snapshotted from the service.
     test('creates a request with the snapshotted price (positive)', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);
@@ -60,6 +66,7 @@ void main() {
       expect(call['price'], '4500');
     });
 
+    // (#) (-) Check if a blank request message is rejected before hitting the gateway.
     test('blank message rejected before the gateway (negative)', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);
@@ -70,7 +77,9 @@ void main() {
     });
   });
 
+  // (#) Picking the request that governs a service's footer state.
   group('activeRequestForServiceProvider (footer selection)', () {
+    // (#) (+) Check if a cancelled request frees the footer while a pending one still occupies it.
     test('cancelled requests free the footer; others occupy it', () async {
       final gateway = FakeExpertGateway()
         ..myRequests = [
@@ -88,7 +97,9 @@ void main() {
     });
   });
 
+  // (#) Leaving a review on a finished request.
   group('SubmitReview', () {
+    // (#) (+) Check if a valid review forwards to the RPC and refreshes the directory.
     test('forwards to the RPC and refreshes the directory (positive)', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);
@@ -101,6 +112,7 @@ void main() {
           {'requestId': 'r1', 'rating': 5, 'body': 'Superb coaching'});
     });
 
+    // (#) (-) Check if a zero rating or a blank body is rejected before the gateway.
     test('invalid rating or blank body rejected (negative)', () async {
       final gateway = FakeExpertGateway();
       final c = _container(gateway);

@@ -3,31 +3,38 @@ import 'package:wise_workout/entities/enums.dart';
 import 'package:wise_workout/entities/fitness_goal.dart';
 import 'package:wise_workout/entities/fitness_profile.dart';
 
+// (#) Tests the fitness profile and goal entity rules: XP/level maths, age, unit mapping, JSON decoding.
 void main() {
+  // (#) Group covering the XP-to-level and age helpers.
   group('FitnessProfile level/XP rules', () {
+    // (#) (+) Check if level is floor(XP/200)+1 and the bar shows XP mod 200.
     test('level = floor(XP/200)+1; bar = XP mod 200', () {
       const fp = FitnessProfile(id: 'u', totalXp: 719);
       expect(fp.level, 4);
       expect(fp.xpIntoLevel, 119);
     });
 
+    // (#) (-) Check if zero XP is level 1 with an empty bar.
     test('0 XP is level 1 with an empty bar', () {
       const fp = FitnessProfile(id: 'u');
       expect(fp.level, 1);
       expect(fp.xpIntoLevel, 0);
     });
 
+    // (#) (+) Check if ageAt counts correctly the day before and on the birthday.
     test('ageAt handles pre/post birthday correctly', () {
       final fp = FitnessProfile(id: 'u', dateOfBirth: DateTime(2002, 3, 12));
       expect(fp.ageAt(DateTime(2026, 3, 11)), 23); // day before birthday
       expect(fp.ageAt(DateTime(2026, 3, 12)), 24); // on the birthday
     });
 
+    // (#) (-) Check if ageAt is null when no date of birth is set.
     test('ageAt is null without a DOB (negative)', () {
       const fp = FitnessProfile(id: 'u');
       expect(fp.ageAt(DateTime(2026, 6, 11)), isNull);
     });
 
+    // (#) (+) Check if fromJson maps a snake_case row into enums and fields.
     test('fromJson maps snake_case row', () {
       final fp = FitnessProfile.fromJson({
         'id': 'u1',
@@ -49,7 +56,9 @@ void main() {
     });
   });
 
+  // (#) Group covering the goal unit, defaults, and stepper rules.
   group('FitnessGoal rules', () {
+    // (#) (+) Check if each primary goal maps to the right target unit.
     test('unit mapping per goal', () {
       expect(FitnessGoal.unitFor(PrimaryGoal.loseWeight), TargetUnit.kg);
       expect(FitnessGoal.unitFor(PrimaryGoal.buildMuscle), TargetUnit.kg);
@@ -57,6 +66,7 @@ void main() {
       expect(FitnessGoal.unitFor(PrimaryGoal.maintainFitness), isNull);
     });
 
+    // (#) (+) Check if default targets are derived from the current weight.
     test('defaults derive from current weight', () {
       expect(FitnessGoal.defaultTargetFor(PrimaryGoal.loseWeight, currentWeightKg: 70), 65);
       expect(FitnessGoal.defaultTargetFor(PrimaryGoal.buildMuscle, currentWeightKg: 70), 74);
@@ -64,11 +74,13 @@ void main() {
       expect(FitnessGoal.defaultTargetFor(PrimaryGoal.maintainFitness), isNull);
     });
 
+    // (#) (+) Check if the stepper increments by 1 kg or 5 minutes per unit.
     test('stepper increments: ±1 kg, ±5 minutes', () {
       expect(FitnessGoal.stepFor(TargetUnit.kg), 1);
       expect(FitnessGoal.stepFor(TargetUnit.minutes), 5);
     });
 
+    // (#) (+) Check if fromJson maps an active lose_weight goal with its target.
     test('fromJson maps an active lose_weight goal', () {
       final g = FitnessGoal.fromJson({
         'id': 'g1',
