@@ -13,6 +13,13 @@ const hasLogoImage = computed(() => {
   return /^\/uploads\//.test(url) || /^https?:\/\//.test(url);
 });
 
+// Nav items are landing-section anchors (e.g. "#features"). Route them to the
+// landing page + hash so they work from the home pages too, not just from "/".
+function navTarget(url: string) {
+  if (url.startsWith("#")) return { path: "/", hash: url };
+  return url;
+}
+
 // Experts and pending applicants have their own home; everyone else the member home.
 const homeRoute = computed(() => {
   const m = props.member;
@@ -43,7 +50,9 @@ async function onLogout() {
       <span class="brand-name">{{ site.brand_first_word }} <span>{{ site.brand_second_word }}</span></span>
     </RouterLink>
     <nav class="primary-nav" aria-label="Main navigation">
-      <a v-for="item in site.navigation" :key="item.url" :href="item.url">{{ item.label }}</a>
+      <RouterLink v-for="item in site.navigation" :key="item.url" :to="navTarget(item.url)">
+        {{ item.label }}
+      </RouterLink>
     </nav>
     <nav class="auth-nav" aria-label="Account navigation">
       <!-- Signed in: circular profile button (home) + logout, in place of login/register. -->

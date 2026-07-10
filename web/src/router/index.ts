@@ -65,8 +65,21 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to) {
-    if (to.hash) return { el: to.hash, behavior: "smooth" };
-    return { top: 0 };
+    if (!to.hash) return { top: 0 };
+    // Landing sections render after their data loads, so the anchor may not
+    // exist yet when we arrive from another route. Poll briefly for it.
+    return new Promise((resolve) => {
+      const tryScroll = (attempt = 0) => {
+        if (document.querySelector(to.hash)) {
+          resolve({ el: to.hash, behavior: "smooth" });
+        } else if (attempt < 25) {
+          setTimeout(() => tryScroll(attempt + 1), 60);
+        } else {
+          resolve({ top: 0 });
+        }
+      };
+      tryScroll();
+    });
   },
 });
 
