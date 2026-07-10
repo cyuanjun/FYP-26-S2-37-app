@@ -3,13 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../boundaries/gateways/auth_gateway.dart';
 import '../core/seq_log.dart';
 
-/// CONTROL — Request Password Reset (#4 Forgot Password). Always reports
-/// success to the boundary (silent on unknown emails — never reveal whether
-/// an address is registered).
+// (#) The Forgot Password use case (#4). Asks the auth gateway to mail a reset
+// (#) link. It always reports success even for unknown emails, so nobody can probe
+// (#) which addresses are registered.
 class RequestPasswordReset extends AsyncNotifier<void> {
+  // (#) Nothing to load up front, so build just returns empty.
   @override
   Future<void> build() async {}
 
+  // (#) Runs when the user submits the forgot-password form. Sets loading, then calls
+  // (#) the auth gateway to send the email, always ending in a success state.
   Future<void> send(String email) async {
     SeqLog.msg('password-reset', 'ForgotPasswordScreen', 'RequestPasswordReset',
         'send($email)');
@@ -27,5 +30,6 @@ class RequestPasswordReset extends AsyncNotifier<void> {
   }
 }
 
+// (#) The provider the forgot-password screen watches to run and track the reset.
 final requestPasswordResetProvider =
     AsyncNotifierProvider<RequestPasswordReset, void>(RequestPasswordReset.new);

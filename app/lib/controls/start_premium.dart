@@ -6,11 +6,11 @@ import '../entities/enums.dart';
 import '../entities/subscription.dart';
 import 'authenticate.dart';
 
-/// CONTROLs — the premium tier's account lifecycle: the simulated Free→Premium
-/// upgrade (#16, `start_premium` RPC) and subscription management (#13.6,
-/// owner-scoped cancel/resume). Payment is simulated throughout.
+// (#) The premium tier's account lifecycle: the simulated Free-to-Premium upgrade
+// (#) (#16) and managing the subscription afterwards (#13.6 cancel/resume). No real
+// (#) money changes hands anywhere here.
 
-/// The caller's subscription row; null while Free.
+// (#) Read provider for the user's subscription row; null while they are still Free.
 final subscriptionProvider = FutureProvider<Subscription?>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return null;
@@ -19,13 +19,15 @@ final subscriptionProvider = FutureProvider<Subscription?>((ref) async {
   return ref.watch(profileGatewayProvider).fetchSubscription(userId);
 });
 
+// (#) The Start Premium use case (#16). Runs the start_premium RPC via the gateway
+// (#) (payment simulated) so the account flips to Premium without needing a re-login.
 class StartPremium {
   StartPremium(this._ref);
 
   final Ref _ref;
 
-  /// Flips the caller Free→Premium via the RPC, then refetches everything
-  /// role-gated so the app updates live (no re-login).
+  // (#) Calls the RPC, then invalidates the profile and subscription so the role
+  // (#) flip shows through the app straight away.
   Future<void> call() async {
     SeqLog.msg('start-premium', 'UpgradeScreen', 'StartPremium', 'upgrade()');
     SeqLog.msg(
@@ -36,16 +38,22 @@ class StartPremium {
   }
 }
 
+// (#) Provider the upgrade screen uses to go Premium.
 final startPremiumProvider = Provider<StartPremium>(StartPremium.new);
 
+// (#) The Manage Subscription use case (#13.6). Lets an owner cancel or resume their
+// (#) subscription by flipping its status through the gateway.
 class ManageSubscription {
   ManageSubscription(this._ref);
 
   final Ref _ref;
 
+  // (#) Cancel marks the subscription cancelled.
   Future<void> cancel() => _set(SubscriptionStatus.cancelled);
+  // (#) Resume sets it back to active.
   Future<void> resume() => _set(SubscriptionStatus.active);
 
+  // (#) Shared helper: writes the chosen status via the gateway, then reloads the row.
   Future<void> _set(SubscriptionStatus status) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -58,5 +66,6 @@ class ManageSubscription {
   }
 }
 
+// (#) Provider the subscription management screen uses to cancel/resume.
 final manageSubscriptionProvider =
     Provider<ManageSubscription>(ManageSubscription.new);

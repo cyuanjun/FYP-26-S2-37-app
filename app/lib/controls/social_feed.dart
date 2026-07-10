@@ -7,8 +7,8 @@ import '../entities/feed_post.dart';
 import '../entities/post_comment.dart';
 import 'authenticate.dart';
 
-/// CONTROL — View Social Feed (US22, #11 Community). Friends + self, newest
-/// first; the gateway reads through the privacy views.
+// (#) View Social Feed use case (US22, #11 Community). Loads the current user's and
+// (#) their friends' posts, newest first; the gateway respects the privacy views.
 final feedProvider = FutureProvider<List<FeedPost>>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return const <FeedPost>[];
@@ -20,7 +20,7 @@ final feedProvider = FutureProvider<List<FeedPost>>((ref) async {
   return gateway.fetchFeed(userId: userId, friendIds: friends);
 });
 
-/// CONTROL — View Post Detail (#11.1). Single enriched post by id.
+// (#) View Post Detail (#11.1): fetches one full post by id, with like/comment info.
 final postDetailProvider =
     FutureProvider.family<FeedPost?, String>((ref, postId) async {
   final userId = ref.watch(currentUserIdProvider);
@@ -30,7 +30,7 @@ final postDetailProvider =
   return ref.watch(socialGatewayProvider).fetchFeedPost(postId, me: userId);
 });
 
-/// CONTROL — List Post Comments (#11.1). Flat thread, oldest first.
+// (#) List Post Comments (#11.1): the comment thread for a post, oldest first.
 final postCommentsProvider =
     FutureProvider.family<List<PostComment>, String>((ref, postId) {
   SeqLog.msg('view-post', 'ListPostComments', 'SocialGateway',
@@ -38,13 +38,15 @@ final postCommentsProvider =
   return ref.watch(socialGatewayProvider).listComments(postId);
 });
 
-/// CONTROL — Toggle Post Like (US23). Insert/delete on the composite key,
-/// then refetch (invalidate) — the repo's mutation convention.
+// (#) Toggle Post Like use case (US23). Depending on whether the user already liked
+// (#) it, adds or removes the like row via the gateway, then refreshes feed and post.
 class TogglePostLike {
   TogglePostLike(this._ref);
 
   final Ref _ref;
 
+  // (#) Calls likePost or unlikePost based on currentlyLiked, then invalidates the
+  // (#) feed and this post so counts update.
   Future<void> call(String postId, {required bool currentlyLiked}) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -62,14 +64,18 @@ class TogglePostLike {
   }
 }
 
+// (#) Provider the post card and detail screen use to like/unlike.
 final togglePostLikeProvider = Provider<TogglePostLike>(TogglePostLike.new);
 
-/// CONTROL — Add Post Comment (US23). Rejects blank bodies.
+// (#) Add Post Comment use case (US23). Turns down a blank body, writes the comment
+// (#) via the gateway, then reloads the thread, post, and feed.
 class AddPostComment {
   AddPostComment(this._ref);
 
   final Ref _ref;
 
+  // (#) Guards against no-login and blank body, saves through the gateway, and
+  // (#) invalidates comments, post, and feed. Returns true when it wrote.
   Future<bool> call({required String postId, required String body}) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null || body.isBlank) return false;
@@ -85,14 +91,17 @@ class AddPostComment {
   }
 }
 
+// (#) Provider the post detail screen uses to add a comment.
 final addPostCommentProvider = Provider<AddPostComment>(AddPostComment.new);
 
-/// CONTROL — Delete Post Comment (own comments only; RLS enforces).
+// (#) Delete Post Comment use case. Removes a comment through the gateway; the
+// (#) database RLS makes sure you can only delete your own.
 class DeletePostComment {
   DeletePostComment(this._ref);
 
   final Ref _ref;
 
+  // (#) Deletes the comment, then refreshes the thread, post, and feed.
   Future<void> call({required String postId, required String commentId}) async {
     SeqLog.msg('delete-comment', 'PostDetailScreen', 'DeletePostComment',
         'delete($commentId)');
@@ -103,15 +112,18 @@ class DeletePostComment {
   }
 }
 
+// (#) Provider the post detail screen uses to delete a comment.
 final deletePostCommentProvider =
     Provider<DeletePostComment>(DeletePostComment.new);
 
-/// CONTROL — Update Post Body (#11.1 caption edit; empty clears to null).
+// (#) Update Post Body use case (#11.1 caption edit). Saves the new caption through
+// (#) the gateway; an empty caption clears it back to null.
 class UpdatePostBody {
   UpdatePostBody(this._ref);
 
   final Ref _ref;
 
+  // (#) Writes the new caption, then refreshes the post and feed.
   Future<void> call({required String postId, required String? body}) async {
     SeqLog.msg('edit-caption', 'PostDetailScreen', 'UpdatePostBody',
         'update($postId)');
@@ -121,10 +133,12 @@ class UpdatePostBody {
   }
 }
 
+// (#) Provider the post detail screen uses to edit a caption.
 final updatePostBodyProvider = Provider<UpdatePostBody>(UpdatePostBody.new);
 
-/// The current user's share-post id for a session (null = not shared).
-/// #12.1 uses it to link a workout to its post's likes/comments.
+// (#) Looks up whether a given workout session was shared as a post, returning that
+// (#) post's id (null means not shared). The #12.1 detail screen uses it to link a
+// (#) workout to its post's likes and comments.
 final sessionSharePostProvider =
     FutureProvider.family<String?, String>((ref, sessionId) async {
   final userId = ref.watch(currentUserIdProvider);

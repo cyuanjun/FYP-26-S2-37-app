@@ -1,3 +1,6 @@
+// (#) Premium advanced-analytics maths. A grab-bag of pure functions that turn
+// (#) a user's finished workouts into load scores, ACWR bands, weekly trends, HR
+// (#) zones and personal bests. Nothing gets stored, it just returns numbers.
 // ENTITY-layer rules for #12.2 Advanced Workout Analytics (Premium).
 // Everything is derived from ended WorkoutSessions — no new stored entity.
 // All functions are pure (take `now`) so the maths is unit-testable.
@@ -16,12 +19,15 @@ import 'workout_session.dart';
 // ---------------------------------------------------------------------------
 // Karvonen helpers
 
+// (#) fallback resting HR when the user never set one
 const defaultRestingHr = 60;
+// (#) fallback age when DOB is missing
 const _defaultAge = 30;
 
+// (#) classic 220 minus age estimate of max heart rate
 int estimatedMaxHr(int? age) => 220 - (age ?? _defaultAge);
 
-/// Heart-rate-reserve fraction (Karvonen). Clamped to [0, 1].
+// (#) how hard the heart is working as a 0 to 1 slice of its reserve (Karvonen)
 double hrrFraction(int hr, {int? restingHr, int? age}) {
   final rest = restingHr ?? defaultRestingHr;
   final max = estimatedMaxHr(age);
@@ -32,8 +38,8 @@ double hrrFraction(int hr, {int? restingHr, int? age}) {
 // ---------------------------------------------------------------------------
 // Session load (Training-Effect-flavoured 1–10)
 
-/// Load score for one session: an hour at moderate effort ≈ 5, scaled by
-/// Karvonen intensity when HR is known (0.5×–1.5×), clamped to 1–10.
+// (#) turns one session into a 1 to 10 effort score, an hour of moderate work
+// (#) lands near 5 and it scales up or down by heart-rate intensity when known
 double sessionLoad(WorkoutSession s, {int? restingHr, int? age}) {
   final hours = s.durationSeconds / 3600.0;
   var intensity = 1.0; // moderate fallback (no HR recorded)
@@ -47,8 +53,10 @@ double sessionLoad(WorkoutSession s, {int? restingHr, int? age}) {
 // ---------------------------------------------------------------------------
 // ACWR — Acute:Chronic Workload Ratio (always now-anchored)
 
+// (#) the four risk zones an acute-to-chronic workload ratio can fall into
 enum AcwrBand { detraining, sustainable, highLoad, overreaching }
 
+// (#) gives each band its upper-case display text
 extension AcwrBandLabel on AcwrBand {
   String get label => switch (this) {
         AcwrBand.detraining => 'DETRAINING',
@@ -58,17 +66,18 @@ extension AcwrBandLabel on AcwrBand {
       };
 }
 
+// (#) the outcome of an ACWR calc, the ratio plus which band it sits in
 class AcwrResult {
   const AcwrResult({required this.ratio, required this.band});
 
-  /// Null when the chronic baseline is too thin to be meaningful
-  /// (< 0.5 average weekly load ≈ under ~3 weeks of sessions).
-  final double? ratio;
-  final AcwrBand? band;
+  final double? ratio; // (#) null when there isn't enough history to be meaningful
+  final AcwrBand? band; // (#) null alongside a null ratio
 
+  // (#) true once we actually have a ratio to show
   bool get hasEnoughHistory => ratio != null;
 }
 
+// (#) compares the last 7 days of load against the 28-day weekly average
 AcwrResult computeAcwr(List<WorkoutSession> sessions,
     {required DateTime now, int? restingHr, int? age}) {
   double loadSince(Duration back) => sessions
@@ -94,6 +103,7 @@ AcwrResult computeAcwr(List<WorkoutSession> sessions,
 // ---------------------------------------------------------------------------
 // Weekly buckets (range-scoped trends)
 
+// (#) one week's worth of totals, a single point on the trend charts
 class WeekBucket {
   const WeekBucket({
     required this.weekStart,
@@ -104,19 +114,17 @@ class WeekBucket {
     required this.load,
   });
 
-  final DateTime weekStart;
-  final int sessions;
+  final DateTime weekStart; // (#) Monday that starts this week
+  final int sessions; // (#) how many workouts landed in the week
   final int activeMinutes;
   final int calories;
 
-  /// Null when no session that week recorded HR.
-  final double? avgHr;
-  final double load;
+  final double? avgHr; // (#) null if nothing that week logged heart rate
+  final double load; // (#) summed session-load score for the week
 }
 
-/// Contiguous Mon-anchored weekly buckets covering [weeks] back from `now`
-/// (oldest first; zero-filled weeks included so charts show gaps honestly).
-/// Pass `weeks = null` for "All": buckets span back to the earliest session.
+// (#) builds a run of weekly buckets back from now, zero-filling empty weeks so
+// (#) gaps show honestly, pass weeks null for an all-time span
 List<WeekBucket> weeklyBuckets(List<WorkoutSession> sessions,
     {required DateTime now, int? weeks, int? restingHr, int? age}) {
   DateTime weekStartOf(DateTime d) {
@@ -163,8 +171,7 @@ List<WeekBucket> weeklyBuckets(List<WorkoutSession> sessions,
   return buckets;
 }
 
-/// True when the latest week's load jumped >50% over the prior week
-/// (the spec's factual "acute spike" caption).
+// (#) flags when the newest week's load jumped more than 50% over the one before
 bool hasAcuteSpike(List<WeekBucket> buckets) {
   if (buckets.length < 2) return false;
   final prev = buckets[buckets.length - 2].load;
@@ -175,12 +182,12 @@ bool hasAcuteSpike(List<WeekBucket> buckets) {
 // ---------------------------------------------------------------------------
 // HR zones (Karvonen %HRR, five canonical bands)
 
+// (#) the five heart-rate zone names shown on the zones chart
 const hrZoneLabels = ['Z1 Recovery', 'Z2 Aerobic', 'Z3 Tempo', 'Z4 Threshold', 'Z5 VO2 max'];
 
-/// Share (0–1, summing to 1 when any HR time exists) of training time per
-/// zone. Each session contributes its whole duration to the zone its
-/// avgHeartRate lands in (the spec's fallback path). Sub-Z1 time (< 50% HRR)
-/// is excluded — sedentary, not training.
+// (#) splits training time across the five zones as fractions that add to 1,
+// (#) each session drops its whole duration into the zone its avg HR sits in,
+// (#) very easy sub-zone-1 time is dropped as sedentary
 List<double> computeHrZones(List<WorkoutSession> sessions,
     {int? restingHr, int? age}) {
   final seconds = List<double>.filled(5, 0);
@@ -200,13 +207,15 @@ List<double> computeHrZones(List<WorkoutSession> sessions,
 // ---------------------------------------------------------------------------
 // Personal bests (all-time, range-independent)
 
+// (#) one personal-best tile, the already-formatted value and when it happened
 class PersonalBest {
   const PersonalBest({required this.value, required this.date});
 
-  final String value;
-  final DateTime date;
+  final String value; // (#) display text like "12.40 km"
+  final DateTime date; // (#) when the record was set
 }
 
+// (#) the full set of all-time bests shown on the analytics screen
 class PersonalBests {
   const PersonalBests({
     this.longestDistance,
@@ -217,14 +226,13 @@ class PersonalBests {
 
   final PersonalBest? longestDistance;
 
-  /// Fastest average pace over sessions of ≥ 1 km (avoids sprint noise).
-  final PersonalBest? fastestPace;
+  final PersonalBest? fastestPace; // (#) best pace, only over runs of 1 km plus so sprints don't skew it
   final PersonalBest? longestSession;
 
-  /// Longest run of consecutive calendar days with ≥ 1 session.
-  final int longestStreakDays;
+  final int longestStreakDays; // (#) longest run of back-to-back active days
 }
 
+// (#) scans every finished session to work out all of the personal bests
 PersonalBests computePersonalBests(List<WorkoutSession> sessions) {
   final ended = sessions.where((s) => s.isEnded).toList();
 

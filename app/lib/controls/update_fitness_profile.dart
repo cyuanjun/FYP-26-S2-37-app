@@ -10,13 +10,17 @@ import '../entities/workout_type.dart';
 import 'view_profile.dart';
 import '../core/strings.dart';
 
-/// CONTROL — Update Fitness Profile (#13.1 Save Profile). Batches every edited
-/// field + chip selection into one update; the screen edits locally and commits
-/// once.
+// (#) The Update Fitness Profile use case (#13.1 Save Profile). The screen edits
+// (#) everything locally then commits all the changed fields and chip picks in one
+// (#) batch here, after range-checking the numeric ones.
 class UpdateFitnessProfile extends AsyncNotifier<void> {
+  // (#) Nothing to preload.
   @override
   Future<void> build() async {}
 
+  // (#) Validates the patched numbers, then writes the whole patch via the fitness
+  // (#) gateway and refreshes the profile. Returns false (with an error state) if any
+  // (#) value is out of range.
   Future<bool> save(String userId, Map<String, dynamic> patch) async {
     SeqLog.msg('update-fitness-profile', 'FitnessProfileScreen', 'UpdateFitnessProfile',
         'save(${patch.keys.join(',')})');
@@ -37,7 +41,8 @@ class UpdateFitnessProfile extends AsyncNotifier<void> {
     return !state.hasError;
   }
 
-  /// null when every present numeric field is in range, else the first error.
+  // (#) Helper that checks height, weight, and resting HR against their allowed ranges.
+  // (#) Returns null when all present values are fine, otherwise the first error message.
   static String? _invalidField(Map<String, dynamic> patch) {
     if (patch.containsKey('height_cm') &&
         !Validators.validHeightCm(patch['height_cm'] as num?)) {
@@ -55,8 +60,8 @@ class UpdateFitnessProfile extends AsyncNotifier<void> {
     return null;
   }
 
-  /// "+ Add your own" workout type — inserts the custom type and refreshes
-  /// the catalog (#13.1 / onboarding preferred-workouts pickers).
+  // (#) Backs the "+ Add your own" option in the workout-type pickers. Inserts a custom
+  // (#) type via the workout gateway, refreshes the catalog, and returns the new type.
   Future<WorkoutType?> addCustomWorkoutType({
     required String userId,
     required String name,
@@ -71,7 +76,8 @@ class UpdateFitnessProfile extends AsyncNotifier<void> {
     return type;
   }
 
-  /// "+ Add X" in a picker — inserts the custom tag and refreshes the catalog.
+  // (#) Backs the "+ Add X" option in a diet/allergy/injury picker. Inserts a custom
+  // (#) health tag via the fitness gateway, refreshes the catalog, and returns the tag.
   Future<HealthTag?> addCustomTag({
     required String userId,
     required HealthTagKind kind,
@@ -88,5 +94,6 @@ class UpdateFitnessProfile extends AsyncNotifier<void> {
   }
 }
 
+// (#) Provider the fitness profile screen watches to save and add custom entries.
 final updateFitnessProfileProvider =
     AsyncNotifierProvider<UpdateFitnessProfile, void>(UpdateFitnessProfile.new);

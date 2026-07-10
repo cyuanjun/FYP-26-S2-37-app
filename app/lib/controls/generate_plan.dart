@@ -13,7 +13,7 @@ import '../entities/planned_workout.dart';
 import 'authenticate.dart';
 import 'view_profile.dart';
 
-/// One scheduled slot in a drafted weekly template (pre-persistence).
+// (#) One planned workout in a draft plan, before it is saved to the DB.
 class PlannedSlot {
   const PlannedSlot({
     required this.slug,
@@ -24,14 +24,15 @@ class PlannedSlot {
     required this.descriptor,
   });
 
-  final String slug;
-  final int week; // 1..durationWeeks within the generated timeline
-  final int dayOfWeek;
-  final int durationMinutes;
-  final String name;
-  final String descriptor;
+  final String slug; // (#) which workout type, e.g. running
+  final int week; // (#) which week in the timeline, 1..durationWeeks
+  final int dayOfWeek; // (#) day of the week, 1=Mon .. 7=Sun
+  final int durationMinutes; // (#) how long this session should run
+  final String name; // (#) short label shown on the plan
+  final String descriptor; // (#) one-line coaching note for the session
 }
 
+// (#) A whole drafted plan (title, length, and every slot) before it is saved.
 class PlanDraft {
   const PlanDraft({
     required this.name,
@@ -42,24 +43,24 @@ class PlanDraft {
     required this.slots,
   });
 
-  final String name;
-  final String description;
-  final int durationWeeks;
-  final int workoutsPerWeek;
-  final GenerationStrategy strategy;
-  final List<PlannedSlot> slots;
+  final String name; // (#) plan title
+  final String description; // (#) plan summary line
+  final int durationWeeks; // (#) total weeks the plan spans
+  final int workoutsPerWeek; // (#) sessions scheduled each week
+  final GenerationStrategy strategy; // (#) basic (rule) or personalised (AI)
+  final List<PlannedSlot> slots; // (#) every scheduled workout across the timeline
 }
 
-/// Day spread for n workouts/week (1=Mon … 7=Sun) — matches the Edge Function.
+// (#) Which weekdays to use for n workouts a week (1=Mon .. 7=Sun); kept in step
+// (#) with the Edge Function so the app and server schedule days the same way.
 const _daySpread = <int, List<int>>{
   1: [3], 2: [2, 5], 3: [1, 3, 5], 4: [1, 3, 5, 6],
   5: [1, 2, 4, 5, 6], 6: [1, 2, 3, 4, 5, 6], 7: [1, 2, 3, 4, 5, 6, 7],
 };
 
-/// CONTROL (rule-based) — BuildPlanSkeleton. The offline/AI-down fallback:
-/// a deterministic full-timeline plan from the goal + experience +
-/// preferences. Preferences are a contract — when present, ONLY preferred
-/// types are scheduled.
+// (#) The rule-based plan builder, used offline or when the AI is down. It makes
+// (#) a fixed, repeatable plan from the goal, experience and preferences. If the
+// (#) user gave preferred types, only those get scheduled. No network needed.
 PlanDraft buildPlanSkeleton({
   required PrimaryGoal goal,
   TrainingExperience? experience,
@@ -122,8 +123,11 @@ PlanDraft buildPlanSkeleton({
   );
 }
 
+// (#) The four stages a plan moves through as the weeks progress.
 enum _PlanPhase { foundation, build, peak, recovery }
 
+// (#) Works out which phase a given week falls in: last week is recovery, the
+// (#) rest split into foundation, build and peak by how far through you are.
 _PlanPhase _timelinePhase(int week, int totalWeeks) {
   if (week == totalWeeks && totalWeeks > 1) return _PlanPhase.recovery;
   final progress = week / totalWeeks;
@@ -132,6 +136,8 @@ _PlanPhase _timelinePhase(int week, int totalWeeks) {
   return _PlanPhase.peak;
 }
 
+// (#) Extra minutes to add for a week: ramps up through build and peak, drops a
+// (#) little on the recovery week, so effort climbs then eases.
 int _weekBump(int week, int totalWeeks, _PlanPhase phase) {
   if (phase == _PlanPhase.recovery) return -5;
   final ramp = totalWeeks <= 1 ? 0 : ((week - 1) / (totalWeeks - 1) * 15).round();
@@ -143,42 +149,48 @@ int _weekBump(int week, int totalWeeks, _PlanPhase phase) {
   };
 }
 
-/// The user's active plan (Train card) and its weekly template.
+// (#) The user's currently active plan, shown on the Train card; null if none.
 final activePlanProvider = FutureProvider<FitnessPlan?>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Future.value(null);
   return ref.watch(planGatewayProvider).fetchActivePlan(userId);
 });
 
+// (#) The scheduled workouts of the active plan.
 final plannedWorkoutsProvider = FutureProvider<List<PlannedWorkout>>((ref) async {
   final plan = await ref.watch(activePlanProvider.future);
   if (plan == null) return const <PlannedWorkout>[];
   return ref.watch(planGatewayProvider).listPlannedWorkouts(plan.id);
 });
 
+// (#) Every plan the user has saved, for the plans list.
 final plansProvider = FutureProvider<List<FitnessPlan>>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Future.value(const <FitnessPlan>[]);
   return ref.watch(planGatewayProvider).listPlans(userId);
 });
 
+// (#) One plan by id, for the plan detail screen.
 final planByIdProvider = FutureProvider.family<FitnessPlan?, String>((ref, planId) {
   return ref.watch(planGatewayProvider).fetchPlan(planId);
 });
 
+// (#) The scheduled workouts of any plan by id.
 final plannedWorkoutsForPlanProvider =
     FutureProvider.family<List<PlannedWorkout>, String>((ref, planId) {
   return ref.watch(planGatewayProvider).listPlannedWorkouts(planId);
 });
 
-/// CONTROL — GeneratePlan. Free tier → rule-based BuildPlanSkeleton;
-/// Premium → SuggestPlan via the AiGateway (falls back to the skeleton if the
-/// AI is unavailable). Persists the plan + weekly template and refreshes the
-/// active-plan providers.
+// (#) Builds a training plan for the user. It asks the AI gateway for a suggestion
+// (#) (Free gets basic depth, Premium personalised), falls back to the rule-based
+// (#) skeleton if the AI fails, then saves the plan plus its weekly workouts and
+// (#) refreshes the plan providers. Loading and errors show through its AsyncValue.
 class GeneratePlan extends AsyncNotifier<void> {
+  // (#) Nothing to load up front; sits idle until generate() is called.
   @override
   Future<void> build() async {}
 
+  // (#) Runs the whole generate flow and returns the created plan, or null on error.
   Future<FitnessPlan?> generate() async {
     SeqLog.msg('generate-plan', 'OnboardingFlow', 'GeneratePlan', 'generate()');
     state = const AsyncLoading();
@@ -248,6 +260,7 @@ class GeneratePlan extends AsyncNotifier<void> {
     return state.hasError ? null : created;
   }
 
+  // (#) Small wrapper that feeds the goal's settings into buildPlanSkeleton.
   PlanDraft _skeleton(FitnessGoal goal, TrainingExperience? exp, List<String> slugs) =>
       buildPlanSkeleton(
         goal: goal.primaryGoal,
@@ -257,6 +270,8 @@ class GeneratePlan extends AsyncNotifier<void> {
         timelineWeeks: goal.timelineWeeks,
       );
 
+  // (#) Turns the AI gateway's raw JSON into a PlanDraft, clamping odd values and
+  // (#) throwing if it came back with no workouts (so the fallback can kick in).
   PlanDraft _draftFromAi(Map<String, dynamic> data) {
     final durationWeeks = ((data['duration_weeks'] as num?)?.toInt() ?? 4).clamp(1, 52).toInt();
     final workouts = (data['workouts'] as List? ?? const [])
@@ -284,13 +299,17 @@ class GeneratePlan extends AsyncNotifier<void> {
   }
 }
 
+// (#) Hands the onboarding and plan screens the GeneratePlan control.
 final generatePlanProvider = AsyncNotifierProvider<GeneratePlan, void>(GeneratePlan.new);
 
-/// CONTROL — SelectFitnessPlan. Makes a saved plan the active training plan.
+// (#) Switches which saved plan is the active one. Tells the gateway to set it
+// (#) current and refreshes the plan providers the Train card reads.
 class SelectFitnessPlan extends AsyncNotifier<void> {
+  // (#) Nothing to load up front; idle until select() is called.
   @override
   Future<void> build() async {}
 
+  // (#) Makes the given plan active; returns true on success, false on error.
   Future<bool> select(String planId) async {
     SeqLog.msg('select-plan', 'PlanDetailScreen', 'SelectFitnessPlan', 'select($planId)');
     state = const AsyncLoading();
@@ -313,16 +332,18 @@ class SelectFitnessPlan extends AsyncNotifier<void> {
   }
 }
 
+// (#) Hands the plan detail screen the SelectFitnessPlan control.
 final selectFitnessPlanProvider =
     AsyncNotifierProvider<SelectFitnessPlan, void>(SelectFitnessPlan.new);
 
-/// CONTROL — CompleteOnboarding. Marks the wizard done; Splash/Login stop
-/// routing here (profiles.onboarding_completed_at).
+// (#) Marks the onboarding wizard finished. Stamps the profile through the gateway
+// (#) so Splash and Login stop sending the user back into setup.
 class CompleteOnboarding {
   CompleteOnboarding(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway and user id
 
+  // (#) Records that onboarding is done for the signed-in user.
   Future<void> call() async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -332,4 +353,5 @@ class CompleteOnboarding {
   }
 }
 
+// (#) Hands the onboarding flow the CompleteOnboarding control.
 final completeOnboardingProvider = Provider<CompleteOnboarding>(CompleteOnboarding.new);

@@ -9,23 +9,13 @@ import 'generate_plan.dart';
 import 'manage_notification_prefs.dart';
 import 'workout_history.dart';
 
-/// CONTROL — Schedule Reminders (US19–US21). RULE-BASED by design (SRS §3.9:
-/// reminders/inactivity/rest alerts are not AI). A sync recomputes the next
-/// 7 days of one-shot local notifications from the user's prefs, plan, and
-/// recent history, then replaces whatever the OS was holding.
-///
-/// Rules:
-/// - `daily_reminder` (US19): a nudge on each plan day at the reminder hour —
-///   Free at 08:00; Premium adapts to the user's median session start hour.
-///   If today's hour already passed with no session yet, a late nudge fires
-///   in a couple of minutes (evening cutoff 21:00).
-/// - `missed_workout` (US19): if yesterday was a plan day with no session,
-///   one catch-up nudge tomorrow-morning-at-09:00.
-/// - `inactivity_reminder` (US20): one alert 3 days after the last session
-///   (at 10:00), or 3 days from now when there's no history yet.
-/// - `rest_alert` (US21, Premium): if the last 3 days hold 3+ sessions, a
-///   recovery suggestion at 08:00 tomorrow.
+// (#) The Schedule Reminders feature (US19 to US21). These are rule-based, not AI:
+// (#) a sync works out the next 7 days of local notifications from the user's prefs,
+// (#) plan, and recent history, then swaps out whatever the phone had queued.
+// (#) Four rules exist: daily plan-day nudge (Premium adapts the hour), missed-workout
+// (#) catch-up, 3-day inactivity alert, and a Premium rest alert when training a lot.
 
+// (#) One reminder the engine decided to schedule: its id, kind, text, and fire time.
 class PlannedReminder {
   const PlannedReminder({
     required this.id,
@@ -35,21 +25,22 @@ class PlannedReminder {
     required this.fireAt,
   });
 
-  final int id;
-  final String kind;
-  final String title;
-  final String body;
-  final DateTime fireAt;
+  final int id; // (#) stable id so a re-sync overwrites the same slot instead of piling up
+  final String kind; // (#) which rule made it (daily_reminder, missed_workout, etc.)
+  final String title; // (#) notification headline
+  final String body; // (#) notification message
+  final DateTime fireAt; // (#) when it should pop
 }
 
-/// Days without a session before the inactivity alert fires (US20).
+// (#) How many days without a workout before the inactivity alert fires (US20).
 const inactivityThresholdDays = 3;
 
-/// Sessions within [restWindowDays] that trigger the rest alert (US21).
+// (#) The rest alert (US21) triggers when this many sessions land inside the window.
 const restAlertSessionCount = 3;
-const restWindowDays = 3;
+const restWindowDays = 3; // (#) size of the recent-training window checked for the rest alert
 
-/// The pure rule engine — deterministic given `now`, so fully testable.
+// (#) The pure rule engine. Given now plus the inputs it always returns the same
+// (#) list, no side effects, which makes it easy to unit test.
 List<PlannedReminder> planReminders({
   required Map<String, bool> prefs,
   required bool isPremium,
@@ -169,25 +160,32 @@ List<PlannedReminder> planReminders({
   return out;
 }
 
-/// What the last sync scheduled — #13.4 renders this as its UPCOMING list.
+// (#) Holds whatever the last sync scheduled so the #13.4 screen can show it as
+// (#) an UPCOMING list. Starts empty and gets set after each sync.
 class ScheduledReminders extends Notifier<List<PlannedReminder>> {
+  // (#) Starts with no reminders known.
   @override
   List<PlannedReminder> build() => const [];
 
+  // (#) Replaces the stored list with the newest sync result.
   void set(List<PlannedReminder> value) => state = value;
 }
 
+// (#) Provider the UI watches to read the current UPCOMING reminder list.
 final scheduledRemindersProvider =
     NotifierProvider<ScheduledReminders, List<PlannedReminder>>(
         ScheduledReminders.new);
 
+// (#) The Sync Reminders use case. Reads the user's prefs, plan, and history, runs
+// (#) the rule engine for the coming week, then tells the notification gateway to
+// (#) cancel everything and re-schedule the fresh set.
 class SyncReminders {
   SyncReminders(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) handle to read the other providers and the gateway
 
-  /// Recomputes and replaces all scheduled local notifications. Safe to call
-  /// often — same inputs produce the same schedule (stable ids overwrite).
+  // (#) Recomputes and re-installs all local notifications. Cheap to call repeatedly
+  // (#) since stable ids mean the same schedule just overwrites itself.
   Future<void> call() async {
     final profile = await _ref.read(currentProfileProvider.future);
     if (profile == null || profile.isExpert) return;
@@ -217,4 +215,5 @@ class SyncReminders {
   }
 }
 
+// (#) Provider the shell and #13.4 toggles use to trigger a re-sync.
 final syncRemindersProvider = Provider<SyncReminders>(SyncReminders.new);

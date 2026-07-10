@@ -7,13 +7,17 @@ import '../entities/fitness_goal.dart';
 import '../entities/validators.dart';
 import 'view_profile.dart';
 
-/// CONTROL — Set Fitness Goal (#13.2 Save Goal). Upsert-by-convention: patches
-/// the active goal (achievedAt == null) or inserts a fresh one. The screen
-/// never needs to know whether it's editing or creating.
+// (#) The set-goal use case. It checks the input (1 to 7 days a week, positive
+// (#) target where needed) then saves through the gateway, which patches the
+// (#) active goal or inserts a new one. The screen just calls save() and never
+// (#) sees the DB or knows whether it's creating or editing.
 class SetFitnessGoal extends AsyncNotifier<void> {
+  // (#) Nothing to load up front; idle until save() is called.
   @override
   Future<void> build() async {}
 
+  // (#) Validates the inputs, maps enums to columns and upserts the goal; returns
+  // (#) true on success, false when validation fails or the save errors.
   Future<bool> save({
     required String userId,
     required PrimaryGoal primaryGoal,
@@ -53,10 +57,11 @@ class SetFitnessGoal extends AsyncNotifier<void> {
   }
 }
 
-// Explicit enum→column adapters (kept deliberately, simplify M4): the
-// json_serializable enum maps are library-private to the entities' .g.dart
-// files, so a control building a raw values map spells the mapping out.
+// (#) Spells out how a PrimaryGoal maps to its DB string. Kept on purpose: the
+// (#) generated enum maps are private to the entity .g.dart files, so a control
+// (#) building a raw values map needs its own mapping.
 extension PrimaryGoalDb on PrimaryGoal {
+  // (#) The snake_case column value for this goal.
   String get toDb => switch (this) {
         PrimaryGoal.loseWeight => 'lose_weight',
         PrimaryGoal.buildMuscle => 'build_muscle',
@@ -65,12 +70,15 @@ extension PrimaryGoalDb on PrimaryGoal {
       };
 }
 
+// (#) Same enum-to-column mapping for the target unit.
 extension TargetUnitDb on TargetUnit {
+  // (#) The snake_case column value for this unit.
   String get toDb => switch (this) {
         TargetUnit.stepsPerDay => 'steps_per_day',
         _ => name,
       };
 }
 
+// (#) Hands the fitness-goals screen the SetFitnessGoal control.
 final setFitnessGoalProvider =
     AsyncNotifierProvider<SetFitnessGoal, void>(SetFitnessGoal.new);

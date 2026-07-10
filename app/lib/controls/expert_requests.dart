@@ -8,10 +8,11 @@ import '../entities/service_request_summary.dart';
 import 'authenticate.dart';
 import 'browse_experts.dart';
 
-/// CONTROLs — the expert's side of the marketplace (US49–US51, minimal
-/// realization): incoming requests + accept / decline / deliverable / complete.
-/// Status transitions go through the SECURITY DEFINER RPCs.
+// (#) This file is the expert's side of the marketplace: the list of incoming
+// (#) requests plus the accept, decline, send-deliverable and complete actions.
+// (#) The status changes go through SECURITY DEFINER RPCs in the gateway.
 
+// (#) Loads the requests waiting for the signed-in expert; empty for non-experts.
 final incomingRequestsProvider =
     FutureProvider<List<ServiceRequestSummary>>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
@@ -24,11 +25,14 @@ final incomingRequestsProvider =
   return ref.watch(expertGatewayProvider).listIncomingRequests(userId);
 });
 
+// (#) Expert accepts a client's request. Runs the accept RPC through the gateway
+// (#) and reloads the incoming list.
 class AcceptServiceRequest {
   AcceptServiceRequest(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway
 
+  // (#) Marks the given request accepted.
   Future<void> call(String requestId) async {
     SeqLog.msg('accept-request', 'ExpertRequestsView', 'AcceptServiceRequest',
         'accept($requestId)');
@@ -39,11 +43,14 @@ class AcceptServiceRequest {
   }
 }
 
+// (#) Expert turns down a request. Marks it declined via the gateway and reloads
+// (#) the incoming list.
 class DeclineServiceRequest {
   DeclineServiceRequest(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway
 
+  // (#) Marks the given request declined.
   Future<void> call(String requestId) async {
     SeqLog.msg('decline-request', 'ExpertRequestsView',
         'DeclineServiceRequest', 'decline($requestId)');
@@ -52,11 +59,15 @@ class DeclineServiceRequest {
   }
 }
 
+// (#) Expert sends the finished work to the client. Requires a title, builds an
+// (#) optional section from the typed heading and lines, posts it through the
+// (#) gateway and reloads the list. Returns false if the title is blank.
 class SendDeliverable {
   SendDeliverable(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway
 
+  // (#) Validates the title, assembles the deliverable and submits it.
   Future<bool> call({
     required String requestId,
     required String title,
@@ -80,11 +91,14 @@ class SendDeliverable {
   }
 }
 
+// (#) Expert closes out a finished job. Runs the complete RPC, then reloads both
+// (#) the request list and the expert directory because the client count changes.
 class CompleteServiceRequest {
   CompleteServiceRequest(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway
 
+  // (#) Marks the given request complete.
   Future<void> call(String requestId) async {
     SeqLog.msg('complete-request', 'ExpertRequestsView',
         'CompleteServiceRequest', 'complete($requestId)');
@@ -96,6 +110,7 @@ class CompleteServiceRequest {
   }
 }
 
+// (#) Providers that hand the expert-requests screen each of the four controls.
 final acceptServiceRequestProvider =
     Provider<AcceptServiceRequest>(AcceptServiceRequest.new);
 final declineServiceRequestProvider =

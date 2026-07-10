@@ -7,8 +7,9 @@ import '../entities/enums.dart';
 import 'authenticate.dart';
 import '../core/strings.dart';
 
-/// The user's devices, with the phone-sensors virtual device guaranteed to
-/// exist (system-managed, pinned first, never removable — #7.1 spec).
+// (#) The user's paired devices. It makes sure the built-in phone-sensors device
+// (#) exists, loads the rest, and sorts so phone sensors is pinned first, then
+// (#) the others by name. That virtual device is system-managed and never removed.
 final connectedDevicesProvider = FutureProvider<List<ConnectedDevice>>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return const <ConnectedDevice>[];
@@ -22,8 +23,8 @@ final connectedDevicesProvider = FutureProvider<List<ConnectedDevice>>((ref) asy
   return devices;
 });
 
-/// The wearable whose data feeds the next capture: first active non-phone
-/// device (null = phone only).
+// (#) The wearable that will feed the next recording: the first active non-phone
+// (#) device, or null when it's phone sensors only.
 final activeWearableProvider = FutureProvider<ConnectedDevice?>((ref) async {
   final devices = await ref.watch(connectedDevicesProvider.future);
   for (final d in devices) {
@@ -32,8 +33,8 @@ final activeWearableProvider = FutureProvider<ConnectedDevice?>((ref) async {
   return null;
 });
 
-/// The phone-sensors virtual device row (sessions captured without a wearable
-/// link to it; null connectedDeviceId is reserved for manual entries).
+// (#) The built-in phone-sensors device row. Sensor-only sessions link to it; a
+// (#) null device id instead means a manual entry.
 final phoneSensorsDeviceProvider = FutureProvider<ConnectedDevice?>((ref) async {
   final devices = await ref.watch(connectedDevicesProvider.future);
   for (final d in devices) {
@@ -42,12 +43,16 @@ final phoneSensorsDeviceProvider = FutureProvider<ConnectedDevice?>((ref) async 
   return null;
 });
 
-/// CONTROL — ManageConnectedDevice (#7.1): pair / toggle / remove / sync.
+// (#) Manages paired devices. It can pair a new one, toggle a device active,
+// (#) remove one, and stamp last-synced, refreshing the list after each. Phone
+// (#) sensors are system-managed and can't be removed.
 class ManageConnectedDevice {
   ManageConnectedDevice(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway and user id
 
+  // (#) Pairs a new device (optionally with a BLE id); returns it, or null if not
+  // (#) signed in or the name is blank. Reloads the device list.
   Future<ConnectedDevice?> pair(
       {required DeviceType type, required String name, String? bleRemoteId}) async {
     final userId = _ref.read(currentUserIdProvider);
@@ -60,6 +65,7 @@ class ManageConnectedDevice {
     return device;
   }
 
+  // (#) Turns a device on or off as the active data source and reloads the list.
   Future<void> setActive(ConnectedDevice device, bool active) async {
     SeqLog.msg('manage-device', 'ConnectedDevicesScreen', 'ManageConnectedDevice',
         'setActive(${device.deviceName}, $active)');
@@ -67,7 +73,8 @@ class ManageConnectedDevice {
     _ref.invalidate(connectedDevicesProvider);
   }
 
-  /// Phone sensors are system-managed and cannot be removed.
+  // (#) Removes a device and reloads the list. Refuses (returns false) for the
+  // (#) phone-sensors device since it's system-managed.
   Future<bool> remove(ConnectedDevice device) async {
     if (device.isPhoneSensors) return false;
     SeqLog.msg('manage-device', 'ConnectedDevicesScreen', 'ManageConnectedDevice',
@@ -77,11 +84,13 @@ class ManageConnectedDevice {
     return true;
   }
 
+  // (#) Bumps a device's last-synced time (called after it feeds a workout).
   Future<void> markSynced(String deviceId) async {
     await _ref.read(deviceGatewayProvider).touchLastSynced(deviceId);
     _ref.invalidate(connectedDevicesProvider);
   }
 }
 
+// (#) Hands the devices screen the ManageConnectedDevice control.
 final manageConnectedDeviceProvider =
     Provider<ManageConnectedDevice>(ManageConnectedDevice.new);

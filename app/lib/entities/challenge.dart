@@ -6,27 +6,26 @@ import 'enums.dart';
 part 'challenge.freezed.dart';
 part 'challenge.g.dart';
 
-/// ENTITY — a community challenge (#11/#11.3): two orthogonal axes,
-/// [visibility] (public / invite-only) × [metricKind] (accumulator races a
-/// [targetValue]; best_of ranks a single best effort). Progress is never
-/// stored — leaderboards aggregate qualifying sessions live.
+// (#) A community challenge people can join and race in. Holds the name, dates,
+// (#) which metric it competes on and the target. Your own progress is never
+// (#) kept here, the leaderboards work out standings live from qualifying sessions.
 @freezed
 abstract class Challenge with _$Challenge {
   const Challenge._();
 
   const factory Challenge({
     required String id,
-    String? createdByUserId,
+    String? createdByUserId, // (#) who made it, null for built-in challenges
     required String name,
     required String shortName,
     String? description,
     required String icon,
     @Default('') String joinCode, // server-assigned shareable code (#11)
-    @Default(ChallengeVisibility.public) ChallengeVisibility visibility,
-    required ChallengeMetricKind metricKind,
-    required ChallengeMetric metric,
-    int? targetValue,
-    String? workoutTypeId,
+    @Default(ChallengeVisibility.public) ChallengeVisibility visibility, // (#) public or invite-only
+    required ChallengeMetricKind metricKind, // (#) accumulate-a-total vs single-best-effort
+    required ChallengeMetric metric, // (#) exactly what gets measured
+    int? targetValue, // (#) goal to reach, only for accumulator challenges
+    String? workoutTypeId, // (#) limits it to one workout type when set
     required DateTime startedAt,
     required DateTime endedAt,
   }) = _Challenge;
@@ -34,14 +33,17 @@ abstract class Challenge with _$Challenge {
   factory Challenge.fromJson(Map<String, dynamic> json) =>
       _$ChallengeFromJson(json);
 
+  // (#) true while now sits inside the start-to-end window
   bool isActive(DateTime now) =>
       !now.isBefore(startedAt) && now.isBefore(endedAt);
 
+  // (#) true once the challenge has finished
   bool isPast(DateTime now) => !now.isBefore(endedAt);
 
+  // (#) true when it's the run-up-a-total kind rather than best-effort
   bool get isAccumulator => metricKind == ChallengeMetricKind.accumulator;
 
-  /// (day X, of Y) — date-based, clamped to the window.
+  // (#) returns (which day we're on, total days) clamped inside the window
   (int, int) dayXofY(DateTime now) {
     DateTime d(DateTime t) {
       final l = t.toLocal();
@@ -53,10 +55,10 @@ abstract class Challenge with _$Challenge {
     return (x, total);
   }
 
-  /// fastest_time ranks ascending; everything else descending.
+  // (#) true when a smaller number wins (only fastest-time works that way)
   bool get lowerWins => metric == ChallengeMetric.fastestTime;
 
-  /// Which metrics each kind can race (create-modal filter).
+  // (#) the metrics that make sense for a given kind, used to filter the create form
   static List<ChallengeMetric> metricsFor(ChallengeMetricKind kind) =>
       switch (kind) {
         ChallengeMetricKind.accumulator => const [
@@ -72,8 +74,8 @@ abstract class Challenge with _$Challenge {
           ],
       };
 
-  /// One formatter for card previews, detail rows, and result panels so the
-  /// unit rendering can't drift (distances arrive in metres, times in secs).
+  // (#) single place that turns a raw value into display text so units stay
+  // (#) consistent everywhere (distances come in metres, times in seconds)
   String formatValue(num v) => switch (metric) {
         ChallengeMetric.totalDistance ||
         ChallengeMetric.longestDistance =>

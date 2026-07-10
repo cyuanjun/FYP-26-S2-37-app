@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../boundaries/gateways/ai_gateway.dart';
 import '../core/seq_log.dart';
 
-/// CONTROL — SummariseProgress (AI). Reads the AiGateway, which proxies the
-/// summarise-progress Edge Function. AI scope per build-plan §5.
+// (#) One of the two AI use cases in scope: SummariseProgress. It asks the AI gateway
+// (#) for a plain-English recap of the user's recent training; the gateway proxies the
+// (#) summarise-progress Edge Function so the OpenAI key never ships in the app.
 class SummariseProgress {
   SummariseProgress(this._ref);
 
   final Ref _ref;
 
+  // (#) Calls the AI gateway and hands the resulting summary back to the sheet.
   Future<ProgressSummary> call() {
     SeqLog.msg('summarise-progress', 'HistoryScreen', 'SummariseProgress', 'summarise()');
     SeqLog.msg('summarise-progress', 'SummariseProgress', 'AiGateway', 'summariseProgress()');
@@ -17,10 +19,11 @@ class SummariseProgress {
   }
 }
 
+// (#) Provider the history screen uses to reach the control.
 final summariseProgressProvider = Provider<SummariseProgress>(SummariseProgress.new);
 
-/// Generated on demand when the AI-summary sheet opens; auto-disposes on close so
-/// each open re-runs against fresh data.
+// (#) Runs the summary when the AI sheet opens. autoDispose means it clears on close,
+// (#) so opening the sheet again re-summarises against the latest data.
 final aiSummaryProvider = FutureProvider.autoDispose<ProgressSummary>(
   (ref) => ref.read(summariseProgressProvider).call(),
 );

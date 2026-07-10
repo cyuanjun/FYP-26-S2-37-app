@@ -14,9 +14,12 @@ import 'manage_connected_device.dart';
 import 'view_profile.dart';
 import 'workout_history.dart';
 
+// (#) The three states a recording can be in: not started, ticking, or on hold.
 enum WorkoutStatus { idle, running, paused }
 
-/// Live state the ActiveWorkoutScreen watches.
+// (#) The snapshot of a live workout the screen watches: status, type, timer,
+// (#) distance, steps, heart rate and the paired wearable's name. Immutable, so
+// (#) any change makes a fresh copy via copyWith.
 class ActiveWorkoutState {
   const ActiveWorkoutState({
     this.status = WorkoutStatus.idle,
@@ -29,17 +32,19 @@ class ActiveWorkoutState {
     this.wearableName,
   });
 
-  final WorkoutStatus status;
-  final WorkoutType? type;
-  final String? sessionId;
-  final Duration elapsed;
-  final double distanceMeters;
-  final int steps;
-  final int? heartRate;
-  final String? wearableName;
+  final WorkoutStatus status; // (#) idle, running or paused
+  final WorkoutType? type; // (#) what kind of workout is being recorded
+  final String? sessionId; // (#) the DB row id once the session is started
+  final Duration elapsed; // (#) time counted so far
+  final double distanceMeters; // (#) distance from the phone GPS
+  final int steps; // (#) step count from the pedometer
+  final int? heartRate; // (#) latest HR reading, null if no wearable
+  final String? wearableName; // (#) name of the paired HR device, if any
 
+  // (#) True when a workout is going (running or paused), false when idle.
   bool get isActive => status != WorkoutStatus.idle;
 
+  // (#) Makes a new state with only the given fields changed, rest kept as-is.
   ActiveWorkoutState copyWith({
     WorkoutStatus? status,
     WorkoutType? type,
@@ -62,22 +67,28 @@ class ActiveWorkoutState {
       );
 }
 
-/// CONTROL — orchestrates the StartWorkoutSession + EndWorkoutSession use cases
-/// and the live timer/sensor aggregation for one recording session.
+// (#) Runs one live workout recording start to finish. It starts the timer and
+// (#) the phone/wearable sensor streams, keeps the state's numbers fresh as
+// (#) readings arrive, and on stop hands the totals to the workout gateway. The
+// (#) screen only watches; it never touches sensors or the DB itself.
 class ActiveWorkout extends Notifier<ActiveWorkoutState> {
-  Timer? _timer;
-  WorkoutDataSource? _source;
-  ConnectedDevice? _wearable;
-  StreamSubscription<LiveMetrics>? _metricsSub;
-  Duration _accumulated = Duration.zero;
-  DateTime? _segmentStart;
+  Timer? _timer; // (#) fires every second to update the elapsed clock
+  WorkoutDataSource? _source; // (#) the sensor feed (phone, or phone + wearable)
+  ConnectedDevice? _wearable; // (#) the paired HR device for this session, if any
+  StreamSubscription<LiveMetrics>? _metricsSub; // (#) listens to sensor readings
+  Duration _accumulated = Duration.zero; // (#) time banked before the current run segment
+  DateTime? _segmentStart; // (#) when the current running segment began, null if paused
 
+  // (#) Sets up teardown on dispose and starts idle.
   @override
   ActiveWorkoutState build() {
     ref.onDispose(_teardown);
     return const ActiveWorkoutState();
   }
 
+  // (#) Begins a recording: looks up devices, asks the gateway to open a session
+  // (#) row, wires up the phone (and wearable HR) sensor streams, and starts the
+  // (#) per-second timer. Flips state to running.
   Future<void> start(WorkoutType type) async {
     final userId = ref.read(currentUserIdProvider)!;
     SeqLog.msg('start-workout', 'ActiveWorkoutScreen', 'ActiveWorkout', 'start(${type.slug})');
@@ -148,6 +159,7 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
     );
   }
 
+  // (#) Puts the recording on hold: banks the elapsed time and stops the clock.
   void pause() {
     if (state.status != WorkoutStatus.running) return;
     _accumulated = _elapsed();
@@ -155,14 +167,17 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
     state = state.copyWith(status: WorkoutStatus.paused);
   }
 
+  // (#) Restarts a paused recording: opens a fresh segment and ticks again.
   void resume() {
     if (state.status != WorkoutStatus.paused) return;
     _segmentStart = DateTime.now();
     state = state.copyWith(status: WorkoutStatus.running);
   }
 
-  /// Stops capture and finalizes via the RPC. Returns the RPC result map
-  /// (xp_gained, new_level, leveled_up, current_streak) for the summary screen.
+  // (#) Ends the recording: reads body weight for the calorie estimate, tears
+  // (#) down the sensors and timer, builds the metrics map and calls the endSession
+  // (#) RPC. Returns the RPC result (xp gained, new level, leveled up, streak) for
+  // (#) the summary screen, bumps the wearable's synced stamp, and resets to idle.
   Future<Map<String, dynamic>> end() async {
     final sessionId = state.sessionId!;
     final type = state.type!;
@@ -220,11 +235,13 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
     return result;
   }
 
+  // (#) Total time so far: banked time plus the current segment if still running.
   Duration _elapsed() {
     if (_segmentStart == null) return _accumulated;
     return _accumulated + DateTime.now().difference(_segmentStart!);
   }
 
+  // (#) Cleanup on dispose: stop the timer and shut down the sensor streams.
   void _teardown() {
     _timer?.cancel();
     _metricsSub?.cancel();
@@ -232,5 +249,6 @@ class ActiveWorkout extends Notifier<ActiveWorkoutState> {
   }
 }
 
+// (#) Hands the screen the ActiveWorkout control and its live state.
 final activeWorkoutProvider =
     NotifierProvider<ActiveWorkout, ActiveWorkoutState>(ActiveWorkout.new);

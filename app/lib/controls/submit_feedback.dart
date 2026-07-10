@@ -5,14 +5,18 @@ import '../core/seq_log.dart';
 import '../entities/enums.dart';
 import 'authenticate.dart';
 
-/// CONTROL — Submit Feedback (#13.5). Fire-and-forget insert; enforces the
-/// 10-character minimum (counted after trim) before touching the gateway.
+// (#) The Submit Feedback use case (#13.5). Takes a category and message and inserts
+// (#) it via the gateway, but only after the message clears a minimum length. The
+// (#) screen watches this notifier's error state to show validation messages.
 class SubmitFeedback extends AsyncNotifier<void> {
-  static const minBodyLength = 10;
+  static const minBodyLength = 10; // (#) shortest allowed message, counted after trimming
 
+  // (#) Nothing to preload.
   @override
   Future<void> build() async {}
 
+  // (#) Trims and length-checks the body, checks the user is signed in, then inserts
+  // (#) via the feedback gateway. Sets error states on failure and returns whether it sent.
   Future<bool> submit({required FeedbackCategory category, required String body}) async {
     SeqLog.msg('submit-feedback', 'SubmitFeedbackScreen', 'SubmitFeedback',
         'submit(${category.name})');
@@ -39,5 +43,6 @@ class SubmitFeedback extends AsyncNotifier<void> {
   }
 }
 
+// (#) Provider the feedback screen watches to submit and track state.
 final submitFeedbackProvider =
     AsyncNotifierProvider<SubmitFeedback, void>(SubmitFeedback.new);

@@ -9,10 +9,12 @@ import '../entities/health_tag.dart';
 import '../entities/workout_session.dart';
 import 'authenticate.dart';
 
-/// Read-side of the Profile hub (#13) and its sub-screens — the ViewProfile
-/// use case. Write controls invalidate these providers after committing.
+// (#) The read side of the Profile hub (#13) and its sub-screens: the ViewProfile use
+// (#) case. These are all read providers; the write controls elsewhere invalidate them
+// (#) after they commit so the profile screens refresh.
 
-/// The signed-in user's athlete specialization row (XP / streak / metrics).
+// (#) Loads the signed-in user's fitness profile row, the one holding XP, streak, and
+// (#) body metrics. Null when logged out.
 final fitnessProfileProvider = FutureProvider<FitnessProfile?>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Future.value(null);
@@ -20,34 +22,38 @@ final fitnessProfileProvider = FutureProvider<FitnessProfile?>((ref) {
   return ref.watch(fitnessGatewayProvider).fetchFitnessProfile(userId);
 });
 
-/// The active fitness goal (achievedAt == null), or null when none set.
+// (#) Loads the user's current in-progress fitness goal (one that isn't achieved yet),
+// (#) or null when they haven't set one.
 final activeGoalProvider = FutureProvider<FitnessGoal?>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Future.value(null);
   return ref.watch(fitnessGatewayProvider).fetchActiveGoal(userId);
 });
 
-/// The diet/allergy/injury catalog (#13.1 pickers).
+// (#) Loads the full diet/allergy/injury tag catalog that the #13.1 pickers offer.
 final healthTagsProvider = FutureProvider<List<HealthTag>>(
   (ref) => ref.watch(fitnessGatewayProvider).listHealthTags(),
 );
 
-/// Headline stats for the Profile identity block. Deliberately NOT derived
-/// from historyProvider: Profile is identity, not a History-window snapshot,
-/// so it bypasses the Free monthly cap (#13 spec) with its own lifetime query.
+// (#) Small data holder for the headline numbers on the Profile identity block. Kept
+// (#) separate from the History window on purpose: Profile shows lifetime totals and so
+// (#) ignores the Free monthly cap, using its own query below.
 class ProfileStats {
   const ProfileStats({required this.workouts, required this.activeDays});
 
-  final int workouts;
-  final int activeDays;
+  final int workouts; // (#) total completed workouts ever
+  final int activeDays; // (#) count of distinct calendar days trained
 }
 
+// (#) Loads every ended session for the user (lifetime, no cap) to feed the stats.
 final lifetimeSessionsProvider = FutureProvider<List<WorkoutSession>>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Future.value(const <WorkoutSession>[]);
   return ref.watch(workoutGatewayProvider).listEndedSessions(userId);
 });
 
+// (#) Derives the ProfileStats (workout count and unique active days) from the lifetime
+// (#) sessions, keeping the loading/error wrapper.
 final profileStatsProvider = Provider<AsyncValue<ProfileStats>>((ref) {
   return ref.watch(lifetimeSessionsProvider).whenData((sessions) {
     final days = <String>{};

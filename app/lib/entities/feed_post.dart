@@ -7,29 +7,27 @@ import 'workout_session.dart';
 part 'feed_post.freezed.dart';
 part 'feed_post.g.dart';
 
-/// ENTITY (read model) — one enriched feed row (#11): the [post] plus its
-/// [author], the wrapped [session] for workout_share posts, and like/comment
-/// tallies. Built by [FeedPost.fromRow] from the gateway's single embedded
-/// select; counts are client-side because PostgREST aggregates are disabled.
+// (#) One social feed row carrying everything its card needs: the post, its
+// (#) author, any shared workout, and the like and comment counts. The counts
+// (#) are tallied on the client since the DB aggregates are turned off.
 @freezed
 abstract class FeedPost with _$FeedPost {
   const FeedPost._();
 
   const factory FeedPost({
     required Post post,
-    required PublicProfile author,
-    WorkoutSession? session,
+    required PublicProfile author, // (#) who posted it
+    WorkoutSession? session, // (#) the shared workout, only on workout-share posts
     @Default(0) int likeCount,
     @Default(0) int commentCount,
-    @Default(false) bool likedByMe,
+    @Default(false) bool likedByMe, // (#) whether I've already liked it
   }) = _FeedPost;
 
   factory FeedPost.fromJson(Map<String, dynamic> json) =>
       _$FeedPostFromJson(json);
 
-  /// Decodes one embedded PostgREST row:
-  /// `posts.* , author:public_profiles, session:public_workout_sessions,
-  ///  likes:post_likes(user_id), comments:post_comments(id)`.
+  // (#) builds a feed row from one embedded query row, pulling out the author,
+  // (#) session and counting the likes/comments, and flagging if "me" liked it
   factory FeedPost.fromRow(Map<String, dynamic> row, {required String me}) {
     final likes = (row['likes'] as List? ?? const [])
         .map((l) => (l as Map<String, dynamic>)['user_id'] as String)

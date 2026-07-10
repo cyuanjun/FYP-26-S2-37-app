@@ -5,12 +5,14 @@ import '../core/seq_log.dart';
 import '../entities/enums.dart';
 import 'workout_history.dart';
 
-/// CONTROL — persists the summary-screen inputs (name / feel / notes) for a session.
+// (#) Saves the extras typed on the workout summary screen. It sends the custom
+// (#) name, feel rating and notes to the workout gateway, then refreshes history.
 class SaveWorkoutDetails {
   SaveWorkoutDetails(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway
 
+  // (#) Writes the name/feel/notes for the given session.
   Future<void> call({
     required String sessionId,
     String? customName,
@@ -28,4 +30,5 @@ class SaveWorkoutDetails {
   }
 }
 
+// (#) Hands the summary screen the SaveWorkoutDetails control.
 final saveWorkoutDetailsProvider = Provider<SaveWorkoutDetails>(SaveWorkoutDetails.new);

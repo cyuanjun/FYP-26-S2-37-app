@@ -1,16 +1,17 @@
 import 'workout_session.dart';
 
-// ENTITY rules — per-session Training Effect (#10/#12.1 spec, US35 short-term).
-// Formula per the spec: intensity = avgHr / estMaxHr (220 − age, fallback 190
-// when age is unknown); durationMultiplier = min(2, duration/1800) so longer
-// easy sessions score meaningfully higher; raw = intensity × 10 ×
-// (0.6 + 0.4 × durationMultiplier), clamped to a 1–10 integer.
-// The Premium breakdown (aerobic/anaerobic split + recovery hours) uses
-// indicative population-average formulas — descriptive, never prescriptive.
+// (#) The rules for scoring one workout's Training Effect. In short: intensity
+// (#) is avg heart rate over an estimated max, a duration multiplier rewards
+// (#) longer sessions, and the two combine into a 1 to 10 score. The aerobic and
+// (#) anaerobic split plus recovery hours use rough population averages, they
+// (#) describe the effort, they are not medical advice.
 
+// (#) The four effort bands a score falls into, from an easy day to a hard one.
 enum TeBand { low, moderate, high, veryHigh }
 
+// (#) Adds human-friendly text on top of the plain TeBand enum values.
 extension TeBandLabel on TeBand {
+  // (#) The short label to print for each band, like "Low" or "Very High".
   String get label => switch (this) {
         TeBand.low => 'Low',
         TeBand.moderate => 'Moderate',
@@ -18,7 +19,7 @@ extension TeBandLabel on TeBand {
         TeBand.veryHigh => 'Very High',
       };
 
-  /// Canned per-band advice line (#10 spec) — recovery scales with the band.
+  // (#) A canned advice line per band, where more recovery is suggested the harder it was.
   String get advice => switch (this) {
         TeBand.low =>
           'Light session. Great as a warmup or recovery — no rest needed.',
@@ -30,6 +31,9 @@ extension TeBandLabel on TeBand {
       };
 }
 
+// (#) The Training Effect of a single workout: a 1 to 10 score with its band, an
+// (#) aerobic and anaerobic split, and a rough recovery time, all worked out from
+// (#) the session's heart rate and how long it ran.
 class TrainingEffect {
   const TrainingEffect({
     required this.score,
@@ -39,20 +43,22 @@ class TrainingEffect {
     required this.recoveryHours,
   });
 
-  /// 1–10 integer.
+  // (#) The overall effect score, a whole number from 1 to 10.
   final int score;
+  // (#) Which band that score lands in.
   final TeBand band;
 
-  /// 0–5, one decimal place of meaning.
+  // (#) The aerobic part of the effort on a 0 to 5 scale.
   final double aerobic;
+  // (#) The anaerobic part of the effort on a 0 to 5 scale.
   final double anaerobic;
 
-  /// Indicative recovery window, banded (4 / 12 / 24 / 48 h).
+  // (#) Suggested rest window in hours, banded at 4, 12, 24 or 48.
   final int recoveryHours;
 }
 
-/// Null when [session] has no avgHeartRate (manual entry / HR dropout) —
-/// the card renders the spec's "effect estimate unavailable" state.
+// (#) Works out the Training Effect for a session. Returns null when there is no
+// (#) average heart rate, such as a manual entry, so the card can show "unavailable".
 TrainingEffect? computeTrainingEffect(WorkoutSession session, {int? age}) {
   final hr = session.avgHeartRate;
   if (hr == null || session.durationSeconds <= 0) return null;

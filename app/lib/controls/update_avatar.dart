@@ -7,14 +7,16 @@ import '../boundaries/gateways/storage_gateway.dart';
 import '../core/seq_log.dart';
 import 'authenticate.dart';
 
-/// CONTROL — Update Avatar (#13 profile photo). Uploads the picked image to
-/// the public avatars bucket, points profiles.avatar_url at it, and refreshes
-/// the profile so every avatar surface updates live.
+// (#) The Update Avatar use case (#13 profile photo). Uploads the chosen image to the
+// (#) public avatars storage bucket, saves its URL on the profile, then refreshes so
+// (#) every avatar in the app shows the new picture.
 class UpdateAvatar {
   UpdateAvatar(this._ref);
 
   final Ref _ref;
 
+  // (#) Takes the picked image bytes, uploads via the storage gateway, writes the new
+  // (#) URL through the profile gateway, and invalidates the profile so avatars refresh.
   Future<void> call(Uint8List bytes) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -32,4 +34,5 @@ class UpdateAvatar {
   }
 }
 
+// (#) Provider the profile screen uses to change the photo.
 final updateAvatarProvider = Provider<UpdateAvatar>(UpdateAvatar.new);

@@ -5,10 +5,11 @@ import 'enums.dart';
 part 'workout_type.freezed.dart';
 part 'workout_type.g.dart';
 
-/// Cardio disciplines earn distance-based XP and show pace/distance metrics.
+// (#) The set of slugs counted as cardio, which earn distance-based XP and show pace.
 const cardioSlugs = {'running', 'cycling', 'swimming', 'walking', 'hiit', 'rowing', 'hiking'};
 
-/// ENTITY — catalog of selectable workout disciplines (seeded `workout_types`).
+// (#) A kind of workout, like running or yoga. It is a catalog entry that also
+// (#) carries the MET value and the calorie maths for that discipline.
 @freezed
 abstract class WorkoutType with _$WorkoutType {
   const WorkoutType._();
@@ -16,17 +17,18 @@ abstract class WorkoutType with _$WorkoutType {
   const factory WorkoutType({
     required String id,
     required String name,
-    required String slug,
-    @Default(false) bool isCustom,
+    required String slug, // (#) machine key like "running", also used to look up MET
+    @Default(false) bool isCustom, // (#) true when a user added it, not from the seeded catalog
   }) = _WorkoutType;
 
+  // (#) Rebuilds a WorkoutType from its stored JSON.
   factory WorkoutType.fromJson(Map<String, dynamic> json) => _$WorkoutTypeFromJson(json);
 
+  // (#) True when this discipline is a cardio one, based on its slug.
   bool get isCardio => cardioSlugs.contains(slug);
 
-  /// MET (metabolic equivalent) per catalog slug — population averages from
-  /// the Compendium of Physical Activities; unknown/custom types fall back to
-  /// a moderate 4.0.
+  // (#) MET, the metabolic equivalent, per discipline, from published population
+  // (#) averages. Anything not listed here falls back to a moderate 4.0.
   static const mets = <String, double>{
     'running': 9.8,
     'cycling': 7.5,
@@ -40,19 +42,19 @@ abstract class WorkoutType with _$WorkoutType {
     'pilates': 3.0,
   };
 
+  // (#) This discipline's MET value, falling back to a moderate 4.0 if unlisted.
   double get met => mets[slug] ?? 4.0;
 
-  /// Population-average fallback weight (kg) used when the fitness profile has
-  /// no weight set, keyed on sex (≈ adult averages); 70 kg when sex is unknown.
+  // (#) A stand-in body weight in kg for when the profile has none, picked by
+  // (#) sex from rough adult averages, and 70 kg when sex is unknown.
   static double defaultWeightKg(Sex? sex) => switch (sex) {
         Sex.male => 70,
         Sex.female => 55,
         _ => 70, // other / not specified
       };
 
-  /// Estimated kcal = MET × weight(kg) × hours (US16 basic effect estimate).
-  /// [weightKg] falls back to a sex-based population default ([defaultWeightKg])
-  /// when the fitness profile has no weight set.
+  // (#) Rough calories burned = MET times weight in kg times hours. If no weight
+  // (#) is known it borrows the sex-based default above.
   int estimateCalories({required int durationSeconds, double? weightKg, Sex? sex}) =>
       (met * (weightKg ?? defaultWeightKg(sex)) * (durationSeconds / 3600)).round();
 }

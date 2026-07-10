@@ -7,17 +7,18 @@ import '../entities/validators.dart';
 import 'authenticate.dart';
 import 'browse_experts.dart';
 
-/// CONTROLs — the expert portal's self-service management (US45–US47):
-/// create/edit service listings (#21.2, `PublishService` per bce §2.4) and
-/// edit the professional profile (#24.1).
+// (#) This file is the expert portal's self-service editing: managing service
+// (#) listings and editing the professional profile.
 
+// (#) Creates or edits an expert's service listing. It first checks the price is
+// (#) valid, then inserts (when the id is empty) or updates through the gateway,
+// (#) and refreshes both the expert directory and the marketplace listings.
 class PublishService {
   PublishService(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway
 
-  /// Create when [service].id is empty, otherwise update. Refreshes both the
-  /// expert's own summary and the client-facing marketplace lists.
+  // (#) Saves the given service: create if it has no id, otherwise update.
   Future<void> call(ExpertService service) async {
     if (!Validators.validPriceCents(service.priceCents)) return; // guard input
     final creating = service.id.isEmpty;
@@ -36,13 +37,18 @@ class PublishService {
   }
 }
 
+// (#) Hands the service editor screen the PublishService control.
 final publishServiceProvider = Provider<PublishService>(PublishService.new);
 
+// (#) Edits the expert's professional info. It checks the years-coaching value,
+// (#) saves the title, about, credentials and specialties via the gateway, then
+// (#) refreshes the directory.
 class UpdateExpertProfile {
   UpdateExpertProfile(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway and user id
 
+  // (#) Validates then saves the expert's professional profile fields.
   Future<void> call({
     required String title,
     required int yearsCoaching,
@@ -69,5 +75,6 @@ class UpdateExpertProfile {
   }
 }
 
+// (#) Hands the professional-info screen the UpdateExpertProfile control.
 final updateExpertProfileProvider =
     Provider<UpdateExpertProfile>(UpdateExpertProfile.new);

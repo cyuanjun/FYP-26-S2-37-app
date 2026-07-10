@@ -7,13 +7,16 @@ import '../entities/enums.dart';
 import 'authenticate.dart';
 import '../core/strings.dart';
 
-/// CONTROL — Update Account Settings (#13.3). Inline commits, no save button:
-/// the units toggle persists instantly; Change Password reuses the reset-link
-/// machinery against the signed-in user's own email.
+// (#) The Update Account Settings use case (#13.3). Everything commits inline, there
+// (#) is no save button: the units toggle saves right away, and Change Password just
+// (#) reuses the password-reset email flow against the user's own address.
 class UpdateAccountSettings extends AsyncNotifier<void> {
+  // (#) Nothing to preload.
   @override
   Future<void> build() async {}
 
+  // (#) Saves the metric/imperial choice through the profile gateway and refreshes
+  // (#) the profile so the rest of the app picks up the new units.
   Future<void> setPreferredUnits(PreferredUnits units) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -23,8 +26,9 @@ class UpdateAccountSettings extends AsyncNotifier<void> {
     ref.invalidate(currentProfileProvider);
   }
 
-  /// Fills in the user's name (onboarding fallback when the website signup
-  /// metadata was missing; later also #13.3 per-field editing).
+  // (#) Saves the user's name via the gateway. Used both as an onboarding fallback
+  // (#) when signup metadata was missing and for later #13.3 name editing. Rejects a
+  // (#) blank first name and returns whether it saved.
   Future<bool> saveName({required String firstName, String? lastName}) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null || firstName.isBlank) return false;
@@ -37,7 +41,8 @@ class UpdateAccountSettings extends AsyncNotifier<void> {
     return true;
   }
 
-  /// Emails the signed-in user a password-reset link.
+  // (#) The Change Password action: emails the signed-in user a reset link through
+  // (#) the auth gateway, tracking loading/error state. Returns whether it sent.
   Future<bool> sendChangePasswordEmail(String email) async {
     SeqLog.msg('account-settings', 'UpdateAccountSettings', 'AuthGateway',
         'sendPasswordResetEmail');
@@ -48,5 +53,6 @@ class UpdateAccountSettings extends AsyncNotifier<void> {
   }
 }
 
+// (#) Provider the account settings screen watches for these actions and their state.
 final updateAccountSettingsProvider =
     AsyncNotifierProvider<UpdateAccountSettings, void>(UpdateAccountSettings.new);

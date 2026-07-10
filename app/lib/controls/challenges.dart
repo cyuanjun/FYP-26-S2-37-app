@@ -7,10 +7,10 @@ import '../entities/challenge_summary.dart';
 import '../entities/validators.dart';
 import 'authenticate.dart';
 
-/// CONTROL — View Challenges (US25, #11 Challenges tab + #11.3 detail).
-/// One fetch assembles every card: challenges + participants + the batched
-/// leaderboard RPC + the standings' public profiles. The UI partitions
-/// Joined / Active / Past with the entity's window rules.
+// (#) Loads everything the Challenges tab needs in one go: the challenges, their
+// (#) participants, the batched leaderboard RPC, and the public profiles of the
+// (#) people on each board. Builds a ChallengeSummary per challenge with the
+// (#) caller's own value and the standings; the UI splits Joined/Active/Past.
 final challengesProvider =
     FutureProvider<List<ChallengeSummary>>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
@@ -55,19 +55,22 @@ final challengesProvider =
   ];
 });
 
-/// One challenge's summary, for #11.3 (derived — no extra fetch).
+// (#) Pulls one challenge's summary out of the loaded list by id for the detail
+// (#) screen; no extra fetch.
 final challengeSummaryProvider =
     FutureProvider.family<ChallengeSummary?, String>((ref, id) async {
   final all = await ref.watch(challengesProvider.future);
   return all.where((s) => s.challenge.id == id).firstOrNull;
 });
 
-/// CONTROL — Join Challenge (bce-design §5.5).
+// (#) Signs the current user up for a challenge. Reads their id, calls the social
+// (#) gateway to join, then reloads the challenge list so the card flips.
 class JoinChallenge {
   JoinChallenge(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway and user id
 
+  // (#) Joins the given challenge for the signed-in user.
   Future<void> call(String challengeId) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -80,12 +83,14 @@ class JoinChallenge {
   }
 }
 
-/// CONTROL — Leave Challenge.
+// (#) Undoes a join. Calls the gateway to drop the user from the challenge, then
+// (#) reloads the list so the card flips back to not-joined.
 class LeaveChallenge {
   LeaveChallenge(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway and user id
 
+  // (#) Removes the signed-in user from the given challenge.
   Future<void> call(String challengeId) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return;
@@ -98,12 +103,16 @@ class LeaveChallenge {
   }
 }
 
-/// CONTROL — Create Challenge (creator auto-joins in the gateway).
+// (#) Creates a brand-new challenge. For accumulator challenges it first checks
+// (#) the target is positive, then saves it through the gateway (which auto-joins
+// (#) the creator) and reloads the list. Returns the new challenge, or null if
+// (#) not signed in or the target failed validation.
 class CreateChallenge {
   CreateChallenge(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway and user id
 
+  // (#) Validates then persists a new challenge from the sheet's field map.
   Future<Challenge?> call(Map<String, dynamic> fields) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return null;
@@ -124,14 +133,15 @@ class CreateChallenge {
   }
 }
 
-/// CONTROL — Find Challenge by Code (#11). Resolves a shared join code to a
-/// challenge so the UI can open its detail before the user joins. Codes are
-/// stored uppercase; input is trimmed + upper-cased here.
+// (#) Resolves a shared join code to a challenge so the UI can open its detail
+// (#) before the user joins. Codes are stored uppercase, so the typed input is
+// (#) trimmed and upper-cased here first.
 class FindChallengeByCode {
   FindChallengeByCode(this._ref);
 
-  final Ref _ref;
+  final Ref _ref; // (#) Riverpod handle for reading the gateway
 
+  // (#) Normalises the code and asks the gateway to find the matching challenge.
   Future<Challenge?> call(String code) async {
     final normalised = code.trim().toUpperCase();
     if (normalised.isEmpty) return null;
@@ -143,6 +153,7 @@ class FindChallengeByCode {
   }
 }
 
+// (#) Providers that hand the challenge screens each of the four controls above.
 final joinChallengeProvider = Provider<JoinChallenge>(JoinChallenge.new);
 final leaveChallengeProvider = Provider<LeaveChallenge>(LeaveChallenge.new);
 final createChallengeProvider = Provider<CreateChallenge>(CreateChallenge.new);

@@ -6,19 +6,20 @@ import '../boundaries/gateways/profile_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/profile.dart';
 
-/// Stream of auth state changes — the router refreshes on this.
+// (#) Emits every login/logout event; the router listens so it can redirect.
 final authChangesProvider = StreamProvider<AuthState>(
   (ref) => ref.watch(authGatewayProvider).onAuthStateChange,
 );
 
-/// The signed-in user's id (null when signed out). A seam that lets controls
-/// avoid depending on the Supabase `User` type — overridable in tests.
+// (#) The signed-in user's id, or null when signed out. Controls read this
+// (#) instead of touching Supabase's User type, and tests can override it.
 final currentUserIdProvider = Provider<String?>((ref) {
   ref.watch(authChangesProvider);
   return ref.watch(authGatewayProvider).currentUser?.id;
 });
 
-/// The signed-in user's Profile (null when signed out). Re-fetches on auth change.
+// (#) The signed-in user's full Profile row, refetched whenever auth changes;
+// (#) null when nobody is signed in.
 final currentProfileProvider = FutureProvider<Profile?>((ref) async {
   ref.watch(authChangesProvider);
   final auth = ref.watch(authGatewayProvider);
@@ -28,13 +29,16 @@ final currentProfileProvider = FutureProvider<Profile?>((ref) async {
   return ref.watch(profileGatewayProvider).fetchProfile(userId);
 });
 
-/// CONTROL — the Authenticate use case (login / logout). The LoginScreen watches
-/// this notifier's [AsyncValue] for loading/error; success flips the auth stream,
-/// which refreshes the router redirect.
+// (#) The login and logout use case. It passes email and password to the auth
+// (#) gateway and flips the signed-in state. The login screen just watches this
+// (#) notifier's AsyncValue for loading and errors; it never talks to Supabase.
 class Authenticate extends AsyncNotifier<void> {
+  // (#) Nothing to load at startup; the notifier just sits idle until called.
   @override
   Future<void> build() async {}
 
+  // (#) Signs the user in via the auth gateway (trims the email), then refreshes
+  // (#) their profile. Wrapped in guard so loading and errors land in state.
   Future<void> signIn({required String email, required String password}) async {
     SeqLog.msg('authenticate', 'LoginScreen', 'Authenticate', 'signIn($email)');
     state = const AsyncLoading();
@@ -47,6 +51,7 @@ class Authenticate extends AsyncNotifier<void> {
     });
   }
 
+  // (#) Signs the user out through the gateway and clears the cached profile.
   Future<void> signOut() async {
     SeqLog.msg('authenticate', 'HomeShell', 'Authenticate', 'signOut');
     await ref.read(authGatewayProvider).signOut();
@@ -54,5 +59,6 @@ class Authenticate extends AsyncNotifier<void> {
   }
 }
 
+// (#) Exposes the Authenticate control to the login screen and shell.
 final authenticateProvider =
     AsyncNotifierProvider<Authenticate, void>(Authenticate.new);
