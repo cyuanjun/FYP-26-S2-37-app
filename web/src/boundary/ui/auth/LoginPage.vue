@@ -14,6 +14,9 @@ const form = reactive({
 const error = ref<string | null>(null);
 const submitting = ref(false);
 
+// Toggles the password field between hidden and plain text.
+const showPassword = ref(false);
+
 // Shown when login is blocked because the email isn't verified yet.
 const showVerifyModal = ref(false);
 const unverifiedEmail = ref("");
@@ -82,12 +85,22 @@ async function onResend() {
 
         <label class="auth-field">
           <span>Password</span>
-          <input
-            v-model="form.password"
-            type="password"
-            autocomplete="current-password"
-            required
-          />
+          <div class="password-wrap">
+            <input
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-peek"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              @click="showPassword = !showPassword"
+            >
+              {{ showPassword ? "Hide" : "Show" }}
+            </button>
+          </div>
         </label>
 
         <p v-if="error" class="auth-message error">{{ error }}</p>

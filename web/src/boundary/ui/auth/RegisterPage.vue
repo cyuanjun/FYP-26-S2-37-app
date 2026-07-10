@@ -17,6 +17,10 @@ const form = reactive({
 const error = ref<string | null>(null);
 const submitting = ref(false);
 
+// Toggles for the password and confirm-password fields.
+const showPassword = ref(false);
+const showConfirm = ref(false);
+
 // Shown after a successful sign-up: prompt to verify email before logging in.
 const showVerifyModal = ref(false);
 const registeredEmail = ref("");
@@ -98,24 +102,44 @@ function goToLogin() {
 
         <label class="auth-field">
           <span>Password</span>
-          <input
-            v-model="form.password"
-            type="password"
-            minlength="8"
-            autocomplete="new-password"
-            required
-          />
+          <div class="password-wrap">
+            <input
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              minlength="8"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-peek"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              @click="showPassword = !showPassword"
+            >
+              {{ showPassword ? "Hide" : "Show" }}
+            </button>
+          </div>
         </label>
 
         <label class="auth-field">
           <span>Confirm password</span>
-          <input
-            v-model="form.confirm"
-            type="password"
-            minlength="8"
-            autocomplete="new-password"
-            required
-          />
+          <div class="password-wrap">
+            <input
+              v-model="form.confirm"
+              :type="showConfirm ? 'text' : 'password'"
+              minlength="8"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-peek"
+              :aria-label="showConfirm ? 'Hide password' : 'Show password'"
+              @click="showConfirm = !showConfirm"
+            >
+              {{ showConfirm ? "Hide" : "Show" }}
+            </button>
+          </div>
         </label>
 
         <p v-if="error" class="auth-message error">{{ error }}</p>

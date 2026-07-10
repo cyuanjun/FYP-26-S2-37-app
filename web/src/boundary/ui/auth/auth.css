@@ -124,6 +124,27 @@
   outline: none;
 }
 
+/* Password field with a show/hide toggle sitting inside the input. */
+.password-wrap {
+  position: relative;
+}
+.password-wrap input {
+  padding-right: 64px;
+}
+.password-peek {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  padding: 0 14px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .auth-submit {
   width: 100%;
   margin-top: 8px;
