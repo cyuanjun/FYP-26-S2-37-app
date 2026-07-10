@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import type { SiteData } from "@/controller/landing/viewModels";
 import { logoutMember, type SessionMember } from "@/controller/auth/memberSession";
+import Avatar from "./Avatar.vue";
 
 // site drives the brand + nav; member is null when nobody is signed in.
 const props = defineProps<{ site: SiteData; member?: SessionMember | null }>();
@@ -65,8 +66,9 @@ async function onLogout() {
       </RouterLink>
     </nav>
     <nav class="auth-nav" aria-label="Account navigation">
-      <!-- Signed in: download (or application) + logout, in place of login/register. -->
+      <!-- Signed in: profile picture + download (or application) + logout, in place of login/register. -->
       <template v-if="member">
+        <Avatar :name="member.first_name" :size="42" :title="member.first_name" />
         <RouterLink :to="primaryRoute" class="button primary">{{ primaryLabel }}</RouterLink>
         <button type="button" class="button logout-button" @click="onLogout">Logout</button>
       </template>
