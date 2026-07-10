@@ -159,7 +159,7 @@ Do this the night before **and** ~30 min before the slot:
 > Boundary–Control–Entity — 26 entities mirroring the TDM ERD, one control
 > per use case, and no screen ever touching the database. The backend is
 > Postgres with row-level security everywhere, eight SECURITY DEFINER RPCs
-> for every multi-step rule, and 223 automated tests. The admin portal ships
+> for every multi-step rule, and 238 automated tests. The admin portal ships
 > separately as a web app on the same backend."
 
 ---

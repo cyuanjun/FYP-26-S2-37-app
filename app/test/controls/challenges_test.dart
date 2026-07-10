@@ -119,6 +119,18 @@ void main() {
       expect(await c.read(createChallengeProvider).call({'name': 'x'}), isNull);
       expect(social.createdChallenges, isEmpty);
     });
+
+    test('accumulator with a non-positive target is rejected (negative)', () async {
+      final social = FakeSocialGateway();
+      final c = _container(social);
+      final created = await c.read(createChallengeProvider).call({
+        'short_name': 'BAD',
+        'metric_kind': 'accumulator',
+        'target_value': 0, // invalid for an accumulator
+      });
+      expect(created, isNull);
+      expect(social.createdChallenges, isEmpty);
+    });
   });
 
   group('FindChallengeByCode', () {

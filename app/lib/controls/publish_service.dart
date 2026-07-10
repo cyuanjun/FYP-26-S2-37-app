@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../boundaries/gateways/expert_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/expert_service.dart';
+import '../entities/validators.dart';
 import 'authenticate.dart';
 import 'browse_experts.dart';
 
@@ -18,6 +19,7 @@ class PublishService {
   /// Create when [service].id is empty, otherwise update. Refreshes both the
   /// expert's own summary and the client-facing marketplace lists.
   Future<void> call(ExpertService service) async {
+    if (!Validators.validPriceCents(service.priceCents)) return; // guard input
     final creating = service.id.isEmpty;
     SeqLog.msg('publish-service', 'ServiceEditorScreen', 'PublishService',
         '${creating ? 'create' : 'update'}(${service.name})');
@@ -50,6 +52,7 @@ class UpdateExpertProfile {
   }) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return;
+    if (!Validators.validYearsCoaching(yearsCoaching)) return; // guard input
     SeqLog.msg('manage-professional-info', 'ProfessionalInfoScreen',
         'UpdateExpertProfile', 'save()');
     SeqLog.msg('manage-professional-info', 'UpdateExpertProfile',

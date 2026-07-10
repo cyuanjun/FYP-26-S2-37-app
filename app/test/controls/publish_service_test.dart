@@ -44,6 +44,15 @@ void main() {
       expect(gateway.updatedServices, hasLength(1));
       expect(gateway.updatedServices.single.priceCents, 9000);
     });
+
+    test('negative price is rejected before the gateway (negative)', () async {
+      final gateway = FakeExpertGateway();
+      final c = _container(gateway);
+
+      await c.read(publishServiceProvider).call(_service.copyWith(priceCents: -100));
+      expect(gateway.createdServices, isEmpty);
+      expect(gateway.updatedServices, isEmpty);
+    });
   });
 
   group('UpdateExpertProfile', () {
@@ -73,6 +82,21 @@ void main() {
       await c.read(updateExpertProfileProvider).call(
         title: 'Head Coach',
         yearsCoaching: 10,
+        about: 'About me',
+        credentials: ['NASM CPT'],
+        specialties: ['strength'],
+      );
+
+      expect(gateway.profileUpdates, isEmpty);
+    });
+
+    test('out-of-range years coaching is rejected (negative)', () async {
+      final gateway = FakeExpertGateway();
+      final c = _container(gateway);
+
+      await c.read(updateExpertProfileProvider).call(
+        title: 'Head Coach',
+        yearsCoaching: 999, // implausible
         about: 'About me',
         credentials: ['NASM CPT'],
         specialties: ['strength'],

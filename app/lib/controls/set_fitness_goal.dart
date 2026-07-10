@@ -4,6 +4,7 @@ import '../boundaries/gateways/fitness_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/enums.dart';
 import '../entities/fitness_goal.dart';
+import '../entities/validators.dart';
 import 'view_profile.dart';
 
 /// CONTROL — Set Fitness Goal (#13.2 Save Goal). Upsert-by-convention: patches
@@ -28,6 +29,12 @@ class SetFitnessGoal extends AsyncNotifier<void> {
       return false;
     }
     final hasTarget = FitnessGoal.hasTargetFor(primaryGoal);
+    // A goal that races a target must carry a positive one.
+    if (hasTarget && !Validators.validPositiveTarget(targetValue)) {
+      state = AsyncError(
+          ArgumentError('Target value must be greater than 0'), StackTrace.current);
+      return false;
+    }
     final unit = FitnessGoal.unitFor(primaryGoal);
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {

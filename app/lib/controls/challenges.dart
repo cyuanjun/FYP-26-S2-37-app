@@ -4,6 +4,7 @@ import '../boundaries/gateways/social_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/challenge.dart';
 import '../entities/challenge_summary.dart';
+import '../entities/validators.dart';
 import 'authenticate.dart';
 
 /// CONTROL — View Challenges (US25, #11 Challenges tab + #11.3 detail).
@@ -106,6 +107,11 @@ class CreateChallenge {
   Future<Challenge?> call(Map<String, dynamic> fields) async {
     final userId = _ref.read(currentUserIdProvider);
     if (userId == null) return null;
+    // An accumulator challenge races a positive target — reject otherwise.
+    if (fields['metric_kind'] == 'accumulator' &&
+        !Validators.validPositiveTarget(fields['target_value'] as num?)) {
+      return null;
+    }
     SeqLog.msg('create-challenge', 'CreateChallengeSheet', 'CreateChallenge',
         'create(${fields['short_name']})');
     SeqLog.msg('create-challenge', 'CreateChallenge', 'SocialGateway',

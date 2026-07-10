@@ -13,6 +13,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../entities/enums.dart';
 import '../../../entities/fitness_goal.dart';
 import '../../../entities/fitness_plan.dart';
+import '../../../entities/validators.dart';
 import '../../gateways/workout_gateway.dart';
 import '../common/app_card.dart';
 import '../profile/profile_widgets.dart';
@@ -315,8 +316,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               title: 'Height',
               unit: 'cm',
               current: _heightCm?.toDouble(),
-              min: 100,
-              max: 250,
+              min: Validators.minHeightCm.toDouble(),
+              max: Validators.maxHeightCm.toDouble(),
               onSet: (v) => setState(() => _heightCm = v.round())),
         ),
         const Divider(color: AppColors.faint, height: 1),
@@ -327,8 +328,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               title: 'Weight',
               unit: 'kg',
               current: _weightKg,
-              min: 30,
-              max: 250,
+              min: Validators.minWeightKg,
+              max: Validators.maxWeightKg,
               onSet: (v) => setState(() => _weightKg = v)),
         ),
       ],

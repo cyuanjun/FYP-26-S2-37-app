@@ -45,6 +45,20 @@ void main() {
       expect(c.read(updateFitnessProfileProvider).hasError, isTrue);
     });
 
+    test('out-of-range height is rejected before the gateway (negative)', () async {
+      final fake = FakeFitnessGateway();
+      final c = ProviderContainer(overrides: [
+        fitnessGatewayProvider.overrideWithValue(fake),
+        currentUserIdProvider.overrideWithValue('user-1'),
+      ]);
+      addTearDown(c.dispose);
+      final ok = await c
+          .read(updateFitnessProfileProvider.notifier)
+          .save('user-1', {'height_cm': 999, 'weight_kg': 74.0});
+      expect(ok, isFalse); // control's contract: rejected
+      expect(fake.profilePatches, isEmpty); // nothing reached the gateway
+    });
+
     test('addCustomTag inserts and returns the tag (positive)', () async {
       final fake = FakeFitnessGateway();
       final c = ProviderContainer(
@@ -122,6 +136,21 @@ void main() {
             userId: 'user-1',
             primaryGoal: PrimaryGoal.maintainFitness,
             weeklyCommitmentDays: 9,
+          );
+      expect(ok, isFalse);
+      expect(fake.goalUpserts, isEmpty);
+    });
+
+    test('target-racing goal with a non-positive target is rejected (negative)', () async {
+      final fake = FakeFitnessGateway();
+      final c = ProviderContainer(
+          overrides: [fitnessGatewayProvider.overrideWithValue(fake)]);
+      addTearDown(c.dispose);
+      final ok = await c.read(setFitnessGoalProvider.notifier).save(
+            userId: 'user-1',
+            primaryGoal: PrimaryGoal.loseWeight, // races a kg target
+            targetValue: 0, // invalid
+            weeklyCommitmentDays: 4,
           );
       expect(ok, isFalse);
       expect(fake.goalUpserts, isEmpty);

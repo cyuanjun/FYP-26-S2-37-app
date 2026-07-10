@@ -2,7 +2,7 @@
 
 > This report is the **execution evidence** for the **[module-test-plan.md](module-test-plan.md)** — its case tables are the per-case realisation of that plan.
 
-**Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **223 automated tests**)
+**Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **238 automated tests**)
 **Environment:** Flutter stable · iPhone 17 Pro simulator (iOS 26) + Pixel API 35 emulator · Supabase local stack (ports 55321-9) mirroring hosted
 **Reproduce:** `cd app && flutter analyze && flutter test` (all automated cases) · manual procedures in [../prototype-demo-guide.md](../prototype-demo-guide.md) §4
 
@@ -14,20 +14,20 @@ Two evidence streams per module:
 
 | # | Module | Automated cases | Result | Manual procedure | Result |
 |---|---|---|---|---|---|
-| ENT | Entity rules (domain logic) | 78 | ✅ 78/78 pass | — (rules exercised via every manual flow) | — |
-| AUTH | Auth & profile cluster | 26 | ✅ 26/26 pass | Guide §A, §F, §F2 (login/logout/reset, profile edits, photo upload) | Pass (10 Jul) |
+| ENT | Entity rules (domain logic) | 88 | ✅ 88/88 pass | — (rules exercised via every manual flow) | — |
+| AUTH | Auth & profile cluster | 28 | ✅ 28/28 pass | Guide §A, §F, §F2 (login/logout/reset, profile edits, photo upload) | Pass (10 Jul) |
 | CAP | Capture & devices | 22 | ✅ 22/22 pass | Guide §B, §B2 (phone GPS / freeform / wearable) | Pass (BLE: sim-safe path; hardware pass pending) |
 | HIST | History & analytics | 14 | ✅ 14/14 pass | Guide §C, §G + search cases | Pass (9 Jul) |
 | PLAN | Plans & AI | 15 | ✅ 15/15 pass | Guide §A2 (onboarding → AI plan), regen cap | Pass (earlier sprints) |
-| SOC | Social & challenges | 33 | ✅ 33/33 pass | Guide §E + Social walkthrough + History→post link + join-by-code | Pass (9–10 Jul, 5-athlete feed; join-code verified on sim) |
-| MKT | Marketplace & expert portal | 18 | ✅ 18/18 pass | Expert walkthrough: 2-account lifecycle + portal editors | Pass (7–9 Jul, DB checked) |
+| SOC | Social & challenges | 34 | ✅ 34/34 pass | Guide §E + Social walkthrough + History→post link + join-by-code | Pass (9–10 Jul, 5-athlete feed; join-code verified on sim) |
+| MKT | Marketplace & expert portal | 20 | ✅ 20/20 pass | Expert walkthrough: 2-account lifecycle + portal editors | Pass (7–9 Jul, DB checked) |
 | PREM | Premium subscription | 6 | ✅ 6/6 pass | Guide §H (upgrade → #13.6 → reset) | Pass (8 Jul, DB checked) |
 | NOTIF | Notifications (rule engine) | 11 | ✅ 11/11 pass | #13.4 UPCOMING + pending=1 + push-payload display | Pass (delivery = device pass pending) |
-| | **Total** | **223** | **✅ 223/223 pass** | | |
+| | **Total** | **238** | **✅ 238/238 pass** | | |
 
-All 223 automated cases pass on the refresh date (0 failures, `flutter analyze` clean).
+All 238 automated cases pass on the refresh date (0 failures, `flutter analyze` clean).
 
-> **Delta since the 11 Jul milestone (221 → 222):** **US13 manual workout entry was descoped/removed** — its 2 automated cases dropped (CAP 24 → 22) because a free-text entry let users farm XP/level/streak with no sensor evidence (see [user-stories.md](../../requirements/user-stories.md) US13, reconciliation §C8). **Challenge join codes added** — `FindChallengeByCode` gained 3 automated cases (SOC 30 → 33: resolve + input-normalisation, unknown-code, blank-input negatives).
+> **Delta since the 11 Jul milestone (221 → 238):** **US13 manual workout entry descoped/removed** — its 2 cases dropped (CAP 24 → 22; see reconciliation §C8). **Challenge join codes added** — `FindChallengeByCode` gained 3 cases (SOC). **Input-validation hardening** — a pure `Validators` module now backs Boundary bounds *and* Control guards (defence in depth: invalid numeric input — height/weight/goal/challenge target/price/years — is rejected before it reaches a gateway, even if the UI is bypassed); +15 cases (ENT 78 → 88 validator unit tests; AUTH +2, SOC +1, MKT +2 control-guard negatives).
 
 ## Requirements traceability
 
@@ -55,9 +55,9 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 
 ## Automated cases by module
 
-### ENT — Entity rules (domain logic) (78 cases)
+### ENT — Entity rules (domain logic) (88 cases)
 
-*Scope:* XP/level/streak math, MET calories, month-cap windows, ACWR/HR-zone/personal-best analytics, Training Effect formula, price/label formatting, feed/challenge/marketplace entity invariants.
+*Scope:* XP/level/streak math, MET calories, month-cap windows, ACWR/HR-zone/personal-best analytics, Training Effect formula, price/label formatting, feed/challenge/marketplace entity invariants, **input validators** (numeric-range rules).
 
 | ID | Test file | Case | Result |
 |---|---|---|---|
@@ -139,8 +139,18 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | ENT-76 | `format_test` | relativeDay older shows weekday d mon | ✅ |
 | ENT-77 | `format_test` | relativeDay UTC timestamps compare by LOCAL date (regression: 01:40 SGT bug) | ✅ |
 | ENT-78 | `format_test` | startOfWeek returns Monday 00:00 | ✅ |
+| ENT-79 | `validators_test` | validHeightCm accepts a plausible height incl. bounds (positive) | ✅ |
+| ENT-80 | `validators_test` | validHeightCm rejects out-of-range and null (negative) | ✅ |
+| ENT-81 | `validators_test` | heightCmError is null only when valid | ✅ |
+| ENT-82 | `validators_test` | validWeightKg accepts in-range incl. bounds (positive) | ✅ |
+| ENT-83 | `validators_test` | validWeightKg rejects out-of-range and null (negative) | ✅ |
+| ENT-84 | `validators_test` | validRestingHr allows null (optional field) | ✅ |
+| ENT-85 | `validators_test` | validRestingHr in-range accepted, out-of-range rejected (negative) | ✅ |
+| ENT-86 | `validators_test` | validYearsCoaching accepts 0..80, rejects outside + null (negative) | ✅ |
+| ENT-87 | `validators_test` | validPositiveTarget positive only, rejects 0/negative/null (negative) | ✅ |
+| ENT-88 | `validators_test` | validPriceCents non-negative accepted, negative/null rejected (negative) | ✅ |
 
-### AUTH — Auth & profile cluster (26 cases)
+### AUTH — Auth & profile cluster (28 cases)
 
 *Scope:* Login/logout/reset flows, fitness profile + goals upserts, units & notification prefs, account settings, feedback submission, onboarding completion.
 
@@ -172,6 +182,8 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | AUTH-24 | `profile_cluster_test` | RequestPasswordReset gateway failure is swallowed — same "sent" outcome (anti-enumeration) | ✅ |
 | AUTH-25 | `profile_cluster_test` | addCustomWorkoutType inserts a custom type and returns it (positive) | ✅ |
 | AUTH-26 | `profile_cluster_test` | addCustomWorkoutType rejects empty names (negative) | ✅ |
+| AUTH-27 | `profile_cluster_test` | UpdateFitnessProfile out-of-range height rejected before the gateway (negative) | ✅ |
+| AUTH-28 | `profile_cluster_test` | SetFitnessGoal target-racing goal with a non-positive target rejected (negative) | ✅ |
 
 ### CAP — Capture & devices (22 cases)
 
@@ -245,7 +257,7 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | PLAN-14 | `generate_plan_test` | Profile.needsOnboarding null onboardingCompletedAt → wizard required | ✅ |
 | PLAN-15 | `generate_plan_test` | Profile.needsOnboarding completed → straight to the shell | ✅ |
 
-### SOC — Social & challenges (33 cases)
+### SOC — Social & challenges (34 cases)
 
 *Scope:* Feed assembly (friends+self), likes/comments, mutual-friend RPC pairs, share-post creation + session→post link, challenge join/leave/create + live leaderboards + join-by-code resolution.
 
@@ -284,8 +296,9 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | SOC-31 | `challenges_test` | FindChallengeByCode resolves a code, upper-casing + trimming the input | ✅ |
 | SOC-32 | `challenges_test` | FindChallengeByCode unknown code → null (negative) | ✅ |
 | SOC-33 | `challenges_test` | FindChallengeByCode blank input → null without hitting the gateway (negative) | ✅ |
+| SOC-34 | `challenges_test` | CreateChallenge accumulator with a non-positive target rejected (negative) | ✅ |
 
-### MKT — Marketplace & expert portal (18 cases)
+### MKT — Marketplace & expert portal (20 cases)
 
 *Scope:* Browse/search experts, request lifecycle (snapshot price, footer states), expert inbox gating, accept/decline/deliver/complete, service create-vs-update dispatch, professional-info payload.
 
@@ -309,6 +322,8 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | MKT-16 | `publish_service_test` | UpdateExpertProfile writes the descriptive fields for the current user (positive) | ✅ |
 | MKT-17 | `publish_service_test` | UpdateExpertProfile signed out → no-op, nothing written (negative) | ✅ |
 | MKT-18 | `publish_service_test` | service enum wire values dbValue matches the Postgres enum spellings | ✅ |
+| MKT-19 | `publish_service_test` | PublishService negative price rejected before the gateway (negative) | ✅ |
+| MKT-20 | `publish_service_test` | UpdateExpertProfile out-of-range years coaching rejected (negative) | ✅ |
 
 ### PREM — Premium subscription (6 cases)
 
