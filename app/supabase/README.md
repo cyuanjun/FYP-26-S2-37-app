@@ -125,3 +125,78 @@ Secrets): `OPENAI_API_KEY`, optional `GEMINI_API_KEY` — never shipped in the a
   `update profiles set onboarding_completed_at = null where email = '<demo email>';`
 - Seeded sessions carry no `connected_device_id` (null = no connected device recorded) even though
   they include HR values — cosmetic; live captures do link their source device.
+
+## Creating a login/onboarding test account
+
+To test the **onboarding wizard** you need a login-ready account that hasn't onboarded yet:
+`email_confirmed_at` set (so no email step), `onboarding_completed_at` NULL (so the wizard shows),
+and no goal/plan/metrics. The demo loop in `seed-demo.sql` flags every account onboarding-complete,
+so it can't be used for this — insert a dedicated account instead. Change the four variables and run
+in the Supabase SQL Editor (or `psql` against the target DB):
+
+```sql
+do $$
+declare
+  uid uuid;
+  target_email text := 'onboard@wiseworkout.test';   -- must be unique
+  target_pw    text := 'Password123!';               -- 8+ chars; what you type at login
+  target_first text := 'Onboard';
+  target_last  text := 'Tester';
+begin
+  select id into uid from auth.users where email = target_email;
+  if uid is null then
+    uid := gen_random_uuid();
+    -- Manually-inserted auth.users need empty-string (not NULL) token columns or GoTrue
+    -- rejects the login; email_confirmed_at = now() skips the email-verification step.
+    insert into auth.users (
+      instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+      created_at, updated_at, raw_app_meta_data, raw_user_meta_data,
+      confirmation_token, recovery_token, email_change, email_change_token_new,
+      email_change_token_current, phone_change, phone_change_token, reauthentication_token
+    ) values (
+      '00000000-0000-0000-0000-000000000000', uid, 'authenticated', 'authenticated', target_email,
+      crypt(target_pw, gen_salt('bf')), now(), now(), now(),
+      '{"provider":"email","providers":["email"]}'::jsonb,
+      jsonb_build_object('first_name', target_first, 'last_name', target_last,
+                         'username', lower(target_first) || floor(random()*1000)::text),
+      '', '', '', '', '', '', '', ''
+    );
+    insert into auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+    values (gen_random_uuid(), uid,
+      jsonb_build_object('sub', uid::text, 'email', target_email), 'email', uid::text, now(), now(), now());
+  end if;
+
+  -- Plain, un-onboarded free user: NULL onboarding flag, no goal/plan/metrics rows.
+  update public.profiles
+     set role = 'free', first_name = target_first, last_name = target_last,
+         onboarding_completed_at = null
+   where id = uid;
+end $$;
+```
+
+Verify (`confirmed = true`, `onboarding_completed_at = null`, no goal/plan):
+
+```sql
+select p.email, p.role, (u.email_confirmed_at is not null) as confirmed,
+       p.onboarding_completed_at,
+       exists(select 1 from public.fitness_goals g where g.user_id = p.id) as has_goal,
+       exists(select 1 from public.fitness_plans pl where pl.user_id = p.id) as has_plan
+from public.profiles p join auth.users u on u.id = p.id
+where p.email = 'onboard@wiseworkout.test';
+```
+
+Clean up when done (profile + fitness rows cascade off the `auth.users` FK):
+
+```sql
+delete from auth.users where email = 'onboard@wiseworkout.test';
+```
+
+Notes: the email must be unique — re-running with an existing email skips the insert and just
+re-applies the free/un-onboarded state. Point a plain `flutter run` at the same project the account
+lives in (hosted by default; a local `supabase start` stack is a *different* DB). The safer-but-heavier
+alternative to the raw insert is the Admin API (`POST /auth/v1/admin/users` with the service-role key
+and `"email_confirm": true`).
+
+> An `onboard@wiseworkout.test` / `Password123!` account of exactly this shape currently exists on the
+> **hosted** project (seeded 11 Jul for onboarding testing); it is not in `seed-demo.sql`, so a local
+> `db reset` won't recreate it — use the block above.

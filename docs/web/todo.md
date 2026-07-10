@@ -4,37 +4,39 @@
 
 ## Future Auth Work
 
-### Supabase Login Sessions
+### Supabase Login Sessions — ✅ DONE
 
-Connect the existing login UI to Supabase Auth.
+Login uses real Supabase Auth and keeps a persistent session (members and admins alike).
 
-Future implementation:
+Behavior:
 
-- Sign in with email and password.
-- Fetch the related `profiles` row after authentication.
-- Block suspended users.
-- Route by role:
-  - `admin` -> admin home
-  - `expert` -> expert home
-  - `free` / `premium` -> member home
-- Add logout.
+- Signs in with email and password (login page has a show/hide password toggle).
+- Fetches the related `profiles` row after authentication and blocks suspended users.
+- Routes by role + expert status:
+  - `admin` -> `/admin`
+  - `expert` / anyone with an expert application -> `/expert` (status / download)
+  - `free` / `premium` -> `/download`
+- Logout is implemented (header logout button ends the session and returns to the landing page).
+- The landing page and post-login pages share one auth-aware header: signed in, login/register
+  become a profile avatar + a Download button (`My application` for a pending/rejected applicant)
+  + logout.
 
-### Email Verification
+### Email Verification — ✅ DONE
 
-Add email verification for new registrations.
+Uses Supabase built-in email confirmation (not a custom OTP).
 
-Likely approach:
+Behavior:
 
-- Send an OTP or email verification code after registration.
-- Require the user to verify the code before full account access.
-- Store verification state through Supabase Auth or a related profile/auth metadata field.
-- Apply the same flow to user registration and expert registration.
+- Registration shows a "check your email" popup on success, then routes to `/login`.
+- `signUp` sets `emailRedirectTo = <origin>/login`, so the confirmation link returns to the
+  site's login page (needs the deployed URL in Supabase's Site URL / Redirect allow-list).
+- Logging in before confirming shows a verify-your-email prompt with a resend button
+  (the gateway tells "email not confirmed" apart from bad credentials).
 
 Notes:
 
-- This is not implemented yet.
-- Registration UI currently collects the fields needed for account creation, but does not verify email ownership.
-- Final implementation should decide whether to use Supabase built-in email confirmation or a custom OTP flow.
+- Applies to both member registration and expert application.
+- Free-plan mailer rate limit applies — see [limitations.md](./limitations.md).
 
 ### Expert Verification Document Storage — ✅ DONE
 

@@ -25,9 +25,18 @@ Implemented:
   - Collects account/profile fields.
   - Requires one identity document and at least one certification document.
   - Accepts PDF, JPG, PNG, and WebP files up to 5 MB each.
-- Login UI at `/login`.
+- Login UI at `/login`, with a show/hide password toggle and a verify-your-email
+  prompt (with a resend button) when an unconfirmed account tries to sign in.
+- Registration shows a "check your email" popup on success, then routes to `/login`;
+  both password fields have a show/hide toggle.
+- Post-login pages: members land on `/download` (app-download placeholders), experts
+  and applicants on `/expert` (approval status, or download once approved). The
+  landing page and these pages share one auth-aware header — signed in, the
+  login/register buttons become a profile avatar + a **Download** button (labelled
+  "My application" for a pending/rejected applicant) + a logout button.
 - Shared-database gateways (live Supabase reads with bundled-seed fallback).
-- Real Supabase Auth for registration, login, and expert applications.
+- Real Supabase Auth for registration, login, and expert applications; member and
+  admin logins both keep a persistent session with sign-out.
 - Contact form inserts into the shared `contact_messages` table.
 - **Admin portal at `/admin`** (role-guarded): overview, user management
   (suspend / tier switch), expert-application review, service-listing
@@ -43,7 +52,7 @@ Implemented:
 
 Not yet built:
 
-- Member-facing persistent sessions (non-admin logins validate and point at the app; admins get a real portal session with sign-out).
+- Real App Store / Google Play download links (the `/download` and `/expert` pages show disabled placeholder buttons).
 - Admin editing for landing **feature-card copy** specifically (FAQ, pricing, testimonials, categories, and contact/feedback moderation are already editable in `/admin`).
 
 See [docs/limitations.md](../docs/web/limitations.md) for the full limitation list.

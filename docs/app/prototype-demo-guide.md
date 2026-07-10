@@ -88,6 +88,7 @@ Created/seeded in Supabase Auth (see [§7](#7-reset--reseed-demo-data)). Passwor
 | `admin@wiseworkout.test` | Admin (Ava Admin) | Logs into the **web portal** (`web/` → `/login` → `/admin`), not the app — the app role-redirects admins away |
 | `amelia@` / `marcus@` / `elena@wiseworkout.test` | Experts (verified) | Marketplace depth: live services + stored rating aggregates; they drive the landing FEATURED EXPERTS ranking — no need to log in as them |
 | `noah@wiseworkout.test` | Free (pending expert applicant) | PENDING expert application + document metadata — the demo card on `/admin/applications`; approving him live flips his role to expert |
+| `onboard@wiseworkout.test` | Free (un-onboarded) | Confirmed email, `onboarding_completed_at` NULL, no goal/plan/metrics — logging in on the app drops straight into the **onboarding wizard**. Hosted only (not in `seed-demo.sql`); recreate via the recipe in [app/supabase/README.md](../../app/supabase/README.md#creating-a-loginonboarding-test-account) |
 
 ---
 
