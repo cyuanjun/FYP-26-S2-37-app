@@ -2,7 +2,7 @@
 
 > This report is the **execution evidence** for the **[module-test-plan.md](module-test-plan.md)** — its case tables are the per-case realisation of that plan.
 
-**Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **222 automated tests**)
+**Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **223 automated tests**)
 **Environment:** Flutter stable · iPhone 17 Pro simulator (iOS 26) + Pixel API 35 emulator · Supabase local stack (ports 55321-9) mirroring hosted
 **Reproduce:** `cd app && flutter analyze && flutter test` (all automated cases) · manual procedures in [../prototype-demo-guide.md](../prototype-demo-guide.md) §4
 
@@ -20,12 +20,12 @@ Two evidence streams per module:
 | HIST | History & analytics | 14 | ✅ 14/14 pass | Guide §C, §G + search cases | Pass (9 Jul) |
 | PLAN | Plans & AI | 15 | ✅ 15/15 pass | Guide §A2 (onboarding → AI plan), regen cap | Pass (earlier sprints) |
 | SOC | Social & challenges | 33 | ✅ 33/33 pass | Guide §E + Social walkthrough + History→post link + join-by-code | Pass (9–10 Jul, 5-athlete feed; join-code verified on sim) |
-| MKT | Marketplace & expert portal | 17 | ✅ 17/17 pass | Expert walkthrough: 2-account lifecycle + portal editors | Pass (7–9 Jul, DB checked) |
+| MKT | Marketplace & expert portal | 18 | ✅ 18/18 pass | Expert walkthrough: 2-account lifecycle + portal editors | Pass (7–9 Jul, DB checked) |
 | PREM | Premium subscription | 6 | ✅ 6/6 pass | Guide §H (upgrade → #13.6 → reset) | Pass (8 Jul, DB checked) |
 | NOTIF | Notifications (rule engine) | 11 | ✅ 11/11 pass | #13.4 UPCOMING + pending=1 + push-payload display | Pass (delivery = device pass pending) |
-| | **Total** | **222** | **✅ 222/222 pass** | | |
+| | **Total** | **223** | **✅ 223/223 pass** | | |
 
-All 222 automated cases pass on the refresh date (0 failures, `flutter analyze` clean).
+All 223 automated cases pass on the refresh date (0 failures, `flutter analyze` clean).
 
 > **Delta since the 11 Jul milestone (221 → 222):** **US13 manual workout entry was descoped/removed** — its 2 automated cases dropped (CAP 24 → 22) because a free-text entry let users farm XP/level/streak with no sensor evidence (see [user-stories.md](../../requirements/user-stories.md) US13, reconciliation §C8). **Challenge join codes added** — `FindChallengeByCode` gained 3 automated cases (SOC 30 → 33: resolve + input-normalisation, unknown-code, blank-input negatives).
 
@@ -285,7 +285,7 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | SOC-32 | `challenges_test` | FindChallengeByCode unknown code → null (negative) | ✅ |
 | SOC-33 | `challenges_test` | FindChallengeByCode blank input → null without hitting the gateway (negative) | ✅ |
 
-### MKT — Marketplace & expert portal (17 cases)
+### MKT — Marketplace & expert portal (18 cases)
 
 *Scope:* Browse/search experts, request lifecycle (snapshot price, footer states), expert inbox gating, accept/decline/deliver/complete, service create-vs-update dispatch, professional-info payload.
 
@@ -306,8 +306,9 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | MKT-13 | `expert_requests_test` | SendDeliverable builds one section from lines; note optional (positive) | ✅ |
 | MKT-14 | `expert_requests_test` | SendDeliverable blank title rejected; empty section omitted (negative) | ✅ |
 | MKT-15 | `publish_service_test` | PublishService empty id creates, non-empty id updates | ✅ |
-| MKT-16 | `publish_service_test` | UpdateExpertProfile writes the descriptive fields for the current user | ✅ |
-| MKT-17 | `publish_service_test` | service enum wire values dbValue matches the Postgres enum spellings | ✅ |
+| MKT-16 | `publish_service_test` | UpdateExpertProfile writes the descriptive fields for the current user (positive) | ✅ |
+| MKT-17 | `publish_service_test` | UpdateExpertProfile signed out → no-op, nothing written (negative) | ✅ |
+| MKT-18 | `publish_service_test` | service enum wire values dbValue matches the Postgres enum spellings | ✅ |
 
 ### PREM — Premium subscription (6 cases)
 

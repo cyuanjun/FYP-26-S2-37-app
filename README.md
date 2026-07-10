@@ -10,7 +10,7 @@ architecture · **Supabase** (Postgres + Auth + RLS + Edge Functions) · **OpenA
 
 ## Current state (11 Jul 2026) — app feature-complete
 
-Built, tested (222 tests), and verified on the Android emulator + iOS simulator against a live
+Built, tested (223 tests), and verified on the Android emulator + iOS simulator against a live
 backend: login → onboarding wizard → AI-generated training plan → phone-GPS capture with
 wearable heart rate (simulated **and real BLE**) → history + analytics (Premium
 search, per-session **Training Effect**, **#12.2 Advanced Analytics** with ACWR/HR zones/bests)
@@ -42,7 +42,7 @@ dart run build_runner build          # freezed / json_serializable codegen
 flutter run -d <device>              # device ids from `flutter devices`
 
 flutter analyze                      # should report "No issues found!"
-flutter test                         # 222 tests, all green
+flutter test                         # 223 tests, all green
 ```
 
 The app connects to the hosted Supabase project out of the box (publishable key in
@@ -59,7 +59,7 @@ app/                         everything needed to run the product
     boundaries/ui/           BOUNDARY — screens (actor-facing); ui/common/ = shared widget
                              library (StatTile · AppCard · StatusBadge · PremiumCta · SelectorPills · FieldLabel)
     boundaries/gateways/     BOUNDARY — Supabase / sensor / AI / share adapters (system-facing)
-  test/                      221 entity/control/gateway tests
+  test/                      223 entity/control/gateway tests
   supabase/                  backend: migrations · Edge Functions · seeds   (see app/supabase/README.md)
 web/                         marketing website (Vue 3 + Vite + TS, BCE: src/boundary|controller|entity)
   database/migrations/       draft shared-DB add-ons (not applied)

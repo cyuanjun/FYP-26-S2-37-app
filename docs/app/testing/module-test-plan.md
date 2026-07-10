@@ -1,7 +1,7 @@
 # Wise Workout — Module Test Plan
 
 **Milestone:** 11 Jul 2026 — *Individual Functional Modules · Centralized DB · Module Test Plan*
-**Build under test:** `main` (feature-complete, 222 automated cases) · **Prepared by:** FYP-26-S2-37 team
+**Build under test:** `main` (feature-complete, 223 automated cases) · **Prepared by:** FYP-26-S2-37 team
 
 > **Plan vs. report.** This document is the **plan**: it defines the modules, the test approach, the environment, the entry/exit and pass/fail criteria, the planned test cases (with expected results), and the requirements traceability. The **execution evidence** — every case with its actual result — lives in the companion **[module-test-report.md](module-test-report.md)**, whose test-case tables are the enumerated realisation of this plan.
 
@@ -17,7 +17,7 @@ Verify each **functional module** of Wise Workout in isolation, before system/in
 - Automated module tests + declared manual module procedures.
 
 **Out of scope for this plan** (covered elsewhere / later milestones)
-- System/integration testing across modules against the live backend (manual only for now; see Risks §9).
+- System/integration testing across modules against the live backend (manual only for now; see Risks §10).
 - UI/widget automation of Boundaries.
 - The marketing website's own module tests — see [../../web/test plan.md](../../web/test%20plan.md).
 - Performance, load, and security testing.
@@ -62,7 +62,7 @@ The 12 `Fake*Gateway` classes implement the real gateway interfaces, hold in-mem
 **Coverage rule:** every module has **positive** cases and **negative/guard** cases (signed-out → no-op, blank input rejected, boundary conditions).
 
 **Two evidence streams**
-- **Automated** — `flutter test` (222 cases), grouped by module, each with a case ID (e.g. `SOC-31`).
+- **Automated** — `flutter test` (223 cases), grouped by module, each with a case ID (e.g. `SOC-31`).
 - **Manual** — scripted procedures on the simulator against the live backend, verifying the Boundary↔Control↔DB path the fakes stub out.
 
 **Static analysis** — `flutter analyze` runs clean as a gate before the suite.
@@ -89,10 +89,10 @@ The 12 `Fake*Gateway` classes implement the real gateway interfaces, hold in-mem
 | HIST | History & analytics | `WorkoutHistory`, history search, `SummariseProgress` | 14 | Fakes |
 | PLAN | Plans & AI | `GeneratePlan` (AI + rule fallback), plan selection | 15 | Fakes |
 | SOC | Social & challenges | feed/likes/comments, friends, share, challenges, **`FindChallengeByCode`** | 33 | Fakes |
-| MKT | Marketplace & expert portal | browse experts, request service, expert request lifecycle, publish service | 17 | Fakes |
+| MKT | Marketplace & expert portal | browse experts, request service, expert request lifecycle, publish service | 18 | Fakes |
 | PREM | Premium subscription | `StartPremium`, `ManageSubscription` | 6 | Fakes |
 | NOTIF | Notifications | `ScheduleReminders` rule engine | 11 | Fakes |
-| | **Total** | | **222** | |
+| | **Total** | | **223** | |
 
 The **enumerated test cases** for each module (ID · description · expected result) are listed in [module-test-report.md](module-test-report.md) §Detailed cases — those tables are the case-level realisation of this plan.
 
@@ -112,7 +112,23 @@ Each is executed on the simulator against the centralized DB, verifying the Boun
 | MAN-08 | Training Effect card: band/score/split on #12.1 | Correct band/score; honest "unavailable" when HR-less |
 | MAN-09 | Social: 5-voice feed, like/comment, leaderboard | Feed scoped to self+friends; interactions persist; leaderboard live |
 
-## 8. Requirements traceability
+## 8. Per-module in-app demonstration (module-level demo)
+
+Beyond the automated cases, **each module's functionality is demonstrated live in the running app** — this satisfies the milestone's "demonstrate functionalities at module level." One row per module: the exact in-app path and what an assessor should see. Run on the simulator against the centralized DB (accounts: `free@` / `premium@` / `expert@` / `admin@wiseworkout.test`, pw `Password123!`).
+
+| Module | In-app path (screens / taps) | What it demonstrates (expected) |
+|---|---|---|
+| ENT — Entity rules | Complete a workout → **Profile** level/XP bar + streak; **History → session detail** calories; **Advanced Analytics** HR zones/ACWR | Domain rules made visible: XP/level/streak recompute, MET calories, HR zones — the entity logic behind the numbers |
+| AUTH — Auth & profile | **Login** (email/password) → role-aware routing; **Profile → Account Settings** edit; **Log out**; admin account → redirected to `/admin` | Session auth works; role gates routing; profile edits persist |
+| CAP — Capture & devices | **Train → Start Freeform Workout** → live timer + GPS/steps → **End** → Summary; **Devices → + Add device** → pair wearable → live ♥ HR | A session is captured atomically; a wearable streams HR; avg/max saved, session linked to the device |
+| HIST — History & analytics | **History** tab: sessions grouped by week + analytics card with vs-prior deltas; Premium **search**; **Advanced ›** (#12.2) | History windows correct; search filters; advanced analytics render from real sessions |
+| PLAN — Plans & AI | **Onboarding wizard** → live AI plan; **Train → VIEW PLANS → Plan Detail**; **Regenerate** (Free 1/month cap) | A personalised/basic AI plan is generated and viewable; regen cap enforced for Free |
+| SOC — Social & challenges | **Social** feed: like/comment; **Challenges**: *enter a join code → detail → Join*, live leaderboard; **Share** to Facebook/Instagram/Twitter/TikTok | Feed scoped to self+friends; challenge join-by-code works; leaderboard live; named-platform share |
+| MKT — Marketplace & expert portal | **Experts** → Expert Detail → Service Detail → **Request**; log in as `expert@` → portal (**Services / Requests / Clients**): triage, deliverable, mark complete | Client can request a service; expert portal runs the request lifecycle end to end |
+| PREM — Premium subscription | As `free@`: upsell → **#16 Upgrade** → simulated payment → **live role flip**; **#13.6 Manage Subscription** cancel/resume | Free→Premium upgrade flips role live; subscription state correct at each step |
+| NOTIF — Notifications | **Profile → Notifications (#13.4)**: reminder toggles + **UPCOMING** strip of the live schedule | Rule-based reminders schedule correctly; UPCOMING reflects the schedule (delivery = device-pass pending) |
+
+## 9. Requirements traceability
 
 | Module | User stories covered |
 |---|---|
@@ -128,13 +144,13 @@ Each is executed on the simulator against the centralized DB, verifying the Boun
 
 Full story-level status: [../../requirements/user-stories.md](../../requirements/user-stories.md) (50 ✅ · 10 🟨 · 4 ⬜).
 
-## 9. Risks, assumptions & limitations
+## 10. Risks, assumptions & limitations
 
 - **Fakes ≠ backend.** Automated module tests stub the DB, so RLS/RPC behaviour and the network seam are **not** covered automatically; they are verified by the manual procedures (§7) and direct SQL checks. Integration testing across modules against the live backend is a later milestone.
 - **No UI/widget automation.** Boundaries are verified manually on the simulator.
 - **Physical-device pass pending.** Notification calendar delivery and real-BLE pairing are verified sim-safe only; a hardware pass remains (the one open exit-criteria residual, declared not hidden).
 - **Assumption:** the centralized DB schema (migrations) is applied identically to local and hosted, so module behaviour is environment-independent.
 
-## 10. Execution status
+## 11. Execution status
 
-Planned cases: **222 automated + 9 manual procedures**. Latest execution: **all pass**, `flutter analyze` clean. Evidence and per-case results: **[module-test-report.md](module-test-report.md)**.
+Planned cases: **223 automated + 9 manual procedures**. Latest execution: **all pass**, `flutter analyze` clean. Evidence and per-case results: **[module-test-report.md](module-test-report.md)**.

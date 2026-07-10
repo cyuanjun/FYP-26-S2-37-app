@@ -8,9 +8,9 @@ import 'package:wise_workout/entities/expert_service.dart';
 
 import '../helpers/fakes.dart';
 
-ProviderContainer _container(FakeExpertGateway gateway) {
+ProviderContainer _container(FakeExpertGateway gateway, {String? userId = 'x1'}) {
   final c = ProviderContainer(overrides: [
-    currentUserIdProvider.overrideWithValue('x1'),
+    currentUserIdProvider.overrideWithValue(userId),
     expertGatewayProvider.overrideWithValue(gateway),
   ]);
   addTearDown(c.dispose);
@@ -64,6 +64,21 @@ void main() {
       expect(u['id'], 'x1');
       expect(u['title'], 'Head Coach');
       expect(u['specialties'], ['strength', 'mobility']);
+    });
+
+    test('signed out → no-op, nothing written (negative)', () async {
+      final gateway = FakeExpertGateway();
+      final c = _container(gateway, userId: null);
+
+      await c.read(updateExpertProfileProvider).call(
+        title: 'Head Coach',
+        yearsCoaching: 10,
+        about: 'About me',
+        credentials: ['NASM CPT'],
+        specialties: ['strength'],
+      );
+
+      expect(gateway.profileUpdates, isEmpty);
     });
   });
 
