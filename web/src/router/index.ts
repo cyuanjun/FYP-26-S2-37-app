@@ -19,6 +19,16 @@ const router = createRouter({
       component: () => import("@/boundary/ui/auth/RegisterPage.vue"),
     },
     {
+      path: "/home",
+      name: "member-home",
+      component: () => import("@/boundary/ui/member/MemberHomePage.vue"),
+    },
+    {
+      path: "/expert/home",
+      name: "expert-home",
+      component: () => import("@/boundary/ui/member/ExpertHomePage.vue"),
+    },
+    {
       path: "/expert-application",
       name: "expert-application",
       component: () => import("@/boundary/ui/auth/ExpertApplicationPage.vue"),

@@ -22,12 +22,17 @@ export async function loginUser(form: LoginForm): Promise<LoginViewResult> {
 
   return {
     message: `Welcome back, ${user.first_name}.`,
-    redirectTo: routeForRole(user.role),
+    redirectTo: routeForUser(user.role, user.expert_status),
   };
 }
 
-function routeForRole(role: "free" | "premium" | "expert" | "admin"): string {
+// Admins go to the portal; approved experts and anyone with an expert application
+// (role stays 'free' while pending) go to the expert home; everyone else to the member home.
+function routeForUser(
+  role: "free" | "premium" | "expert" | "admin",
+  expertStatus: "none" | "pending" | "verified" | "rejected",
+): string {
   if (role === "admin") return "/admin";
-  if (role === "expert") return "/expert/home";
+  if (role === "expert" || expertStatus !== "none") return "/expert/home";
   return "/home";
 }

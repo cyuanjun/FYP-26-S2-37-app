@@ -35,9 +35,21 @@ export interface RegistrationResult {
   status: "pending" | "created";
 }
 
+export type ExpertStatus = "none" | "pending" | "verified" | "rejected";
+
 export interface LoginResult {
   id: string;
   role: "free" | "premium" | "expert" | "admin";
   status: "active" | "suspended";
   first_name: string;
+  expert_status: ExpertStatus;
+}
+
+// The signed-in member resolved from the current session (guards /home + /expert/home).
+export interface SessionMember {
+  id: string;
+  first_name: string;
+  role: "free" | "premium" | "expert" | "admin";
+  status: "active" | "suspended";
+  expert_status: ExpertStatus;
 }

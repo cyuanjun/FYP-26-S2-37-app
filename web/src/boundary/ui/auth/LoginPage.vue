@@ -22,11 +22,7 @@ async function onSubmit() {
 
   try {
     const result = await loginUser(form);
-    if (result.redirectTo === "/admin") {
-      await router.push("/admin");
-      return;
-    }
-    success.value = `${result.message} Continue to ${result.redirectTo}.`;
+    await router.push(result.redirectTo);
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e);
   } finally {

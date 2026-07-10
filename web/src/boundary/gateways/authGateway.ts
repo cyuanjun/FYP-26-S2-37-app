@@ -1,11 +1,24 @@
 import type {
+  ExpertStatus,
   LoginRequest,
   LoginResult,
   RegisterExpertRequest,
   RegisterUserRequest,
   RegistrationResult,
+  SessionMember,
 } from "./authDtos";
 import { supabase } from "./supabaseClient";
+
+// Looks up whether a user has an expert application and its review state.
+// "none" = never applied; a profile's role flips to 'expert' only once an admin approves.
+async function fetchExpertStatus(userId: string): Promise<ExpertStatus> {
+  const { data } = await supabase
+    .from("expert_profiles")
+    .select("verification_status")
+    .eq("id", userId)
+    .maybeSingle();
+  return (data?.verification_status as ExpertStatus) ?? "none";
+}
 
 export async function createUserRegistration(
   input: RegisterUserRequest,
@@ -129,5 +142,32 @@ export async function authenticateUser(input: LoginRequest): Promise<LoginResult
     role: profile.role as LoginResult["role"],
     status: (profile.status ?? "active") as LoginResult["status"],
     first_name: profile.first_name ?? "Member",
+    expert_status: await fetchExpertStatus(profile.id),
   };
+}
+
+// Resolves the signed-in member from the current session, or null when nobody
+// is signed in. Guards /home and /expert/home the way fetchAdminIdentity guards /admin.
+export async function fetchSessionMember(): Promise<SessionMember | null> {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const user = sessionData.session?.user;
+  if (!user) return null;
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("id, role, status, first_name")
+    .eq("id", user.id)
+    .single();
+  if (error || !profile) return null;
+  return {
+    id: profile.id,
+    first_name: profile.first_name ?? "Member",
+    role: profile.role as SessionMember["role"],
+    status: (profile.status ?? "active") as SessionMember["status"],
+    expert_status: await fetchExpertStatus(profile.id),
+  };
+}
+
+// Ends the session (used by the /home and /expert/home sign-out buttons).
+export async function signOutMember(): Promise<void> {
+  await supabase.auth.signOut();
 }
