@@ -2,12 +2,12 @@
 
 > This report is the **execution evidence** for the **[module-test-plan.md](module-test-plan.md)** — its case tables are the per-case realisation of that plan.
 
-**Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **238 automated tests**)
+**Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **244 automated tests**)
 **Environment:** Flutter stable · iPhone 17 Pro simulator (iOS 26) + Pixel API 35 emulator · Supabase local stack (ports 55321-9) mirroring hosted
 **Reproduce:** `cd app && flutter analyze && flutter test` (all automated cases) · manual procedures in [../prototype-demo-guide.md](../prototype-demo-guide.md) §4
 
 Two evidence streams per module:
-- **Automated** — the `flutter test` suite (entity/control/gateway level; controls run against fake gateways so each module is tested in isolation — module testing in the BCE sense).
+- **Automated** — the `flutter test` suite (entity/control/gateway level + a representative set of Boundary widget tests; controls run against fake gateways so each module is tested in isolation — module testing in the BCE sense).
 - **Manual** — the walkthrough procedures executed on the simulator during the July build-out, with results recorded in [../STATUS.md](../../STATUS.md) dated entries and defects in [bug-log.md](bug-log.md).
 
 ## Summary
@@ -15,7 +15,7 @@ Two evidence streams per module:
 | # | Module | Automated cases | Result | Manual procedure | Result |
 |---|---|---|---|---|---|
 | ENT | Entity rules (domain logic) | 88 | ✅ 88/88 pass | — (rules exercised via every manual flow) | — |
-| AUTH | Auth & profile cluster | 28 | ✅ 28/28 pass | Guide §A, §F, §F2 (login/logout/reset, profile edits, photo upload) | Pass (10 Jul) |
+| AUTH | Auth & profile cluster | 34 | ✅ 34/34 pass | Guide §A, §F, §F2 (login/logout/reset, profile edits, photo upload) | Pass (10 Jul) |
 | CAP | Capture & devices | 22 | ✅ 22/22 pass | Guide §B, §B2 (phone GPS / freeform / wearable) | Pass (BLE: sim-safe path; hardware pass pending) |
 | HIST | History & analytics | 14 | ✅ 14/14 pass | Guide §C, §G + search cases | Pass (9 Jul) |
 | PLAN | Plans & AI | 15 | ✅ 15/15 pass | Guide §A2 (onboarding → AI plan), regen cap | Pass (earlier sprints) |
@@ -23,11 +23,11 @@ Two evidence streams per module:
 | MKT | Marketplace & expert portal | 20 | ✅ 20/20 pass | Expert walkthrough: 2-account lifecycle + portal editors | Pass (7–9 Jul, DB checked) |
 | PREM | Premium subscription | 6 | ✅ 6/6 pass | Guide §H (upgrade → #13.6 → reset) | Pass (8 Jul, DB checked) |
 | NOTIF | Notifications (rule engine) | 11 | ✅ 11/11 pass | #13.4 UPCOMING + pending=1 + push-payload display | Pass (delivery = device pass pending) |
-| | **Total** | **238** | **✅ 238/238 pass** | | |
+| | **Total** | **244** | **✅ 244/244 pass** | | |
 
-All 238 automated cases pass on the refresh date (0 failures, `flutter analyze` clean).
+All 244 automated cases pass on the refresh date (0 failures, `flutter analyze` clean).
 
-> **Delta since the 11 Jul milestone (221 → 238):** **US13 manual workout entry descoped/removed** — its 2 cases dropped (CAP 24 → 22; see reconciliation §C8). **Challenge join codes added** — `FindChallengeByCode` gained 3 cases (SOC). **Input-validation hardening** — a pure `Validators` module now backs Boundary bounds *and* Control guards (defence in depth: invalid numeric input — height/weight/goal/challenge target/price/years — is rejected before it reaches a gateway, even if the UI is bypassed); +15 cases (ENT 78 → 88 validator unit tests; AUTH +2, SOC +1, MKT +2 control-guard negatives).
+> **Delta since the 11 Jul milestone (221 → 244):** **US13 manual workout entry descoped/removed** — its 2 cases dropped (CAP 24 → 22; see reconciliation §C8). **Challenge join codes added** — `FindChallengeByCode` gained 3 cases (SOC). **Input-validation hardening** — a pure `Validators` module now backs Boundary bounds *and* Control guards (defence in depth: invalid numeric input — height/weight/goal/challenge target/price/years — is rejected before it reaches a gateway, even if the UI is bypassed); +15 cases (ENT 78 → 88 validator unit tests; AUTH +2, SOC +1, MKT +2 control-guard negatives). **Boundary (widget) tests added** — the actor-facing Boundary layer now has automated coverage too: +6 `testWidgets` cases (AUTH) for the #2 Login screen (render, tap → control → gateway, error message) and the numeric height/weight picker (in-range accepted, out-of-range / non-numeric rejected before the callback). So all three BCE layers — Entity, Control, **and Boundary** — are automated.
 
 ## Requirements traceability
 
@@ -150,7 +150,9 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | ENT-87 | `validators_test` | validPositiveTarget positive only, rejects 0/negative/null (negative) | ✅ |
 | ENT-88 | `validators_test` | validPriceCents non-negative accepted, negative/null rejected (negative) | ✅ |
 
-### AUTH — Auth & profile cluster (28 cases)
+### AUTH — Auth & profile cluster (34 cases)
+
+*Includes 6 **Boundary (widget) tests** — `testWidgets` over the actual screens (#2 Login) and the numeric height/weight picker, with gateway providers overridden by the same fakes.*
 
 *Scope:* Login/logout/reset flows, fitness profile + goals upserts, units & notification prefs, account settings, feedback submission, onboarding completion.
 
@@ -184,6 +186,12 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | AUTH-26 | `profile_cluster_test` | addCustomWorkoutType rejects empty names (negative) | ✅ |
 | AUTH-27 | `profile_cluster_test` | UpdateFitnessProfile out-of-range height rejected before the gateway (negative) | ✅ |
 | AUTH-28 | `profile_cluster_test` | SetFitnessGoal target-racing goal with a non-positive target rejected (negative) | ✅ |
+| AUTH-29 | `login_screen_test` | **[Boundary]** Login renders the email/password fields + LOG IN | ✅ |
+| AUTH-30 | `login_screen_test` | **[Boundary]** tapping LOG IN drives the control → auth gateway (positive) | ✅ |
+| AUTH-31 | `login_screen_test` | **[Boundary]** failed sign-in shows the mapped error message (negative) | ✅ |
+| AUTH-32 | `number_input_dialog_test` | **[Boundary]** numeric picker accepts an in-range value (positive) | ✅ |
+| AUTH-33 | `number_input_dialog_test` | **[Boundary]** out-of-range value — onSet never fires (negative) | ✅ |
+| AUTH-34 | `number_input_dialog_test` | **[Boundary]** non-numeric input — onSet never fires (negative) | ✅ |
 
 ### CAP — Capture & devices (22 cases)
 

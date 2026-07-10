@@ -1,7 +1,7 @@
 # Wise Workout — Module Test Plan
 
 **Milestone:** 11 Jul 2026 — *Individual Functional Modules · Centralized DB · Module Test Plan*
-**Build under test:** `main` (feature-complete, 238 automated cases) · **Prepared by:** FYP-26-S2-37 team
+**Build under test:** `main` (feature-complete, 244 automated cases) · **Prepared by:** FYP-26-S2-37 team
 
 > **Plan vs. report.** This document is the **plan**: it defines the modules, the test approach, the environment, the entry/exit and pass/fail criteria, the planned test cases (with expected results), and the requirements traceability. The **execution evidence** — every case with its actual result — lives in the companion **[module-test-report.md](module-test-report.md)**, whose test-case tables are the enumerated realisation of this plan.
 
@@ -14,11 +14,11 @@ Verify each **functional module** of Wise Workout in isolation, before system/in
 **In scope**
 - The 9 functional modules of the Flutter app (§6).
 - The **Centralized DB** (§3) as the shared system of record the modules persist to.
-- Automated module tests + declared manual module procedures.
+- Automated module tests (Entity + Control) + **Boundary widget tests** for the spine screen (#2 Login) and input validation (numeric picker) + declared manual module procedures.
 
 **Out of scope for this plan** (covered elsewhere / later milestones)
 - System/integration testing across modules against the live backend (manual only for now; see Risks §10).
-- UI/widget automation of Boundaries.
+- **Broad** UI/widget automation of every Boundary — a representative set is automated (§4); full per-screen coverage is a later pass. Most Boundaries are still exercised manually (§8).
 - The marketing website's own module tests — see [../../web/test plan.md](../../web/test%20plan.md).
 - Performance, load, and security testing.
 
@@ -29,6 +29,7 @@ Verify each **functional module** of Wise Workout in isolation, before system/in
 | Entity modules | Pure domain rules (XP/level/streak, MET calories, ACWR, HR zones, training effect, formatting) | `app/lib/entities/` |
 | Control modules | One class per use case (the module under test) | `app/lib/controls/` |
 | Gateways (as test doubles) | System-facing boundaries, replaced by in-memory fakes | `app/test/helpers/fakes.dart` |
+| Boundary widgets | Actor-facing screens under `testWidgets` (representative set) | `app/test/boundaries/ui/` |
 | Centralized DB | Shared hosted Supabase project (30 tables, RLS, RPCs) | `app/supabase/` |
 
 ## 3. Centralized database (system of record)
@@ -59,12 +60,14 @@ The 12 `Fake*Gateway` classes implement the real gateway interfaces, hold in-mem
 
 **Entity modules** are pure functions and are tested directly (no doubles).
 
+**Boundary (widget) tests.** A representative set of the actor-facing Boundary layer is automated with `flutter_test`'s `testWidgets` — the screen is pumped inside a `ProviderScope` whose gateway providers are overridden by the same fakes, then driven with `enterText`/`tap`. Covered: the **#2 Login** screen (renders fields, tap → Authenticate control → gateway, error message) and the **numeric height/weight picker** (proves the Boundary blocks out-of-range / non-numeric input before the callback fires). Tests live in `app/test/boundaries/ui/`.
+
 **Coverage rule:** every module has **positive** cases and **negative/guard** cases (signed-out → no-op, blank input rejected, boundary conditions).
 
 **Input validation (defence in depth).** User input is validated at **both** layers against one source of truth — the pure [`Validators`](../../../app/lib/entities/validators.dart) module (height/weight/resting-HR ranges, positive goal/challenge targets, non-negative price, years-coaching range). The **Boundary** uses it to bound pickers and disable submit, so input is cleaned before it is sent; the **Control** re-checks it and **rejects** anything invalid before calling a gateway, so the rule holds even if the UI is bypassed. The validators are unit-tested directly (ENT), and each guarded Control has a negative test proving invalid input never reaches its gateway (AUTH/SOC/MKT).
 
 **Two evidence streams**
-- **Automated** — `flutter test` (238 cases), grouped by module, each with a case ID (e.g. `SOC-31`).
+- **Automated** — `flutter test` (244 cases), grouped by module, each with a case ID (e.g. `SOC-31`).
 - **Manual** — scripted procedures on the simulator against the live backend, verifying the Boundary↔Control↔DB path the fakes stub out.
 
 **Static analysis** — `flutter analyze` runs clean as a gate before the suite.
@@ -86,7 +89,7 @@ The 12 `Fake*Gateway` classes implement the real gateway interfaces, hold in-mem
 | # | Module | Under test (Controls / Entities) | Planned cases | Technique |
 |---|---|---|---|---|
 | ENT | Entity rules (incl. **`Validators`**) | XP/level/streak, MET calories, ACWR, HR zones, training effect, formatters, **input validators** | 88 | Direct (pure functions) |
-| AUTH | Auth & profile | `Authenticate`, profile/account/fitness-profile controls (incl. numeric-range guards) | 28 | Fakes |
+| AUTH | Auth & profile | `Authenticate`, profile/account/fitness-profile controls (incl. numeric-range guards) + **Boundary widget tests** (Login screen, numeric picker) | 34 | Fakes + `testWidgets` |
 | CAP | Capture & devices | `ActiveWorkout`, `ManageConnectedDevice`, HR sources, BLE GATT parsing | 22 | Fakes + pure parser |
 | HIST | History & analytics | `WorkoutHistory`, history search, `SummariseProgress` | 14 | Fakes |
 | PLAN | Plans & AI | `GeneratePlan` (AI + rule fallback), plan selection | 15 | Fakes |
@@ -94,7 +97,7 @@ The 12 `Fake*Gateway` classes implement the real gateway interfaces, hold in-mem
 | MKT | Marketplace & expert portal | browse experts, request service, expert request lifecycle, publish service | 20 | Fakes |
 | PREM | Premium subscription | `StartPremium`, `ManageSubscription` | 6 | Fakes |
 | NOTIF | Notifications | `ScheduleReminders` rule engine | 11 | Fakes |
-| | **Total** | | **238** | |
+| | **Total** | | **244** | |
 
 The **enumerated test cases** for each module (ID · description · expected result) are listed in [module-test-report.md](module-test-report.md) §Detailed cases — those tables are the case-level realisation of this plan.
 
@@ -155,4 +158,4 @@ Full story-level status: [../../requirements/user-stories.md](../../requirements
 
 ## 11. Execution status
 
-Planned cases: **238 automated + 9 manual procedures**. Latest execution: **all pass**, `flutter analyze` clean. Evidence and per-case results: **[module-test-report.md](module-test-report.md)**.
+Planned cases: **244 automated + 9 manual procedures**. Latest execution: **all pass**, `flutter analyze` clean. Evidence and per-case results: **[module-test-report.md](module-test-report.md)**.
