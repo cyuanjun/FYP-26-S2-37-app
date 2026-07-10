@@ -15,7 +15,8 @@ Documentation for the **Wise Workout** platform (FYP-26-S2-37). The Flutter app 
 | **[app/testing/](app/testing/)** | QA evidence — the running **[bug-log.md](app/testing/bug-log.md)** (symptom → root cause → fix → commit), feeds PTD testing + module testing | [bug-log.md](app/testing/bug-log.md) |
 | **[archive/](archive/)** | Legacy docs for the React flow-explorer mock (kept for provenance; not the build target) | — |
 | **[web/](web/)** | Marketing-website docs (imported 11 Jul with the site itself, now in `../web/`) — plan, limitations, test plan, demo checklist, presentation guide, DB-change drafts | [web/README.md](web/README.md), [web/plan.md](web/plan.md) |
-| [app/testing/module-test-report.md](app/testing/module-test-report.md) | **Module test report (11 Jul milestone)** — 221 automated cases by module + manual-procedure evidence + traceability | review & sign |
+| [app/testing/module-test-plan.md](app/testing/module-test-plan.md) | **Module Test Plan (11 Jul milestone deliverable)** — modules, approach, environment, entry/exit criteria, planned cases + expected results, centralized-DB section, traceability | review & sign |
+| [app/testing/module-test-report.md](app/testing/module-test-report.md) | **Module test report** — execution evidence for the plan: 222 automated cases by module + manual-procedure evidence + traceability | review & sign |
 | [app/demo-script.md](app/demo-script.md) | **The Aug final-demo run-of-show** — acts, taps, talking points, timings, fallbacks | rehearse from this |
 | [app/prototype-demo-guide.md](app/prototype-demo-guide.md) | **Run & demo the prototype** — setup, walkthroughs, test accounts, backend verification | start here to demo |
 | [project-description.md](project-description.md) | The FYP project brief | — |

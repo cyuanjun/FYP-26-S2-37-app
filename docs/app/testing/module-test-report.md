@@ -1,5 +1,7 @@
 # Wise Workout — Module Test Report
 
+> This report is the **execution evidence** for the **[module-test-plan.md](module-test-plan.md)** — its case tables are the per-case realisation of that plan.
+
 **Date:** 10 Jul 2026 (refreshed after the US13 descope + challenge join codes) · **Milestone:** 11 Jul module testing · **Build:** `main` (feature-complete, **222 automated tests**)
 **Environment:** Flutter stable · iPhone 17 Pro simulator (iOS 26) + Pixel API 35 emulator · Supabase local stack (ports 55321-9) mirroring hosted
 **Reproduce:** `cd app && flutter analyze && flutter test` (all automated cases) · manual procedures in [../prototype-demo-guide.md](../prototype-demo-guide.md) §4

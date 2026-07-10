@@ -42,8 +42,11 @@
 - **RPC change** (migration `20260709090000`, local + hosted): `end_workout_session` honours an optional backdated `started_at` in the metrics (ended_at = start + duration, capped at now; future starts raise). Live sessions unchanged.
 - **190 tests** (+2: manual payload incl. backdate + no-device, non-cardio drops distance).
 
+## 11 Jul — MODULE TEST PLAN (the 11 Jul milestone deliverable)
+- **[testing/module-test-plan.md](app/testing/module-test-plan.md)** written for the milestone (*Individual Functional Modules · Centralized DB · Module Test Plan*): defines the 9 BCE modules, the component-testing-with-fakes approach, the shared **Centralized DB** (one hosted Supabase, 30 tables, RLS + RPCs — app **and** web), environment, entry/exit + pass/fail criteria, planned cases + expected results, manual procedures, traceability, and risks. The **[module-test-report.md](app/testing/module-test-report.md)** is its execution evidence (222/222 pass).
+
 ## 10 Jul (later) — MODULE TEST REPORT (for the 11 Jul milestone)
-- **[testing/module-test-report.md](app/testing/module-test-report.md)** generated from a fresh run: 9 modules · **221/221 automated cases pass** (each enumerated by name from the live suite) · 13 manual procedures indexed to their dated STATUS evidence · requirements traceability per module · declared limitations (sim can't exercise notification delivery / real-BLE hardware; payment simulated by scope) · sign-off block. The 11 Jul milestone becomes review-and-sign.
+- **[testing/module-test-report.md](app/testing/module-test-report.md)** generated from a fresh run: 9 modules · **222/222 automated cases pass** (each enumerated by name from the live suite) · 9 manual procedures indexed to their dated STATUS evidence · requirements traceability per module · declared limitations (sim can't exercise notification delivery / real-BLE hardware; payment simulated by scope) · sign-off block. The 11 Jul milestone becomes review-and-sign.
 
 ## 10 Jul — FINISHING PASS: TRAINING EFFECT + AVATAR UPLOAD + REAL BLE
 - **Per-session TRAINING EFFECT (US35 short-term ✅):** shared card on #10 Summary + #12.1 Detail per the spec — band (Low/Moderate/High/Very High, coloured) + 1–10 score + canned recovery line; Premium adds the **aerobic/anaerobic split + indicative recovery window**; Free gets the upsell link; no-HR sessions get the honest unavailable state. Pure rules in `entities/training_effect.dart` (spec formula; 7 tests). Verified: Alex's Leg day = High · 8/10, aerobic 4.0/5, ~24 h.
