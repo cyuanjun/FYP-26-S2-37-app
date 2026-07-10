@@ -19,14 +19,14 @@ const router = createRouter({
       component: () => import("@/boundary/ui/auth/RegisterPage.vue"),
     },
     {
-      path: "/home",
-      name: "member-home",
-      component: () => import("@/boundary/ui/member/MemberHomePage.vue"),
+      path: "/download",
+      name: "member-download",
+      component: () => import("@/boundary/ui/member/MemberDownloadPage.vue"),
     },
     {
-      path: "/expert/home",
-      name: "expert-home",
-      component: () => import("@/boundary/ui/member/ExpertHomePage.vue"),
+      path: "/expert",
+      name: "expert-status",
+      component: () => import("@/boundary/ui/member/ExpertStatusPage.vue"),
     },
     {
       path: "/expert-application",

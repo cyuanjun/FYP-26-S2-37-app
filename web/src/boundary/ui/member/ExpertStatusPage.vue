@@ -22,7 +22,7 @@ onMounted(async () => {
     return;
   }
   if (m.role !== "expert" && m.expert_status === "none") {
-    router.replace("/home"); // never applied as an expert
+    router.replace("/download"); // never applied as an expert
     return;
   }
   member.value = m;

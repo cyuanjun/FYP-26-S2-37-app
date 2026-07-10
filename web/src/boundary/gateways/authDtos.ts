@@ -45,7 +45,7 @@ export interface LoginResult {
   expert_status: ExpertStatus;
 }
 
-// The signed-in member resolved from the current session (guards /home + /expert/home).
+// The signed-in member resolved from the current session (guards /download + /expert).
 export interface SessionMember {
   id: string;
   first_name: string;

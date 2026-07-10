@@ -161,7 +161,7 @@ export async function authenticateUser(input: LoginRequest): Promise<LoginResult
 }
 
 // Resolves the signed-in member from the current session, or null when nobody
-// is signed in. Guards /home and /expert/home the way fetchAdminIdentity guards /admin.
+// is signed in. Guards /download and /expert the way fetchAdminIdentity guards /admin.
 export async function fetchSessionMember(): Promise<SessionMember | null> {
   const { data: sessionData } = await supabase.auth.getSession();
   const user = sessionData.session?.user;
@@ -181,7 +181,7 @@ export async function fetchSessionMember(): Promise<SessionMember | null> {
   };
 }
 
-// Ends the session (used by the /home and /expert/home sign-out buttons).
+// Ends the session (used by the header logout button on the download / expert pages).
 export async function signOutMember(): Promise<void> {
   await supabase.auth.signOut();
 }

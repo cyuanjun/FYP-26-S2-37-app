@@ -41,12 +41,12 @@ export async function loginUser(form: LoginForm): Promise<LoginViewResult> {
 }
 
 // Admins go to the portal; approved experts and anyone with an expert application
-// (role stays 'free' while pending) go to the expert home; everyone else to the member home.
+// (role stays 'free' while pending) go to the expert status page; everyone else to the download page.
 function routeForUser(
   role: "free" | "premium" | "expert" | "admin",
   expertStatus: "none" | "pending" | "verified" | "rejected",
 ): string {
   if (role === "admin") return "/admin";
-  if (role === "expert" || expertStatus !== "none") return "/expert/home";
-  return "/home";
+  if (role === "expert" || expertStatus !== "none") return "/expert";
+  return "/download";
 }

@@ -19,7 +19,7 @@ onMounted(async () => {
     return;
   }
   if (m.role === "expert" || m.expert_status !== "none") {
-    router.replace("/expert/home"); // experts + applicants belong on the expert home
+    router.replace("/expert"); // experts + applicants belong on the expert status page
     return;
   }
   member.value = m;
