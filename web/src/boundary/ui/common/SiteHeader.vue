@@ -2,13 +2,29 @@
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import type { SiteData } from "@/controller/landing/viewModels";
+import { logoutMember, type SessionMember } from "@/controller/auth/memberSession";
+import Avatar from "./Avatar.vue";
 
-const props = defineProps<{ site: SiteData }>();
+// site drives the brand + nav; member is null when nobody is signed in.
+const props = defineProps<{ site: SiteData; member?: SessionMember | null }>();
 
 const hasLogoImage = computed(() => {
   const url = props.site.logo_url || "";
   return /^\/uploads\//.test(url) || /^https?:\/\//.test(url);
 });
+
+// Experts and pending applicants have their own home; everyone else the member home.
+const homeRoute = computed(() => {
+  const m = props.member;
+  if (!m) return "/home";
+  return m.role === "expert" || m.expert_status !== "none" ? "/expert/home" : "/home";
+});
+
+// Signs out then hard-navigates to the landing page so the nav reverts cleanly.
+async function onLogout() {
+  await logoutMember();
+  window.location.href = "/";
+}
 </script>
 
 <template>
@@ -30,13 +46,24 @@ const hasLogoImage = computed(() => {
       <a v-for="item in site.navigation" :key="item.url" :href="item.url">{{ item.label }}</a>
     </nav>
     <nav class="auth-nav" aria-label="Account navigation">
-      <RouterLink
-        v-for="item in site.auth_actions"
-        :key="item.url"
-        :to="item.url"
-      >
-        {{ item.label }}
-      </RouterLink>
+      <!-- Signed in: circular profile button (home) + logout, in place of login/register. -->
+      <template v-if="member">
+        <RouterLink
+          :to="homeRoute"
+          class="profile-link"
+          :aria-label="`${member.first_name} — go to your home`"
+          :title="`${member.first_name} — home`"
+        >
+          <Avatar :name="member.first_name" :size="42" />
+        </RouterLink>
+        <button type="button" class="button logout-button" @click="onLogout">Logout</button>
+      </template>
+      <!-- Signed out: the usual login / register actions. -->
+      <template v-else>
+        <RouterLink v-for="item in site.auth_actions" :key="item.url" :to="item.url">
+          {{ item.label }}
+        </RouterLink>
+      </template>
     </nav>
   </header>
 </template>
@@ -48,58 +75,21 @@ const hasLogoImage = computed(() => {
   object-fit: contain;
 }
 
-.auth-identity {
+.profile-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 14px 6px 6px;
-  border: 1px solid var(--accent-border);
-  border-radius: 999px;
-  background: rgba(123, 47, 247, 0.05);
-  color: var(--ink);
+  border: none;
+  padding: 0;
+  background: none;
+  border-radius: 50%;
 }
 
-.auth-greeting {
-  color: var(--ink);
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.profile-link:hover :deep(.avatar) {
+  border-color: var(--accent-dim);
+  background: rgba(123, 47, 247, 0.16);
 }
 
-.auth-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  padding: 10px 16px;
-  border: 1px solid var(--faint);
-  border-radius: 12px;
-  color: var(--ink);
-  background: var(--bg2);
+.logout-button {
   cursor: pointer;
-  font-family: var(--display);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-.auth-pill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.auth-logout {
-  border-color: var(--accent);
-  color: #ffffff;
-  background: var(--accent);
-}
-
-.auth-logout:hover {
-  color: #ffffff;
-  background: var(--accent-dim);
 }
 </style>

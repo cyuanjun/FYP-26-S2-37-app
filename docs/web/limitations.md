@@ -16,8 +16,8 @@ This page lists the current limitations of the landing-page repo. These are know
 - Registration, login, and expert application use real Supabase Auth (`signUp` / `signInWithPassword`) against the shared project; `handle_new_user()` mirrors profile fields and creates the pending expert profile + document metadata.
 - The hosted project has email confirmation enabled — a hosted signup must confirm via email before logging in (the local stack auto-confirms). The hosted mailer also rejects non-deliverable domains (e.g. `.test` addresses).
 - **Email rate limit (Supabase free plan):** the built-in mailer caps confirmation/verification emails at a low hourly rate (default ~2–4 per hour across the project, not per user), so rapid signups or repeated "Resend verification email" taps return an `email rate limit exceeded` error. This is a plan constraint, not a code bug — wait for the window to reset, space out test signups, or raise the cap by configuring a custom SMTP provider (Authentication → Emails → SMTP) / upgrading the plan. Relevant to the register flow and the login verify-email resend button.
-- **Member** site logins don't keep a persistent session (member accounts are for the app); login validates credentials and shows the role-based destination. **Admins are the exception** — they get a real portal session with sign-out and role-guarded `/admin` routes (see below).
-- Member logout UI is not implemented (there's no member session to end); admin sign-out works.
+- Member logins now keep a Supabase session (like admins): after login they land on a role-based home (`/home` download page, or `/expert/home` for experts/applicants). The landing page and home pages share one auth-aware header — signed in, the login/register buttons are replaced by a circular profile button (routes to their home) and a logout button.
+- Member logout is implemented (header logout button ends the session and returns to the landing page). The home pages are still thin — download-app placeholders / expert-approval status — because the real product lives in the app.
 
 ## Expert Verification Limitations
 

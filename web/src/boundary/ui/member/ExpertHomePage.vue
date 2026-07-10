@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { RouterLink, useRouter } from "vue-router";
-import { getMemberSession, logoutMember, type SessionMember } from "@/controller/auth/memberSession";
+import { useRouter } from "vue-router";
+import SiteHeader from "@/boundary/ui/common/SiteHeader.vue";
+import SiteFooter from "@/boundary/ui/common/SiteFooter.vue";
+import { getLandingPage } from "@/controller/landing/getLandingPage";
+import { getMemberSession, type SessionMember } from "@/controller/auth/memberSession";
+import type { SiteData } from "@/controller/landing/viewModels";
 
 const router = useRouter();
+const site = ref<SiteData | null>(null);
 const member = ref<SessionMember | null>(null);
-const checking = ref(true);
+const ready = ref(false);
 
 // Approved when the admin flipped the role to expert (or the profile is verified).
 const isApproved = ref(false);
@@ -22,98 +27,121 @@ onMounted(async () => {
   }
   member.value = m;
   isApproved.value = m.role === "expert" || m.expert_status === "verified";
-  checking.value = false;
+  try {
+    site.value = (await getLandingPage()).site;
+  } catch {
+    site.value = null;
+  }
+  ready.value = true;
 });
-
-async function onSignOut() {
-  await logoutMember();
-  router.replace("/login");
-}
 </script>
 
 <template>
-  <main class="auth-shell">
-    <div class="auth-column">
-      <section v-if="!checking && member" class="auth-card">
-        <RouterLink to="/" class="auth-brand" aria-label="Wise Workout home">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span class="brand-name">Wise <span>Workout</span></span>
-        </RouterLink>
+  <div v-if="ready && site && member" class="site-shell">
+    <SiteHeader :site="site" :member="member" />
+    <main>
+      <section class="section hub">
+        <div class="hub-card">
+          <!-- Approved expert: download + a note about the in-app portal. -->
+          <template v-if="isApproved">
+            <div class="hub-eyebrow status-ok">Application approved</div>
+            <h1 class="hub-title">You're a Wise Workout expert, {{ member.first_name }}</h1>
+            <p class="hub-note">
+              Download the app and sign in with the same email and password. The expert
+              portal (your services, requests, and clients) is built into the app.
+            </p>
+            <div class="download-row">
+              <button type="button" class="store-button" disabled>
+                <span class="store-eyebrow">Download on the</span>
+                <span class="store-name">App Store</span>
+              </button>
+              <button type="button" class="store-button" disabled>
+                <span class="store-eyebrow">Get it on</span>
+                <span class="store-name">Google Play</span>
+              </button>
+            </div>
+            <p class="store-hint">App links coming soon.</p>
+          </template>
 
-        <!-- Approved expert: download + a note about the in-app portal -->
-        <template v-if="isApproved">
-          <div class="auth-eyebrow status-ok">Application approved</div>
-          <h1 class="auth-title">You're a Wise Workout expert, {{ member.first_name }}</h1>
-          <p class="auth-note">
-            Download the app and sign in with the same email and password. The expert
-            portal (your services, requests, and clients) is built into the app.
-          </p>
-          <div class="download-row">
-            <button type="button" class="store-button" disabled>
-              <span class="store-eyebrow">Download on the</span>
-              <span class="store-name">App Store</span>
-            </button>
-            <button type="button" class="store-button" disabled>
-              <span class="store-eyebrow">Get it on</span>
-              <span class="store-name">Google Play</span>
-            </button>
-          </div>
-          <p class="store-hint">App links coming soon.</p>
-        </template>
+          <!-- Rejected application. -->
+          <template v-else-if="member.expert_status === 'rejected'">
+            <div class="hub-eyebrow status-bad">Application not approved</div>
+            <h1 class="hub-title">Thanks for applying, {{ member.first_name }}</h1>
+            <p class="hub-note">
+              Your expert application wasn't approved this time. You can still use Wise
+              Workout as a member. If you think this was a mistake, contact support from
+              the landing page.
+            </p>
+          </template>
 
-        <!-- Rejected application -->
-        <template v-else-if="member.expert_status === 'rejected'">
-          <div class="auth-eyebrow status-bad">Application not approved</div>
-          <h1 class="auth-title">Thanks for applying, {{ member.first_name }}</h1>
-          <p class="auth-note">
-            Your expert application wasn't approved this time. You can still use Wise
-            Workout as a member. If you think this was a mistake, contact support from
-            the landing page.
-          </p>
-        </template>
-
-        <!-- Pending review (default) -->
-        <template v-else>
-          <div class="auth-eyebrow status-pending">Application under review</div>
-          <h1 class="auth-title">Thanks for applying, {{ member.first_name }}</h1>
-          <p class="auth-note">
-            Your expert application is being reviewed by our team. We'll verify your
-            credentials and documents, then flip your account to an expert. Check back
-            here after approval to download the app and access your expert portal.
-          </p>
-        </template>
-
-        <button type="button" class="signout" @click="onSignOut">Sign out</button>
+          <!-- Pending review (default). -->
+          <template v-else>
+            <div class="hub-eyebrow status-pending">Application under review</div>
+            <h1 class="hub-title">Thanks for applying, {{ member.first_name }}</h1>
+            <p class="hub-note">
+              Your expert application is being reviewed by our team. We'll verify your
+              credentials and documents, then flip your account to an expert. Check back
+              here after approval to download the app and access your expert portal.
+            </p>
+          </template>
+        </div>
       </section>
-
-      <section v-else class="auth-card">
-        <p class="auth-note">Checking your session…</p>
-      </section>
-    </div>
-  </main>
+    </main>
+    <SiteFooter :site="site" />
+  </div>
+  <div v-else class="page-status">Loading…</div>
 </template>
 
 <style scoped>
-@import "../auth/auth.css";
-
+.hub {
+  display: grid;
+  place-items: center;
+}
+.hub-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 40px 36px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg2);
+  text-align: center;
+}
+.hub-eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
 .status-ok { color: #059669; }
 .status-pending { color: #b45309; }
 .status-bad { color: #dc2626; }
-
+.hub-title {
+  margin: 0 0 12px;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.hub-note {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+}
 .download-row {
   display: flex;
   gap: 12px;
-  margin: 6px 0 8px;
+  justify-content: center;
   flex-wrap: wrap;
 }
 .store-button {
   flex: 1;
-  min-width: 150px;
+  min-width: 170px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   border-radius: 12px;
   border: none;
   background: #111318;
@@ -131,17 +159,18 @@ async function onSignOut() {
   font-weight: 700;
 }
 .store-hint {
-  font-size: 12px;
-  color: #6b7280;
-  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 14px 0 0;
 }
-.signout {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  padding: 0;
-  color: #6d5efc;
-  font-weight: 600;
-  cursor: pointer;
+.page-status {
+  display: grid;
+  min-height: 60vh;
+  place-items: center;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 </style>

@@ -4,6 +4,7 @@ import type { Component } from "vue";
 import SiteHeader from "@/boundary/ui/common/SiteHeader.vue";
 import SiteFooter from "@/boundary/ui/common/SiteFooter.vue";
 import { getLandingPage } from "@/controller/landing/getLandingPage";
+import { getMemberSession, type SessionMember } from "@/controller/auth/memberSession";
 import type { LandingPageData, PageSection } from "@/controller/landing/viewModels";
 import HeroSection from "./components/HeroSection.vue";
 import FeaturesSection from "./components/FeaturesSection.vue";
@@ -17,6 +18,8 @@ import ContactSection from "./components/ContactSection.vue";
 
 const data = ref<LandingPageData | null>(null);
 const error = ref<string | null>(null);
+// Signed-in member (if any) so the header shows the profile + logout instead of login/register.
+const member = ref<SessionMember | null>(null);
 
 const sectionComponent: Record<PageSection["type"], Component> = {
   intro: HeroSection,
@@ -40,6 +43,12 @@ onMounted(async () => {
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e);
   }
+  // Best-effort: a failed session lookup just leaves the header logged-out.
+  try {
+    member.value = await getMemberSession();
+  } catch {
+    member.value = null;
+  }
 });
 </script>
 
@@ -49,7 +58,7 @@ onMounted(async () => {
   </div>
   <div v-else-if="!data" class="page-status">Loading…</div>
   <div v-else class="site-shell">
-    <SiteHeader :site="data.site" />
+    <SiteHeader :site="data.site" :member="member" />
     <main>
       <component
         v-for="(section, index) in data.sections"
