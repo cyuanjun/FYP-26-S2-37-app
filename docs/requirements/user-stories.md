@@ -5,23 +5,23 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **13 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 12 Jul: **admin web portal built** at `/admin` — users, expert-application review, listings, categories, pricing, testimonials, feedback, contact; 13 Jul: **US13 manual entry descoped/removed** + **challenge join codes** added to US25). Tally: 50 ✅ · 10 🟨 · 4 ⬜ (US30/US48 expert content = out of scope; US38 plan customisation; **US13 manual entry descoped — removed to stop XP/level/streak farming**).
+Last updated **13 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 12 Jul: **admin web portal built** at `/admin` — users, expert-application review, listings, categories, pricing, testimonials, feedback, contact; 13 Jul: **US13 manual entry descoped/removed** + **challenge join codes** added to US25; **marketing website DEPLOYED on Vercel** — [fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app), git-linked auto-deploy, flipping US01–US06 to ✅). Tally: 55 ✅ · 5 🟨 · 4 ⬜ (US30/US48 expert content = out of scope; US38 plan customisation; **US13 manual entry descoped — removed to stop XP/level/streak farming**).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 50 built · 10 partial · 4 not started
+**Score:** 55 built · 5 partial · 4 not started
 
 
 ## Unregistered user (US01–US06)
 
 | ID | Status | User story | Build note |
 |---|---|---|---|
-| US01 | 🟨 | As an unregistered user, I want to view the Wise Workout marketing website so that I can understand the platform before creating an account. | Vue 3 BCE site in `web/` — landing sections built; **metrics/pricing/testimonials/experts read live from the shared DB** (seed = offline fallback); deploy pending |
-| US02 | 🟨 | As an unregistered user, I want to view app features, subscription highlights, and pricing so that I can understand the difference between free and premium access. | Vue 3 BCE site in `web/` — features + pricing sections built; pricing live from `landing_pricing_plans` ($9.99/mo) |
-| US03 | 🟨 | As an unregistered user, I want to view expert information so that I can understand what types of professional support are available through the platform. | Vue 3 BCE site in `web/` — featured experts live via `landing_featured_experts()` (verified experts from the shared DB — shows the app's Sam Rivera) |
-| US04 | 🟨 | As an unregistered user, I want to contact support so that I can ask questions about the platform before creating an account. | Vue 3 BCE site in `web/` — contact form inserts into the shared `contact_messages` table (admin triages on #28.1) |
-| US05 | ✅ | As an unregistered user, I want to create an account so that I can become a registered user and access the mobile application. | Vue 3 BCE site in `web/` — `/register` creates a real Supabase Auth account (trigger mirrors profiles + fitness_profiles); hosted requires email confirmation. App stays login-only by design |
-| US06 | 🟨 | As an unregistered user, I want to apply as an expert so that I can offer professional fitness or wellness services through the platform after approval. | Vue 3 BCE site in `web/` — `/expert-application` creates the account + **pending** `expert_profiles` + document metadata (files not uploaded); role flips on admin approval — portal pending |
+| US01 | ✅ | As an unregistered user, I want to view the Wise Workout marketing website so that I can understand the platform before creating an account. | Vue 3 BCE site **deployed on Vercel** — [fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app) (git-linked, auto-deploys on push to `main`, root dir `web/`); **metrics/pricing/testimonials/experts read live from the shared DB** (seed = offline fallback) |
+| US02 | ✅ | As an unregistered user, I want to view app features, subscription highlights, and pricing so that I can understand the difference between free and premium access. | Live on the deployed site — features + pricing sections; pricing live from `landing_pricing_plans` ($9.99/mo) |
+| US03 | ✅ | As an unregistered user, I want to view expert information so that I can understand what types of professional support are available through the platform. | Live on the deployed site — featured experts via `landing_featured_experts()` (verified experts from the shared DB, incl. the app's Sam Rivera) |
+| US04 | ✅ | As an unregistered user, I want to contact support so that I can ask questions about the platform before creating an account. | Live on the deployed site — contact form inserts into the shared `contact_messages` table (admin triages on #28.1) |
+| US05 | ✅ | As an unregistered user, I want to create an account so that I can become a registered user and access the mobile application. | Live on the deployed site — `/register` creates a real Supabase Auth account (trigger mirrors profiles + fitness_profiles); hosted requires email confirmation. App stays login-only by design |
+| US06 | ✅ | As an unregistered user, I want to apply as an expert so that I can offer professional fitness or wellness services through the platform after approval. | Live on the deployed site — `/expert-application` creates the account + **pending** `expert_profiles` + uploaded verification documents (private `expert-docs` Storage bucket); the **admin portal approves** (role flips to expert). Hosted signup needs email confirmation |
 
 ## Registered Free user (US07–US31)
 

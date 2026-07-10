@@ -210,7 +210,7 @@ Current limitations are documented in docs/limitations.md.
 
 Answer:
 
-> Login, registration, and expert application use real Supabase Auth against the shared database — a website registration can immediately log into the mobile app, and an expert application creates the pending profile the admin portal approves. The **admin portal is built** (overview, users, application review, content moderation) with a real session + sign-out; expert document files are validated **and uploaded** to a private Storage bucket the admin opens via signed URLs. What's left is member-side persistent sessions and the production deploy.
+> Login, registration, and expert application use real Supabase Auth against the shared database — a website registration can immediately log into the mobile app, and an expert application creates the pending profile the admin portal approves. The **admin portal is built** (overview, users, application review, content moderation) with a real session + sign-out; expert document files are validated **and uploaded** to a private Storage bucket the admin opens via signed URLs. The site is **deployed on Vercel** ([fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app), auto-deploys on push). What's left is member-side persistent sessions.
 
 ## Quick Recovery
 

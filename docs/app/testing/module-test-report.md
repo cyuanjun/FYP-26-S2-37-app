@@ -43,7 +43,7 @@ All 244 automated cases pass on the refresh date (0 failures, `flutter analyze` 
 | PREM — Premium subscription | US31, US40 |
 | NOTIF — Notifications (rule engine) | US19–US21 |
 
-Full story-level status lives in [../requirements/user-stories.md](../../requirements/user-stories.md) (50 ✅ · 10 🟨 · 4 ⬜).
+Full story-level status lives in [../requirements/user-stories.md](../../requirements/user-stories.md) (55 ✅ · 5 🟨 · 4 ⬜).
 
 ## Known limitations (declared, not defects)
 

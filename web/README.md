@@ -39,14 +39,23 @@ Implemented:
   algorithm-ranked experts/testimonials (see `../docs/web/algorithms.md`).
 - BCE dependency checker.
 - Test, presentation, and demo documentation.
+- **Deployed on Vercel** (see Deployment below).
 
 Not yet built:
 
-- Deployment (the site runs locally).
 - Member-facing persistent sessions (non-admin logins validate and point at the app; admins get a real portal session with sign-out).
 - Admin editing for landing **feature-card copy** specifically (FAQ, pricing, testimonials, categories, and contact/feedback moderation are already editable in `/admin`).
 
 See [docs/limitations.md](../docs/web/limitations.md) for the full limitation list.
+
+## Deployment
+
+Live at **[fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app)**.
+
+- **Host:** Vercel, project `fyp-26-s2-37-wiseworkout`, **git-linked** to `cyuanjun/FYP-26-S2-37-app` with **Root Directory `web/`** and production branch `main`. Every push to `main` auto-builds and deploys; PRs get preview URLs.
+- **Config:** [`vercel.json`](vercel.json) — Vite framework, build `npm run build`, output `dist`, and an SPA rewrite (`/(.*) → /index.html`) so deep links like `/login` and `/admin` resolve on refresh.
+- **Backend:** runs against the **shared hosted Supabase** (URL + publishable key default in `src/boundary/gateways/supabaseClient.ts`; no env vars needed). `web/.env.local-stack.disabled` is the old local-stack config, kept disabled.
+- **Manual deploy** (optional, needs a Vercel token): `cd web && npx vercel deploy --prod`.
 
 ## Run Locally
 

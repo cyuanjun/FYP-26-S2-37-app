@@ -21,11 +21,12 @@ request triage, client engagements, professional info) → **premium upgrade** (
 live role flip, subscription management) → rule-based **notification reminders** → profile-photo
 upload. A local Supabase stack (`supabase start`, ports 55321-9) mirrors hosted for development.
 The **marketing website lives in `web/`** (Vue 3 + Vite + TS, same BCE discipline; landing
-sections + register/expert-application/login UIs, seed-backed — Supabase wiring + deploy pending).
-The site shares the app's Supabase database (live reads + real Auth) and hosts the **admin
-portal** at `/admin` (user management, expert-application review, moderation; demo account
-`admin@wiseworkout.test`). Remaining work: website deployment, submitted-doc reconciliation
-edits, and one physical-device pass (notifications firing + real-BLE pairing).
+sections + register/expert-application/login UIs) and is **deployed on Vercel** at
+**[fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app)** (git-linked,
+auto-deploys on push to `main`, root dir `web/`). The site shares the app's Supabase database
+(live reads + real Auth) and hosts the **admin portal** at `/admin` (user management,
+expert-application review, moderation; demo account `admin@wiseworkout.test`). Remaining work:
+submitted-doc reconciliation edits and one physical-device pass (notifications firing + real-BLE pairing).
 
 - 📍 **Where we are / what's next:** [docs/STATUS.md](docs/STATUS.md)
 - 🏃 **Run & demo it** (setup, walkthroughs, test accounts): [docs/prototype-demo-guide.md](docs/app/prototype-demo-guide.md)

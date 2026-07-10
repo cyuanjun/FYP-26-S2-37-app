@@ -284,4 +284,4 @@ Implementation steps (all ✅ done except deploy):
 7. ✅ Expert verification document storage (private `expert-docs` bucket + signed URLs).
 8. ✅ Admin editing pages (`/admin` — users, applications, categories, pricing, FAQ, testimonials, feedback, contact).
 9. ✅ Browser and DB integration tests.
-10. ⬜ Production deployment (still the main remaining item).
+10. ✅ Production deployment — deployed on Vercel (project `fyp-26-s2-37-wiseworkout`, git-linked, root `web/`, auto-deploys on push to `main`): [fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app).
