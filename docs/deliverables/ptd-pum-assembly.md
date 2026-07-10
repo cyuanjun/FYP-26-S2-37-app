@@ -76,7 +76,7 @@ Yuan Jun = coordination/docs · Devanandi = mobile/UI · Foong = backend/DB/API 
 5. **§18 Glossary** (S).
 6. **Reconcile §12 Technical Stack** to Supabase — see the [reconciliation log](doc-reconciliation-log.md) (B1/A4). §16.3 DB design is **resolved** (use the TDM §8 ERD).
 
-The TDM (**v5, 6 Jun — the canonical version**) **covers §16 System Design well**: §4 architecture, §3.3 context DFD, §5 activity diagrams, §7 wireframes, §8 ERD. ⚠️ **Its §6 sequence diagrams are wrong (team-confirmed 12 Jun)** — do **not** copy them; use the **58 rendered per-story diagrams in [sequence-diagrams/](sequence-diagrams/)** (one per US07–US64, simplified BCE style; sources included). Also remember PRD v3 ≡ v2: apply the reconciliation log §B edits (Supabase stack, $9.99, simulated payment, current AI-plan scope) to any PRD-sourced PTD section during assembly.
+The TDM (**v5, 6 Jun — the canonical version**) **covers §16 System Design well**: §4 architecture, §3.3 context DFD, §5 activity diagrams, §7 wireframes, §8 ERD. ⚠️ **Its §6 sequence diagrams are wrong (team-confirmed 12 Jun)** — do **not** copy them; use the **59 rendered per-story diagrams in [sequence-diagrams/](sequence-diagrams/)** (one per US07–US64 with US18 split into US18a/US18b; simplified BCE style; sources included; US13's diagram is retained but its use case is descoped — see reconciliation §C8). Also remember PRD v3 ≡ v2: apply the reconciliation log §B edits (Supabase stack, $9.99, simulated payment, current AI-plan scope) to any PRD-sourced PTD section during assembly.
 
 ---
 

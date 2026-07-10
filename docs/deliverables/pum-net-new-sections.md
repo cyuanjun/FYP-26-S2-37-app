@@ -51,7 +51,7 @@ On first use the app will request:
 - **Motion & fitness** — to count steps and detect activity.
 - **Notifications** — for workout reminders and summaries.
 
-Granting these enables full tracking; they can be changed later in your device settings. Workouts can still be logged **manually** without sensor permissions.
+Granting these enables full tracking; they can be changed later in your device settings.
 
 ---
 
@@ -59,7 +59,7 @@ Granting these enables full tracking; they can be changed later in your device s
 
 | Feature | What the user can do |
 |---|---|
-| **Workout tracking** | Record workouts using phone sensors (GPS + step/motion) or enter them manually; start a **suggested** session from a plan or a **freeform** session on the spot. |
+| **Workout tracking** | Record workouts using phone sensors (GPS + step/motion) with optional wearable heart rate; start a **suggested** session from a plan or a **freeform** session on the spot. |
 | **Progress & history** | View workout history and basic analytics (day/week/month); Premium adds advanced analytics — HR zones, workload ratio, training load, personal bests. |
 | **AI-assisted support** | Receive AI progress summaries and AI plan suggestions. Plans follow the user's selected goal timeline; Premium gets personalised plans and detailed workout breakdowns. |
 | **Fitness profile & goals** | Set body metrics, training experience, preferences, gender, height, weight, and a primary goal with a target and timeline; track goal progress. |

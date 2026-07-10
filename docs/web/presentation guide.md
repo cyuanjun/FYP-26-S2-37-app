@@ -75,10 +75,10 @@ ExpertsSection.vue
 -> experts.seed.json for now
 ```
 
-Later, `expertGateway.ts` will query the shared app database and rank verified experts using:
+`expertGateway.ts` reads live from the shared app database, ranking verified experts by the **IMDb / Bayesian weighted rating** computed in the DB (see [algorithms.md](./algorithms.md)):
 
 ```text
-rating_avg * ln(review_count + 1)
+WR = (v / (v + m)) * R + (m / (v + m)) * C   (m = 10, C = mean verified rating)
 ```
 
 This avoids manually selecting featured experts.
@@ -145,11 +145,10 @@ docs/limitations.md
 Short version:
 
 - Login, registration, and expert application run against real Supabase Auth on the shared database.
-- The site keeps no persistent session (accounts are for the app); logout UI is not implemented.
-- Expert verification documents are metadata-only — the file blobs are not uploaded to Storage.
-- Gateway data is currently seed-backed.
-- Admin editing pages are not implemented yet.
-- Real media upload/storage is not connected yet.
+- **Admins** get a real portal session with sign-out; member site logins don't keep a persistent session (member accounts are for the app).
+- Expert verification documents **are uploaded** to a private `expert-docs` Storage bucket; the admin opens them via short-lived signed URLs at `/admin/applications`.
+- Landing content reads live from the shared DB (seed = offline fallback).
+- The **admin portal is built** (`/admin`): overview, user management, expert-application review, and content moderation (categories, pricing, FAQ, testimonials, feedback, contact inbox).
 
 ## Build Check
 

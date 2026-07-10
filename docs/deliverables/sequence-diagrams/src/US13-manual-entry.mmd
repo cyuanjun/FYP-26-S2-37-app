@@ -1,5 +1,5 @@
 ---
-title: "US13 — Manually enter workout details"
+title: "US13 — Manually enter workout details (DESCOPED / removed)"
 ---
 sequenceDiagram
   actor A as Registered Free User
@@ -13,4 +13,4 @@ sequenceDiagram
   E-->>C: saved session (xp_gained)
   C-->>B: state = AsyncData (done)
   B-->>A: session appears in History
-  note over E: planned - manual-entry UI pending (US13).<br/>persisted via WorkoutGateway.startSession / endSession → Supabase (RLS)
+  note over E: DESCOPED / removed from the FYP build (US13) — a free-text entry<br/>let users farm XP/level/streak with no sensor evidence (reconciliation §C8).<br/>Diagram retained for traceability; all progress now needs a captured session.

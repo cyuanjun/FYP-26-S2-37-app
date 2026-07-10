@@ -141,7 +141,7 @@ ExpertApplicationPage.vue
 -> authGateway.ts
 ```
 
-The expert application validates document file type/size and records document metadata in `expert_verification_documents` via the signup trigger (files themselves are not uploaded — see [limitations.md](./limitations.md)).
+The expert application validates document file type/size, records document metadata in `expert_verification_documents` via the signup trigger, **and uploads the files** to a private `expert-docs` Storage bucket (owner-write / owner+admin-read); the admin opens them via short-lived signed URLs at `/admin/applications`.
 
 Login:
 
@@ -193,18 +193,21 @@ Final migrations should move into `../FYP-26-S2-37-app`.
 
 Featured experts should be selected automatically, not manually curated.
 
-Recommended score:
+Recommended score — **IMDb / Bayesian weighted rating** (as shipped; see [algorithms.md](./algorithms.md)):
 
 ```text
-rating_avg * ln(review_count + 1)
+WR = (v / (v + m)) * R + (m / (v + m)) * C
+  R = the expert's rating_avg
+  v = the expert's review_count
+  m = 10  (prior weight)
+  C = mean rating across verified experts
 ```
 
 Sort by:
 
 ```text
-recommended_score desc
+score desc      (the WR above, computed in the DB)
 review_count desc
-rating_avg desc
 client_count desc
 ```
 
@@ -247,7 +250,7 @@ Accepted file types:
 
 Each file must be 5 MB or smaller.
 
-Later, files should be uploaded to Supabase Storage and recorded in `expert_verification_documents`.
+Files are uploaded to the private `expert-docs` Supabase Storage bucket and recorded in `expert_verification_documents` (with a `storage_path`); the admin reviews them via signed URLs.
 
 ## Verification
 
@@ -270,14 +273,15 @@ Current limitations are tracked in [limitations.md](./limitations.md).
 
 ## Next Work
 
-Recommended next implementation steps:
+Implementation steps (all ✅ done except deploy):
 
-1. Decide frontend-direct Supabase versus backend API access.
-2. Add environment configuration for DB/Auth.
-3. Move draft migrations into `../FYP-26-S2-37-app`.
-4. Connect gateways to the shared local Postgres/Supabase DB.
-5. Add real Supabase-backed login/logout.
-6. Add real Supabase-backed registration.
-7. Add expert verification document storage.
-8. Add admin editing pages.
-9. Add browser and DB integration tests.
+1. ✅ Decide frontend-direct Supabase versus backend API access.
+2. ✅ Add environment configuration for DB/Auth.
+3. ✅ Move draft migrations into `../FYP-26-S2-37-app`.
+4. ✅ Connect gateways to the shared local Postgres/Supabase DB.
+5. ✅ Real Supabase-backed login (admin session + sign-out; member logins point at the app).
+6. ✅ Real Supabase-backed registration.
+7. ✅ Expert verification document storage (private `expert-docs` bucket + signed URLs).
+8. ✅ Admin editing pages (`/admin` — users, applications, categories, pricing, FAQ, testimonials, feedback, contact).
+9. ✅ Browser and DB integration tests.
+10. ⬜ Production deployment (still the main remaining item).

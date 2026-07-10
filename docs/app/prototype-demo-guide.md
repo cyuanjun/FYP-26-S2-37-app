@@ -276,7 +276,7 @@ session (freeform / phone GPS / wearable). See reconciliation log §C8.
 
 ```bash
 flutter analyze     # static analysis — should report "No issues found!"
-flutter test        # 221 tests — should end "All tests passed!"
+flutter test        # 222 tests — should end "All tests passed!"
 ```
 
 Coverage (positive **and** negative cases per flow): entity rules (`Profile`, `WorkoutType` incl. MET
@@ -376,7 +376,7 @@ supabase/
                    onboarding_completed_at · private custom catalog entries
   functions/       summarise-progress · suggest-plan  (AI Edge Functions, gpt-4o-mini)
   seed.sql         install catalogs       seed-demo.sql  demo accounts + data
-test/              entity · core · control · gateway suites (221 tests)
+test/              entity · core · control · gateway suites (222 tests)
 ```
 
 Design references: [STATUS.md](../STATUS.md) (progress), [architecture/build-plan.md](architecture/build-plan.md),

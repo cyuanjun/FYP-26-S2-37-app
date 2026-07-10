@@ -74,7 +74,7 @@ Strategic position of Wise Workout as a Final Year Project product concept.
 | **Project manager / coordinator** | Chia Yuan Jun |
 | **Purpose** | Deliver a cross-platform mobile fitness application that integrates workout tracking, AI-assisted progress summaries and timeline-aware plan suggestions, a verified-expert services marketplace, and a social/challenge layer, supported by a marketing website and an admin portal. |
 | **Objectives** | (1) Build the core capture → analyse → AI-summary → share loop. (2) Implement all five user roles. (3) Deliver Free/Premium/Expert-services monetisation (simulated payment). (4) Apply a maintainable BCE architecture with role-based + row-level security. (5) Produce the required FYP deliverables (PRD, SRS, TDM, PTD, PUM, final system + demo). |
-| **In scope** | Mobile app (Android + iOS via Flutter); marketing website; admin portal; phone-sensor + manual workout capture; AI summaries/suggestions via a secure backend function; expert listings, requests, and deliverables; social feed, challenges, friends; subscriptions; admin user/expert/content moderation. |
+| **In scope** | Mobile app (Android + iOS via Flutter); marketing website; admin portal; phone-sensor + wearable workout capture; AI summaries/suggestions via a secure backend function; expert listings, requests, and deliverables; social feed, challenges (with shareable join codes), friends; subscriptions; admin user/expert/content moderation. |
 | **Out of scope (this project phase)** | Real payment-gateway settlement (simulated only); live wearable/HealthKit/BLE sync (architecturally provisioned, additive later); push/FCM notifications (local notifications only initially); nutrition tracking; non-English localisation. |
 | **Key deliverables** | PRD, SRS, TDM, **PTD + PUM (≈13 Jun)**, End-of-Term-1 review (20 Jun), module + integration testing, final working system and demonstration (13–22 Aug). |
 | **Stakeholders** | Project team (4), supervisor/assessors (UOW/SIM), prospective end users (free/premium/expert), evaluators. |
@@ -143,7 +143,7 @@ Unregistered Visitor · Registered User (Free/Premium) · Verified Expert · Sys
 |---|---|---|
 | 1.0 | Manage Accounts & Authentication | credentials, registration / expert application → auth result, account record |
 | 2.0 | Manage Profile, Fitness Profile & Goals | profile + goal edits → stored profile, goal progress |
-| 3.0 | Capture Workout (sensor / manual) | sensor + manual workout data, wearable sync → workout session |
+| 3.0 | Capture Workout (phone sensors / wearable) | phone-sensor + wearable workout data, wearable sync → workout session |
 | 4.0 | Generate Analytics & AI Outputs | workout history + profile + goal timeline → basic/advanced analytics, AI summary, AI/rule plan suggestion |
 | 5.0 | Manage Social & Challenges | posts, likes, comments, challenge join/create, share → feed, challenge results |
 | 6.0 | Manage Expert Services | listings, service requests, deliverables, reviews → service status, expert responses |

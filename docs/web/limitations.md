@@ -15,8 +15,8 @@ This page lists the current limitations of the landing-page repo. These are know
 
 - Registration, login, and expert application use real Supabase Auth (`signUp` / `signInWithPassword`) against the shared project; `handle_new_user()` mirrors profile fields and creates the pending expert profile + document metadata.
 - The hosted project has email confirmation enabled — a hosted signup must confirm via email before logging in (the local stack auto-confirms). The hosted mailer also rejects non-deliverable domains (e.g. `.test` addresses).
-- The site does not keep a session after registration (accounts are for the app); login validates credentials and shows the role-based destination, but role-based post-login home pages are not implemented yet.
-- Logout UI is not implemented yet.
+- **Member** site logins don't keep a persistent session (member accounts are for the app); login validates credentials and shows the role-based destination. **Admins are the exception** — they get a real portal session with sign-out and role-guarded `/admin` routes (see below).
+- Member logout UI is not implemented (there's no member session to end); admin sign-out works.
 
 ## Expert Verification Limitations
 

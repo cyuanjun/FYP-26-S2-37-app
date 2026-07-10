@@ -170,7 +170,7 @@ http://127.0.0.1:5173/expert-application
 
 Say:
 
-> The expert application asks for account details, expert profile information, active specialties from the gateway seed, and verification documents. The documents are validated now, while real storage is documented as a limitation.
+> The expert application asks for account details, expert profile information, active specialties from the gateway seed, and verification documents. The documents are validated and uploaded to a private Storage bucket — the admin opens them via signed URLs during review.
 
 ### 10. Show Limitations
 
@@ -210,7 +210,7 @@ Current limitations are documented in docs/limitations.md.
 
 Answer:
 
-> Admin editing, real media uploads, persistent site sessions, and logout are not implemented yet. Login, registration, and expert application use real Supabase Auth against the shared database — a website registration can immediately log into the mobile app, and an expert application creates the pending profile the admin portal will approve. Expert document files are validated and their metadata recorded, but the file blobs are not uploaded.
+> Login, registration, and expert application use real Supabase Auth against the shared database — a website registration can immediately log into the mobile app, and an expert application creates the pending profile the admin portal approves. The **admin portal is built** (overview, users, application review, content moderation) with a real session + sign-out; expert document files are validated **and uploaded** to a private Storage bucket the admin opens via signed URLs. What's left is member-side persistent sessions and the production deploy.
 
 ## Quick Recovery
 

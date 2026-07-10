@@ -45,7 +45,7 @@ Relationship list for the TDM ERD, in the sample-document notation:
 | FitnessProfile | 1 | Records | * | WorkoutSession | completed or in-progress sessions |
 | WorkoutType | 1 | Classifies | * | WorkoutSession | actual session type |
 | PlannedWorkout | 0..1 | IsExecutedBy | * | WorkoutSession | nullable for free-form sessions |
-| ConnectedDevice | 0..1 | Sources | * | WorkoutSession | nullable for manual entry; device type determines phone vs wearable |
+| ConnectedDevice | 0..1 | Sources | * | WorkoutSession | nullable when no device is recorded (phone-only / freeform); device type determines phone vs wearable |
 | WorkoutSession | 1 | Logs | * | ExerciseLog | mainly non-cardio exercise entries |
 | WorkoutSession | 1 | Embeds | 0..1 | trackPoints | inline JSON time-series, not a separate table |
 

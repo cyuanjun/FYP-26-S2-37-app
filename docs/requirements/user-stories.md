@@ -5,11 +5,11 @@ mirrored here with engineering build status. **The SRS is the source of truth fo
 scope** — update status here as features land; never edit story text without an SRS change
 (log it in [../deliverables/doc-reconciliation-log.md](../deliverables/doc-reconciliation-log.md)).
 
-Last updated **12 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 12 Jul: **admin web portal built** at `/admin` — users, expert-application review, listings, categories, pricing, testimonials, feedback, contact). Tally: 50 ✅ · 10 🟨 · 4 ⬜ (US30/US48 expert content = out of scope; US38 plan customisation; **US13 manual entry descoped — removed to stop XP/level/streak farming**).
+Last updated **13 Jul 2026** (11 Jul: website into `web/` + shared Supabase DB; 12 Jul: **admin web portal built** at `/admin` — users, expert-application review, listings, categories, pricing, testimonials, feedback, contact; 13 Jul: **US13 manual entry descoped/removed** + **challenge join codes** added to US25). Tally: 50 ✅ · 10 🟨 · 4 ⬜ (US30/US48 expert content = out of scope; US38 plan customisation; **US13 manual entry descoped — removed to stop XP/level/streak farming**).
 
 **Legend:** ✅ built & verified · 🟨 partial (see note) · ⬜ not started
 
-**Score:** 12 built · 10 partial · 42 not started
+**Score:** 50 built · 10 partial · 4 not started
 
 
 ## Unregistered user (US01–US06)

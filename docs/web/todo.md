@@ -36,20 +36,15 @@ Notes:
 - Registration UI currently collects the fields needed for account creation, but does not verify email ownership.
 - Final implementation should decide whether to use Supabase built-in email confirmation or a custom OTP flow.
 
-### Expert Verification Document Storage
+### Expert Verification Document Storage — ✅ DONE
 
-Connect expert verification document upload to storage and the shared app schema.
+Expert verification document upload is connected to Storage and the shared app schema.
 
-Current UI behavior:
+Behavior:
 
 - One identity document is required.
 - At least one certification document is required.
 - Accepted file types: PDF, JPG, PNG, WebP.
 - Max file size: 5 MB each.
-- File metadata is recorded in `expert_verification_documents` by the signup trigger; the file blobs themselves are still not uploaded.
-
-Future implementation:
-
-- Upload files to Supabase Storage.
-- Create rows in `expert_verification_documents`.
-- Store file references or storage paths according to the app schema.
+- Files are **uploaded** to a private `expert-docs` Storage bucket (owner-write / owner+admin-read), and `expert_verification_documents` rows record the `storage_path`.
+- The admin opens each document via a short-lived **signed URL** at `/admin/applications` (migration `20260713090000_expert_docs_storage.sql`).

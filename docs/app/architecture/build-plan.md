@@ -75,7 +75,7 @@ The app is designed to **Jacobson's BCE** stereotypes so the design docs (robust
 
 ## 4. Sensors — abstraction now, wearables later
 
-One interface today means later work is a new class, not a refactor. The schema already supports this (`ConnectedDevice.deviceType` includes `phone_sensors`; `WorkoutSession.ConnectedDeviceID` null = manual entry).
+One interface today means later work is a new class, not a refactor. The schema already supports this (`ConnectedDevice.deviceType` includes `phone_sensors`; `WorkoutSession.ConnectedDeviceID` null = no connected device — a phone-only / freeform capture).
 
 ```dart
 abstract class WorkoutDataSource {
@@ -86,7 +86,7 @@ abstract class WorkoutDataSource {
 ```
 
 - **Now — `PhoneSensorSource`:** `geolocator` (GPS distance / pace / route → `WorkoutSession.trackPoints`) + `pedometer` (steps / cadence).
-- **Now — `ManualEntrySource`:** a form, counts as a third source.
+- ~~**`ManualEntrySource`:** a form as a third source.~~ **Descoped/removed (US13)** — a free-text entry with no sensor evidence let users farm XP/level/streak; all progress now requires a captured session.
 - **Later (additive):** `HealthSource` (`health` plugin → HealthKit / Health Connect) and `BleHeartRateSource` (`flutter_blue_plus`, standard BLE HR profile — a cheap chest strap covers a demo). Each just implements `WorkoutDataSource`.
 
 Satisfies the brief's "phone sensors *or* wearables" with a clean, examiner-friendly upgrade path.

@@ -43,9 +43,8 @@ Implemented:
 Not yet built:
 
 - Deployment (the site runs locally).
-- Member-facing sessions (non-admin logins validate and point at the app; admins get a real portal session with sign-out).
-- Admin editing for landing feature copy / media (pricing + testimonials are editable).
-- Real uploaded media (verification documents are metadata-only).
+- Member-facing persistent sessions (non-admin logins validate and point at the app; admins get a real portal session with sign-out).
+- Admin editing for landing **feature-card copy** specifically (FAQ, pricing, testimonials, categories, and contact/feedback moderation are already editable in `/admin`).
 
 See [docs/limitations.md](../docs/web/limitations.md) for the full limitation list.
 

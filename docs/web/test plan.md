@@ -136,7 +136,7 @@ Manual steps:
 Expected:
 
 - Success message appears.
-- The message includes the placeholder destination route.
+- An **admin** account lands in the `/admin` portal (real session). A **member** account shows its role-based destination (member accounts are for the app, no persistent web session).
 
 Note:
 
@@ -177,7 +177,7 @@ Expected:
 
 Note:
 
-File storage is deferred, but the form already requires document files and validates type/size.
+The form requires document files, validates type/size, and **uploads them** to the private `expert-docs` Storage bucket (the admin reviews them via signed URLs).
 Accepted files are PDF, JPG, PNG, and WebP up to 5 MB each.
 
 ## Negative Tests

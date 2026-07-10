@@ -41,7 +41,7 @@ All 222 automated cases pass on the refresh date (0 failures, `flutter analyze` 
 | PREM — Premium subscription | US31, US40 |
 | NOTIF — Notifications (rule engine) | US19–US21 |
 
-Full story-level status lives in [../requirements/user-stories.md](../../requirements/user-stories.md) (36 ✅ · 6 🟨 · 22 ⬜; the ⬜ remainder is website/admin-web scope outside this app).
+Full story-level status lives in [../requirements/user-stories.md](../../requirements/user-stories.md) (50 ✅ · 10 🟨 · 4 ⬜).
 
 ## Known limitations (declared, not defects)
 
@@ -171,9 +171,9 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | AUTH-25 | `profile_cluster_test` | addCustomWorkoutType inserts a custom type and returns it (positive) | ✅ |
 | AUTH-26 | `profile_cluster_test` | addCustomWorkoutType rejects empty names (negative) | ✅ |
 
-### CAP — Capture & devices (24 cases)
+### CAP — Capture & devices (22 cases)
 
-*Scope:* Start/end session lifecycle (atomic RPC payloads), device pairing incl. BLE remote-id passthrough, GATT heart-rate packet parsing, manual entry (backdate, no-device, cardio-only distance).
+*Scope:* Start/end session lifecycle (atomic RPC payloads), device pairing incl. BLE remote-id passthrough, GATT heart-rate packet parsing. (The 2 manual-entry cases were removed with US13 — see the milestone delta above.)
 
 | ID | Test file | Case | Result |
 |---|---|---|---|
@@ -199,8 +199,6 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | CAP-20 | `ble_heart_rate_source_test` | GATT Heart Rate Measurement parsing (0x2A37) uint16 little-endian format (flags bit0 = 1) | ✅ |
 | CAP-21 | `ble_heart_rate_source_test` | GATT Heart Rate Measurement parsing (0x2A37) malformed packets return null (negative) | ✅ |
 | CAP-22 | `ble_heart_rate_source_test` | GATT Heart Rate Measurement parsing (0x2A37) avg/max derive from collected samples like the simulated source | ✅ |
-| CAP-23 | `log_manual_workout_test` | manual entry: no device, backdated start, distance for cardio | ✅ |
-| CAP-24 | `log_manual_workout_test` | non-cardio entries never send distance (negative) | ✅ |
 
 ### HIST — History & analytics (14 cases)
 
@@ -245,9 +243,9 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | PLAN-14 | `generate_plan_test` | Profile.needsOnboarding null onboardingCompletedAt → wizard required | ✅ |
 | PLAN-15 | `generate_plan_test` | Profile.needsOnboarding completed → straight to the shell | ✅ |
 
-### SOC — Social & challenges (30 cases)
+### SOC — Social & challenges (33 cases)
 
-*Scope:* Feed assembly (friends+self), likes/comments, mutual-friend RPC pairs, share-post creation + session→post link, challenge join/leave/create + live leaderboards.
+*Scope:* Feed assembly (friends+self), likes/comments, mutual-friend RPC pairs, share-post creation + session→post link, challenge join/leave/create + live leaderboards + join-by-code resolution.
 
 | ID | Test file | Case | Result |
 |---|---|---|---|
@@ -281,6 +279,9 @@ Full story-level status lives in [../requirements/user-stories.md](../../require
 | SOC-28 | `challenges_test` | CreateChallenge forwards fields and the new challenge appears joined (auto-join) | ✅ |
 | SOC-29 | `challenges_test` | CreateChallenge signed out → no-op (negative) | ✅ |
 | SOC-30 | `challenges_test` | challengeSummaryProvider derives one challenge by id from the list | ✅ |
+| SOC-31 | `challenges_test` | FindChallengeByCode resolves a code, upper-casing + trimming the input | ✅ |
+| SOC-32 | `challenges_test` | FindChallengeByCode unknown code → null (negative) | ✅ |
+| SOC-33 | `challenges_test` | FindChallengeByCode blank input → null without hitting the gateway (negative) | ✅ |
 
 ### MKT — Marketplace & expert portal (17 cases)
 
@@ -347,7 +348,7 @@ Executed on the iOS simulator against the local stack during the July build-out;
 |---|---|---|---|
 | MAN-01 | Core loop: login → capture → summary → history → AI summary → share | vertical slice + 6 Jul social entries | ✅ |
 | MAN-02 | Wearable pairing → live HR → avg/max persisted (§B2) | capture entries; BLE sheet re-verified 10 Jul | ✅ |
-| MAN-03 | Manual entry: backdated run, +75 XP, HR-dash row | 9 Jul manual-entry entry | ✅ |
+| MAN-03 | Challenge join code: enter a code → review detail → join; invite popup copy/share | join-code verified on simulator | ✅ |
 | MAN-04 | Free caps & locks: month cap, search lock → #16, regen cap | 8–9 Jul entries | ✅ |
 | MAN-05 | Premium upgrade → live flip → #13.6 cancel/resume → revert | 8 Jul premium entry (DB checked each step) | ✅ |
 | MAN-06 | Premium History search: filter, aggregates narrowing, miss state | 9 Jul search entry | ✅ |

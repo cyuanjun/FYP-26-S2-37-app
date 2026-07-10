@@ -10,9 +10,9 @@ architecture · **Supabase** (Postgres + Auth + RLS + Edge Functions) · **OpenA
 
 ## Current state (11 Jul 2026) — app feature-complete
 
-Built, tested (221 tests), and verified on the Android emulator + iOS simulator against a live
+Built, tested (222 tests), and verified on the Android emulator + iOS simulator against a live
 backend: login → onboarding wizard → AI-generated training plan → phone-GPS capture with
-wearable heart rate (simulated **and real BLE**) → manual entry → history + analytics (Premium
+wearable heart rate (simulated **and real BLE**) → history + analytics (Premium
 search, per-session **Training Effect**, **#12.2 Advanced Analytics** with ACWR/HR zones/bests)
 → AI progress summary → share to named platforms → **social cluster** (feed, likes/comments,
 friends, challenges with live leaderboards) → **experts marketplace** (browse → request →
@@ -42,7 +42,7 @@ dart run build_runner build          # freezed / json_serializable codegen
 flutter run -d <device>              # device ids from `flutter devices`
 
 flutter analyze                      # should report "No issues found!"
-flutter test                         # 221 tests, all green
+flutter test                         # 222 tests, all green
 ```
 
 The app connects to the hosted Supabase project out of the box (publishable key in

@@ -23,7 +23,7 @@ first, then regenerate these files — don't hand-edit DDL in isolation.
 | `migrations/20260707100000_expert_earnings.sql` | `expert_profiles.total_earned_cents` aggregate (complete adds quoted price). |
 | `migrations/20260708090000_start_premium_rpc.sql` | `start_premium()` (role flip past the guard via a txn-local flag) + subscriptions upsert. |
 | `migrations/20260708100000_expert_profile_column_lockdown.sql` | Column-level UPDATE grants: experts edit only their descriptive columns. |
-| `migrations/20260709090000_manual_entry_backdate.sql` | `end_workout_session` honours a backdated `started_at` (manual entry US13). |
+| `migrations/20260709090000_manual_entry_backdate.sql` | `end_workout_session` honours a backdated `started_at` (was for manual entry US13 — **since descoped/removed**; the backdate capability is now unused but harmless). |
 | `migrations/20260709100000_avatars_bucket.sql` | Public `avatars` storage bucket + owner-folder write policies. |
 | `migrations/20260709110000_ble_remote_id.sql` | `connected_devices.ble_remote_id` for real-BLE pairings. |
 | `migrations/20260711090000_landing_site.sql` | Marketing-site integration: `public_testimonials` / `landing_pricing_plans` / `landing_media_assets` tables, anon read policy on `expert_categories`, the anon-callable `landing_metric_summary()` / `landing_featured_experts()` SECURITY DEFINER functions, and signup-trigger v3 (last_name mirroring + expert-application metadata → pending `expert_profiles` + document metadata). |
@@ -123,5 +123,5 @@ Secrets): `OPENAI_API_KEY`, optional `GEMINI_API_KEY` — never shipped in the a
 - Leaves `profiles.onboarding_completed_at` and `fitness_plans` untouched — reseeding does NOT
   re-trigger onboarding; use
   `update profiles set onboarding_completed_at = null where email = '<demo email>';`
-- Seeded sessions carry no `connected_device_id` (null = manual entry per schema) even though
+- Seeded sessions carry no `connected_device_id` (null = no connected device recorded) even though
   they include HR values — cosmetic; live captures do link their source device.
