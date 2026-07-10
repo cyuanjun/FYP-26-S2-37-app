@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { registerUser } from "@/controller/auth/registerUser";
+
+const router = useRouter();
 
 const form = reactive({
   first_name: "",
@@ -13,29 +15,37 @@ const form = reactive({
 });
 
 const error = ref<string | null>(null);
-const success = ref<string | null>(null);
 const submitting = ref(false);
+
+// Shown after a successful sign-up: prompt to verify email before logging in.
+const showVerifyModal = ref(false);
+const registeredEmail = ref("");
 
 async function onSubmit() {
   if (submitting.value) return;
   error.value = null;
-  success.value = null;
   submitting.value = true;
 
   try {
-    const result = await registerUser(form);
-    success.value = result.message;
+    await registerUser(form);
+    registeredEmail.value = form.email.trim().toLowerCase();
     form.first_name = "";
     form.last_name = "";
     form.username = "";
     form.email = "";
     form.password = "";
     form.confirm = "";
+    showVerifyModal.value = true;
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e);
   } finally {
     submitting.value = false;
   }
+}
+
+function goToLogin() {
+  showVerifyModal.value = false;
+  router.push("/login");
 }
 </script>
 
@@ -109,7 +119,6 @@ async function onSubmit() {
         </label>
 
         <p v-if="error" class="auth-message error">{{ error }}</p>
-        <p v-if="success" class="auth-message success">{{ success }}</p>
 
         <button type="submit" class="button primary auth-submit" :disabled="submitting">
           {{ submitting ? "Creating..." : "Create account" }}
@@ -122,9 +131,64 @@ async function onSubmit() {
       </div>
       </section>
     </div>
+
+    <!-- Verify-email popup shown after a successful sign-up. -->
+    <div v-if="showVerifyModal" class="modal-backdrop" @click.self="goToLogin">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="verify-title">
+        <div class="modal-icon" aria-hidden="true">✉️</div>
+        <h2 id="verify-title" class="modal-title">Check your email</h2>
+        <p class="modal-text">
+          We've sent a verification link to
+          <strong>{{ registeredEmail }}</strong>. Please verify your email before
+          logging in.
+        </p>
+        <button type="button" class="button primary modal-button" @click="goToLogin">
+          Go to login
+        </button>
+      </div>
+    </div>
   </main>
 </template>
 
 <style scoped>
 @import "./auth.css";
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 17, 24, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 32px 28px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(15, 17, 24, 0.25);
+}
+.modal-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+.modal-title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111318;
+}
+.modal-text {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+.modal-button {
+  width: 100%;
+}
 </style>

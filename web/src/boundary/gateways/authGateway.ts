@@ -27,6 +27,9 @@ export async function createUserRegistration(
     email: input.email,
     password: input.password,
     options: {
+      // Send the verification link back to this site's login page, not the
+      // project's default Site URL (localhost). Must be allow-listed in Supabase.
+      emailRedirectTo: `${window.location.origin}/login`,
       // handle_new_user() mirrors these into profiles on signup.
       data: {
         first_name: input.first_name,
@@ -50,6 +53,8 @@ export async function createExpertApplication(
     email: input.email,
     password: input.password,
     options: {
+      // Verification link returns to this site's login page (see note above).
+      emailRedirectTo: `${window.location.origin}/login`,
       // handle_new_user() also creates the PENDING expert_profiles row and the
       // verification-document metadata; role stays 'free' until admin approval.
       data: {
