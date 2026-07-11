@@ -51,7 +51,7 @@ This page lists the current limitations of the landing-page repo. These are know
 
 ## Testing Limitations
 
-- Automated checks cover BCE imports and the production build only; there is no committed browser/DB/RLS test suite.
+- Automated checks cover BCE imports, the production build, and **Vitest controller unit tests** (25 positive/negative cases over the auth + landing controllers, gateways faked in-memory). There is still no committed browser/DB/RLS test suite — those flows are verified manually (below).
 - The 11 Jul integration was verified manually end-to-end: headless-browser runs of register/login/expert-application/contact against the local stack with row-level DB checks, plus a hosted signup-trigger test (rows verified, then removed).
 
 ## Payment/Pricing Limitations

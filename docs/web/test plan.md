@@ -15,9 +15,24 @@ npm run verify
 This runs:
 
 ```bash
-npm run check:bce
-npm run build
+npm run check:bce   # BCE dependency rules
+npm run test        # Vitest controller unit tests (positive + negative)
+npm run build       # type-check + production build
 ```
+
+### Controller unit tests (Vitest)
+
+`npm run test` (Vitest) runs **25 automated positive/negative tests** over the controllers (the web's use cases), with the gateways replaced by in-memory fakes so no network or Supabase is touched — the same isolation the app's module tests use. Files in `web/test/`:
+
+| Module | Positive | Negative |
+|---|---|---|
+| `registerUser` | valid form creates the account with a trimmed/lower-cased email | blank name · bad username · short password · password mismatch |
+| `loginUser` | routes free → `/download`, admin → `/admin`, pending applicant → `/expert` | blank email · blank password · suspended account · unverified email → `EmailNotConfirmedError` · bad credentials passed through |
+| `registerExpert` | complete application is submitted | missing title · short about · missing identity doc · wrong file type · file over 5 MB |
+| `resendVerification` | valid email normalised and sent | blank email |
+| `submitContactMessage` | complete message trimmed + inserted | any blank field |
+
+Each case is tagged in the source with the app's convention — `// (#) (+) Check if ...` (positive) / `// (#) (-) Check if ...` (negative). The DB-backed flows below (§ Positive/Negative Tests) remain the manual, end-to-end layer on top of these.
 
 ## Positive Tests
 
