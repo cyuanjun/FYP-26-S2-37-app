@@ -1,22 +1,27 @@
 <script setup lang="ts">
+// (#) Statistics section: user-base segment cards, a hand-drawn inline SVG of
+// (#) weekly platform activity, and a row of headline metric cards.
 import { computed } from "vue";
 import type { StatisticsSection } from "@/controller/landing/viewModels";
 import { formatGrowth, getGrowthClass, isGrowthNotable } from "@/utils/format";
 import SectionHeading from "./SectionHeading.vue";
 
+// (#) segment cards, headline metrics and the activity series data
 const props = defineProps<{ section: StatisticsSection }>();
 
+// (#) true when there's a fallback chart image to show if we have no live series
 const hasChartImage = computed(() =>
   /^\/uploads\//.test(props.section.overview_chart_image_url || ""),
 );
 
-// Real platform activity from landing_activity_series() — rendered as a
+// (#) Real platform activity from landing_activity_series() - rendered as a
 // lightweight inline SVG (no chart package), same convention as the app.
 // Sessions and active-minutes have very different magnitudes, so each gets
 // its OWN axis: sessions (green) on the left, minutes (blue) on the right.
 const SESSION_COLOR = "#10b981";
 const MINUTE_COLOR = "#2563eb";
 
+// (#) fixed SVG viewbox size and padding around the plotting area
 const W = 760;
 const H = 320;
 const PAD = { top: 28, right: 60, bottom: 46, left: 54 };
@@ -24,9 +29,10 @@ const INNER_W = W - PAD.left - PAD.right;
 const INNER_H = H - PAD.top - PAD.bottom;
 const TICKS = 4;
 
+// (#) the weekly activity rows we plot (empty array if none came back)
 const series = computed(() => props.section.activity_series ?? []);
 
-// Round a max up to a "nice" ceiling (1/2/5 × 10ⁿ) so axis ticks are clean.
+// (#) Round a max up to a "nice" ceiling (1/2/5 x 10^n) so axis ticks are clean.
 function niceMax(value: number): number {
   if (value <= 0) return 1;
   const exp = Math.floor(Math.log10(value));
@@ -35,35 +41,41 @@ function niceMax(value: number): number {
   return nf * Math.pow(10, exp);
 }
 
+// (#) top of the left (sessions) axis, rounded to a clean ceiling
 const sessionMax = computed(() =>
   niceMax(Math.max(1, ...series.value.map((w) => w.session_count))),
 );
+// (#) top of the right (minutes) axis, rounded to a clean ceiling
 const minuteMax = computed(() =>
   niceMax(Math.max(1, ...series.value.map((w) => w.active_minutes))),
 );
 
+// (#) x pixel position for the point at index i, evenly spread across the width
 function xAt(i: number): number {
   const n = series.value.length;
   const step = n > 1 ? INNER_W / (n - 1) : 0;
   return PAD.left + i * step;
 }
 
+// (#) y pixel position for a value against the given axis max
 function yAt(value: number, max: number): number {
   return PAD.top + INNER_H * (1 - value / max);
 }
 
+// (#) polyline points string for the sessions line
 const sessionPoints = computed(() =>
   series.value
     .map((w, i) => `${xAt(i).toFixed(1)},${yAt(w.session_count, sessionMax.value).toFixed(1)}`)
     .join(" "),
 );
+// (#) polyline points string for the active-minutes line
 const minutePoints = computed(() =>
   series.value
     .map((w, i) => `${xAt(i).toFixed(1)},${yAt(w.active_minutes, minuteMax.value).toFixed(1)}`)
     .join(" "),
 );
 
-// Shared horizontal gridlines: left label = sessions scale, right = minutes.
+// (#) Shared horizontal gridlines: left label = sessions scale, right = minutes.
 const gridRows = computed(() =>
   Array.from({ length: TICKS + 1 }, (_, t) => {
     const frac = t / TICKS;
@@ -75,7 +87,7 @@ const gridRows = computed(() =>
   }),
 );
 
-// Up to 6 evenly spaced week labels along the x-axis.
+// (#) Up to 6 evenly spaced week labels along the x-axis.
 const xTicks = computed(() => {
   const n = series.value.length;
   if (!n) return [];
@@ -91,9 +103,12 @@ const xTicks = computed(() => {
   return out;
 });
 
+// (#) total sessions across the whole series, shown in the legend
 const totalSessions = computed(() => series.value.reduce((a, w) => a + w.session_count, 0));
+// (#) total active minutes across the whole series, shown in the legend
 const totalMinutes = computed(() => series.value.reduce((a, w) => a + w.active_minutes, 0));
 
+// (#) format a week's start date as a short day/month label for the x-axis
 function weekLabel(index: number): string {
   const w = series.value[index];
   if (!w) return "";

@@ -1,6 +1,9 @@
 <script setup lang="ts">
+// (#) A band of call-to-action panels (e.g. sign up / become an expert),
+// (#) each with its own heading and button.
 import type { CtaRowSection } from "@/controller/landing/viewModels";
 
+// (#) the list of CTA panels to lay out
 defineProps<{ section: CtaRowSection }>();
 </script>
 

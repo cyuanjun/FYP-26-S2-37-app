@@ -1,10 +1,12 @@
 <script setup lang="ts">
+// (#) Member sign-up page: creates the account, then asks the user to verify their email.
 import { reactive, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { registerUser } from "@/controller/auth/registerUser";
 
 const router = useRouter();
 
+// (#) The new-account fields bound to the registration inputs.
 const form = reactive({
   first_name: "",
   last_name: "",
@@ -14,17 +16,21 @@ const form = reactive({
   confirm: "",
 });
 
+// (#) Error text shown when sign-up fails (e.g. taken username).
 const error = ref<string | null>(null);
+// (#) True while the sign-up request is running.
 const submitting = ref(false);
 
-// Toggles for the password and confirm-password fields.
+// (#) Toggles for the password and confirm-password fields.
 const showPassword = ref(false);
 const showConfirm = ref(false);
 
-// Shown after a successful sign-up: prompt to verify email before logging in.
+// (#) Shown after a successful sign-up: prompt to verify email before logging in.
 const showVerifyModal = ref(false);
+// (#) The email we just registered, echoed back in the modal.
 const registeredEmail = ref("");
 
+// (#) Registers the account; on success clears the form and opens the verify modal.
 async function onSubmit() {
   if (submitting.value) return;
   error.value = null;
@@ -47,6 +53,7 @@ async function onSubmit() {
   }
 }
 
+// (#) Closes the modal and sends the user to the login page.
 function goToLogin() {
   showVerifyModal.value = false;
   router.push("/login");

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// (#) Expert sign-up page: collects account + profile + verification docs and submits the application for review.
 import { computed, onMounted, reactive, ref } from "vue";
 import { RouterLink } from "vue-router";
 import {
@@ -7,6 +8,7 @@ import {
 } from "@/controller/auth/getExpertSpecialties";
 import { registerExpert } from "@/controller/auth/registerExpert";
 
+// (#) All the fields for the whole application, bound to the form inputs.
 const form = reactive({
   first_name: "",
   last_name: "",
@@ -23,12 +25,18 @@ const form = reactive({
   certification_documents: [] as File[],
 });
 
+// (#) Error message to show if the submit fails.
 const error = ref<string | null>(null);
+// (#) Success message returned once the application is accepted.
 const success = ref<string | null>(null);
+// (#) True while the request is in flight so we can disable the button.
 const submitting = ref(false);
+// (#) The specialty chips loaded from the backend.
 const specialtyOptions = ref<ExpertSpecialtyOption[]>([]);
 
+// (#) Live character count for the about box (limit is 1000).
 const aboutCount = computed(() => form.about.length);
+// (#) Friendly caption telling the user how many cert files they picked.
 const certificationSelectionLabel = computed(() => {
   const count = form.certification_documents.length;
   if (count === 0) return "No certification documents selected. Upload up to 4.";
@@ -36,38 +44,46 @@ const certificationSelectionLabel = computed(() => {
   return `${count} of 4 certification documents selected.`;
 });
 
+// (#) Adds another empty credential row, capped at 10.
 function addCredential() {
   if (form.credentials.length < 10) form.credentials.push("");
 }
 
+// (#) Drops a credential row, but always keeps at least one.
 function removeCredential(index: number) {
   if (form.credentials.length > 1) form.credentials.splice(index, 1);
 }
 
+// (#) Flips a specialty chip on or off in the selection.
 function toggleSpecialty(specialty: string) {
   const index = form.specialties.indexOf(specialty);
   if (index >= 0) form.specialties.splice(index, 1);
   else form.specialties.push(specialty);
 }
 
+// (#) Grabs the chosen identity file from the file input.
 function onIdentityDocumentChange(event: Event) {
   const input = event.target as HTMLInputElement;
   form.identity_document = input.files?.[0] ?? null;
 }
 
+// (#) Grabs the chosen certification files, keeping at most 4.
 function onCertificationDocumentsChange(event: Event) {
   const input = event.target as HTMLInputElement;
   form.certification_documents = Array.from(input.files ?? []).slice(0, 4);
 }
 
+// (#) Formats a file's byte size as a readable MB string.
 function fileSizeLabel(file: File): string {
   return `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// (#) On load, fetch the specialty options for the chip grid.
 onMounted(async () => {
   specialtyOptions.value = await getExpertSpecialties();
 });
 
+// (#) Submits the application and shows the success or error message.
 async function onSubmit() {
   if (submitting.value) return;
   error.value = null;

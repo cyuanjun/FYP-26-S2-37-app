@@ -1,14 +1,20 @@
 <script setup lang="ts">
+// (#) Featured experts section: pulls the verified experts and shows a card
+// (#) each with photo, bio, credentials and review stats.
 import { onMounted, ref } from "vue";
 import { getFeaturedExperts } from "@/controller/landing/getFeaturedExperts";
 import type { ExpertProfile, ExpertsSection } from "@/controller/landing/viewModels";
 import SectionHeading from "./SectionHeading.vue";
 
+// (#) heading copy for the section (the cards themselves are fetched live)
 const props = defineProps<{ section: ExpertsSection }>();
 
+// (#) the experts to render once fetched
 const experts = ref<ExpertProfile[]>([]);
+// (#) error text if the fetch fails
 const loadError = ref<string | null>(null);
 
+// (#) fetch the featured experts, stashing any error for the empty state
 async function hydrate() {
   loadError.value = null;
   try {
@@ -18,8 +24,10 @@ async function hydrate() {
   }
 }
 
+// (#) load the experts as soon as the section mounts
 onMounted(hydrate);
 
+// (#) build the avatar fallback initials from an expert's name
 function initialsFor(name: string): string {
   const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";
@@ -27,10 +35,12 @@ function initialsFor(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+// (#) true when the avatar value is a real uploaded/remote image path we can show
 function isImagePath(url: string | null): boolean {
   return Boolean(url && (/^\/uploads\//.test(url) || /^https?:\/\//.test(url)));
 }
 
+// (#) short "X years coaching <specialty>" line under the expert's name
 function tagline(profile: ExpertProfile): string {
   if (!profile.years_coaching) return profile.title;
   const first = profile.specialties[0];

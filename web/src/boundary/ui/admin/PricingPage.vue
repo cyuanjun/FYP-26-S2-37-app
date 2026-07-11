@@ -3,11 +3,18 @@ import { onMounted, ref } from "vue";
 import { getPricingPlans, savePricingPlan } from "@/controller/admin/manageCatalog";
 import type { PricingPlanRow } from "@/controller/admin/adminModels";
 
+// (#) Admin editor for the public pricing section - display copy only, not the real checkout price.
+
+// (#) The pricing plans shown on the landing page.
 const plans = ref<PricingPlanRow[]>([]);
+// (#) Error text if a load or save fails.
 const error = ref<string | null>(null);
+// (#) plan_key of the plan that just saved, for the "Saved" flash.
 const savedKey = ref<string | null>(null);
+// (#) Id of the plan currently saving.
 const busyId = ref<string | null>(null);
 
+// (#) Load the pricing plans when the page mounts.
 onMounted(async () => {
   try {
     plans.value = await getPricingPlans();
@@ -16,6 +23,7 @@ onMounted(async () => {
   }
 });
 
+// (#) Save one edited plan and flag it as just-saved.
 async function save(plan: PricingPlanRow) {
   error.value = null;
   savedKey.value = null;

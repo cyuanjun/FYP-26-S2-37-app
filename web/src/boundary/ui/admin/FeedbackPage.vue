@@ -3,10 +3,16 @@ import { onMounted, ref } from "vue";
 import { getFeedback, markFeedbackReviewed, reopenFeedback } from "@/controller/admin/moderateContent";
 import type { FeedbackRow } from "@/controller/admin/adminModels";
 
+// (#) Admin triage page for in-app feedback - mark items reviewed or reopen them.
+
+// (#) All feedback rows submitted from the app.
 const rows = ref<FeedbackRow[]>([]);
+// (#) Error text if something fails.
 const error = ref<string | null>(null);
+// (#) Id of the feedback row currently being acted on.
 const busyId = ref<string | null>(null);
 
+// (#) Fetch the feedback list again.
 async function reload() {
   try {
     rows.value = await getFeedback();
@@ -15,8 +21,10 @@ async function reload() {
   }
 }
 
+// (#) Load feedback on mount.
 onMounted(reload);
 
+// (#) Shared helper: run an action against a row, handle errors, then reload.
 async function run(row: FeedbackRow, action: () => Promise<void>) {
   error.value = null;
   busyId.value = row.id;
@@ -30,10 +38,12 @@ async function run(row: FeedbackRow, action: () => Promise<void>) {
   }
 }
 
+// (#) Display name for who sent the feedback, falling back to email then a dash.
 function sender(row: FeedbackRow) {
   return [row.profile?.first_name, row.profile?.last_name].filter(Boolean).join(" ") || row.profile?.email || "—";
 }
 
+// (#) Pretty labels for the feedback category codes.
 const categoryLabels: Record<string, string> = {
   bug: "Bug",
   feature_request: "Feature request",

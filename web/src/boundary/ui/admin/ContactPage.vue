@@ -3,14 +3,23 @@ import { computed, onMounted, ref } from "vue";
 import { getContactMessages, resolveContactMessage } from "@/controller/admin/moderateContent";
 import type { ContactMessageRow } from "@/controller/admin/adminModels";
 
+// (#) Admin inbox for the public contact form - read messages, jot a reply, resolve them.
+
+// (#) Every contact message we've pulled, both open and resolved.
 const rows = ref<ContactMessageRow[]>([]);
+// (#) Error text if a load or resolve fails.
 const error = ref<string | null>(null);
+// (#) Id of the message being resolved right now (disables its button).
 const busyId = ref<string | null>(null);
+// (#) Reply text keyed by message id, held before we record it.
 const responses = ref<Record<string, string>>({});
 
+// (#) Just the still-open messages.
 const open = computed(() => rows.value.filter((r) => r.status === "open"));
+// (#) Just the ones already dealt with.
 const resolved = computed(() => rows.value.filter((r) => r.status === "resolved"));
 
+// (#) Fetch all contact messages from the backend.
 async function reload() {
   try {
     rows.value = await getContactMessages();
@@ -19,8 +28,10 @@ async function reload() {
   }
 }
 
+// (#) Load the inbox on mount.
 onMounted(reload);
 
+// (#) Record the typed reply against a message and mark it resolved, then refresh.
 async function resolve(row: ContactMessageRow) {
   error.value = null;
   busyId.value = row.id;
@@ -34,8 +45,8 @@ async function resolve(row: ContactMessageRow) {
   }
 }
 
-/// Opens the admin's own mail client with the reply drafted — the site has no
-/// outbound mailer, so the actual send stays with the human.
+// (#) Builds a mailto link with the reply pre-drafted - the site has no outbound
+// mailer, so the actual send stays with the human.
 function mailtoHref(row: ContactMessageRow) {
   const subject = encodeURIComponent("Re: your message to Wise Workout");
   const drafted = responses.value[row.id] ?? "";

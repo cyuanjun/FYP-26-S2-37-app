@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// (#) Sign-in page: logs the user in and routes by role, or prompts to verify email first.
 import { reactive, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { loginUser, EmailNotConfirmedError } from "@/controller/auth/loginUser";
@@ -6,23 +7,30 @@ import { resendVerification } from "@/controller/auth/resendVerification";
 
 const router = useRouter();
 
+// (#) The email + password bound to the login inputs.
 const form = reactive({
   email: "",
   password: "",
 });
 
+// (#) Error text shown under the form when login fails.
 const error = ref<string | null>(null);
+// (#) True while the login request is running.
 const submitting = ref(false);
 
-// Toggles the password field between hidden and plain text.
+// (#) Toggles the password field between hidden and plain text.
 const showPassword = ref(false);
 
-// Shown when login is blocked because the email isn't verified yet.
+// (#) Shown when login is blocked because the email isn't verified yet.
 const showVerifyModal = ref(false);
+// (#) The unverified email, so the modal can name it and resend to it.
 const unverifiedEmail = ref("");
+// (#) True while the resend-verification request is running.
 const resending = ref(false);
+// (#) Feedback line in the modal after resending (sent / error).
 const resendNote = ref<string | null>(null);
 
+// (#) Logs in; on success redirects, on unverified email opens the verify modal.
 async function onSubmit() {
   if (submitting.value) return;
   error.value = null;
@@ -44,6 +52,7 @@ async function onSubmit() {
   }
 }
 
+// (#) Re-sends the verification email to the unverified address.
 async function onResend() {
   if (resending.value) return;
   resending.value = true;

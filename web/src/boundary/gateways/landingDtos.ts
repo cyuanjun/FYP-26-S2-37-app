@@ -1,9 +1,11 @@
+// (#) Payload shape sent to the backend when a visitor submits Contact Us.
 export interface ContactMessageInput {
   submitter_name: string;
   submitter_email: string;
   message: string;
 }
 
+// (#) Raw expert profile row from the DB (snake_case) before we map it to the entity.
 export interface GatewayExpertProfile {
   user_id: string;
   display_name: string;
@@ -20,6 +22,7 @@ export interface GatewayExpertProfile {
   verification_status: "pending" | "verified" | "rejected";
 }
 
+// (#) Expert category as it comes back from the landing_* read functions.
 export interface GatewayExpertCategory {
   id: string;
   label: string;
@@ -27,6 +30,7 @@ export interface GatewayExpertCategory {
   is_active: boolean;
 }
 
+// (#) A testimonial row as stored, including its moderation state and admin reply.
 export interface GatewayTestimonialSubmission {
   id: string;
   rating: number;

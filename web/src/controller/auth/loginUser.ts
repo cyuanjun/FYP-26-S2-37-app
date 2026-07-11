@@ -1,7 +1,7 @@
 import { authenticateUser, EMAIL_NOT_CONFIRMED } from "@/boundary/gateways/authGateway";
 import type { LoginForm, LoginViewResult } from "./loginModels";
 
-// Thrown when the account exists but its email hasn't been verified yet.
+// (#) Thrown when the account exists but its email hasn't been verified yet.
 // The login page catches this to show the "check your email" prompt.
 export class EmailNotConfirmedError extends Error {
   constructor(public email: string) {
@@ -10,6 +10,8 @@ export class EmailNotConfirmedError extends Error {
   }
 }
 
+// (#) Login use case: checks email + password are present, calls the auth gateway to
+// sign in, blocks suspended accounts, and returns a greeting plus the right landing route.
 export async function loginUser(form: LoginForm): Promise<LoginViewResult> {
   const email = form.email.trim().toLowerCase();
 
@@ -40,7 +42,7 @@ export async function loginUser(form: LoginForm): Promise<LoginViewResult> {
   };
 }
 
-// Admins go to the portal; approved experts and anyone with an expert application
+// (#) Admins go to the portal; approved experts and anyone with an expert application
 // (role stays 'free' while pending) go to the expert status page; everyone else to the download page.
 function routeForUser(
   role: "free" | "premium" | "expert" | "admin",

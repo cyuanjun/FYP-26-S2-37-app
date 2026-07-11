@@ -1,35 +1,38 @@
 <script setup lang="ts">
+// (#) Top site header: brand, main nav, and either the signed-in actions or login/register.
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import type { SiteData } from "@/controller/landing/viewModels";
 import { logoutMember, type SessionMember } from "@/controller/auth/memberSession";
 import Avatar from "./Avatar.vue";
 
-// site drives the brand + nav; member is null when nobody is signed in.
+// (#) site drives the brand + nav; member is null when nobody is signed in.
 const props = defineProps<{ site: SiteData; member?: SessionMember | null }>();
 
+// (#) True when there's a real logo image to show instead of the plain mark.
 const hasLogoImage = computed(() => {
   const url = props.site.logo_url || "";
   return /^\/uploads\//.test(url) || /^https?:\/\//.test(url);
 });
 
-// Nav items are landing-section anchors (e.g. "#features"). Route them to the
+// (#) Nav items are landing-section anchors (e.g. "#features"). Route them to the
 // landing page + hash so they work from the post-login pages too, not just "/".
 function navTarget(url: string) {
   if (url.startsWith("#")) return { path: "/", hash: url };
   return url;
 }
 
-// Experts and pending applicants live on the expert status page; everyone else
+// (#) Experts and pending applicants live on the expert status page; everyone else
 // on the download page.
 const isExpertTrack = computed(() => {
   const m = props.member;
   return !!m && (m.role === "expert" || m.expert_status !== "none");
 });
 
+// (#) Where the primary button sends the signed-in user.
 const primaryRoute = computed(() => (isExpertTrack.value ? "/expert" : "/download"));
 
-// Approved users can actually download; a pending/rejected applicant sees their
+// (#) Approved users can actually download; a pending/rejected applicant sees their
 // application instead, so the button says so rather than promising a download.
 const primaryLabel = computed(() => {
   const m = props.member;
@@ -38,7 +41,7 @@ const primaryLabel = computed(() => {
   return isExpertTrack.value && !approved ? "My application" : "Download";
 });
 
-// Signs out then hard-navigates to the landing page so the nav reverts cleanly.
+// (#) Signs out then hard-navigates to the landing page so the nav reverts cleanly.
 async function onLogout() {
   await logoutMember();
   window.location.href = "/";

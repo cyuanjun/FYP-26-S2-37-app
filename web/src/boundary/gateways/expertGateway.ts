@@ -3,6 +3,8 @@ import categorySeed from "./seed/expert-categories.seed.json";
 import type { GatewayExpertCategory, GatewayExpertProfile } from "./landingDtos";
 import { supabase } from "./supabaseClient";
 
+// (#) Shape of a row returned by the landing_featured_experts RPC (includes the
+// database-computed ranking score).
 interface FeaturedExpertRow {
   user_id: string;
   display_name: string;
@@ -18,9 +20,11 @@ interface FeaturedExpertRow {
   score: number;
 }
 
+// (#) Fetches the top 3 experts for the landing page via the
+// landing_featured_experts RPC; falls back to the bundled seed if it fails.
 export async function readTopRankedExperts(): Promise<GatewayExpertProfile[]> {
   try {
-    // SECURITY DEFINER function: verified, non-suspended experts only.
+    // (#) SECURITY DEFINER function: verified, non-suspended experts only.
     // Ranking = IMDb-style Bayesian weighted rating, computed in the database
     // (single source of truth): WR = (v/(v+m))·R + (m/(v+m))·C with m = 10 and
     // C = mean rating across verified experts; ties broken by review_count,
@@ -53,6 +57,8 @@ export async function readTopRankedExperts(): Promise<GatewayExpertProfile[]> {
   }
 }
 
+// (#) Offline fallback: ranks the bundled verified experts with the same
+// rating-times-log(reviews) idea and returns the top 3.
 function seedTopRankedExperts(): GatewayExpertProfile[] {
   return (expertSeed as GatewayExpertProfile[])
     .filter((expert) => expert.verification_status === "verified")
@@ -74,6 +80,8 @@ function seedTopRankedExperts(): GatewayExpertProfile[] {
     .map(({ expert }) => expert);
 }
 
+// (#) Reads the active expert_categories (alphabetical by label); on failure
+// returns the active seed categories instead.
 export async function readActiveExpertCategories(): Promise<GatewayExpertCategory[]> {
   try {
     const { data, error } = await supabase

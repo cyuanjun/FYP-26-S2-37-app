@@ -1,8 +1,11 @@
 <script setup lang="ts">
+// (#) Pricing section: a heading over a row of plan cards, each showing price,
+// (#) feature list and a sign-up button.
 import type { PricingSection } from "@/controller/landing/viewModels";
 import { formatPrice } from "@/utils/format";
 import SectionHeading from "./SectionHeading.vue";
 
+// (#) heading copy plus the plan cards to show
 defineProps<{ section: PricingSection }>();
 </script>
 

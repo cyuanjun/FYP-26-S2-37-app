@@ -2,9 +2,14 @@
 import { onMounted, ref } from "vue";
 import { getOverview, type AdminOverview } from "@/controller/admin/getOverview";
 
+// (#) Admin landing page: tier tiles plus the "needs attention" counts, all live from the DB.
+
+// (#) The snapshot of counts, null until it loads.
 const overview = ref<AdminOverview | null>(null);
+// (#) Error text if the snapshot fails to load.
 const error = ref<string | null>(null);
 
+// (#) Grab the overview snapshot once the page mounts.
 onMounted(async () => {
   try {
     overview.value = await getOverview();

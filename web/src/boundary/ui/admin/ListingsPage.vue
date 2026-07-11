@@ -3,10 +3,16 @@ import { onMounted, ref } from "vue";
 import { archiveListing, getServiceListings, restoreListing } from "@/controller/admin/manageCatalog";
 import type { ServiceListingRow } from "@/controller/admin/adminModels";
 
+// (#) Admin page for monitoring marketplace service listings - archive or restore them.
+
+// (#) All service listings across experts.
 const listings = ref<ServiceListingRow[]>([]);
+// (#) Error text if a load or action fails.
 const error = ref<string | null>(null);
+// (#) Id of the listing currently being archived/restored.
 const busyId = ref<string | null>(null);
 
+// (#) Fetch the listings again.
 async function reload() {
   try {
     listings.value = await getServiceListings();
@@ -15,8 +21,10 @@ async function reload() {
   }
 }
 
+// (#) Load listings on mount.
 onMounted(reload);
 
+// (#) Shared helper: run an archive/restore action on a row, then reload.
 async function run(row: ServiceListingRow, action: () => Promise<void>) {
   error.value = null;
   busyId.value = row.id;
@@ -30,17 +38,20 @@ async function run(row: ServiceListingRow, action: () => Promise<void>) {
   }
 }
 
+// (#) Name of the expert who owns the listing, falling back to email or a dash.
 function expertName(row: ServiceListingRow) {
   const p = row.expert?.profile;
   return p ? [p.first_name, p.last_name].filter(Boolean).join(" ") || p.email : "—";
 }
 
+// (#) Format the cents price as dollars, dropping the decimals when it's a round number.
 function price(row: ServiceListingRow) {
   if (!row.price_cents) return "—";
   const dollars = row.price_cents / 100;
   return `$${Number.isInteger(dollars) ? dollars : dollars.toFixed(2)}`;
 }
 
+// (#) Pick the pill colour class for a listing's status.
 function statusClass(status: string) {
   return status === "live" ? "ok" : status === "archived" ? "muted" : "pending";
 }

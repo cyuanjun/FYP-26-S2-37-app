@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// (#) Expert applicant landing: shows approved / rejected / pending state after applying.
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import SiteHeader from "@/boundary/ui/common/SiteHeader.vue";
@@ -8,13 +9,17 @@ import { getMemberSession, type SessionMember } from "@/controller/auth/memberSe
 import type { SiteData } from "@/controller/landing/viewModels";
 
 const router = useRouter();
+// (#) Brand/nav data for the header and footer.
 const site = ref<SiteData | null>(null);
+// (#) The signed-in member whose application status we're showing.
 const member = ref<SessionMember | null>(null);
+// (#) Gate the page until the session + site data have loaded.
 const ready = ref(false);
 
-// Approved when the admin flipped the role to expert (or the profile is verified).
+// (#) Approved when the admin flipped the role to expert (or the profile is verified).
 const isApproved = ref(false);
 
+// (#) On load, require sign-in, bounce non-applicants to /download, else load the status.
 onMounted(async () => {
   const m = await getMemberSession();
   if (!m) {

@@ -1,8 +1,11 @@
 import { createUserRegistration } from "@/boundary/gateways/authGateway";
 import type { RegistrationViewResult, UserRegistrationForm } from "./registrationModels";
 
+// (#) Allowed username shape: 3-30 chars, letters/numbers/underscores only.
 const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,30}$/;
 
+// (#) Plain member sign-up use case: validates the form, then asks the auth gateway to
+// create the account and returns a success message for the view.
 export async function registerUser(form: UserRegistrationForm): Promise<RegistrationViewResult> {
   validateBaseRegistration(form);
 
@@ -19,6 +22,8 @@ export async function registerUser(form: UserRegistrationForm): Promise<Registra
   };
 }
 
+// (#) Shared registration checks used by both member and expert sign-up: names present,
+// username matches the pattern, email present, password 8+ chars and matching the confirm field.
 export function validateBaseRegistration(form: UserRegistrationForm): void {
   if (!form.first_name.trim() || !form.last_name.trim()) {
     throw new Error("First and last name are required.");

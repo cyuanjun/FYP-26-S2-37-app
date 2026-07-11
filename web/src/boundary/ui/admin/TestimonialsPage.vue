@@ -7,14 +7,23 @@ import {
 } from "@/controller/admin/moderateContent";
 import type { TestimonialRow } from "@/controller/admin/adminModels";
 
+// (#) Admin moderation page for landing-page testimonials - approve or reject submissions.
+
+// (#) Every testimonial, pending or decided.
 const rows = ref<TestimonialRow[]>([]);
+// (#) Error text if a load or review fails.
 const error = ref<string | null>(null);
+// (#) Id of the testimonial being reviewed right now.
 const busyId = ref<string | null>(null);
+// (#) Optional admin reply text keyed by testimonial id.
 const replies = ref<Record<string, string>>({});
 
+// (#) The ones still awaiting a decision.
 const pending = computed(() => rows.value.filter((r) => r.status === "pending"));
+// (#) The ones already approved or rejected.
 const decided = computed(() => rows.value.filter((r) => r.status !== "pending"));
 
+// (#) Fetch all testimonials again.
 async function reload() {
   try {
     rows.value = await getTestimonials();
@@ -23,8 +32,10 @@ async function reload() {
   }
 }
 
+// (#) Load testimonials on mount.
 onMounted(reload);
 
+// (#) Approve or reject a testimonial (with any typed reply), then refresh.
 async function review(row: TestimonialRow, approve: boolean) {
   error.value = null;
   busyId.value = row.id;
@@ -39,6 +50,7 @@ async function review(row: TestimonialRow, approve: boolean) {
   }
 }
 
+// (#) Turn a 1-5 rating into filled/empty star glyphs.
 function stars(n: number) {
   return "★".repeat(n) + "☆".repeat(5 - n);
 }

@@ -3,12 +3,20 @@ import { onMounted, reactive, ref } from "vue";
 import { getFaqs, saveFaq } from "@/controller/admin/manageCatalog";
 import type { FaqRow } from "@/controller/admin/adminModels";
 
+// (#) Admin editor for the public FAQ - edit entries, reorder them, hide/show, and add new.
+
+// (#) The FAQ entries, in display order.
 const faqs = ref<FaqRow[]>([]);
+// (#) Error text if a save fails.
 const error = ref<string | null>(null);
+// (#) Id of the row that just saved, so we can flash "Saved" on its button.
 const savedId = ref<string | null>(null);
+// (#) Id of the row mid-save ("new" while adding), disables buttons.
 const busyId = ref<string | null>(null);
+// (#) Fields for a new FAQ before it's added.
 const draft = reactive({ faq_key: "", question: "", answer: "" });
 
+// (#) Fetch the FAQ list again.
 async function reload() {
   try {
     faqs.value = await getFaqs();
@@ -17,8 +25,10 @@ async function reload() {
   }
 }
 
+// (#) Load the FAQs when the page mounts.
 onMounted(reload);
 
+// (#) Save a single edited FAQ row and mark it as just-saved.
 async function save(row: FaqRow) {
   error.value = null;
   savedId.value = null;
@@ -33,11 +43,13 @@ async function save(row: FaqRow) {
   }
 }
 
+// (#) Flip an entry's shown/hidden flag and persist it.
 async function toggle(row: FaqRow) {
   row.is_active = !row.is_active;
   await save(row);
 }
 
+// (#) Add the draft as a new FAQ at the bottom of the order, then clear and reload.
 async function addFaq() {
   error.value = null;
   busyId.value = "new";
@@ -56,6 +68,7 @@ async function addFaq() {
   }
 }
 
+// (#) Move a row up or down by swapping display_order with its neighbour.
 async function move(row: FaqRow, direction: -1 | 1) {
   const index = faqs.value.indexOf(row);
   const other = faqs.value[index + direction];

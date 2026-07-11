@@ -1,12 +1,15 @@
 <script setup lang="ts">
+// (#) Round avatar: shows the photo if given, otherwise falls back to the name's initials.
 import { computed } from "vue";
 
+// (#) name for the fallback initials, plus optional size and image.
 const props = defineProps<{
   name: string;
   size?: number;
   imageUrl?: string;
 }>();
 
+// (#) Builds the initials from the first and last word of the name.
 const initials = computed(() => {
   const parts = (props.name ?? "").trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";
@@ -14,7 +17,9 @@ const initials = computed(() => {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 });
 
+// (#) The circle's width/height in px (defaults to 32).
 const sizePx = computed(() => `${props.size ?? 32}px`);
+// (#) Scales the initials font to the avatar size, with a small floor.
 const fontPx = computed(() => `${Math.max(11, Math.round((props.size ?? 32) * 0.38))}px`);
 </script>
 

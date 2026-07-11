@@ -1,9 +1,13 @@
 <script setup lang="ts">
+// (#) Features section: a heading and a grid of feature cards, each with an
+// (#) image (or a placeholder) plus title and blurb.
 import type { FeaturesSection } from "@/controller/landing/viewModels";
 import SectionHeading from "./SectionHeading.vue";
 
+// (#) heading copy plus the feature cards to render
 defineProps<{ section: FeaturesSection }>();
 
+// (#) true when the icon value points at an uploaded image rather than a label
 function isImagePath(url: string): boolean {
   return /^\/uploads\//.test(url || "");
 }

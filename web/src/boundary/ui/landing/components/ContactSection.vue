@@ -1,11 +1,15 @@
 <script setup lang="ts">
+// (#) Contact section: the copy + social links on one side and a working
+// (#) "get in touch" form on the other.
 import { reactive, ref, type Component } from "vue";
 import { Facebook, Instagram, Youtube, Linkedin } from "lucide-vue-next";
 import { submitContactMessage } from "@/controller/landing/submitContactMessage";
 import type { ContactSectionData } from "@/controller/landing/viewModels";
 
+// (#) section content (headings, description, social links, button label)
 defineProps<{ section: ContactSectionData }>();
 
+// (#) lookup from a social platform name to its lucide icon
 const socialIcons: Record<string, Component> = {
   facebook: Facebook,
   instagram: Instagram,
@@ -13,14 +17,19 @@ const socialIcons: Record<string, Component> = {
   linkedin: Linkedin,
 };
 
+// (#) pick the icon for a link name, or null if we don't have one for it
 function iconFor(name: string): Component | null {
   return socialIcons[name.toLowerCase()] ?? null;
 }
 
+// (#) the two-way bound state of the contact form fields
 const form = reactive({ name: "", email: "", message: "", agreed: false });
+// (#) tracks where the submit is at so the button/feedback can react
 const status = ref<"idle" | "submitting" | "sent" | "error">("idle");
+// (#) error text to show under the form when something fails
 const errorMessage = ref<string | null>(null);
 
+// (#) validate the consent box then send the message; clears the form on success
 async function onSubmit() {
   errorMessage.value = null;
   if (!form.agreed) {

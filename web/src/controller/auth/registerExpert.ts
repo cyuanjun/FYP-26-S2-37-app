@@ -2,7 +2,9 @@ import { createExpertApplication } from "@/boundary/gateways/authGateway";
 import type { ExpertRegistrationForm, RegistrationViewResult } from "./registrationModels";
 import { validateBaseRegistration } from "./registerUser";
 
+// (#) Upload cap for each verification file: 5 MB.
 const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
+// (#) File types we accept for identity + certification docs.
 const ALLOWED_DOCUMENT_TYPES = new Set([
   "application/pdf",
   "image/jpeg",
@@ -10,6 +12,9 @@ const ALLOWED_DOCUMENT_TYPES = new Set([
   "image/webp",
 ]);
 
+// (#) Expert sign-up use case: runs the shared account checks, then the expert-only ones
+// (title, years, about length, credentials, specialties, the required docs), and hands the
+// whole application off to the auth gateway to create.
 export async function registerExpert(
   form: ExpertRegistrationForm,
 ): Promise<RegistrationViewResult> {
@@ -69,6 +74,7 @@ export async function registerExpert(
   };
 }
 
+// (#) Rejects a document that isn't an allowed type or is over the size cap.
 function validateDocument(document: File): void {
   if (!ALLOWED_DOCUMENT_TYPES.has(document.type)) {
     throw new Error("Verification documents must be PDF, JPG, PNG, or WebP files.");
@@ -78,6 +84,7 @@ function validateDocument(document: File): void {
   }
 }
 
+// (#) Turns a picked File into the draft shape the gateway wants (type, name, size, mime, blob).
 function toDocumentDraft(
   doc_type: "identity" | "certification",
   document: File,

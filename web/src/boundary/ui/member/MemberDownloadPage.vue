@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// (#) Post-signup member page: welcomes the user and points them to the app store downloads.
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import SiteHeader from "@/boundary/ui/common/SiteHeader.vue";
@@ -8,10 +9,14 @@ import { getMemberSession, type SessionMember } from "@/controller/auth/memberSe
 import type { SiteData } from "@/controller/landing/viewModels";
 
 const router = useRouter();
+// (#) Brand/nav data for the header and footer.
 const site = ref<SiteData | null>(null);
+// (#) The signed-in member being welcomed.
 const member = ref<SessionMember | null>(null);
+// (#) Gate the page until the session + site data have loaded.
 const ready = ref(false);
 
+// (#) On load, require sign-in, send experts/applicants to /expert, else show the download page.
 onMounted(async () => {
   const m = await getMemberSession();
   if (!m) {

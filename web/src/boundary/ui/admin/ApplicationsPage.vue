@@ -7,11 +7,19 @@ import {
 } from "@/controller/admin/reviewApplications";
 import type { ExpertApplication } from "@/controller/admin/adminModels";
 
+// (#) Admin page for reviewing pending expert applications - approve to grant
+// (#) the expert role, or reject.
+
+// (#) The list of applications still waiting on a decision.
 const applications = ref<ExpertApplication[]>([]);
+// (#) Last error message to show, if anything went wrong.
 const error = ref<string | null>(null);
+// (#) Id of the application currently being approved/rejected, so we can disable its buttons.
 const busyId = ref<string | null>(null);
+// (#) Flips true after the first fetch so we don't flash the empty state too early.
 const loaded = ref(false);
 
+// (#) Pull the current pending applications from the backend.
 async function reload() {
   try {
     applications.value = await getPendingApplications();
@@ -22,8 +30,10 @@ async function reload() {
   }
 }
 
+// (#) Load the applications as soon as the page appears.
 onMounted(reload);
 
+// (#) Approve or reject one application, then refresh the list.
 async function review(app: ExpertApplication, approve: boolean) {
   error.value = null;
   busyId.value = app.id;
@@ -37,6 +47,7 @@ async function review(app: ExpertApplication, approve: boolean) {
   }
 }
 
+// (#) Build a display name from the applicant's profile, falling back to their email.
 function name(app: ExpertApplication) {
   return [app.profile.first_name, app.profile.last_name].filter(Boolean).join(" ") || app.profile.email;
 }

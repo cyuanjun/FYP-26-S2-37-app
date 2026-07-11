@@ -1,7 +1,9 @@
 <script setup lang="ts">
+// (#) FAQ section: a heading over a list of expand/collapse question rows.
 import type { FaqSectionData } from "@/controller/landing/viewModels";
 import SectionHeading from "./SectionHeading.vue";
 
+// (#) heading plus the question/answer items to list
 defineProps<{ section: FaqSectionData }>();
 </script>
 

@@ -3,11 +3,18 @@ import { onMounted, reactive, ref } from "vue";
 import { getCategories, saveCategory, setCategoryActive } from "@/controller/admin/manageCatalog";
 import type { ExpertCategoryRow } from "@/controller/admin/adminModels";
 
+// (#) Admin page for the expert-category catalog - add new ones and retire/reactivate.
+
+// (#) All categories in the catalog, active or retired.
 const categories = ref<ExpertCategoryRow[]>([]);
+// (#) Error text to surface if a save/toggle blows up.
 const error = ref<string | null>(null);
+// (#) Which row is mid-action ("new" while adding), used to disable buttons.
 const busyId = ref<string | null>(null);
+// (#) The form fields for a brand new category before it's saved.
 const draft = reactive({ id: "", label: "", description: "" });
 
+// (#) Fetch the whole category list again.
 async function reload() {
   try {
     categories.value = await getCategories();
@@ -16,8 +23,10 @@ async function reload() {
   }
 }
 
+// (#) Load categories when the page opens.
 onMounted(reload);
 
+// (#) Save the draft as a new active category, then clear the form and reload.
 async function addCategory() {
   error.value = null;
   busyId.value = "new";
@@ -32,6 +41,7 @@ async function addCategory() {
   }
 }
 
+// (#) Flip a category between active and retired.
 async function toggle(row: ExpertCategoryRow) {
   error.value = null;
   busyId.value = row.id;

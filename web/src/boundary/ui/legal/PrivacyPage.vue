@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// (#) Privacy Policy page: static copy dropped into the shared LegalLayout wrapper.
 import { RouterLink } from "vue-router";
 import LegalLayout from "./LegalLayout.vue";
 </script>

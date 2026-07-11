@@ -3,11 +3,18 @@ import { computed, onMounted, ref } from "vue";
 import { getUsers, reactivateUser, setUserTier, suspendUser } from "@/controller/admin/manageUsers";
 import type { AdminUser } from "@/controller/admin/adminModels";
 
+// (#) Admin user-management page - search accounts, switch free/premium tier, suspend/reactivate.
+
+// (#) All accounts loaded from the backend.
 const users = ref<AdminUser[]>([]);
+// (#) The live search box text.
 const query = ref("");
+// (#) Error text if a load or action fails.
 const error = ref<string | null>(null);
+// (#) Id of the user currently being acted on.
 const busyId = ref<string | null>(null);
 
+// (#) Users filtered by the search box (name, email, or username); all when empty.
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase();
   if (!q) return users.value;
@@ -16,6 +23,7 @@ const filtered = computed(() => {
   );
 });
 
+// (#) Fetch the account list again.
 async function reload() {
   try {
     users.value = await getUsers();
@@ -24,8 +32,10 @@ async function reload() {
   }
 }
 
+// (#) Load users on mount.
 onMounted(reload);
 
+// (#) Shared helper: run a tier/suspend action on a user, then reload the list.
 async function run(user: AdminUser, action: () => Promise<void>) {
   error.value = null;
   busyId.value = user.id;
@@ -39,6 +49,7 @@ async function run(user: AdminUser, action: () => Promise<void>) {
   }
 }
 
+// (#) Display name from first/last, or a dash if both are missing.
 function name(u: AdminUser) {
   return [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
 }

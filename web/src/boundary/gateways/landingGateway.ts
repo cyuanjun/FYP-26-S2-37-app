@@ -3,6 +3,7 @@ import metricSeed from "./seed/metrics.seed.json";
 import pricingSeed from "./seed/pricing.seed.json";
 import { supabase } from "./supabaseClient";
 
+// (#) The metric keys the landing_metric_summary RPC can return a count for.
 type MetricSource =
   | "free_users"
   | "premium_users"
@@ -11,6 +12,8 @@ type MetricSource =
   | "active_categories"
   | "contact_resolved";
 
+// (#) A stat card in the seed page bound to one metric source; its count/value
+// gets filled in live at hydrate time.
 interface MetricBoundItem {
   data_source: MetricSource;
   segment_count?: string;
@@ -18,6 +21,8 @@ interface MetricBoundItem {
   growth_percentage: string;
 }
 
+// (#) One section of the landing page (statistics, pricing, faq, etc.) as
+// carried in the seed JSON.
 interface GatewaySection {
   type: string;
   user_base?: MetricBoundItem[];
@@ -25,12 +30,15 @@ interface GatewaySection {
   activity_series?: ActivityWeek[];
 }
 
+// (#) The whole landing page: an ordered list of sections.
 interface GatewayLandingPage {
   sections: GatewaySection[];
 }
 
+// (#) Seed-side metric values keyed by source (value plus its growth % blurb).
 type MetricSeed = Partial<Record<MetricSource, { value: string; growth_percentage: string }>>;
 
+// (#) A pricing plan as the UI wants it (price already labelled).
 interface PricingItem {
   plan_name: string;
   price: string;
@@ -40,6 +48,7 @@ interface PricingItem {
   features: string[];
 }
 
+// (#) A pricing plan as stored in landing_pricing_plans (raw price_label column).
 interface PricingRow {
   plan_name: string;
   price_label: string;
@@ -49,21 +58,26 @@ interface PricingRow {
   features: string[];
 }
 
+// (#) A single FAQ question/answer pair.
 interface FaqItem {
   question: string;
   answer: string;
 }
 
+// (#) One week of platform activity for the stats chart.
 interface ActivityWeek {
   week_start: string;
   session_count: number;
   active_minutes: number;
 }
 
+// (#) Bundled metric values used to seed the shape and as the offline fallback.
 const seedMetricValues = metricSeed as MetricSeed;
 
+// (#) Builds the full landing page: keeps the bundled copy/layout but folds in
+// live metrics, pricing, FAQs and activity pulled from the database.
 export async function readLandingSeed() {
-  // Page structure (copy, section order, media placeholders) stays bundled;
+  // (#) Page structure (copy, section order, media placeholders) stays bundled;
   // metric values, pricing plans, and FAQs come live from the shared database.
   const [metrics, pricing, faqs, activity] = await Promise.all([
     readLiveMetrics(),
@@ -78,8 +92,8 @@ export async function readLandingSeed() {
   return page;
 }
 
-/// landing_metric_summary() returns live counts; growth %s stay seed-side —
-/// the database has no month-over-month history to derive them from.
+// (#) landing_metric_summary() returns live counts; growth %s stay seed-side,
+// since the database has no month-over-month history to derive them from.
 async function readLiveMetrics(): Promise<MetricSeed> {
   try {
     const { data, error } = await supabase.rpc("landing_metric_summary");
@@ -100,6 +114,8 @@ async function readLiveMetrics(): Promise<MetricSeed> {
   }
 }
 
+// (#) Reads active landing_pricing_plans in display order and maps them to the
+// UI shape; falls back to the pricing seed if the query is empty or fails.
 async function readPricingPlans(): Promise<PricingItem[]> {
   try {
     const { data, error } = await supabase
@@ -122,8 +138,8 @@ async function readPricingPlans(): Promise<PricingItem[]> {
   }
 }
 
-/// FAQ entries live in landing_faqs; the seed section's items are the
-/// offline fallback (null = fall back to whatever the seed carries).
+// (#) FAQ entries live in landing_faqs; the seed section's items are the
+// offline fallback (null = fall back to whatever the seed carries).
 async function readFaqs(): Promise<FaqItem[] | null> {
   try {
     const { data, error } = await supabase
@@ -139,8 +155,9 @@ async function readFaqs(): Promise<FaqItem[] | null> {
   }
 }
 
-/// Weekly platform activity (sessions + active minutes) straight from
-/// workout_sessions via landing_activity_series() — null = chart placeholder.
+// (#) Weekly platform activity (sessions + active minutes) straight from
+// workout_sessions via landing_activity_series(); null = chart placeholder
+// (used when every week is empty or the call fails).
 async function readActivitySeries(): Promise<ActivityWeek[] | null> {
   try {
     const { data, error } = await supabase.rpc("landing_activity_series", { p_weeks: 12 });
@@ -153,6 +170,8 @@ async function readActivitySeries(): Promise<ActivityWeek[] | null> {
   }
 }
 
+// (#) Folds the live data into one section: fills stat cards with metric values
+// and the activity series, swaps in live pricing, and replaces FAQs when present.
 function hydrateSection(
   section: GatewaySection,
   metrics: MetricSeed,

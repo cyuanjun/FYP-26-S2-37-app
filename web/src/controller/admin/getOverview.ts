@@ -6,6 +6,7 @@ import {
   listUsers,
 } from "@/boundary/gateways/adminGateway";
 
+// (#) Tallied numbers shown on the admin dashboard's summary cards.
 export interface AdminOverview {
   totalUsers: number;
   freeUsers: number;
@@ -18,6 +19,9 @@ export interface AdminOverview {
   newFeedback: number;
 }
 
+// (#) Builds the dashboard overview: pulls users, applications, contact
+// (#) messages, testimonials and feedback from the admin gateway in parallel,
+// (#) then counts them into the headline stats.
 export async function getOverview(): Promise<AdminOverview> {
   const [users, applications, contact, testimonials, feedback] = await Promise.all([
     listUsers(),

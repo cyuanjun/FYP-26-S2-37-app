@@ -1,15 +1,22 @@
 <script setup lang="ts">
+// (#) Testimonials section: an overall-rating panel plus a paged carousel of
+// (#) approved member reviews.
 import { computed, onMounted, ref } from "vue";
 import type { TestimonialSubmission, TestimonialsSection } from "@/controller/landing/viewModels";
 import { getTestimonials } from "@/controller/landing/getTestimonials";
 import SectionHeading from "./SectionHeading.vue";
 
+// (#) heading copy plus rating labels and the admin's featured id list
 const props = defineProps<{ section: TestimonialsSection }>();
 
+// (#) the approved reviews once fetched
 const approved = ref<TestimonialSubmission[]>([]);
+// (#) whether the reviews are still loading
 const loading = ref(true);
+// (#) error text if the reviews fetch fails
 const loadError = ref<string | null>(null);
 
+// (#) fetch the approved reviews, toggling the loading/error flags around it
 async function load() {
   loading.value = true;
   loadError.value = null;
@@ -22,10 +29,12 @@ async function load() {
   }
 }
 
+// (#) how many review cards show per carousel page
 const PAGE_SIZE = 3;
+// (#) which carousel page is currently on screen
 const pageIndex = ref(0);
 
-// Carousel reads from the curated featured set when the admin has picked any,
+// (#) Carousel reads from the curated featured set when the admin has picked any,
 // preserving the chosen order. Empty featured_ids = legacy default of "all
 // approved". Overall stats (below) always come from the full approved set so
 // the headline numbers don't depend on what's spotlighted.
@@ -38,19 +47,24 @@ const carousel = computed<TestimonialSubmission[]>(() => {
     .filter((t): t is TestimonialSubmission => Boolean(t));
 });
 
+// (#) total number of carousel pages (at least 1)
 const pageCount = computed(() => Math.max(1, Math.ceil(carousel.value.length / PAGE_SIZE)));
+// (#) the slice of reviews shown on the current page
 const visibleTestimonials = computed(() => {
   const start = pageIndex.value * PAGE_SIZE;
   return carousel.value.slice(start, start + PAGE_SIZE);
 });
 
+// (#) step back one page, stopping at the first
 function prevPage() {
   if (pageIndex.value > 0) pageIndex.value--;
 }
+// (#) step forward one page, stopping at the last
 function nextPage() {
   if (pageIndex.value < pageCount.value - 1) pageIndex.value++;
 }
 
+// (#) headline rating summary: average, star count, total and per-star bars
 const aggregateStats = computed(() => {
   const list = approved.value;
   const count = list.length;
@@ -68,6 +82,7 @@ const aggregateStats = computed(() => {
   };
 });
 
+// (#) load the reviews as soon as the section mounts
 onMounted(load);
 </script>
 

@@ -1,9 +1,12 @@
 <script setup lang="ts">
+// (#) Shared chrome for the legal pages: back link, title/date header, then slotted body text.
 import { RouterLink } from "vue-router";
 import "./legal.css";
 
+// (#) title of the document and the "last updated" date to show.
 defineProps<{ title: string; updated: string }>();
 
+// (#) This year, for the footnote copyright.
 const year = new Date().getFullYear();
 </script>
 

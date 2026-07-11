@@ -1,9 +1,13 @@
 <script setup lang="ts">
+// (#) Hero section: headline, tagline and the phone app-preview media, with
+// (#) the primary and secondary CTA buttons.
 import { computed } from "vue";
 import type { IntroSection } from "@/controller/landing/viewModels";
 
+// (#) the intro slice of the page data (headlines, CTAs, hero media)
 const props = defineProps<{ section: IntroSection }>();
 
+// (#) true when we have an uploaded video to play instead of the placeholder
 const hasVideo = computed(() => /^\/uploads\//.test(props.section.hero_media_url || ""));
 </script>
 

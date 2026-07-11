@@ -5,16 +5,23 @@ import { getAdminIdentity, logoutAdmin } from "@/controller/admin/adminSession";
 import type { AdminIdentity } from "@/controller/admin/adminModels";
 import "./admin.css";
 
+// (#) Shell around the whole admin portal: sidebar nav + the routed page.
+// (#) Also the guard that bounces you to login if you're not an admin.
+
 const router = useRouter();
+// (#) The signed-in admin's identity, null until we've checked.
 const admin = ref<AdminIdentity | null>(null);
+// (#) True while the session check is still running (shows the "checking" state).
 const checking = ref(true);
 
+// (#) On load, ask who's signed in; kick out to /login if it's nobody.
 onMounted(async () => {
   admin.value = await getAdminIdentity();
   checking.value = false;
   if (!admin.value) router.replace("/login");
 });
 
+// (#) Sign the admin out and send them back to the login page.
 async function onSignOut() {
   await logoutAdmin();
   router.replace("/login");
