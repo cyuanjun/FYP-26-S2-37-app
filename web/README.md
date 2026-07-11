@@ -105,9 +105,12 @@ npm run verify
 This runs:
 
 ```bash
-npm run check:bce
-npm run build
+npm run check:bce   # BCE dependency rules
+npm run test        # Vitest controller unit tests (positive + negative)
+npm run build       # type-check + production build
 ```
+
+`npm run test` (Vitest) runs 25 positive/negative unit tests over the controllers with the gateways faked in-memory. See [../docs/web/test plan.md](../docs/web/test%20plan.md) for the case list.
 
 ## BCE Structure
 

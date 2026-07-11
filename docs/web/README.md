@@ -30,4 +30,4 @@ Use this folder to understand the repo status, architecture, database plan, test
 npm run verify
 ```
 
-This runs the BCE dependency check and the production build.
+This runs the BCE dependency check, the Vitest controller unit tests (25 positive/negative), and the production build.
