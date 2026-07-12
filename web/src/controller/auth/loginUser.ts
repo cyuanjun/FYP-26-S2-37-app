@@ -1,4 +1,4 @@
-import { authenticateUser, EMAIL_NOT_CONFIRMED } from "@/boundary/gateways/authGateway";
+import { authenticateUser, signOutMember, EMAIL_NOT_CONFIRMED } from "@/boundary/gateways/authGateway";
 import type { LoginForm, LoginViewResult } from "./loginModels";
 
 // (#) Thrown when the account exists but its email hasn't been verified yet.
@@ -33,6 +33,9 @@ export async function loginUser(form: LoginForm): Promise<LoginViewResult> {
   }
 
   if (user.status === "suspended") {
+    // (#) Sign-in already created a session; end it so a suspended user can't
+    // (#) reach the post-login pages by navigating there directly.
+    await signOutMember();
     throw new Error("This account is suspended.");
   }
 

@@ -6,6 +6,7 @@ import { loginUser, EmailNotConfirmedError } from "@/controller/auth/loginUser";
 // (#) rejection internally, and vi.fn's tracking would wrongly flag that as an error.
 const gw = vi.hoisted(() => ({
   calls: 0,
+  signOuts: 0,
   impl: (_input: unknown): Promise<unknown> => Promise.resolve(null),
 }));
 
@@ -14,6 +15,9 @@ vi.mock("@/boundary/gateways/authGateway", () => ({
   authenticateUser: (input: unknown) => {
     gw.calls += 1;
     return gw.impl(input);
+  },
+  signOutMember: async () => {
+    gw.signOuts += 1;
   },
 }));
 
@@ -38,6 +42,7 @@ function rejectsWith(message: string) {
 
 beforeEach(() => {
   gw.calls = 0;
+  gw.signOuts = 0;
   gw.impl = () => Promise.resolve(null);
 });
 
@@ -75,10 +80,11 @@ describe("loginUser", () => {
     expect(gw.calls).toBe(0);
   });
 
-  // (#) (-) Check if a suspended account is blocked from logging in.
-  it("blocks a suspended account", async () => {
+  // (#) (-) Check if a suspended account is blocked AND its session is signed out.
+  it("blocks a suspended account and signs it out", async () => {
     resolvesUser({ status: "suspended" });
     await expect(loginUser({ email: "free@x.com", password: "pw" })).rejects.toThrow(/suspended/i);
+    expect(gw.signOuts).toBe(1);
   });
 
   // (#) (-) Check if an unverified email surfaces EmailNotConfirmedError carrying the email.

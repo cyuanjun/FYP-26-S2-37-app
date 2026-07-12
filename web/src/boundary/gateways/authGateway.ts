@@ -182,6 +182,9 @@ export async function fetchSessionMember(): Promise<SessionMember | null> {
     .eq("id", user.id)
     .single();
   if (error || !profile) return null;
+  // (#) Treat a suspended account as signed-out, so the /download and /expert
+  // (#) guards bounce them even if a session lingers in the browser.
+  if ((profile.status ?? "active") === "suspended") return null;
   return {
     id: profile.id,
     first_name: profile.first_name ?? "Member",
