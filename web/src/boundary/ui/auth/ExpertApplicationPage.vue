@@ -1,12 +1,14 @@
 <script setup lang="ts">
 // (#) Expert sign-up page: collects account + profile + verification docs and submits the application for review.
 import { computed, onMounted, reactive, ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import {
   getExpertSpecialties,
   type ExpertSpecialtyOption,
 } from "@/controller/auth/getExpertSpecialties";
 import { registerExpert } from "@/controller/auth/registerExpert";
+
+const router = useRouter();
 
 // (#) All the fields for the whole application, bound to the form inputs.
 const form = reactive({
@@ -27,10 +29,12 @@ const form = reactive({
 
 // (#) Error message to show if the submit fails.
 const error = ref<string | null>(null);
-// (#) Success message returned once the application is accepted.
-const success = ref<string | null>(null);
 // (#) True while the request is in flight so we can disable the button.
 const submitting = ref(false);
+// (#) Shown after a successful submit: prompt to verify email before login/review.
+const showVerifyModal = ref(false);
+// (#) The email we just registered, echoed back in the modal.
+const registeredEmail = ref("");
 // (#) The specialty chips loaded from the backend.
 const specialtyOptions = ref<ExpertSpecialtyOption[]>([]);
 
@@ -87,17 +91,23 @@ onMounted(async () => {
 async function onSubmit() {
   if (submitting.value) return;
   error.value = null;
-  success.value = null;
   submitting.value = true;
 
   try {
-    const result = await registerExpert(form);
-    success.value = result.message;
+    await registerExpert(form);
+    registeredEmail.value = form.email.trim().toLowerCase();
+    showVerifyModal.value = true;
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e);
   } finally {
     submitting.value = false;
   }
+}
+
+// (#) Closes the modal and sends the applicant to the login page.
+function goToLogin() {
+  showVerifyModal.value = false;
+  router.push("/login");
 }
 </script>
 
@@ -259,7 +269,6 @@ async function onSubmit() {
         </ul>
 
         <p v-if="error" class="auth-message error">{{ error }}</p>
-        <p v-if="success" class="auth-message success">{{ success }}</p>
 
         <button type="submit" class="button primary auth-submit" :disabled="submitting">
           {{ submitting ? "Submitting..." : "Submit application" }}
@@ -272,9 +281,64 @@ async function onSubmit() {
       </div>
       </section>
     </div>
+
+    <!-- Verify-email popup shown after a successful application. -->
+    <div v-if="showVerifyModal" class="modal-backdrop" @click.self="goToLogin">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="expert-verify-title">
+        <div class="modal-icon" aria-hidden="true">✉️</div>
+        <h2 id="expert-verify-title" class="modal-title">Application submitted</h2>
+        <p class="modal-text">
+          We've sent a verification link to <strong>{{ registeredEmail }}</strong>.
+          Verify your email, then our team reviews your application. You can log in
+          once your email is verified.
+        </p>
+        <button type="button" class="button primary modal-button" @click="goToLogin">
+          Go to login
+        </button>
+      </div>
+    </div>
   </main>
 </template>
 
 <style scoped>
 @import "./auth.css";
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 17, 24, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 32px 28px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(15, 17, 24, 0.25);
+}
+.modal-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+.modal-title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111318;
+}
+.modal-text {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+.modal-button {
+  width: 100%;
+}
 </style>

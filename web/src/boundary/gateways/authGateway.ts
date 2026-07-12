@@ -91,7 +91,8 @@ export async function createExpertApplication(
   await uploadVerificationDocuments(data.user.id, input);
 
   await supabase.auth.signOut();
-  return { id: data.user.id, role: "expert", status: "pending" };
+  // (#) Role stays 'free' until an admin approves; the application is pending.
+  return { id: data.user.id, role: "free", status: "pending" };
 }
 
 // (#) Uploads each verification file to the expert-docs storage bucket, then
