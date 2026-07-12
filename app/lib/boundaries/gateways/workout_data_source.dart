@@ -99,9 +99,13 @@ class PhoneSensorSource implements WorkoutDataSource {
   }
 
   // (#) Pushes the current distance, steps, and elevation out on the stream.
-  void _emit() => _controller.add(
-        LiveMetrics(distanceMeters: _distance, steps: _steps, lastElevation: _last?.altitude),
-      );
+  // (#) Guards isClosed: a GPS fix can still land after stop() closed the stream.
+  void _emit() {
+    if (_controller.isClosed) return;
+    _controller.add(
+      LiveMetrics(distanceMeters: _distance, steps: _steps, lastElevation: _last?.altitude),
+    );
+  }
 
   // (#) Stops the GPS and step listeners and closes the stream.
   @override
