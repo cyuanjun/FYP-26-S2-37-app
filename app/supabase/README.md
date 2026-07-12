@@ -77,8 +77,9 @@ These are the deliberate translations from the PascalCase ERD to the physical sc
 
 - **Owner-scoped** private data: `fitness_profiles`, `fitness_goals`, `fitness_plans`, `planned_workouts`,
   `workout_sessions`, `exercise_logs`, `connected_devices`, `subscriptions`.
-- **`workout_sessions.notes` is always private.** The base table is owner-only; everyone else reads the
-  `public_workout_sessions` view, which omits `notes`. That enforces the documented invariant at the DB layer.
+- **`workout_sessions.notes` and `track_points` are owner-only.** The base table is owner-only; everyone else
+  reads the `public_workout_sessions` view, which omits `notes` (the documented always-private invariant) and
+  `track_points` (raw GPS breadcrumbs — dropped 14 Jul so location isn't exposed platform-wide). Enforced at the DB layer.
 - **`public_profiles` view** exposes safe identity columns + computed `level` / `current_streak` (for Social
   #11.2) while keeping `email` and `notification_prefs` off-limits. Base `profiles` is self/admin only.
 - **Reads** for the social graph and marketplace: `posts`, `post_likes`, `post_comments`,
