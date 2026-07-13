@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../boundaries/gateways/ble_heart_rate_source.dart';
 import '../boundaries/gateways/device_gateway.dart';
 import '../core/seq_log.dart';
 import '../entities/connected_device.dart';
@@ -89,6 +90,9 @@ class ManageConnectedDevice {
     await _ref.read(deviceGatewayProvider).touchLastSynced(deviceId);
     _ref.invalidate(connectedDevicesProvider);
   }
+
+  // (#) Runs a real BLE scan for nearby heart-rate devices (empty without Bluetooth).
+  Future<List<ScannedBleDevice>> scanForDevices() => scanForHeartRateDevices();
 }
 
 // (#) Hands the devices screen the ManageConnectedDevice control.

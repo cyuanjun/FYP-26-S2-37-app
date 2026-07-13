@@ -93,18 +93,18 @@ class ConnectedDevicesScreen extends ConsumerWidget {
 
 // (#) The bottom sheet that appears while pairing: shows a scanning spinner,
 // then the list of devices to pick from.
-class _ScanSheet extends StatefulWidget {
+class _ScanSheet extends ConsumerStatefulWidget {
   const _ScanSheet({required this.discoverable});
 
   final List<(DeviceType, String)> discoverable; // (#) the demo devices to always offer
 
   // (#) Makes the state that tracks the scan progress and nearby finds.
   @override
-  State<_ScanSheet> createState() => _ScanSheetState();
+  ConsumerState<_ScanSheet> createState() => _ScanSheetState();
 }
 
 // (#) Holds the sheet's state: whether we're still scanning and any real devices found.
-class _ScanSheetState extends State<_ScanSheet> {
+class _ScanSheetState extends ConsumerState<_ScanSheet> {
   bool _scanning = true; // (#) true while the spinner shows
   List<ScannedBleDevice> _nearby = const []; // (#) real Bluetooth devices the scan turned up
 
@@ -113,7 +113,7 @@ class _ScanSheetState extends State<_ScanSheet> {
   void initState() {
     super.initState();
     // Real scan (returns [] without Bluetooth); the spinner covers it.
-    scanForHeartRateDevices().then((found) {
+    ref.read(manageConnectedDeviceProvider).scanForDevices().then((found) {
       if (mounted) setState(() => _nearby = found);
     });
     Future.delayed(const Duration(milliseconds: 1400), () {

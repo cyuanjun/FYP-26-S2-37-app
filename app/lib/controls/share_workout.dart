@@ -41,6 +41,12 @@ class ShareWorkoutToSocial {
     SeqLog.msg('share-workout', 'WorkoutSummaryScreen', 'ShareWorkoutToSocial', 'shareTo(${platform.name})');
     return _ref.read(socialShareGatewayProvider).shareTo(platform, text: text);
   }
+
+  // (#) Shares a challenge invite code out through the system share sheet.
+  Future<void> shareInvite(String text) {
+    SeqLog.msg('share-workout', 'InviteCodeDialog', 'ShareWorkoutToSocial', 'shareInvite');
+    return _ref.read(socialShareGatewayProvider).shareInvite(text);
+  }
 }
 
 // (#) Hands the summary screen the ShareWorkoutToSocial control.

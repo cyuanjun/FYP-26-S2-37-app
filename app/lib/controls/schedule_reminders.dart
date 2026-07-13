@@ -213,6 +213,10 @@ class SyncReminders {
         'pending=${await gateway.pendingCount()}');
     _ref.read(scheduledRemindersProvider.notifier).set(plan);
   }
+
+  // (#) Asks the OS for notification permission, through the gateway.
+  Future<void> requestPermission() =>
+      _ref.read(notificationGatewayProvider).requestPermission();
 }
 
 // (#) Provider the shell and #13.4 toggles use to trigger a re-sync.

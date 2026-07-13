@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../boundaries/gateways/notification_gateway.dart';
 import '../../../controls/authenticate.dart';
 import '../../../controls/schedule_reminders.dart';
 import '../../../core/theme/app_colors.dart';
@@ -41,7 +40,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Future<void> _syncReminders() async {
     if (_remindersSynced) return;
     _remindersSynced = true;
-    await ref.read(notificationGatewayProvider).requestPermission();
+    await ref.read(syncRemindersProvider).requestPermission();
     await ref.read(syncRemindersProvider).call();
   }
 

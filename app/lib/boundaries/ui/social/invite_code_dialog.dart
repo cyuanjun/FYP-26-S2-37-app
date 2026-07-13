@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../gateways/social_share_gateway.dart';
+import '../../../controls/share_workout.dart';
 
 // (#) Popup that shows a shareable invite code. You can copy it to the clipboard
 // (#) or hit Share, which pushes the text out through the share gateway. Opened
@@ -51,7 +51,7 @@ Future<void> showInviteCodeDialog(
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () {
-              ref.read(socialShareGatewayProvider).shareInvite(shareText);
+              ref.read(shareWorkoutToSocialProvider).shareInvite(shareText);
               Navigator.of(ctx).pop();
             },
             icon: const Icon(Icons.ios_share_rounded, size: 18),
