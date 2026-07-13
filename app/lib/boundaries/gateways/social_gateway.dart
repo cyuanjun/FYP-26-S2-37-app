@@ -315,10 +315,6 @@ class SocialGateway {
     final row = await _client.from('posts').insert(payload).select('id').single();
     return row['id'] as String;
   }
-
-  // (#) Deletes a post by id.
-  Future<void> deletePost(String postId) =>
-      _client.from('posts').delete().eq('id', postId);
 }
 
 // (#) Riverpod provider handing out the social gateway on the live client.

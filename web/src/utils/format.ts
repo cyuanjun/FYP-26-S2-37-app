@@ -33,8 +33,3 @@ export function formatPrice(value: string): string {
   if (price.startsWith("$")) return price;
   return `$${price}`;
 }
-
-export function ratingScore(value: string | number): number {
-  const raw = typeof value === "number" ? value : parseFloat(String(value).replace("/5", ""));
-  return Math.round(raw || 0);
-}

@@ -52,9 +52,4 @@ class Validators {
   static String? weightKgError(num? v) => validWeightKg(v)
       ? null
       : 'Enter a weight between ${minWeightKg.toInt()}–${maxWeightKg.toInt()} kg';
-
-  // (#) Gives the inline error text for bad coaching years, or null when it is fine.
-  static String? yearsCoachingError(num? v) => validYearsCoaching(v)
-      ? null
-      : 'Enter years between $minYearsCoaching–$maxYearsCoaching';
 }

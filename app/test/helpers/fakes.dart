@@ -237,7 +237,6 @@ class FakeSocialGateway implements SocialGateway {
       sharePostIds[sessionId];
 
   final createdPosts = <Map<String, String?>>[];
-  final deletedIds = <String>[];
 
   /// Canned feed rows returned by [fetchFeed] / [fetchFeedPost].
   var feed = <FeedPost>[];
@@ -441,9 +440,6 @@ class FakeSocialGateway implements SocialGateway {
     createdPosts.add({'userId': userId, 'sessionId': workoutSessionId, 'body': body});
     return 'post-${createdPosts.length}';
   }
-
-  @override
-  Future<void> deletePost(String postId) async => deletedIds.add(postId);
 }
 
 /// Fake SocialShareGateway — records platform + text passed to the OS share.
