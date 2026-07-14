@@ -118,17 +118,20 @@ npm run build       # type-check + production build
 src/
   boundary/
     ui/          Vue components that users interact with
-    gateways/    seed data now, future DB/API/Supabase access
+    gateways/    live Supabase reads/writes with seed fallback
 
-  controller/    use-case coordination and validation
-
-  entity/        domain concepts
+  controller/    use-case coordination + validation + view-models
 ```
+
+The marketing/admin site is thin CRUD with no domain rules, so the Entity role
+collapses into the controller's view-models (the shaped types components consume);
+there is no separate `entity/` folder. The app (`app/lib/entities/`) keeps a real
+Entity layer because it has genuine domain logic (XP, streak, training effect).
 
 Main rule:
 
 ```text
-User -> boundary UI -> controller -> gateway/entity
+User -> boundary UI -> controller -> gateway
 ```
 
 The code enforces this with:
