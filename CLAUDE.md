@@ -6,7 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Wise Workout** (FYP-26-S2-37) — a cross-platform (Android + iOS) mobile fitness app, the Final Year Project of a 4-person team at UOW/SIM. Think Strava-style: capture workouts from phone sensors (wearables later), AI-generated training plans, analytics, a social feed with challenges, an expert marketplace, and Free/Premium/Expert/Admin roles.
 
-**Current state: the Flutter app is FEATURE-COMPLETE and running** (Android emulator + iOS simulator) against a live Supabase backend — vertical slice, onboarding, AI plans (live OpenAI), the full Profile cluster (incl. avatar upload), the **Social cluster** (feed + likes/comments, mutual friends + user profiles, challenges with live leaderboards), the **Experts marketplace** (#6 browse → request → deliverable → review, simulated payment) **plus the complete #20–#24 expert portal**, the **premium upgrade flow** (#16 + #13.6, live role flip), **notifications** (rule-based reminders US19–21), History search, #12.2 Advanced Analytics, per-session Training Effect, and real BLE heart-rate capture behind the pairing flow; **244 tests**. (US13 manual workout entry was built then **descoped/removed** — a free-text entry let users farm XP/level/streak with no sensor evidence; all progress now requires a captured session.) The **marketing website lives in `web/`** (Vue 3 + Vite + TS, BCE folders `src/boundary|controller` — the Entity role collapses into the controller's view-models since the site is thin CRUD with no domain rules, so there's no `src/entity/`; `check:bce` still enforces the layering, seed-backed gateways; US01–US06 built — **shares the app's Supabase DB** (live reads via `landing_*` functions/tables + real Auth signup/login; seed JSON = offline fallback; migration `20260711090000_landing_site.sql`); **DEPLOYED on Vercel** at [fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app) (git-linked to the repo, root dir `web/`, auto-deploys on push to `main`; config in `web/vercel.json`); run `npm install && npm run dev` from `web/`, `npm run verify` = check-bce + Vitest controller tests (25 positive/negative) + build). The **web auth flow is complete**: register (with a verify-email popup + password toggle) → Supabase email confirmation → login (which prompts to verify + resend if unconfirmed) → a **persistent session** (members like admins) that lands on `/download` (members) or `/expert` (experts/applicants: approval status, download once approved); the landing + post-login pages share one auth-aware header (profile avatar + **Download** button + logout replacing login/register). Hosted caveats: Supabase **Site URL / Redirect URLs** must include the Vercel domain for confirmation links to resolve, and the free-plan mailer has a low email rate limit — both in [docs/web/limitations.md](docs/web/limitations.md). A **local Supabase stack** exists (`cd app && supabase start`, ports 55321-9; target it with `--dart-define`s) — new backend work is tested locally first. `docs/` holds the planning/design/reference material; **[docs/STATUS.md](docs/STATUS.md) is the up-to-date state**. The design decisions below are **already made** — implement to them; don't reopen them without being asked.
+**Two shipping products on one backend:**
+
+- **`app/`** — the Flutter app (Android + iOS) plus `app/supabase/` (migrations, Edge Functions, seeds). Feature-complete and demoable against the hosted Supabase project; a local stack mirrors it for backend work.
+- **`web/`** — the marketing website **and the admin portal** (Vue 3 + Vite + TS), on the **same Supabase database** as the app (live reads via `landing_*` functions/tables + real Auth; bundled seed JSON is the offline fallback). BCE folders are `src/boundary|controller` — the Entity role collapses into the controller's view-models since the site is thin CRUD with no domain rules, so there is deliberately **no `src/entity/`**; `check:bce` still enforces the layering. **Deployed on Vercel** at [fyp-26-s2-37-wiseworkout.vercel.app](https://fyp-26-s2-37-wiseworkout.vercel.app) — git-linked, root dir `web/`, **every push to `main` auto-deploys**.
+- **`docs/`** — planning/design/reference material and deliverable tooling.
+
+Hosted-web caveats (Supabase **Site URL / Redirect URLs** must list the Vercel domain or email-confirmation links break; the free-plan mailer rate-limits confirmation emails) are in [docs/web/limitations.md](docs/web/limitations.md).
+
+**Current state lives in [docs/STATUS.md](docs/STATUS.md), not here** — read it first when resuming. Keep test counts, story tallies, dates, and "what's built / what's left" in that one file so they can't drift out of sync; this file is for decisions and conventions that outlive a sprint. Those decisions are **already made** — implement to them; don't reopen them without being asked.
 
 ## Where the knowledge lives
 
@@ -73,16 +81,40 @@ Optimise for **rubric coverage**, build **core-first** (PRD §10.3 sprints + ris
 
 ## Commands
 
-Standard Flutter project — **run everything from `app/`**:
+**App (Flutter) — run everything from `app/`:**
 
 ```bash
 cd app
 flutter pub get                          # install dependencies
 dart run build_runner build --delete-conflicting-outputs   # codegen for freezed / json_serializable
-flutter run                              # run on a connected device/emulator
-flutter test                             # run all tests
-flutter test test/path/to/foo_test.dart # run a single test file
-flutter analyze                          # lint / static analysis
+flutter run                              # run on a connected device/emulator (ids: flutter devices)
+flutter test                             # run all tests — must be fully green
+flutter test test/path/to/foo_test.dart  # run a single test file
+flutter test --plain-name "substring"    # run a single test by name
+flutter analyze                          # lint / static analysis — must be "No issues found!"
 ```
+
+Re-run `build_runner` after ANY edit to a freezed/json_serializable entity — stale `*.freezed.dart` / `*.g.dart` fail the build in confusing ways. Default backend is hosted Supabase (publishable key in `lib/core/config/env.dart`); target the local stack with `--dart-define=SUPABASE_URL=http://127.0.0.1:55321 --dart-define=SUPABASE_ANON_KEY=<key printed by supabase start>`.
+
+**Website + admin portal (Vue) — run from `web/`:**
+
+```bash
+cd web
+npm install && npm run dev               # dev server
+npm run verify                           # check:bce → vitest → typed build — the gate before pushing
+npm run check:bce                        # BCE layering check (scripts/check-bce.mjs) — ui → controller → gateways only
+npm test -- test/auth/register.test.ts   # single test file
+```
+
+Pushing to `main` auto-deploys `web/` to Vercel — `npm run verify` green *before* pushing, or the live site breaks.
+
+**Backend (Supabase) — from `app/`:**
+
+```bash
+supabase start        # local stack (Docker; ports 55321-9)
+supabase db reset     # replay migrations/ in order, then seed.sql
+```
+
+Hosted changes go through the Supabase MCP (`project_ref` in `.mcp.json`), not `db push` — remote migration versions intentionally differ from the local history (see [app/supabase/README.md](app/supabase/README.md)). Write the migration file in `app/supabase/migrations/` *and* apply it to hosted so the two stay in sync, and test locally first.
 
 The docs are plain Markdown with relative cross-links; `docs/app/reference/` was moved as a unit so its internal links resolve. A few `docs/archive/` files cite mock source paths (`../app/...`, `../CLAUDE.md`) that intentionally don't resolve here — they're provenance references to the separate React mock.

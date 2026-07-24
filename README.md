@@ -8,9 +8,9 @@ analytics, social sharing, an expert marketplace, and Free/Premium/Expert/Admin 
 architecture · **Supabase** (Postgres + Auth + RLS + Edge Functions) · **OpenAI** `gpt-4o-mini`
 (Gemini → rule-based fallback) for the two AI surfaces (progress summaries, plan generation).
 
-## Current state (11 Jul 2026) — app feature-complete
+## Current state — app feature-complete (details + dates: [docs/STATUS.md](docs/STATUS.md))
 
-Built, tested (244 tests), and verified on the Android emulator + iOS simulator against a live
+Built, tested, and verified on the Android emulator + iOS simulator against a live
 backend: login → onboarding wizard → AI-generated training plan → phone-GPS capture with
 wearable heart rate (simulated **and real BLE**) → history + analytics (Premium
 search, per-session **Training Effect**, **#12.2 Advanced Analytics** with ACWR/HR zones/bests)
@@ -43,7 +43,7 @@ dart run build_runner build          # freezed / json_serializable codegen
 flutter run -d <device>              # device ids from `flutter devices`
 
 flutter analyze                      # should report "No issues found!"
-flutter test                         # 244 tests, all green
+flutter test                         # full suite — all green
 ```
 
 The app connects to the hosted Supabase project out of the box (publishable key in
@@ -60,7 +60,7 @@ app/                         everything needed to run the product
     boundaries/ui/           BOUNDARY — screens (actor-facing); ui/common/ = shared widget
                              library (StatTile · AppCard · StatusBadge · PremiumCta · SelectorPills · FieldLabel)
     boundaries/gateways/     BOUNDARY — Supabase / sensor / AI / share adapters (system-facing)
-  test/                      244 entity/control/gateway/widget tests
+  test/                      entity / control / gateway / widget tests
   supabase/                  backend: migrations · Edge Functions · seeds   (see app/supabase/README.md)
 web/                         marketing website (Vue 3 + Vite + TS, BCE: src/boundary|controller|entity)
   database/migrations/       draft shared-DB add-ons (not applied)
